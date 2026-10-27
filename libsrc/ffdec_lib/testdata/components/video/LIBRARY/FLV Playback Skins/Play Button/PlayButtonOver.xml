@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Play Button/PlayButtonOver" itemID="427077a3-00000339" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="PlayButtonOver" linkageClassName="PlayButtonOver" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Play Button/PlayButtonOver" sourceLastModified="1157562312" lastModified="1157562312" lastUniqueIdentifier="6" sourceItemID="427077a3-00000339">
+  <timeline>
+    <DOMTimeline name="PlayButtonOver">
+      <layers>
+        <DOMLayer name="Icon" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Play Button/Assets/PlayIcon">
+                  <matrix>
+                    <Matrix tx="8" ty="9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="4.5" y="2.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Button" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/_SquareButton/SquareBgOver" name="button_mc">
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

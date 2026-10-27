@@ -1,0 +1,32 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ScrollPaneSkins/ScrollPane_upSkin" itemID="450aff20-00000493" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="ScrollPane_upSkin" scaleGridLeft="4" scaleGridRight="267.95" scaleGridTop="22.05" scaleGridBottom="183" lastModified="1168290344" lastUniqueIdentifier="6">
+  <timeline>
+    <DOMTimeline name="ScrollPane_upSkin">
+      <layers>
+        <DOMLayer name="skin" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/Shared/panelBackground_Shadow">
+                  <matrix>
+                    <Matrix tx="-3" ty="-1"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <filters>
+                    <DropShadowFilter alpha="0.6" angle="90" blurX="3" blurY="3" distance="2" hideObject="true" knockout="true" quality="2"/>
+                  </filters>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/Shared/panelBackground_Base">
+                  <transformationPoint>
+                    <Point x="136" y="95.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

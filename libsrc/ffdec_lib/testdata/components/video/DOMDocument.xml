@@ -1,0 +1,2005 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <folders>
+          <DOMFolderItem name=" FLV Playback Skins" itemID="4295fba7-00000752"/>
+          <DOMFolderItem name=" FLV Playback Skins/_SquareButton" itemID="42702128-00000118"/>
+          <DOMFolderItem name=" FLV Playback Skins/Buffering Bar" itemID="42929821-0000093a"/>
+          <DOMFolderItem name=" FLV Playback Skins/Caption Button" itemID="455b7d37-00000854"/>
+          <DOMFolderItem name=" FLV Playback Skins/Caption Button/Assets" itemID="455b7b1c-0000038b"/>
+          <DOMFolderItem name=" FLV Playback Skins/Forward and Back Buttons" itemID="42710846-0000008a"/>
+          <DOMFolderItem name=" FLV Playback Skins/Forward and Back Buttons/Back Button" itemID="42710852-0000008f"/>
+          <DOMFolderItem name=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets" itemID="4270309a-000002df"/>
+          <DOMFolderItem name=" FLV Playback Skins/Forward and Back Buttons/Forward Button" itemID="42710854-00000090"/>
+          <DOMFolderItem name=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets" itemID="427030f2-000002ea"/>
+          <DOMFolderItem name=" FLV Playback Skins/FullScreen Button" itemID="455b7b49-000003b5"/>
+          <DOMFolderItem name=" FLV Playback Skins/FullScreen Button/Assets" itemID="455b7d56-0000086f"/>
+          <DOMFolderItem name=" FLV Playback Skins/Mute Button" itemID="42710848-0000008b"/>
+          <DOMFolderItem name=" FLV Playback Skins/Mute Button/Assets" itemID="427073c1-00000068"/>
+          <DOMFolderItem name=" FLV Playback Skins/Pause Button" itemID="4271084d-0000008d"/>
+          <DOMFolderItem name=" FLV Playback Skins/Pause Button/Assets" itemID="42707819-0000041f"/>
+          <DOMFolderItem name=" FLV Playback Skins/Play Button" itemID="4271084b-0000008c"/>
+          <DOMFolderItem name=" FLV Playback Skins/Play Button/Assets" itemID="42707703-00000333"/>
+          <DOMFolderItem name=" FLV Playback Skins/Seek Bar" itemID="429236f6-00000091"/>
+          <DOMFolderItem name=" FLV Playback Skins/Stop Button" itemID="4271084f-0000008e"/>
+          <DOMFolderItem name=" FLV Playback Skins/Stop Button/Assets" itemID="42707942-00000658"/>
+          <DOMFolderItem name=" FLV Playback Skins/Volume Bar" itemID="4292371e-00000094"/>
+          <DOMFolderItem name="Component Assets" itemID="44e488a0-000016d6"/>
+          <DOMFolderItem name="Component Assets/_private" itemID="4573a4bc-000003c6"/>
+          <DOMFolderItem name="Component Assets/CellRendererSkins" itemID="44d7baa5-000000e7"/>
+          <DOMFolderItem name="Component Assets/ComboBoxSkins" itemID="44f73b7c-0000018e"/>
+          <DOMFolderItem name="Component Assets/ListSkins" itemID="44e5f6f9-00000039"/>
+          <DOMFolderItem name="Component Assets/ScrollBarSkins" itemID="44ea2edf-000000a6"/>
+          <DOMFolderItem name="Component Assets/Shared" itemID="44f892ff-0000001e"/>
+          <DOMFolderItem name="Component Assets/TextInputSkins" itemID="44c91d04-00000282"/>
+     </folders>
+     <media>
+          <DOMCompiledClipItem name="Component Assets/_private/ComponentShim" itemID="4d08cfa8-000001ee" linkageExportForAS="true" linkageClassName="fl.core.ComponentShim" sourceLastImported="1292423080" displayAsComponent="false" customIconID="0" actionscriptClass="fl.core.ComponentShim" swfScmHRef="kbx0udh422.swf" swfScmSourceFilename="C:\Users\jkamerer\AppData\Local\Adobe\Flash CS5.5\en_US\Configuration\TMPkavphdh40p..swf" persistLivePreview11="true" livePreview11ScmHRef="kbx0udh4221.swf" livePreview11ScmSourceFilename="C:\Users\jkamerer\AppData\Local\Adobe\Flash CS5.5\en_US\Configuration\TMPkavphdh40p..swf" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true" swcPath="Component Assets/_private/ComponentShim.xml" rootSymbolLinkageID="fl.core.ComponentShim" playerVersion="9" actionscriptVersion="3" hashKey="k718tUOF1.A1OSpQnqdJJ0">
+               <classProperties><![CDATA[<component id="fl/core/ComponentShim" class="fl.core.ComponentShim" modified="1292423059130">
+<movieBounds xmin="0" xmax="0" ymin="0" ymax="0" />
+<classDefs>
+	<classDef id="fl.core.AccessibilityShim"/>
+	<classDef id="fl.controls.CheckBox"/>
+	<classDef id="fl.controls.LabelButton"/>
+	<classDef id="fl.controls.List"/>
+	<classDef id="fl.controls.ComboBox"/>
+	<classDef id="fl.controls.ProgressBarDirection"/>
+	<classDef id="fl.data.SimpleCollectionItem"/>
+	<classDef id="fl.controls.TextArea"/>
+	<classDef id="fl.display.ProLoaderInfo"/>
+	<classDef id="fl.controls.Slider"/>
+	<classDef id="fl.events.DataChangeEvent"/>
+	<classDef id="fl.accessibility.ComboBoxAccImpl"/>
+	<classDef id="fl.events.DataChangeType"/>
+	<classDef id="fl.accessibility.TileListAccImpl"/>
+	<classDef id="fl.accessibility.ButtonAccImpl"/>
+	<classDef id="fl.controls.BaseButton"/>
+	<classDef id="fl.core.UIComponent"/>
+	<classDef id="fl.controls.DataGrid"/>
+	<classDef id="fl.display.ProLoader"/>
+	<classDef id="fl.containers.BaseScrollPane"/>
+	<classDef id="fl.livepreview.LivePreviewParent"/>
+	<classDef id="fl.controls.Label"/>
+	<classDef id="fl.managers.IFocusManagerComponent"/>
+	<classDef id="fl.controls.UIScrollBar"/>
+	<classDef id="fl.controls.listClasses.ICellRenderer"/>
+	<classDef id="fl.controls.ColorPicker"/>
+	<classDef id="fl.controls.dataGridClasses.DataGridCellEditor"/>
+	<classDef id="fl.managers.FocusManager"/>
+	<classDef id="fl.events.ProLoaderRSLPreloaderSandboxEvent"/>
+	<classDef id="fl.events.DataGridEventReason"/>
+	<classDef id="fl.events.SliderEvent"/>
+	<classDef id="fl.events.SliderEventClickTarget"/>
+	<classDef id="fl.controls.progressBarClasses.IndeterminateBar"/>
+	<classDef id="fl.controls.listClasses.ListData"/>
+	<classDef id="fl.core.InvalidationType"/>
+	<classDef id="fl.controls.NumericStepper"/>
+	<classDef id="fl.controls.RadioButtonGroup"/>
+	<classDef id="fl.accessibility.LabelButtonAccImpl"/>
+	<classDef id="fl.containers.UILoader"/>
+	<classDef id="fl.events.ColorPickerEvent"/>
+	<classDef id="fl.controls.ButtonLabelPlacement"/>
+	<classDef id="fl.accessibility.CheckBoxAccImpl"/>
+	<classDef id="fl.controls.TileList"/>
+	<classDef id="fl.managers.StyleManager"/>
+	<classDef id="fl.controls.RadioButton"/>
+	<classDef id="fl.containers.ScrollPane"/>
+	<classDef id="fl.controls.listClasses.TileListData"/>
+	<classDef id="fl.events.InteractionInputType"/>
+	<classDef id="fl.controls.Button"/>
+	<classDef id="fl.core.ComponentShim"/>
+	<classDef id="fl.accessibility.UIComponentAccImpl"/>
+	<classDef id="fl.controls.SelectableList"/>
+	<classDef id="fl.events.ComponentEvent"/>
+	<classDef id="fl.accessibility.RadioButtonAccImpl"/>
+	<classDef id="fl.controls.listClasses.CellRenderer"/>
+	<classDef id="fl.managers.IFocusManagerGroup"/>
+	<classDef id="fl.controls.ScrollPolicy"/>
+	<classDef id="fl.controls.ProgressBar"/>
+	<classDef id="fl.controls.ScrollBar"/>
+	<classDef id="fl.controls.listClasses.ImageCell"/>
+	<classDef id="fl.managers.IFocusManager"/>
+	<classDef id="fl.controls.ProgressBarMode"/>
+	<classDef id="fl.accessibility.SelectableListAccImpl"/>
+	<classDef id="fl.controls.TextInput"/>
+	<classDef id="fl.events.ListEvent"/>
+	<classDef id="fl.accessibility.AccImpl"/>
+	<classDef id="fl.accessibility.DataGridAccImpl"/>
+	<classDef id="fl.events.ScrollEvent"/>
+	<classDef id="fl.controls.dataGridClasses.DataGridColumn"/>
+	<classDef id="fl.events.DataGridEvent"/>
+	<classDef id="fl.data.TileListCollectionItem"/>
+	<classDef id="fl.data.DataProvider"/>
+	<classDef id="fl.accessibility.ListAccImpl"/>
+	<classDef id="fl.controls.dataGridClasses.HeaderRenderer"/>
+	<classDef id="fl.controls.ScrollBarDirection"/>
+	<classDef id="fl.controls.SliderDirection"/>
+</classDefs>
+<class id="fl.core.ComponentShim" >
+	<method id="ComponentShim" isConstructor="true" isProperty="false">
+	</method>
+</class></component>
+]]></classProperties>
+               <customIcon>
+                    <CustomIcon rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="360" frameBottom="360" isTransparent="true" href="kbx0udh4222.dat"/>
+               </customIcon>
+               <SwcItem name="fl.core.ComponentShim" version="1292423059" isTopLevel="true"/>
+          </DOMCompiledClipItem>
+          <DOMCompiledClipItem name="FlexComponentBase" itemID="67829673-00000032" linkageExportForAS="true" linkageClassName="mx.flash.FlexContentHolder" sourceLastImported="1262819207" customIconID="0" actionscriptClass="mx.flash.FlexContentHolder" swfScmHRef="7en0onm5je.swf" swfScmSourceFilename="C:\Users\MyUser\AppData\Local\Adobe\Flash CS6\en_US\Configuration\TMP7en0onm5je..swf" persistLivePreview11="true" livePreview11ScmHRef="7en0onm5je12.swf" livePreview11ScmSourceFilename="C:\Users\MyUser\AppData\Local\Adobe\Flash CS6\en_US\Configuration\TMP7en0onm5je..swf" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true" swcPath="FlexComponentBase.xml" rootSymbolLinkageID="mx.flash.FlexContentHolder" movieRectRight="10000" movieRectBottom="7500" playerVersion="9" actionscriptVersion="3" hashKey="W4/s/RUftagZay/5v/0450">
+               <parametersAsXML><![CDATA[   <property id="baseline">
+      <Inspectable name="baseline" variable="baseline" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="bottom">
+      <Inspectable name="bottom" variable="bottom" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="boundingBoxName">
+      <Inspectable name="boundingBoxName" variable="boundingBoxName" category="" verbose="0" defaultValue="" type="String"/>
+   </property>
+   <property id="hasFocusableChildren">
+      <Inspectable name="hasFocusableChildren" variable="hasFocusableChildren" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="horizontalCenter">
+      <Inspectable name="horizontalCenter" variable="horizontalCenter" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="left">
+      <Inspectable name="left" variable="left" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="right">
+      <Inspectable name="right" variable="right" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="tabFocusEnabled">
+      <Inspectable name="tabFocusEnabled" variable="tabFocusEnabled" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="top">
+      <Inspectable name="top" variable="top" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="verticalCenter">
+      <Inspectable name="verticalCenter" variable="verticalCenter" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="autoUpdateCurrentState">
+      <Inspectable name="autoUpdateCurrentState" variable="autoUpdateCurrentState" category="General" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="autoUpdateMeasuredSize">
+      <Inspectable name="autoUpdateMeasuredSize" variable="autoUpdateMeasuredSize" category="General" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="scaleContentWhenResized">
+      <Inspectable name="scaleContentWhenResized" variable="scaleContentWhenResized" category="General" verbose="0" defaultValue="false" enumeration="false,true" type="List"/>
+   </property>
+   <property id="x">
+      <Inspectable name="x" variable="x" category="General" verbose="0" defaultValue="0" type="Number"/>
+   </property>
+   <property id="y">
+      <Inspectable name="y" variable="y" category="General" verbose="0" defaultValue="0" type="Number"/>
+   </property>
+   <property id="scaleX">
+      <Inspectable name="scaleX" variable="scaleX" category="Size" verbose="0" defaultValue="1.0" type="Number"/>
+   </property>
+   <property id="scaleY">
+      <Inspectable name="scaleY" variable="scaleY" category="Size" verbose="0" defaultValue="1.0" type="Number"/>
+   </property>
+   <property id="scaleZ">
+      <Inspectable name="scaleZ" variable="scaleZ" category="Size" verbose="0" defaultValue="1.0" type="Number"/>
+   </property>
+]]></parametersAsXML>
+               <classProperties><![CDATA[<component id="mx/flash/FlexContentHolder" class="mx.flash.FlexContentHolder" modified="1262819207886">
+<movieBounds xmin="0" xmax="10000" ymin="0" ymax="7500" />
+<classDefs>
+	<classDef id="mx.geom.Transform"/>
+	<classDef id="mx.core.AdvancedLayoutFeatures"/>
+	<classDef id="mx.resources.ResourceManagerImpl"/>
+	<classDef id="ResourceManagerImpl.as$130.ResourceModuleInfo"/>
+	<classDef id="ResourceManagerImpl.as$130.ResourceEventDispatcher"/>
+	<classDef id="mx.core.IChildList"/>
+	<classDef id="mx.geom.CompoundTransform"/>
+	<classDef id="mx.managers.IFocusManagerComponent"/>
+	<classDef id="mx.events.ResourceEvent"/>
+	<classDef id="mx.core.LayoutElementUIComponentUtils"/>
+	<classDef id="mx.core.IFlexModule"/>
+	<classDef id="mx.modules.IModuleInfo"/>
+	<classDef id="mx.events.Request"/>
+	<classDef id="mx.events.ToolTipEvent"/>
+	<classDef id="mx.modules.ModuleManagerGlobals"/>
+	<classDef id="mx.resources.ResourceManager"/>
+	<classDef id="mx.flash.ContainerMovieClip"/>
+	<classDef id="mx.events.MoveEvent"/>
+	<classDef id="mx.modules.ModuleManager"/>
+	<classDef id="ModuleManager.as$140.ModuleManagerImpl"/>
+	<classDef id="ModuleManager.as$140.ModuleInfo"/>
+	<classDef id="ModuleManager.as$140.FactoryInfo"/>
+	<classDef id="ModuleManager.as$140.ModuleInfoProxy"/>
+	<classDef id="mx.resources.IResourceModule"/>
+	<classDef id="_472d13db055d1131b047fac436bf2f3b7d76e737da2d1e445956f4e1c3a74d7d_flash_display_Sprite"/>
+	<classDef id="mx.events.PropertyChangeEventKind"/>
+	<classDef id="mx.events.StateChangeEvent"/>
+	<classDef id="mx.core.IStateClient"/>
+	<classDef id="mx.events.DragEvent"/>
+	<classDef id="mx.events.PropertyChangeEvent"/>
+	<classDef id="mx.utils.StringUtil"/>
+	<classDef id="mx.resources.IResourceBundle"/>
+	<classDef id="mx.core.IFlexDisplayObject"/>
+	<classDef id="mx.core.FlexVersion"/>
+	<classDef id="mx.core.IConstraintClient"/>
+	<classDef id="mx.managers.SystemManagerGlobals"/>
+	<classDef id="mx.core.IUIComponent"/>
+	<classDef id="mx.resources.LocaleSorter"/>
+	<classDef id="LocaleSorter.as$133.LocaleID"/>
+	<classDef id="LocaleSorter.as$133.LocaleRegistry"/>
+	<classDef id="mx.flash.UIMovieClip"/>
+	<classDef id="mx.managers.ISystemManager"/>
+	<classDef id="mx.core.ILayoutElement"/>
+	<classDef id="mx.core.Singleton"/>
+	<classDef id="mx.resources.ResourceBundle"/>
+	<classDef id="mx.core.IVisualElementContainer"/>
+	<classDef id="mx.core.IToolTip"/>
+	<classDef id="mx.events.FlexEvent"/>
+	<classDef id="mx.resources.IResourceManager"/>
+	<classDef id="mx.core.IInvalidating"/>
+	<classDef id="mx.core.IMXMLObject"/>
+	<classDef id="mx.events.ResizeEvent"/>
+	<classDef id="mx.managers.IToolTipManagerClient"/>
+	<classDef id="mx.core.IDeferredInstantiationUIComponent"/>
+	<classDef id="mx.utils.MatrixUtil"/>
+	<classDef id="mx.core.ComponentDescriptor"/>
+	<classDef id="mx.core.DragSource"/>
+	<classDef id="mx.events.FlexMouseEvent"/>
+	<classDef id="mx.events.ModuleEvent"/>
+	<classDef id="mx.flash.FlexContentHolder"/>
+	<classDef id="mx.core.DesignLayer"/>
+	<classDef id="mx.automation.IAutomationObject"/>
+	<classDef id="mx.core.IVisualElement"/>
+	<classDef id="mx.core.IFlexModuleFactory"/>
+	<classDef id="mx.geom.TransformOffsets"/>
+	<classDef id="mx.core.UIComponentDescriptor"/>
+</classDefs>
+<class id="mx.flash.FlexContentHolder" >
+	<ExcludeClass />
+	<__go_to_ctor_definition_help file="/Users/rfrishbe/opensource/flex/sdk/trunk/frameworks/projects/flash-integration/src/mx/flash/FlexContentHolder.as" pos="1386" />
+	<DefaultProperty param1="content" />
+	<__go_to_ctor_definition_help file="/Users/rfrishbe/opensource/flex/sdk/trunk/frameworks/projects/flash-integration/src/mx/flash/ContainerMovieClip.as" pos="3618" />
+	<Event name="toolTipStart" type="mx.events.ToolTipEvent" />
+	<Event name="toolTipShown" type="mx.events.ToolTipEvent" />
+	<Event name="toolTipShow" type="mx.events.ToolTipEvent" />
+	<Event name="toolTipHide" type="mx.events.ToolTipEvent" />
+	<Event name="toolTipEnd" type="mx.events.ToolTipEvent" />
+	<Event name="toolTipCreate" type="mx.events.ToolTipEvent" />
+	<Event name="currentStateChange" type="mx.events.StateChangeEvent" />
+	<Event name="currentStateChanging" type="mx.events.StateChangeEvent" />
+	<Event name="dragComplete" type="mx.events.DragEvent" />
+	<Event name="dragDrop" type="mx.events.DragEvent" />
+	<Event name="dragExit" type="mx.events.DragEvent" />
+	<Event name="dragOver" type="mx.events.DragEvent" />
+	<Event name="dragEnter" type="mx.events.DragEvent" />
+	<Event name="mouseWheelOutside" type="mx.events.FlexMouseEvent" />
+	<Event name="mouseDownOutside" type="mx.events.FlexMouseEvent" />
+	<Event name="show" type="mx.events.FlexEvent" />
+	<Event name="resize" type="mx.events.ResizeEvent" />
+	<Event name="remove" type="mx.events.FlexEvent" />
+	<Event name="preinitialize" type="mx.events.FlexEvent" />
+	<Event name="move" type="mx.events.MoveEvent" />
+	<Event name="initialize" type="mx.events.FlexEvent" />
+	<Event name="hide" type="mx.events.FlexEvent" />
+	<Event name="creationComplete" type="mx.events.FlexEvent" />
+	<Event name="add" type="mx.events.FlexEvent" />
+	<__go_to_ctor_definition_help file="/Users/rfrishbe/opensource/flex/sdk/trunk/frameworks/projects/flash-integration/src/mx/flash/UIMovieClip.as" pos="20590" />
+	<method id="content" returnType="IUIComponent" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="scaleContentWhenResized" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable category="General" enumeration="false,true" defaultValue="false" />
+	</method>
+	<method id="numElements" returnType="int" isProperty="true" permissions="readonly">
+	</method>
+	<method id="alpha" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="autoUpdateMeasuredSize" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable category="General" />
+	</method>
+	<method id="autoUpdateCurrentState" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable category="General" />
+	</method>
+	<method id="x" returnType="Number" isProperty="true" permissions="readwrite">
+		<Inspectable category="General" />
+	</method>
+	<method id="y" returnType="Number" isProperty="true" permissions="readwrite">
+		<Inspectable category="General" />
+	</method>
+	<method id="z" returnType="Number" isProperty="true" permissions="readwrite">
+		<Bindable param1="zChanged" />
+	</method>
+	<method id="baseline" returnType="Object" isProperty="true" permissions="readwrite">
+		<Bindable event="propertyChange" />
+		<Inspectable />
+	</method>
+	<method id="bottom" returnType="Object" isProperty="true" permissions="readwrite">
+		<Bindable event="propertyChange" />
+		<Inspectable />
+	</method>
+	<method id="horizontalCenter" returnType="Object" isProperty="true" permissions="readwrite">
+		<Bindable event="propertyChange" />
+		<Inspectable />
+	</method>
+	<method id="left" returnType="Object" isProperty="true" permissions="readwrite">
+		<Bindable event="propertyChange" />
+		<Inspectable />
+	</method>
+	<method id="right" returnType="Object" isProperty="true" permissions="readwrite">
+		<Bindable event="propertyChange" />
+		<Inspectable />
+	</method>
+	<method id="top" returnType="Object" isProperty="true" permissions="readwrite">
+		<Bindable event="propertyChange" />
+		<Inspectable />
+	</method>
+	<method id="verticalCenter" returnType="Object" isProperty="true" permissions="readwrite">
+		<Bindable event="propertyChange" />
+		<Inspectable />
+	</method>
+	<method id="cachePolicy" returnType="String" isProperty="true" permissions="readonly">
+	</method>
+	<method id="descriptor" returnType="UIComponentDescriptor" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="id" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="baselinePosition" returnType="Number" isProperty="true" permissions="readonly">
+	</method>
+	<method id="document" returnType="Object" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="explicitHeight" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="explicitMaxHeight" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="explicitMaxWidth" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="explicitMinHeight" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="explicitMinWidth" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="explicitWidth" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="focusPane" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="includeInLayout" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="isPopUp" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="designLayer" returnType="DesignLayer" isProperty="true" permissions="readwrite">
+		<Inspectable environment="none" />
+	</method>
+	<method id="maxHeight" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="maxWidth" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="measuredMinHeight" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="measuredMinWidth" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="minHeight" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="minWidth" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="moduleFactory" returnType="IFlexModuleFactory" isProperty="true" permissions="readwrite">
+		<Inspectable environment="none" />
+	</method>
+	<method id="owner" returnType="DisplayObjectContainer" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="percentHeight" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="percentWidth" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="systemManager" returnType="ISystemManager" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="tweeningProperties" returnType="Array" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="visible" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="height" returnType="Number" isProperty="true" permissions="readwrite">
+		<PercentProxy param1="percentHeight" />
+	</method>
+	<method id="measuredHeight" returnType="Number" isProperty="true" permissions="readonly">
+	</method>
+	<method id="measuredWidth" returnType="Number" isProperty="true" permissions="readonly">
+	</method>
+	<method id="width" returnType="Number" isProperty="true" permissions="readwrite">
+		<PercentProxy param1="percentWidth" />
+	</method>
+	<method id="scaleX" returnType="Number" isProperty="true" permissions="readwrite">
+		<Inspectable category="Size" defaultValue="1.0" />
+	</method>
+	<method id="scaleY" returnType="Number" isProperty="true" permissions="readwrite">
+		<Inspectable category="Size" defaultValue="1.0" />
+	</method>
+	<method id="scaleZ" returnType="Number" isProperty="true" permissions="readwrite">
+		<Inspectable category="Size" defaultValue="1.0" />
+	</method>
+	<method id="toolTip" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="focusEnabled" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="hasFocusableChildren" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="true" />
+		<Bindable param1="hasFocusableChildrenChange" />
+	</method>
+	<method id="mouseFocusEnabled" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="tabFocusEnabled" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="true" />
+		<Bindable param1="tabFocusEnabledChange" />
+	</method>
+	<method id="depth" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="transformX" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="transformY" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="transformZ" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="rotation" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="rotationX" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="rotationY" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="rotationZ" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="postLayoutTransformOffsets" returnType="TransformOffsets" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="transform" returnType="Transform" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="maintainProjectionCenter" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="hasLayoutMatrix3D" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="is3D" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="parent" returnType="DisplayObjectContainer" isProperty="true" permissions="readonly">
+	</method>
+	<method id="parentDocument" returnType="Object" isProperty="true" permissions="readonly">
+	</method>
+	<method id="currentState" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="tabEnabled" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="automationDelegate" returnType="Object" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="automationName" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="automationValue" returnType="Array" isProperty="true" permissions="readonly">
+	</method>
+	<method id="automationOwner" returnType="DisplayObjectContainer" isProperty="true" permissions="readonly">
+	</method>
+	<method id="automationParent" returnType="DisplayObjectContainer" isProperty="true" permissions="readonly">
+	</method>
+	<method id="automationEnabled" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="automationVisible" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="showInAutomationHierarchy" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="numAutomationChildren" returnType="int" isProperty="true" permissions="readonly">
+	</method>
+	<method id="automationTabularData" returnType="Object" isProperty="true" permissions="readonly">
+	</method>
+	<method id="cacheHeuristic" returnType="Boolean" isProperty="true" permissions="writeonly">
+	</method>
+	<method id="boundingBoxName" returnType="String" isProperty="true" permissions="readwrite">
+		<Inspectable />
+	</method>
+	<method id="initialize" returnType="void" isProperty="false">
+	</method>
+	<method id="setActualSize" returnType="void" isProperty="false">
+	</method>
+	<method id="sizeFlexContent" returnType="void" isProperty="false">
+	</method>
+	<method id="FlexContentHolder" isConstructor="true" isProperty="false">
+	</method>
+	<method id="getElementAt" returnType="IVisualElement" isProperty="false">
+	</method>
+	<method id="getElementIndex" returnType="int" isProperty="false">
+	</method>
+	<method id="addElement" returnType="IVisualElement" isProperty="false">
+	</method>
+	<method id="addElementAt" returnType="IVisualElement" isProperty="false">
+	</method>
+	<method id="removeElement" returnType="IVisualElement" isProperty="false">
+	</method>
+	<method id="removeElementAt" returnType="IVisualElement" isProperty="false">
+	</method>
+	<method id="removeAllElements" returnType="void" isProperty="false">
+	</method>
+	<method id="setElementIndex" returnType="void" isProperty="false">
+	</method>
+	<method id="swapElements" returnType="void" isProperty="false">
+	</method>
+	<method id="swapElementsAt" returnType="void" isProperty="false">
+	</method>
+	<method id="ContainerMovieClip" isConstructor="true" isProperty="false">
+	</method>
+	<method id="createReferenceOnParentDocument" returnType="void" isProperty="false">
+	</method>
+	<method id="deleteReferenceOnParentDocument" returnType="void" isProperty="false">
+	</method>
+	<method id="executeBindings" returnType="void" isProperty="false">
+	</method>
+	<method id="registerEffects" returnType="void" isProperty="false">
+	</method>
+	<method id="getConstraintValue" returnType="null" isProperty="false">
+	</method>
+	<method id="setConstraintValue" returnType="void" isProperty="false">
+	</method>
+	<method id="getLayoutMatrix" returnType="Matrix" isProperty="false">
+	</method>
+	<method id="setLayoutMatrix" returnType="void" isProperty="false">
+	</method>
+	<method id="getLayoutMatrix3D" returnType="Matrix3D" isProperty="false">
+	</method>
+	<method id="setLayoutMatrix3D" returnType="void" isProperty="false">
+	</method>
+	<method id="transformAround" returnType="void" isProperty="false">
+	</method>
+	<method id="transformPointToParent" returnType="void" isProperty="false">
+	</method>
+	<method id="getPreferredBoundsWidth" returnType="Number" isProperty="false">
+	</method>
+	<method id="getPreferredBoundsHeight" returnType="Number" isProperty="false">
+	</method>
+	<method id="getMinBoundsWidth" returnType="Number" isProperty="false">
+	</method>
+	<method id="getMinBoundsHeight" returnType="Number" isProperty="false">
+	</method>
+	<method id="getMaxBoundsWidth" returnType="Number" isProperty="false">
+	</method>
+	<method id="getMaxBoundsHeight" returnType="Number" isProperty="false">
+	</method>
+	<method id="getBoundsXAtSize" returnType="Number" isProperty="false">
+	</method>
+	<method id="getBoundsYAtSize" returnType="Number" isProperty="false">
+	</method>
+	<method id="getLayoutBoundsWidth" returnType="Number" isProperty="false">
+	</method>
+	<method id="getLayoutBoundsHeight" returnType="Number" isProperty="false">
+	</method>
+	<method id="getLayoutBoundsX" returnType="Number" isProperty="false">
+	</method>
+	<method id="getLayoutBoundsY" returnType="Number" isProperty="false">
+	</method>
+	<method id="setLayoutBoundsPosition" returnType="void" isProperty="false">
+	</method>
+	<method id="setLayoutBoundsSize" returnType="void" isProperty="false">
+	</method>
+	<method id="parentChanged" returnType="void" isProperty="false">
+	</method>
+	<method id="getExplicitOrMeasuredWidth" returnType="Number" isProperty="false">
+	</method>
+	<method id="getExplicitOrMeasuredHeight" returnType="Number" isProperty="false">
+	</method>
+	<method id="setVisible" returnType="void" isProperty="false">
+	</method>
+	<method id="owns" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="move" returnType="void" isProperty="false">
+	</method>
+	<method id="setFocus" returnType="void" isProperty="false">
+	</method>
+	<method id="drawFocus" returnType="void" isProperty="false">
+	</method>
+	<method id="createAutomationIDPart" returnType="Object" isProperty="false">
+	</method>
+	<method id="createAutomationIDPartWithRequiredProperties" returnType="Object" isProperty="false">
+	</method>
+	<method id="resolveAutomationIDPart" returnType="Array" isProperty="false">
+	</method>
+	<method id="getAutomationChildAt" returnType="IAutomationObject" isProperty="false">
+	</method>
+	<method id="getAutomationChildren" returnType="Array" isProperty="false">
+	</method>
+	<method id="replayAutomatableEvent" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="UIMovieClip" isConstructor="true" isProperty="false">
+	</method>
+</class></component>
+]]></classProperties>
+               <SwcItem name="mx.flash.FlexContentHolder" version="1262819207" isTopLevel="true"/>
+          </DOMCompiledClipItem>
+          <DOMCompiledClipItem name="FLVPlayback" itemID="67829673-00000039" linkageExportForAS="true" linkageClassName="fl.video.FLVPlayback" sourceLastImported="1267834356" tooltip="FLVPlayback" customIconID="0" actionscriptClass="fl.video.FLVPlayback" livePreviewScmHRef="7c07hnm5fz.swf" livePreviewScmSourceFilename="C:\Users\MyUser\AppData\Local\Adobe\Flash CS6\en_US\Configuration\TMP7c07hnm5fz..swf" persistLivePreview11="true" livePreview11ScmHRef="7c07hnm5fz3.swf" livePreview11ScmSourceFilename="C:\Users\MyUser\AppData\Local\Adobe\Flash CS6\en_US\Configuration\TMP7c07hnm5fz..swf" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true" swcPath="FLVPlayback.xml" rootSymbolLinkageID="fl.video.FLVPlayback" movieRectRight="6401" movieRectBottom="4800" playerVersion="9" actionscriptVersion="3" hashKey="5hQS0VF2RpEUrBqYgohhO.">
+               <parametersAsXML><![CDATA[   <property id="align">
+      <Inspectable name="align" variable="align" category="" verbose="0" defaultValue="center" enumeration="center,top,left,bottom,right,topLeft,topRight,bottomLeft,bottomRight" type="List"/>
+   </property>
+   <property id="autoPlay">
+      <Inspectable name="autoPlay" variable="autoPlay" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="cuePoints">
+      <Inspectable name="cuePoints" variable="cuePoints" category="" verbose="0" defaultValue="" type="Video Cue Points"/>
+   </property>
+   <property id="isLive">
+      <Inspectable name="isLive" variable="isLive" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="preview">
+      <Inspectable name="preview" variable="preview" category="" verbose="0" defaultValue="" type="Video Preview"/>
+   </property>
+   <property id="scaleMode">
+      <Inspectable name="scaleMode" variable="scaleMode" category="" verbose="0" defaultValue="maintainAspectRatio" enumeration="maintainAspectRatio,noScale,exactFit" type="List"/>
+   </property>
+   <property id="skin">
+      <Inspectable name="skin" variable="skin" category="" verbose="0" defaultValue="" type="Video Skin"/>
+   </property>
+   <property id="skinAutoHide">
+      <Inspectable name="skinAutoHide" variable="skinAutoHide" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="skinBackgroundAlpha">
+      <Inspectable name="skinBackgroundAlpha" variable="skinBackgroundAlpha" category="" verbose="0" defaultValue="0.85" type="Number"/>
+   </property>
+   <property id="skinBackgroundColor">
+      <Inspectable name="skinBackgroundColor" variable="skinBackgroundColor" category="" verbose="0" defaultValue="#47ABCB" type="Color"/>
+   </property>
+   <property id="source">
+      <Inspectable name="source" variable="source" category="" verbose="0" defaultValue="" type="Video Content Path"/>
+   </property>
+   <property id="volume">
+      <Inspectable name="volume" variable="volume" category="" verbose="0" defaultValue="1" type="Number"/>
+   </property>
+]]></parametersAsXML>
+               <classProperties><![CDATA[<component id="fl/video/FLVPlayback" class="fl.video.FLVPlayback" livePreviewClass="FLVPlaybackStageLivePreview" modified="1267834356096">
+<movieBounds xmin="0" xmax="6400" ymin="0" ymax="4800" />
+<classDefs>
+	<classDef id="fl.video.CuePointType"/>
+	<classDef id="fl.video.ParseResults"/>
+	<classDef id="fl.video.VideoPlayerState"/>
+	<classDef id="fl.video.NCManagerNativeShim"/>
+	<classDef id="fl.video.VideoError"/>
+	<classDef id="fl.video.VideoEvent"/>
+	<classDef id="fl.video.AutoLayoutEvent"/>
+	<classDef id="fl.video.SkinErrorEvent"/>
+	<classDef id="fl.video.VolumeBarAccImpl"/>
+	<classDef id="fl.video.FPADManager"/>
+	<classDef id="fl.video.SeekBarAccImpl"/>
+	<classDef id="fl.video.VideoScaleMode"/>
+	<classDef id="fl.video.ReconnectClient"/>
+	<classDef id="fl.video.ConnectClient"/>
+	<classDef id="fl.livepreview.LivePreviewParent"/>
+	<classDef id="fl.video.NCManagerNative"/>
+	<classDef id="fl.video.VideoPlayerClient"/>
+	<classDef id="fl.video.LayoutEvent"/>
+	<classDef id="fl.video.Icon"/>
+	<classDef id="fl.video.ControlData"/>
+	<classDef id="fl.video.VideoState"/>
+	<classDef id="fl.video.QueuedCommand"/>
+	<classDef id="fl.video.VideoProgressEvent"/>
+	<classDef id="fl.video.VideoAlign"/>
+	<classDef id="fl.video.CuePointManager"/>
+	<classDef id="fl.video.IVPEvent"/>
+	<classDef id="fl.video.VideoPlayer"/>
+	<classDef id="fl.video.UIManager"/>
+	<classDef id="fl.video.ConnectClientNative"/>
+	<classDef id="fl.video.INCManager"/>
+	<classDef id="fl.video.SoundEvent"/>
+	<classDef id="fl.video.FLVPlayback"/>
+	<classDef id="fl.video.MetadataEvent"/>
+	<classDef id="fl.video.SMILManager"/>
+	<classDef id="fl.video.NCManager"/>
+</classDefs>
+<class id="fl.video.FLVPlayback" >
+	<LivePreviewVersion param1="1" />
+	<RequiresDataBinding param1="true" />
+	<IconFile param1="FLVPlayback.png" />
+	<Event param1="soundUpdate" type="fl.video.SoundEvent" />
+	<Event param1="stoppedStateEntered" type="fl.video.VideoEvent" />
+	<Event param1="stateChange" type="fl.video.VideoEvent" />
+	<Event param1="skinLoaded" type="fl.video.VideoEvent" />
+	<Event param1="skinError" type="fl.video.SkinErrorEvent" />
+	<Event param1="seeked" type="fl.video.VideoEvent" />
+	<Event param1="scrubStart" type="fl.video.VideoEvent" />
+	<Event param1="scrubFinish" type="fl.video.VideoEvent" />
+	<Event param1="rewind" type="fl.video.VideoEvent" />
+	<Event param1="layout" type="fl.video.LayoutEvent" />
+	<Event param1="ready" type="fl.video.VideoEvent" />
+	<Event param1="progress" type="fl.video.VideoProgressEvent" />
+	<Event param1="playheadUpdate" type="fl.video.VideoEvent" />
+	<Event param1="playingStateEntered" type="fl.video.VideoEvent" />
+	<Event param1="pausedStateEntered" type="fl.video.VideoEvent" />
+	<Event param1="metadataReceived" type="fl.video.MetadataEvent" />
+	<Event param1="fastForward" type="fl.video.VideoEvent" />
+	<Event param1="cuePoint" type="fl.video.MetadataEvent" />
+	<Event param1="complete" type="fl.video.VideoEvent" />
+	<Event param1="close" type="fl.video.VideoEvent" />
+	<Event param1="bufferingStateEntered" type="fl.video.VideoEvent" />
+	<Event param1="autoRewound" type="fl.video.VideoEvent" />
+	<Event param1="autoLayout" type="fl.video.AutoLayoutEvent" />
+	<__go_to_ctor_definition_help file="C:\devsrc\flashfarm\media_frameworks\branches\FLVPlayback_AS3_LIVE\FLVPlayback\..\fl\video\FLVPlayback.as" pos="30587" />
+	<method id="playheadPercentage" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="activeVideoPlayerIndex" returnType="uint" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="align" returnType="String" isProperty="true" permissions="readwrite">
+		<Inspectable type="List" enumeration="center,top,left,bottom,right,topLeft,topRight,bottomLeft,bottomRight" defaultValue="center" />
+	</method>
+	<method id="autoPlay" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="true" />
+	</method>
+	<method id="autoRewind" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="bitrate" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="buffering" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="bufferingBar" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="bufferingBarHidesAndDisablesOthers" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="backButton" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="bufferTime" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="bytesLoaded" returnType="uint" isProperty="true" permissions="readonly">
+	</method>
+	<method id="bytesTotal" returnType="uint" isProperty="true" permissions="readonly">
+	</method>
+	<method id="source" returnType="String" isProperty="true" permissions="readwrite">
+		<Inspectable type="Video Content Path" />
+	</method>
+	<method id="forwardButton" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="fullScreenBackgroundColor" returnType="uint" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="fullScreenButton" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="fullScreenSkinDelay" returnType="int" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="fullScreenTakeOver" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="height" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="idleTimeout" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="isRTMP" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="isLive" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="false" />
+	</method>
+	<method id="metadata" returnType="Object" isProperty="true" permissions="readonly">
+	</method>
+	<method id="metadataLoaded" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="muteButton" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="ncMgr" returnType="INCManager" isProperty="true" permissions="readonly">
+	</method>
+	<method id="pauseButton" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="paused" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="playButton" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="playheadTime" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="playheadUpdateInterval" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="playing" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="playPauseButton" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="preferredHeight" returnType="int" isProperty="true" permissions="readonly">
+	</method>
+	<method id="preferredWidth" returnType="int" isProperty="true" permissions="readonly">
+	</method>
+	<method id="progressInterval" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="registrationX" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="registrationY" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="registrationWidth" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="registrationHeight" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="scaleMode" returnType="String" isProperty="true" permissions="readwrite">
+		<Inspectable type="List" enumeration="maintainAspectRatio,noScale,exactFit" defaultValue="maintainAspectRatio" />
+	</method>
+	<method id="scaleX" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="scaleY" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="scrubbing" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="seekBar" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="seekBarInterval" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="seekBarScrubTolerance" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="seekToPrevOffset" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="skin" returnType="String" isProperty="true" permissions="readwrite">
+		<Inspectable type="Video Skin" />
+	</method>
+	<method id="skinAutoHide" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="false" />
+	</method>
+	<method id="skinBackgroundAlpha" returnType="Number" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="0.85" />
+	</method>
+	<method id="skinBackgroundColor" returnType="uint" isProperty="true" permissions="readwrite">
+		<Inspectable type="Color" defaultValue="#47ABCB" />
+	</method>
+	<method id="skinFadeTime" returnType="int" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="skinScaleMaximum" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="soundTransform" returnType="SoundTransform" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="state" returnType="String" isProperty="true" permissions="readonly">
+	</method>
+	<method id="stateResponsive" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="stopButton" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="stopped" returnType="Boolean" isProperty="true" permissions="readonly">
+	</method>
+	<method id="totalTime" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="visibleVideoPlayerIndex" returnType="uint" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="volume" returnType="Number" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="1" />
+	</method>
+	<method id="volumeBar" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="volumeBarInterval" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="volumeBarScrubTolerance" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="width" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="x" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="y" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="endTabIndex" returnType="int" isProperty="true" permissions="readonly">
+	</method>
+	<method id="startTabIndex" returnType="int" isProperty="true" permissions="readonly">
+	</method>
+	<method id="preview" returnType="String" isProperty="true" permissions="writeonly">
+		<Inspectable type="Video Preview" />
+	</method>
+	<method id="componentInspectorSetting" returnType="Boolean" isProperty="true" permissions="writeonly">
+	</method>
+	<method id="cuePoints" returnType="Array" isProperty="true" permissions="writeonly">
+		<Inspectable type="Video Cue Points" />
+	</method>
+	<method id="boundingBox_mc" returnType="DisplayObject" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="setSize" returnType="void" isProperty="false">
+	</method>
+	<method id="setScale" returnType="void" isProperty="false">
+	</method>
+	<method id="load" returnType="void" isProperty="false">
+	</method>
+	<method id="play" returnType="void" isProperty="false">
+	</method>
+	<method id="playWhenEnoughDownloaded" returnType="void" isProperty="false">
+	</method>
+	<method id="pause" returnType="void" isProperty="false">
+	</method>
+	<method id="stop" returnType="void" isProperty="false">
+	</method>
+	<method id="seek" returnType="void" isProperty="false">
+	</method>
+	<method id="seekSeconds" returnType="void" isProperty="false">
+	</method>
+	<method id="seekPercent" returnType="void" isProperty="false">
+	</method>
+	<method id="seekToNavCuePoint" returnType="void" isProperty="false">
+	</method>
+	<method id="seekToNextNavCuePoint" returnType="void" isProperty="false">
+	</method>
+	<method id="seekToPrevNavCuePoint" returnType="void" isProperty="false">
+	</method>
+	<method id="addASCuePoint" returnType="Object" isProperty="false">
+	</method>
+	<method id="removeASCuePoint" returnType="Object" isProperty="false">
+	</method>
+	<method id="findCuePoint" returnType="Object" isProperty="false">
+	</method>
+	<method id="findNearestCuePoint" returnType="Object" isProperty="false">
+	</method>
+	<method id="findNextCuePointWithName" returnType="Object" isProperty="false">
+	</method>
+	<method id="setFLVCuePointEnabled" returnType="Number" isProperty="false">
+	</method>
+	<method id="isFLVCuePointEnabled" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="bringVideoPlayerToFront" returnType="void" isProperty="false">
+	</method>
+	<method id="getVideoPlayer" returnType="VideoPlayer" isProperty="false">
+	</method>
+	<method id="closeVideoPlayer" returnType="void" isProperty="false">
+	</method>
+	<method id="enterFullScreenDisplayState" returnType="void" isProperty="false">
+	</method>
+	<method id="assignTabIndexes" returnType="int" isProperty="false">
+	</method>
+	<method id="FLVPlayback" isConstructor="true" isProperty="false">
+	</method>
+</class><livePreview class="FLVPlaybackStageLivePreview">
+<movieBounds xmin="0" xmax="6401" ymin="0" ymax="4800" />
+<classDefs>
+	<classDef id="fl.livepreview.IEditContextV1"/>
+	<classDef id="fl.livepreview.IPreviewInterface"/>
+	<classDef id="fl.video.CuePointType"/>
+	<classDef id="fl.video.VideoPlayerState"/>
+	<classDef id="fl.video.ControlData"/>
+	<classDef id="fl.video.CuePointManager"/>
+	<classDef id="fl.video.UIManager"/>
+	<classDef id="fl.video.INCManager"/>
+	<classDef id="fl.video.VideoState"/>
+	<classDef id="fl.livepreview.EditContextFlags"/>
+	<classDef id="fl.video.VideoScaleMode"/>
+	<classDef id="fl.video.QueuedCommand"/>
+	<classDef id="fl.video.IVPEvent"/>
+	<classDef id="fl.video.ParseResults"/>
+	<classDef id="fl.video.SMILManager"/>
+	<classDef id="fl.video.FPADManager"/>
+	<classDef id="fl.video.VideoAlign"/>
+	<classDef id="fl.video.ConnectClient"/>
+	<classDef id="fl.video.ReconnectClient"/>
+	<classDef id="fl.video.VideoPlayerClient"/>
+	<classDef id="fl.video.LayoutEvent"/>
+	<classDef id="fl.video.SoundEvent"/>
+	<classDef id="fl.video.VolumeBarAccImpl"/>
+	<classDef id="fl.video.SeekBarAccImpl"/>
+	<classDef id="fl.livepreview.IVideoInterfaceV1"/>
+	<classDef id="fl.video.VideoError"/>
+	<classDef id="UIManagerStage"/>
+	<classDef id="fl.video.NCManager"/>
+	<classDef id="fl.video.VideoEvent"/>
+	<classDef id="fl.video.MetadataEvent"/>
+	<classDef id="fl.video.VideoProgressEvent"/>
+	<classDef id="fl.video.AutoLayoutEvent"/>
+	<classDef id="fl.video.SkinErrorEvent"/>
+	<classDef id="fl.video.VideoPlayer"/>
+	<classDef id="FLVPlaybackStageLivePreview"/>
+	<classDef id="fl.stage.video.StopButtonDown"/>
+	<classDef id="fl.stage.video.StopButtonNormal"/>
+	<classDef id="fl.stage.video.StopButtonOver"/>
+	<classDef id="fl.video.FLVPlayback"/>
+	<classDef id="fl.stage.video.ComponentVersionView"/>
+	<classDef id="fl.stage.video.BackgroundBox"/>
+	<classDef id="FLVPlaybackStage"/>
+	<classDef id="fl.livepreview.LivePreviewParent"/>
+	<classDef id="fl.video.Icon"/>
+</classDefs>
+<class id="FLVPlaybackStageLivePreview" >
+	<method id="width" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="height" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="source" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="isLive" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="volume" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="align" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="skinAutoHide" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="scaleMode" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="autoPlay" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="skin" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="skinBackgroundAlpha" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="skinBackgroundColor" returnType="uint" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="DocumentRoot" returnType="String" isProperty="true" permissions="writeonly">
+	</method>
+	<method id="FullPathSourceFromRelativePath" returnType="String" isProperty="true" permissions="writeonly">
+	</method>
+	<method id="avatar_mc" returnType="DisplayObject" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="caPreviewClass" returnType="ComponentVersionView" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="createButtonsOverlay" returnType="void" isProperty="false">
+	</method>
+	<method id="destroyButtonsOverlay" returnType="void" isProperty="false">
+	</method>
+	<method id="SetFLVplaybackPlayheadUpdateTimer" returnType="void" isProperty="false">
+	</method>
+	<method id="initFLVplaybackPlayheadUpdateTimer" returnType="void" isProperty="false">
+	</method>
+	<method id="stopFLVplaybackPlayheadUpdateTimer" returnType="void" isProperty="false">
+	</method>
+	<method id="onFLVplaybackPlayheadUpdateTimer" returnType="void" isProperty="false">
+	</method>
+	<method id="startFLVplaybackRemotePreloadBufferingTimer" returnType="void" isProperty="false">
+	</method>
+	<method id="stopFLVplaybackRemotePreloadBufferingTimer" returnType="void" isProperty="false">
+	</method>
+	<method id="onFLVplaybackRemotePreloadBufferingTimer" returnType="void" isProperty="false">
+	</method>
+	<method id="FileExist" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="setSize" returnType="void" isProperty="false">
+	</method>
+	<method id="draw" returnType="void" isProperty="false">
+	</method>
+	<method id="setIPreviewInterface" returnType="void" isProperty="false">
+	</method>
+	<method id="designTimeEdit" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="load" returnType="void" isProperty="false">
+	</method>
+	<method id="play" returnType="void" isProperty="false">
+	</method>
+	<method id="pause" returnType="void" isProperty="false">
+	</method>
+	<method id="stop" returnType="void" isProperty="false">
+	</method>
+	<method id="seek" returnType="void" isProperty="false">
+	</method>
+	<method id="seekVideo" returnType="void" isProperty="false">
+	</method>
+	<method id="seekSeconds" returnType="void" isProperty="false">
+	</method>
+	<method id="startSeek" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="stopSeek" returnType="void" isProperty="false">
+	</method>
+	<method id="setDocumentRoot" returnType="void" isProperty="false">
+	</method>
+	<method id="ResetSource" returnType="void" isProperty="false">
+	</method>
+	<method id="DisableSetSource" returnType="void" isProperty="false">
+	</method>
+	<method id="EnableSetSource" returnType="void" isProperty="false">
+	</method>
+	<method id="loadPreview" returnType="void" isProperty="false">
+	</method>
+	<method id="unloadPreview" returnType="void" isProperty="false">
+	</method>
+	<method id="close" returnType="void" isProperty="false">
+	</method>
+	<method id="Mute" returnType="void" isProperty="false">
+	</method>
+	<method id="grabBitmap" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="FLVPlaybackStageLivePreview" isConstructor="true" isProperty="false">
+	</method>
+</class></livePreview>
+</component>
+]]></classProperties>
+               <customIcon>
+                    <CustomIcon rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="360" frameBottom="360" isTransparent="true" href="7c07hnm5fz4.dat"/>
+               </customIcon>
+               <SwcItem name="fl.video.FLVPlayback" version="1267834356" isTopLevel="true"/>
+          </DOMCompiledClipItem>
+          <DOMCompiledClipItem name="FLVPlaybackCaptioning" itemID="67829673-00000043" linkageExportForAS="true" linkageClassName="fl.video.FLVPlaybackCaptioning" sourceLastImported="1263907861" customIconID="0" actionscriptClass="fl.video.FLVPlaybackCaptioning" livePreviewScmHRef="7d5ctnm5hg.swf" livePreviewScmSourceFilename="C:\Users\MyUser\AppData\Local\Adobe\Flash CS6\en_US\Configuration\TMP7d5ctnm5hg..swf" persistLivePreview11="true" livePreview11ScmHRef="7d5ctnm5hg6.swf" livePreview11ScmSourceFilename="C:\Users\MyUser\AppData\Local\Adobe\Flash CS6\en_US\Configuration\TMP7d5ctnm5hg..swf" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true" swcPath="FLVPlaybackCaptioning.xml" rootSymbolLinkageID="fl.video.FLVPlaybackCaptioning" movieRectRight="1440" movieRectBottom="1680" playerVersion="9" actionscriptVersion="3" hashKey="u6WoxbQBPf5MDbMcy6Jt7.">
+               <parametersAsXML><![CDATA[   <property id="autoLayout">
+      <Inspectable name="autoLayout" variable="autoLayout" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="captionTargetName">
+      <Inspectable name="captionTargetName" variable="captionTargetName" category="" verbose="0" defaultValue="auto" type="String"/>
+   </property>
+   <property id="flvPlaybackName">
+      <Inspectable name="flvPlaybackName" variable="flvPlaybackName" category="" verbose="0" defaultValue="auto" type="String"/>
+   </property>
+   <property id="showCaptions">
+      <Inspectable name="showCaptions" variable="showCaptions" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="simpleFormatting">
+      <Inspectable name="simpleFormatting" variable="simpleFormatting" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="source">
+      <Inspectable name="source" variable="source" category="" verbose="0" defaultValue="" type="String"/>
+   </property>
+]]></parametersAsXML>
+               <classProperties><![CDATA[<component id="fl/video/FLVPlaybackCaptioning" class="fl.video.FLVPlaybackCaptioning" modified="1263907861046">
+<movieBounds xmin="0" xmax="1440" ymin="0" ymax="1680" />
+<classDefs>
+	<classDef id="fl.livepreview.LivePreviewParent"/>
+	<classDef id="fl.video.TimedTextManager"/>
+	<classDef id="fl.video.CaptionChangeEvent"/>
+	<classDef id="fl.video.CaptionTargetEvent"/>
+	<classDef id="fl.video.FLVPlaybackCaptioning"/>
+</classDefs>
+<class id="fl.video.FLVPlaybackCaptioning" >
+	<RequiresDataBinding param1="true" />
+	<IconFile param1="FLVPlaybackCaptioning.png" />
+	<Event param1="securityError" type="flash.events.SecurityErrorEvent" />
+	<Event param1="progress" type="flash.events.ProgressEvent" />
+	<Event param1="open" type="flash.events.Event" />
+	<Event param1="ioError" type="flash.events.IOErrorEvent" />
+	<Event param1="httpStatus" type="flash.events.HTTPStatusEvent" />
+	<Event param1="complete" type="flash.events.Event" />
+	<Event param1="captionTargetCreated" type="fl.video.CaptionTargetEvent" />
+	<Event param1="captionChange" type="fl.video.CaptionChangeEvent" />
+	<method id="showCaptions" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="true" />
+	</method>
+	<method id="source" returnType="String" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="" />
+	</method>
+	<method id="autoLayout" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="true" />
+	</method>
+	<method id="captionTargetName" returnType="String" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="auto" />
+	</method>
+	<method id="captionTarget" returnType="DisplayObject" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="captionButton" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="flvPlaybackName" returnType="String" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="auto" />
+	</method>
+	<method id="flvPlayback" returnType="FLVPlayback" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="track" returnType="uint" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="videoPlayerIndex" returnType="uint" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="simpleFormatting" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="false" />
+	</method>
+	<method id="getCaptionsAsTranscript" returnType="String" isProperty="false">
+	</method>
+	<method id="getCaptionsAsArray" returnType="Array" isProperty="false">
+	</method>
+	<method id="secondsToTime" returnType="String" isProperty="false">
+	</method>
+	<method id="findInCaptions" returnType="Array" isProperty="false">
+	</method>
+	<method id="FLVPlaybackCaptioning" isConstructor="true" isProperty="false">
+	</method>
+</class></component>
+]]></classProperties>
+               <customIcon>
+                    <CustomIcon rowByteCount="64" colorDepth="32" width="16" height="16" frameRight="320" frameBottom="320" isTransparent="true" href="7d5ctnm5hg7.dat"/>
+               </customIcon>
+               <SwcItem name="fl.video.FLVPlaybackCaptioning" version="1263907861" isTopLevel="true"/>
+          </DOMCompiledClipItem>
+     </media>
+     <symbols>
+          <Include href=" FLV Playback Skins/_SquareButton/SquareBgDown.xml" loadImmediate="false" itemID="4270372f-000005a7" lastModified="1157562211"/>
+          <Include href=" FLV Playback Skins/_SquareButton/SquareBgNormal.xml" loadImmediate="false" itemID="4270387d-000005af" lastModified="1157562212"/>
+          <Include href=" FLV Playback Skins/_SquareButton/SquareBgOver.xml" loadImmediate="false" itemID="427038bb-000005b1" lastModified="1157562215"/>
+          <Include href=" FLV Playback Skins/Buffering Bar/BufferingPattern.xml" loadImmediate="false" itemID="4294fc77-0000072b" lastModified="1157562216"/>
+          <Include href=" FLV Playback Skins/Buffering Bar/BufferingPatternSymbol.xml" itemID="4294fc6c-0000072a" lastModified="1157562221"/>
+          <Include href=" FLV Playback Skins/Caption Button/Assets/CaptionOffIcon.xml" loadImmediate="false" itemID="455b9f54-000002d6" lastModified="1168906900"/>
+          <Include href=" FLV Playback Skins/Caption Button/Assets/CaptionOnIcon.xml" loadImmediate="false" itemID="455b9f57-000002d7" lastModified="1168906900"/>
+          <Include href=" FLV Playback Skins/Caption Button/CaptionButtonOff.xml" itemID="456b56b3-0000164e" lastModified="1165901746"/>
+          <Include href=" FLV Playback Skins/Caption Button/CaptionButtonOffDisabled.xml" itemID="455b7b34-000003ad" lastModified="1165901773"/>
+          <Include href=" FLV Playback Skins/Caption Button/CaptionButtonOffDown.xml" itemID="455b7b37-000003ae" lastModified="1165901801"/>
+          <Include href=" FLV Playback Skins/Caption Button/CaptionButtonOffNormal.xml" itemID="455b7b38-000003af" lastModified="1165901779"/>
+          <Include href=" FLV Playback Skins/Caption Button/CaptionButtonOffOver.xml" itemID="455b7b3b-000003b0" lastModified="1165901788"/>
+          <Include href=" FLV Playback Skins/Caption Button/CaptionButtonOn.xml" itemID="456b56a5-0000164d" lastModified="1165901796"/>
+          <Include href=" FLV Playback Skins/Caption Button/CaptionButtonOnDisabled.xml" itemID="455b7b3d-000003b1" lastModified="1165901792"/>
+          <Include href=" FLV Playback Skins/Caption Button/CaptionButtonOnDown.xml" itemID="455b7b3f-000003b2" lastModified="1165901793"/>
+          <Include href=" FLV Playback Skins/Caption Button/CaptionButtonOnNormal.xml" itemID="455b7b41-000003b3" lastModified="1165901793"/>
+          <Include href=" FLV Playback Skins/Caption Button/CaptionButtonOnOver.xml" itemID="455b7b44-000003b4" lastModified="1165901795"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgDown.xml" loadImmediate="false" itemID="4270306f-000002db" lastModified="1157562248"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgNormal.xml" loadImmediate="false" itemID="42703088-000002dd" lastModified="1157562250"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgOver.xml" loadImmediate="false" itemID="42703095-000002de" lastModified="1157562251"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackIcon.xml" loadImmediate="false" itemID="42703081-000002dc" lastModified="1157562252"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackBorder.xml" loadImmediate="false" itemID="4270361c-000005a3" lastModified="1157562253"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonDisabled.xml" itemID="426edbf5-000000d7" lastModified="1157562254"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonDown.xml" itemID="42702894-00000238" lastModified="1157562255"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonNormal.xml" itemID="42702853-00000234" lastModified="1157562255"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonOver.xml" itemID="4270288c-00000236" lastModified="1157562261"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgDown.xml" loadImmediate="false" itemID="427030bc-000002e1" lastModified="1117169965"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgNormal.xml" loadImmediate="false" itemID="427030c8-000002e3" lastModified="1117169969"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgOver.xml" loadImmediate="false" itemID="427030d6-000002e5" lastModified="1117169975"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardIcon.xml" loadImmediate="false" itemID="427030e6-000002e7" lastModified="1117169979"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardBorder.xml" loadImmediate="false" itemID="4270363a-000005a4" lastModified="1117169994"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonDisabled.xml" itemID="4270310e-000002ec" lastModified="1114719558"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonDown.xml" itemID="4270311b-000002ee" lastModified="1114719563"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonNormal.xml" itemID="42703122-000002f0" lastModified="1114719567"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonOver.xml" itemID="42703131-000002f2" lastModified="1114719571"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/ForwardBackBorder.xml" loadImmediate="false" itemID="42710868-00000091" lastModified="1157562239"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/Assets/FullScreenOffIcon.xml" loadImmediate="false" itemID="455b9f3c-000002d3" lastModified="1163632632"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/Assets/FullScreenOnIcon.xml" loadImmediate="false" itemID="455b9eb8-000002cb" lastModified="1163632624"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/FullScreenButtonOff.xml" itemID="456b5623-00001647" lastModified="1165901835"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/FullScreenButtonOffDisabled.xml" itemID="456dd6dc-00000682" lastModified="1165901831"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/FullScreenButtonOffDown.xml" itemID="456dd6de-00000683" lastModified="1165901831"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/FullScreenButtonOffNormal.xml" itemID="456dd6e6-00000684" lastModified="1165901821"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/FullScreenButtonOffOver.xml" itemID="456dd6e8-00000685" lastModified="1165901827"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/FullScreenButtonOn.xml" itemID="456b563f-00001649" lastModified="1165901829"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/FullScreenButtonOnDisabled.xml" itemID="456dd6f6-00000686" lastModified="1165901830"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/FullScreenButtonOnDown.xml" itemID="456dd6f9-00000687" lastModified="1164826361"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/FullScreenButtonOnNormal.xml" itemID="456dd6fc-00000688" lastModified="1164826364"/>
+          <Include href=" FLV Playback Skins/FullScreen Button/FullScreenButtonOnOver.xml" itemID="456dd700-00000689" lastModified="1164826368"/>
+          <Include href=" FLV Playback Skins/Mute Button/Assets/MuteOffIcon.xml" loadImmediate="false" itemID="427074e8-00000138" lastModified="1165901843"/>
+          <Include href=" FLV Playback Skins/Mute Button/Assets/MuteOnIcon.xml" loadImmediate="false" itemID="427073fd-0000006a" lastModified="1165901845"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOff.xml" itemID="429df785-000001b8" lastModified="1165901890"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOffDisabled.xml" itemID="42707491-00000130" lastModified="1165901890"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOffDown.xml" itemID="4270749a-00000132" lastModified="1165901889"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOffNormal.xml" itemID="4270749f-00000134" lastModified="1165901888"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOffOver.xml" itemID="427074a6-00000136" lastModified="1165901888"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOn.xml" itemID="429df986-0000042a" lastModified="1165901895"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOnDisabled.xml" itemID="42707390-00000065" lastModified="1165901886"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOnDown.xml" itemID="4270745b-0000006e" lastModified="1165901885"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOnNormal.xml" itemID="4270743c-0000006c" lastModified="1165901885"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOnOver.xml" itemID="42707464-00000070" lastModified="1165901884"/>
+          <Include href=" FLV Playback Skins/Pause Button/Assets/PauseIcon.xml" loadImmediate="false" itemID="42707855-00000421" lastModified="1157562300"/>
+          <Include href=" FLV Playback Skins/Pause Button/PauseButtonDisabled.xml" itemID="427077f0-00000416" lastModified="1157562301"/>
+          <Include href=" FLV Playback Skins/Pause Button/PauseButtonDown.xml" itemID="427077f9-00000418" lastModified="1157562301"/>
+          <Include href=" FLV Playback Skins/Pause Button/PauseButtonNormal.xml" itemID="42707801-0000041a" lastModified="1157562302"/>
+          <Include href=" FLV Playback Skins/Pause Button/PauseButtonOver.xml" itemID="42707807-0000041c" lastModified="1157562304"/>
+          <Include href=" FLV Playback Skins/Play Button/Assets/PlayIcon.xml" loadImmediate="false" itemID="427076f8-00000330" lastModified="1157562305"/>
+          <Include href=" FLV Playback Skins/Play Button/PlayButtonDisabled.xml" itemID="427075c8-0000032e" lastModified="1157562308"/>
+          <Include href=" FLV Playback Skins/Play Button/PlayButtonDown.xml" itemID="42707797-00000337" lastModified="1157562308"/>
+          <Include href=" FLV Playback Skins/Play Button/PlayButtonNormal.xml" itemID="42707763-00000335" lastModified="1157562309"/>
+          <Include href=" FLV Playback Skins/Play Button/PlayButtonOver.xml" itemID="427077a3-00000339" lastModified="1157562312"/>
+          <Include href=" FLV Playback Skins/Seek Bar/SeekBarHandle.xml" itemID="426eda86-000000c9" lastModified="1157562313"/>
+          <Include href=" FLV Playback Skins/Seek Bar/SeekBarHandleHit.xml" itemIcon="1" loadImmediate="false" itemID="4296aef4-0000013d" lastModified="1157562313"/>
+          <Include href=" FLV Playback Skins/Seek Bar/SeekBarProgress.xml" itemID="4296ba97-00000213" lastModified="1157562317"/>
+          <Include href=" FLV Playback Skins/Stop Button/Assets/StopIcon.xml" loadImmediate="false" itemID="42707935-00000655" lastModified="1157562318"/>
+          <Include href=" FLV Playback Skins/Stop Button/StopButtonDisabled.xml" itemID="427078e9-00000653" lastModified="1157562319"/>
+          <Include href=" FLV Playback Skins/Stop Button/StopButtonDown.xml" itemID="427079ba-000006cf" lastModified="1157562319"/>
+          <Include href=" FLV Playback Skins/Stop Button/StopButtonNormal.xml" itemID="4270799b-000006cd" lastModified="1157562320"/>
+          <Include href=" FLV Playback Skins/Stop Button/StopButtonOver.xml" itemID="427079c8-000006d1" lastModified="1157562323"/>
+          <Include href=" FLV Playback Skins/Volume Bar/VolumeBarFullness.xml" loadImmediate="false" itemID="42bce8ff-00003847" lastModified="1157562324"/>
+          <Include href=" FLV Playback Skins/Volume Bar/VolumeBarFullnessFill.xml" itemID="429d6119-00005fe7" lastModified="1157562341"/>
+          <Include href=" FLV Playback Skins/Volume Bar/VolumeBarFullnessMask.xml" loadImmediate="false" itemID="42bce953-00003849" lastModified="1157562342"/>
+          <Include href=" FLV Playback Skins/Volume Bar/VolumeBarHandle.xml" itemID="4295075b-000001cd" lastModified="1157562344"/>
+          <Include href=" FLV Playback Skins/Volume Bar/VolumeBarHandleHit.xml" itemIcon="1" loadImmediate="false" itemID="4296af24-0000013f" lastModified="1117171492"/>
+          <Include href="BackButton.xml" itemID="4256c8df-00000073" lastModified="1166032226"/>
+          <Include href="BufferingBar.xml" itemID="4294fc18-00000729" lastModified="1166032235"/>
+          <Include href="CaptionButton.xml" itemID="456b559d-000015d2" lastModified="1166032246"/>
+          <Include href="ComboBox.xml" itemID="44f70a5f-0000008e" lastModified="1292423117"/>
+          <Include href="Component Assets/_private/Component_avatar.xml" loadImmediate="false" itemID="44f89322-00000020" lastModified="1168286780"/>
+          <Include href="Component Assets/CellRenderer.xml" itemID="44d7bb1d-000000ed" lastModified="1292423118"/>
+          <Include href="Component Assets/CellRendererSkins/CellRenderer_disabledSkin.xml" itemID="453f806e-000004dd" lastModified="1168293053"/>
+          <Include href="Component Assets/CellRendererSkins/CellRenderer_downSkin.xml" itemID="453f806e-000004e0" lastModified="1168286936"/>
+          <Include href="Component Assets/CellRendererSkins/CellRenderer_overSkin.xml" itemID="453f806e-000004e3" lastModified="1168297377"/>
+          <Include href="Component Assets/CellRendererSkins/CellRenderer_selectedDisabledSkin.xml" itemID="453f806e-000004e6" lastModified="1168293033"/>
+          <Include href="Component Assets/CellRendererSkins/CellRenderer_selectedDownSkin.xml" itemID="453f806e-000004e9" lastModified="1168287002"/>
+          <Include href="Component Assets/CellRendererSkins/CellRenderer_selectedOverSkin.xml" itemID="453f806e-000004ec" lastModified="1168292911"/>
+          <Include href="Component Assets/CellRendererSkins/CellRenderer_selectedUpSkin.xml" itemID="453f806e-000004ef" lastModified="1168287028"/>
+          <Include href="Component Assets/CellRendererSkins/CellRenderer_upSkin.xml" itemID="453f806e-000004da" lastModified="1169163238"/>
+          <Include href="Component Assets/ComboBoxSkins/ComboBox_disabledSkin.xml" itemID="44f747a4-00000196" lastModified="1168287287"/>
+          <Include href="Component Assets/ComboBoxSkins/ComboBox_downSkin.xml" itemID="44f74767-00000192" lastModified="1168287299"/>
+          <Include href="Component Assets/ComboBoxSkins/ComboBox_overSkin.xml" itemID="44f7476d-00000193" lastModified="1168287312"/>
+          <Include href="Component Assets/ComboBoxSkins/ComboBox_upSkin.xml" itemID="44f7477c-00000194" lastModified="1168288699"/>
+          <Include href="Component Assets/ListSkins/List_skin.xml" itemID="44d01cb5-00000051" lastModified="1169163244"/>
+          <Include href="Component Assets/ScrollBar.xml" itemID="45365ac7-000002ef" lastModified="1292423118"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollArrowDown_disabledSkin.xml" itemID="4399b48a-00008d0a" lastModified="1168289950"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollArrowDown_downSkin.xml" itemID="4399b4a4-00008e29" lastModified="1168289961"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollArrowDown_icon.xml" itemIcon="1" loadImmediate="false" itemID="456df1e4-00000190" lastModified="1168289966"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollArrowDown_overSkin.xml" itemID="4399c50b-00008f6e" lastModified="1168290195"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollArrowDown_upSkin.xml" itemID="4399c519-0000900f" lastModified="1168290217"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollArrowUp_disabledSkin.xml" itemID="4399b493-00008d74" lastModified="1168290230"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollArrowUp_downSkin.xml" itemID="4399c54a-00009130" lastModified="1168290244"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollArrowUp_icon.xml" itemIcon="1" loadImmediate="false" itemID="456df209-00000192" lastModified="1168290248"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollArrowUp_overSkin.xml" itemID="4399c55c-000091cd" lastModified="1168290260"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollArrowUp_upSkin.xml" itemID="4399c568-00009256" lastModified="1168290275"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollBar_thumbIcon.xml" itemID="442a68fb-00006a9d" lastModified="1164927281"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollThumb_downSkin.xml" itemID="4399c5a6-000092e7" lastModified="1168290280"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollThumb_overSkin.xml" itemID="4399c5b6-00009358" lastModified="1168290288"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollThumb_upSkin.xml" itemID="4399c5d1-000093e9" lastModified="1168290292"/>
+          <Include href="Component Assets/ScrollBarSkins/ScrollTrack_skin.xml" itemID="44fdb956-000002bc" lastModified="1168290301"/>
+          <Include href="Component Assets/Shared/arrowIcon.xml" itemIcon="1" loadImmediate="false" itemID="456df449-0000019f" lastModified="1168290350"/>
+          <Include href="Component Assets/Shared/focusRectSkin.xml" itemID="44d8b6f8-00000055" lastModified="1168290361"/>
+          <Include href="Component Assets/TextInputSkins/TextInput_disabledSkin.xml" itemID="44b148ab-000000ee" lastModified="1168290428"/>
+          <Include href="Component Assets/TextInputSkins/TextInput_upSkin.xml" itemID="44b148bb-000000ef" lastModified="1168290434"/>
+          <Include href="ForwardButton.xml" itemID="4256c8d9-00000071" lastModified="1166032256"/>
+          <Include href="FullScreenButton.xml" itemID="456b5594-000015cf" lastModified="1166032264"/>
+          <Include href="List.xml" itemID="44e5f6db-00000035" lastModified="1292423118"/>
+          <Include href="MuteButton.xml" itemID="429df9ee-000006f0" lastModified="1166032273"/>
+          <Include href="PauseButton.xml" itemID="4249d26f-000000fc" lastModified="1166032280"/>
+          <Include href="PlayButton.xml" itemID="4249d20e-000000f7" lastModified="1166032286"/>
+          <Include href="PlayPauseButton.xml" itemID="42519c72-00000090" lastModified="1166032293"/>
+          <Include href="SeekBar.xml" itemID="429df456-00000347" lastModified="1166032307"/>
+          <Include href="StopButton.xml" itemID="4249d131-000000e3" lastModified="1166032314"/>
+          <Include href="TextInput.xml" itemID="44b159e1-000000fd" lastModified="1292423118"/>
+          <Include href="VolumeBar.xml" itemID="42950911-00000320" lastModified="1166032325"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="ComboBox" color="#FF4FFF" current="true" isSelected="true" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="ComboBox" name="items_ComboBox" selected="true" centerPoint3DX="30" centerPoint3DY="599.95" uniqueID="35">
+                                             <matrix>
+                                                  <Matrix tx="-20" ty="588.95"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="50" y="11"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='35'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="dataProvider">
+      <Inspectable name="dataProvider" variable="dataProvider" category="" verbose="0" defaultValue="fl.data.DataProvider, fl.data.SimpleCollectionItem, item, 0, 0" type="Collection"/>
+   </property>
+   <property id="editable">
+      <Inspectable name="editable" variable="editable" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="enabled">
+      <Inspectable name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="prompt">
+      <Inspectable name="prompt" variable="prompt" category="" verbose="0" defaultValue="" type="String"/>
+   </property>
+   <property id="restrict">
+      <Inspectable name="restrict" variable="restrict" category="" verbose="1" defaultValue="" type="String"/>
+   </property>
+   <property id="rowCount">
+      <Inspectable name="rowCount" variable="rowCount" category="" verbose="0" defaultValue="5" type="Number"/>
+   </property>
+   <property id="visible">
+      <Inspectable name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Flex" color="#FF800A" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMCompiledClipInstance libraryItemName="FlexComponentBase" name="sample_Flex" uniqueID="33">
+                                             <matrix>
+                                                  <Matrix tx="349.95" ty="412.45"/>
+                                             </matrix>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='33'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="baseline">
+      <Inspectable name="baseline" variable="baseline" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="bottom">
+      <Inspectable name="bottom" variable="bottom" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="boundingBoxName">
+      <Inspectable name="boundingBoxName" variable="boundingBoxName" category="" verbose="0" defaultValue="" type="String"/>
+   </property>
+   <property id="hasFocusableChildren">
+      <Inspectable name="hasFocusableChildren" variable="hasFocusableChildren" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="horizontalCenter">
+      <Inspectable name="horizontalCenter" variable="horizontalCenter" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="left">
+      <Inspectable name="left" variable="left" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="right">
+      <Inspectable name="right" variable="right" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="tabFocusEnabled">
+      <Inspectable name="tabFocusEnabled" variable="tabFocusEnabled" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="top">
+      <Inspectable name="top" variable="top" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="verticalCenter">
+      <Inspectable name="verticalCenter" variable="verticalCenter" category="" verbose="0" defaultValue="" type="Object"/>
+   </property>
+   <property id="autoUpdateCurrentState">
+      <Inspectable name="autoUpdateCurrentState" variable="autoUpdateCurrentState" category="General" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="autoUpdateMeasuredSize">
+      <Inspectable name="autoUpdateMeasuredSize" variable="autoUpdateMeasuredSize" category="General" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="scaleContentWhenResized">
+      <Inspectable name="scaleContentWhenResized" variable="scaleContentWhenResized" category="General" verbose="0" defaultValue="false" enumeration="false,true" type="List"/>
+   </property>
+   <property id="x">
+      <Inspectable name="x" variable="x" category="General" verbose="0" defaultValue="0" type="Number"/>
+   </property>
+   <property id="y">
+      <Inspectable name="y" variable="y" category="General" verbose="0" defaultValue="0" type="Number"/>
+   </property>
+   <property id="scaleX">
+      <Inspectable name="scaleX" variable="scaleX" category="Size" verbose="0" defaultValue="1.0" type="Number"/>
+   </property>
+   <property id="scaleY">
+      <Inspectable name="scaleY" variable="scaleY" category="Size" verbose="0" defaultValue="1.0" type="Number"/>
+   </property>
+   <property id="scaleZ">
+      <Inspectable name="scaleZ" variable="scaleZ" category="Size" verbose="0" defaultValue="1.0" type="Number"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMCompiledClipInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="FLVPlaybackCaptioning" color="#9933CC" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMCompiledClipInstance libraryItemName="FLVPlaybackCaptioning" name="sample_FLVPlaybackCaptioning" uniqueID="31">
+                                             <matrix>
+                                                  <Matrix tx="193.95" ty="407.95"/>
+                                             </matrix>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='31'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="autoLayout">
+      <Inspectable name="autoLayout" variable="autoLayout" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="captionTargetName">
+      <Inspectable name="captionTargetName" variable="captionTargetName" category="" verbose="0" defaultValue="auto" type="String"/>
+   </property>
+   <property id="flvPlaybackName">
+      <Inspectable name="flvPlaybackName" variable="flvPlaybackName" category="" verbose="0" defaultValue="auto" type="String"/>
+   </property>
+   <property id="showCaptions">
+      <Inspectable name="showCaptions" variable="showCaptions" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="simpleFormatting">
+      <Inspectable name="simpleFormatting" variable="simpleFormatting" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="source">
+      <Inspectable name="source" variable="source" category="" verbose="0" defaultValue="" type="String"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMCompiledClipInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="FLVPlayback" color="#4FFF4F" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMCompiledClipInstance libraryItemName="FLVPlayback" name="sample_FLVPlayback" uniqueID="29">
+                                             <matrix>
+                                                  <Matrix tx="-130" ty="329.95"/>
+                                             </matrix>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='29'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="align">
+      <Inspectable name="align" variable="align" category="" verbose="0" defaultValue="center" enumeration="center,top,left,bottom,right,topLeft,topRight,bottomLeft,bottomRight" type="List"/>
+   </property>
+   <property id="autoPlay">
+      <Inspectable name="autoPlay" variable="autoPlay" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="cuePoints">
+      <Inspectable name="cuePoints" variable="cuePoints" category="" verbose="0" defaultValue="" type="Video Cue Points"/>
+   </property>
+   <property id="isLive">
+      <Inspectable name="isLive" variable="isLive" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="preview">
+      <Inspectable name="preview" variable="preview" category="" verbose="0" defaultValue="None" type="Video Preview"/>
+   </property>
+   <property id="scaleMode">
+      <Inspectable name="scaleMode" variable="scaleMode" category="" verbose="0" defaultValue="maintainAspectRatio" enumeration="maintainAspectRatio,noScale,exactFit" type="List"/>
+   </property>
+   <property id="skin">
+      <Inspectable name="skin" variable="skin" category="" verbose="0" defaultValue="MinimaFlatCustomColorPlayBackSeekCounterVolMute.swf" type="Video Skin"/>
+   </property>
+   <property id="skinAutoHide">
+      <Inspectable name="skinAutoHide" variable="skinAutoHide" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="skinBackgroundAlpha">
+      <Inspectable name="skinBackgroundAlpha" variable="skinBackgroundAlpha" category="" verbose="0" defaultValue="0.85" type="Number"/>
+   </property>
+   <property id="skinBackgroundColor">
+      <Inspectable name="skinBackgroundColor" variable="skinBackgroundColor" category="" verbose="0" defaultValue="#666666" type="Color"/>
+   </property>
+   <property id="source">
+      <Inspectable name="source" variable="source" category="" verbose="0" defaultValue="" type="Video Content Path"/>
+   </property>
+   <property id="volume">
+      <Inspectable name="volume" variable="volume" category="" verbose="0" defaultValue="1" type="Number"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMCompiledClipInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="CaptionButton" color="#FF4F4F" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="CaptionButton" name="sample_CaptionButton" uniqueID="27">
+                                             <matrix>
+                                                  <Matrix tx="618.45" ty="298.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='27'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="FullScreenButton" color="#4F80FF" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="FullScreenButton" name="sample_FullScreenButton" uniqueID="25">
+                                             <matrix>
+                                                  <Matrix tx="418.45" ty="298.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='25'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="MuteButton" color="#808080" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="MuteButton" name="sample_MuteButton" uniqueID="23">
+                                             <matrix>
+                                                  <Matrix tx="218.45" ty="298.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='23'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="BufferingBar" color="#4FFFFF" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="BufferingBar" name="sample_BufferingBar" uniqueID="21">
+                                             <matrix>
+                                                  <Matrix tx="-20.5" ty="305.55"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="248.35" y="4.45"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='21'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="SeekBar" color="#FF4FFF" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="SeekBar" name="sample_SeekBar" uniqueID="19">
+                                             <matrix>
+                                                  <Matrix tx="579.45" ty="165.55"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="50.5" y="4.45"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='19'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="VolumeBar" color="#FF800A" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="VolumeBar" name="sample_VolumeBar" uniqueID="17">
+                                             <matrix>
+                                                  <Matrix tx="403.95" ty="165"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25.75" y="4.95"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='17'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="StopButton" color="#9933CC" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="StopButton" name="sample_StopButton" uniqueID="15">
+                                             <matrix>
+                                                  <Matrix tx="218.45" ty="158.55"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.45"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='15'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="PlayPauseButton" color="#4FFF4F" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="PlayPauseButton" name="sample_PlayPauseButton" uniqueID="13">
+                                             <matrix>
+                                                  <Matrix tx="18.5" ty="158.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='13'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="PlayButton" color="#FF4F4F" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="PlayButton" name="sample_PlayButton" uniqueID="11">
+                                             <matrix>
+                                                  <Matrix tx="618.45" ty="18.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='11'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="PauseButton" color="#4F80FF" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="PauseButton" name="sample_PauseButton" uniqueID="9">
+                                             <matrix>
+                                                  <Matrix tx="418.45" ty="18.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='9'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="ForwardButton" color="#808080" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="ForwardButton" name="sample_ForwardButton" uniqueID="7">
+                                             <matrix>
+                                                  <Matrix tx="218.45" ty="18.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="10.5" y="10.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='7'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="BackButton" color="#4FFFFF" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="BackButton" name="sample_BackButton" uniqueID="5">
+                                             <matrix>
+                                                  <Matrix tx="18.5" ty="18.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="10.5" y="10.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='5'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="TileList" color="#FF4FFF" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="List" color="#FF800A" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="ComboBox" color="#9933CC" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 1" color="#4FFF4F">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="528" publishTime="1793184051"/>
+     </publishHistory>
+     <swcCache>
+          <Swc hashKey="5hQS0VF2RpEUrBqYgohhO." href="7pbybnm5x9.swc">
+               <classDefinitions>
+                    <ClassDefinition value="fl.video.CuePointType"/>
+                    <ClassDefinition value="fl.video.ParseResults"/>
+                    <ClassDefinition value="fl.video.VideoPlayerState"/>
+                    <ClassDefinition value="fl.video.NCManagerNativeShim"/>
+                    <ClassDefinition value="fl.video.VideoError"/>
+                    <ClassDefinition value="fl.video.VideoEvent"/>
+                    <ClassDefinition value="fl.video.AutoLayoutEvent"/>
+                    <ClassDefinition value="fl.video.SkinErrorEvent"/>
+                    <ClassDefinition value="fl.video.VolumeBarAccImpl"/>
+                    <ClassDefinition value="fl.video.FPADManager"/>
+                    <ClassDefinition value="fl.video.SeekBarAccImpl"/>
+                    <ClassDefinition value="fl.video.VideoScaleMode"/>
+                    <ClassDefinition value="fl.video.ReconnectClient"/>
+                    <ClassDefinition value="fl.video.ConnectClient"/>
+                    <ClassDefinition value="fl.livepreview.LivePreviewParent"/>
+                    <ClassDefinition value="fl.video.NCManagerNative"/>
+                    <ClassDefinition value="fl.video.VideoPlayerClient"/>
+                    <ClassDefinition value="fl.video.LayoutEvent"/>
+                    <ClassDefinition value="fl.video.Icon"/>
+                    <ClassDefinition value="fl.video.ControlData"/>
+                    <ClassDefinition value="fl.video.VideoState"/>
+                    <ClassDefinition value="fl.video.QueuedCommand"/>
+                    <ClassDefinition value="fl.video.VideoProgressEvent"/>
+                    <ClassDefinition value="fl.video.VideoAlign"/>
+                    <ClassDefinition value="fl.video.CuePointManager"/>
+                    <ClassDefinition value="fl.video.IVPEvent"/>
+                    <ClassDefinition value="fl.video.VideoPlayer"/>
+                    <ClassDefinition value="fl.video.UIManager"/>
+                    <ClassDefinition value="fl.video.ConnectClientNative"/>
+                    <ClassDefinition value="fl.video.INCManager"/>
+                    <ClassDefinition value="fl.video.SoundEvent"/>
+                    <ClassDefinition value="fl.video.FLVPlayback"/>
+                    <ClassDefinition value="fl.video.MetadataEvent"/>
+                    <ClassDefinition value="fl.video.SMILManager"/>
+                    <ClassDefinition value="fl.video.NCManager"/>
+                    <ClassDefinition value="fl.livepreview.IEditContextV1"/>
+                    <ClassDefinition value="fl.livepreview.IPreviewInterface"/>
+                    <ClassDefinition value="fl.video.CuePointType"/>
+                    <ClassDefinition value="fl.video.VideoPlayerState"/>
+                    <ClassDefinition value="fl.video.ControlData"/>
+                    <ClassDefinition value="fl.video.CuePointManager"/>
+                    <ClassDefinition value="fl.video.UIManager"/>
+                    <ClassDefinition value="fl.video.INCManager"/>
+                    <ClassDefinition value="fl.video.VideoState"/>
+                    <ClassDefinition value="fl.livepreview.EditContextFlags"/>
+                    <ClassDefinition value="fl.video.VideoScaleMode"/>
+                    <ClassDefinition value="fl.video.QueuedCommand"/>
+                    <ClassDefinition value="fl.video.IVPEvent"/>
+                    <ClassDefinition value="fl.video.ParseResults"/>
+                    <ClassDefinition value="fl.video.SMILManager"/>
+                    <ClassDefinition value="fl.video.FPADManager"/>
+                    <ClassDefinition value="fl.video.VideoAlign"/>
+                    <ClassDefinition value="fl.video.ConnectClient"/>
+                    <ClassDefinition value="fl.video.ReconnectClient"/>
+                    <ClassDefinition value="fl.video.VideoPlayerClient"/>
+                    <ClassDefinition value="fl.video.LayoutEvent"/>
+                    <ClassDefinition value="fl.video.SoundEvent"/>
+                    <ClassDefinition value="fl.video.VolumeBarAccImpl"/>
+                    <ClassDefinition value="fl.video.SeekBarAccImpl"/>
+                    <ClassDefinition value="fl.livepreview.IVideoInterfaceV1"/>
+                    <ClassDefinition value="fl.video.VideoError"/>
+                    <ClassDefinition value="UIManagerStage"/>
+                    <ClassDefinition value="fl.video.NCManager"/>
+                    <ClassDefinition value="fl.video.VideoEvent"/>
+                    <ClassDefinition value="fl.video.MetadataEvent"/>
+                    <ClassDefinition value="fl.video.VideoProgressEvent"/>
+                    <ClassDefinition value="fl.video.AutoLayoutEvent"/>
+                    <ClassDefinition value="fl.video.SkinErrorEvent"/>
+                    <ClassDefinition value="fl.video.VideoPlayer"/>
+                    <ClassDefinition value="FLVPlaybackStageLivePreview"/>
+                    <ClassDefinition value="fl.stage.video.StopButtonDown"/>
+                    <ClassDefinition value="fl.stage.video.StopButtonNormal"/>
+                    <ClassDefinition value="fl.stage.video.StopButtonOver"/>
+                    <ClassDefinition value="fl.video.FLVPlayback"/>
+                    <ClassDefinition value="fl.stage.video.ComponentVersionView"/>
+                    <ClassDefinition value="fl.stage.video.BackgroundBox"/>
+                    <ClassDefinition value="FLVPlaybackStage"/>
+                    <ClassDefinition value="fl.livepreview.LivePreviewParent"/>
+                    <ClassDefinition value="fl.video.Icon"/>
+               </classDefinitions>
+          </Swc>
+          <Swc hashKey="k718tUOF1.A1OSpQnqdJJ0" href="7pbybnm5x914.swc">
+               <classDefinitions>
+                    <ClassDefinition value="fl.core.AccessibilityShim"/>
+                    <ClassDefinition value="fl.controls.CheckBox"/>
+                    <ClassDefinition value="fl.controls.LabelButton"/>
+                    <ClassDefinition value="fl.controls.List"/>
+                    <ClassDefinition value="fl.controls.ComboBox"/>
+                    <ClassDefinition value="fl.controls.ProgressBarDirection"/>
+                    <ClassDefinition value="fl.data.SimpleCollectionItem"/>
+                    <ClassDefinition value="fl.controls.TextArea"/>
+                    <ClassDefinition value="fl.display.ProLoaderInfo"/>
+                    <ClassDefinition value="fl.controls.Slider"/>
+                    <ClassDefinition value="fl.events.DataChangeEvent"/>
+                    <ClassDefinition value="fl.accessibility.ComboBoxAccImpl"/>
+                    <ClassDefinition value="fl.events.DataChangeType"/>
+                    <ClassDefinition value="fl.accessibility.TileListAccImpl"/>
+                    <ClassDefinition value="fl.accessibility.ButtonAccImpl"/>
+                    <ClassDefinition value="fl.controls.BaseButton"/>
+                    <ClassDefinition value="fl.core.UIComponent"/>
+                    <ClassDefinition value="fl.controls.DataGrid"/>
+                    <ClassDefinition value="fl.display.ProLoader"/>
+                    <ClassDefinition value="fl.containers.BaseScrollPane"/>
+                    <ClassDefinition value="fl.livepreview.LivePreviewParent"/>
+                    <ClassDefinition value="fl.controls.Label"/>
+                    <ClassDefinition value="fl.managers.IFocusManagerComponent"/>
+                    <ClassDefinition value="fl.controls.UIScrollBar"/>
+                    <ClassDefinition value="fl.controls.listClasses.ICellRenderer"/>
+                    <ClassDefinition value="fl.controls.ColorPicker"/>
+                    <ClassDefinition value="fl.controls.dataGridClasses.DataGridCellEditor"/>
+                    <ClassDefinition value="fl.managers.FocusManager"/>
+                    <ClassDefinition value="fl.events.ProLoaderRSLPreloaderSandboxEvent"/>
+                    <ClassDefinition value="fl.events.DataGridEventReason"/>
+                    <ClassDefinition value="fl.events.SliderEvent"/>
+                    <ClassDefinition value="fl.events.SliderEventClickTarget"/>
+                    <ClassDefinition value="fl.controls.progressBarClasses.IndeterminateBar"/>
+                    <ClassDefinition value="fl.controls.listClasses.ListData"/>
+                    <ClassDefinition value="fl.core.InvalidationType"/>
+                    <ClassDefinition value="fl.controls.NumericStepper"/>
+                    <ClassDefinition value="fl.controls.RadioButtonGroup"/>
+                    <ClassDefinition value="fl.accessibility.LabelButtonAccImpl"/>
+                    <ClassDefinition value="fl.containers.UILoader"/>
+                    <ClassDefinition value="fl.events.ColorPickerEvent"/>
+                    <ClassDefinition value="fl.controls.ButtonLabelPlacement"/>
+                    <ClassDefinition value="fl.accessibility.CheckBoxAccImpl"/>
+                    <ClassDefinition value="fl.controls.TileList"/>
+                    <ClassDefinition value="fl.managers.StyleManager"/>
+                    <ClassDefinition value="fl.controls.RadioButton"/>
+                    <ClassDefinition value="fl.containers.ScrollPane"/>
+                    <ClassDefinition value="fl.controls.listClasses.TileListData"/>
+                    <ClassDefinition value="fl.events.InteractionInputType"/>
+                    <ClassDefinition value="fl.controls.Button"/>
+                    <ClassDefinition value="fl.core.ComponentShim"/>
+                    <ClassDefinition value="fl.accessibility.UIComponentAccImpl"/>
+                    <ClassDefinition value="fl.controls.SelectableList"/>
+                    <ClassDefinition value="fl.events.ComponentEvent"/>
+                    <ClassDefinition value="fl.accessibility.RadioButtonAccImpl"/>
+                    <ClassDefinition value="fl.controls.listClasses.CellRenderer"/>
+                    <ClassDefinition value="fl.managers.IFocusManagerGroup"/>
+                    <ClassDefinition value="fl.controls.ScrollPolicy"/>
+                    <ClassDefinition value="fl.controls.ProgressBar"/>
+                    <ClassDefinition value="fl.controls.ScrollBar"/>
+                    <ClassDefinition value="fl.controls.listClasses.ImageCell"/>
+                    <ClassDefinition value="fl.managers.IFocusManager"/>
+                    <ClassDefinition value="fl.controls.ProgressBarMode"/>
+                    <ClassDefinition value="fl.accessibility.SelectableListAccImpl"/>
+                    <ClassDefinition value="fl.controls.TextInput"/>
+                    <ClassDefinition value="fl.events.ListEvent"/>
+                    <ClassDefinition value="fl.accessibility.AccImpl"/>
+                    <ClassDefinition value="fl.accessibility.DataGridAccImpl"/>
+                    <ClassDefinition value="fl.events.ScrollEvent"/>
+                    <ClassDefinition value="fl.controls.dataGridClasses.DataGridColumn"/>
+                    <ClassDefinition value="fl.events.DataGridEvent"/>
+                    <ClassDefinition value="fl.data.TileListCollectionItem"/>
+                    <ClassDefinition value="fl.data.DataProvider"/>
+                    <ClassDefinition value="fl.accessibility.ListAccImpl"/>
+                    <ClassDefinition value="fl.controls.dataGridClasses.HeaderRenderer"/>
+                    <ClassDefinition value="fl.controls.ScrollBarDirection"/>
+                    <ClassDefinition value="fl.controls.SliderDirection"/>
+               </classDefinitions>
+          </Swc>
+          <Swc hashKey="u6WoxbQBPf5MDbMcy6Jt7." href="7pbyqnm5x9.swc">
+               <classDefinitions>
+                    <ClassDefinition value="fl.livepreview.LivePreviewParent"/>
+                    <ClassDefinition value="fl.video.TimedTextManager"/>
+                    <ClassDefinition value="fl.video.CaptionChangeEvent"/>
+                    <ClassDefinition value="fl.video.CaptionTargetEvent"/>
+                    <ClassDefinition value="fl.video.FLVPlaybackCaptioning"/>
+               </classDefinitions>
+          </Swc>
+          <Swc hashKey="W4/s/RUftagZay/5v/0450" href="7pbyqnm5x915.swc">
+               <classDefinitions>
+                    <ClassDefinition value="mx.geom.Transform"/>
+                    <ClassDefinition value="mx.core.AdvancedLayoutFeatures"/>
+                    <ClassDefinition value="mx.resources.ResourceManagerImpl"/>
+                    <ClassDefinition value="ResourceManagerImpl.as$130.ResourceModuleInfo"/>
+                    <ClassDefinition value="ResourceManagerImpl.as$130.ResourceEventDispatcher"/>
+                    <ClassDefinition value="mx.core.IChildList"/>
+                    <ClassDefinition value="mx.geom.CompoundTransform"/>
+                    <ClassDefinition value="mx.managers.IFocusManagerComponent"/>
+                    <ClassDefinition value="mx.events.ResourceEvent"/>
+                    <ClassDefinition value="mx.core.LayoutElementUIComponentUtils"/>
+                    <ClassDefinition value="mx.core.IFlexModule"/>
+                    <ClassDefinition value="mx.modules.IModuleInfo"/>
+                    <ClassDefinition value="mx.events.Request"/>
+                    <ClassDefinition value="mx.events.ToolTipEvent"/>
+                    <ClassDefinition value="mx.modules.ModuleManagerGlobals"/>
+                    <ClassDefinition value="mx.resources.ResourceManager"/>
+                    <ClassDefinition value="mx.flash.ContainerMovieClip"/>
+                    <ClassDefinition value="mx.events.MoveEvent"/>
+                    <ClassDefinition value="mx.modules.ModuleManager"/>
+                    <ClassDefinition value="ModuleManager.as$140.ModuleManagerImpl"/>
+                    <ClassDefinition value="ModuleManager.as$140.ModuleInfo"/>
+                    <ClassDefinition value="ModuleManager.as$140.FactoryInfo"/>
+                    <ClassDefinition value="ModuleManager.as$140.ModuleInfoProxy"/>
+                    <ClassDefinition value="mx.resources.IResourceModule"/>
+                    <ClassDefinition value="_472d13db055d1131b047fac436bf2f3b7d76e737da2d1e445956f4e1c3a74d7d_flash_display_Sprite"/>
+                    <ClassDefinition value="mx.events.PropertyChangeEventKind"/>
+                    <ClassDefinition value="mx.events.StateChangeEvent"/>
+                    <ClassDefinition value="mx.core.IStateClient"/>
+                    <ClassDefinition value="mx.events.DragEvent"/>
+                    <ClassDefinition value="mx.events.PropertyChangeEvent"/>
+                    <ClassDefinition value="mx.utils.StringUtil"/>
+                    <ClassDefinition value="mx.resources.IResourceBundle"/>
+                    <ClassDefinition value="mx.core.IFlexDisplayObject"/>
+                    <ClassDefinition value="mx.core.FlexVersion"/>
+                    <ClassDefinition value="mx.core.IConstraintClient"/>
+                    <ClassDefinition value="mx.managers.SystemManagerGlobals"/>
+                    <ClassDefinition value="mx.core.IUIComponent"/>
+                    <ClassDefinition value="mx.resources.LocaleSorter"/>
+                    <ClassDefinition value="LocaleSorter.as$133.LocaleID"/>
+                    <ClassDefinition value="LocaleSorter.as$133.LocaleRegistry"/>
+                    <ClassDefinition value="mx.flash.UIMovieClip"/>
+                    <ClassDefinition value="mx.managers.ISystemManager"/>
+                    <ClassDefinition value="mx.core.ILayoutElement"/>
+                    <ClassDefinition value="mx.core.Singleton"/>
+                    <ClassDefinition value="mx.resources.ResourceBundle"/>
+                    <ClassDefinition value="mx.core.IVisualElementContainer"/>
+                    <ClassDefinition value="mx.core.IToolTip"/>
+                    <ClassDefinition value="mx.events.FlexEvent"/>
+                    <ClassDefinition value="mx.resources.IResourceManager"/>
+                    <ClassDefinition value="mx.core.IInvalidating"/>
+                    <ClassDefinition value="mx.core.IMXMLObject"/>
+                    <ClassDefinition value="mx.events.ResizeEvent"/>
+                    <ClassDefinition value="mx.managers.IToolTipManagerClient"/>
+                    <ClassDefinition value="mx.core.IDeferredInstantiationUIComponent"/>
+                    <ClassDefinition value="mx.utils.MatrixUtil"/>
+                    <ClassDefinition value="mx.core.ComponentDescriptor"/>
+                    <ClassDefinition value="mx.core.DragSource"/>
+                    <ClassDefinition value="mx.events.FlexMouseEvent"/>
+                    <ClassDefinition value="mx.events.ModuleEvent"/>
+                    <ClassDefinition value="mx.flash.FlexContentHolder"/>
+                    <ClassDefinition value="mx.core.DesignLayer"/>
+                    <ClassDefinition value="mx.automation.IAutomationObject"/>
+                    <ClassDefinition value="mx.core.IVisualElement"/>
+                    <ClassDefinition value="mx.core.IFlexModuleFactory"/>
+                    <ClassDefinition value="mx.geom.TransformOffsets"/>
+                    <ClassDefinition value="mx.core.UIComponentDescriptor"/>
+               </classDefinitions>
+          </Swc>
+     </swcCache>
+</DOMDocument>

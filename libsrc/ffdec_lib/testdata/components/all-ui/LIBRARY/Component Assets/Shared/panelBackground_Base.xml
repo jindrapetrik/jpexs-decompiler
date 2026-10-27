@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/Shared/panelBackground_Base" itemID="450ae432-0000043d" lastModified="1168290370">
+  <timeline>
+    <DOMTimeline name="panelBackground_Base">
+      <layers>
+        <DOMLayer name="background" color="#4FFF4F" outline="true" current="true" isSelected="true" useOutlineView="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape isDrawingObject="true">
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF" alpha="0.6"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!5360 0|80 0!80 0[46 0 23 23!23 23[0 46 0 80!0 80|0 3820!0 3820|5440 3820!5440 3820|5440 80!5440 80[5440 46 5417 23!5417 23[5393 0 5360 0"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

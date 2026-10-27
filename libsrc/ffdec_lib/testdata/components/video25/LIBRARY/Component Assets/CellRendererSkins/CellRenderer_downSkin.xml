@@ -1,0 +1,50 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/CellRendererSkins/CellRenderer_downSkin" itemID="453f806e-000004e0" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="CellRenderer_downSkin" scaleGridLeft="1" scaleGridRight="150.95" scaleGridTop="1" scaleGridBottom="21" lastModified="1168286936">
+  <timeline>
+    <DOMTimeline name="CellRenderer_downSkin">
+      <layers>
+        <DOMLayer name="border" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="0.00787353515625" c="-0.00787353515625" d="0" tx="143.5" ty="7.55"/>
+                        </matrix>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!3040 0|0 0!0 0|0 440!0 440|3040 440!3040 440|3040 0!3020 420|20 420!20 420|20 20!20 20|3020 20!3020 20|3020 420"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="fill" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#9AD8FF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!3039.5 440.5|-0.5 440.5!-0.5 440.5|-0.5 0.5!-0.5 0.5|3039.5 0.5!3039.5 0.5|3039.5 440.5"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

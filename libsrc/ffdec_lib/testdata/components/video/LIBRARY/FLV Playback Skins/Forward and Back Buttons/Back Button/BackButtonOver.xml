@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonOver" itemID="4270288c-00000236" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="BackButtonOver" linkageClassName="BackButtonOver" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonOver" sourceLastModified="1157562261" lastModified="1157562261" lastUniqueIdentifier="12" sourceItemID="4270288c-00000236">
+  <timeline>
+    <DOMTimeline name="BackButtonOver">
+      <layers>
+        <DOMLayer name="Icon" color="#FFFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackIcon" name="icon_mc">
+                  <matrix>
+                    <Matrix tx="9" ty="9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="3" y="2.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Button" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgOver" name="button_mc">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

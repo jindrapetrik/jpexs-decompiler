@@ -16,8 +16,11 @@
  */
 package com.jpexs.decompiler.flash.exporters.settings;
 
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Script export settings.
@@ -55,6 +58,11 @@ public class ScriptExportSettings implements Cloneable {
      * Ignore accessibility
      */
     public boolean ignoreAccessibility;
+
+    /**
+     * Initializers restored as native FLA component parameters.
+     */
+    public Set<MethodBody> ignoredInstanceMethods = Collections.emptySet();
 
     /**
      * Export embed

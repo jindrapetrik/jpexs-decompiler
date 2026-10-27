@@ -1,0 +1,817 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="ColorPicker" itemID="44f35aca-00000053" linkageExportForAS="true" linkageBaseClass="flash.display.Sprite" linkageClassName="fl.controls.ColorPicker" lastModified="1292423438" lastUniqueIdentifier="61" tooltip="ColorPicker" customIconID="0" actionscriptClass="fl.controls.ColorPicker" livePreviewScmHRef="hadtcx0lui.swf" livePreviewScmSourceFilename="ColorPicker.swf" persistLivePreview11="true" livePreview11ScmHRef="hadtcx0lui8.swf" livePreview11ScmSourceFilename="C:\Users\jkamerer\AppData\Local\Adobe\Flash CS5.5\en_US\Configuration\TMPkiv91dh4b2..swf" editFrameIndex="2" requiredMinimumPlayerVersion="9" requiredMinimumASVersion="3" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="ColorPicker" currentFrame="1">
+      <layers>
+        <DOMLayer name="assets" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/ColorPickerSkins/ColorPicker_upSkin">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="88.6" ty="38.85"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.4" y="11.4"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ColorPickerSkins/ColorPicker_disabledSkin">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="90.1" ty="136.9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="13.75" y="13.75"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ColorPickerSkins/ColorPicker_swatchSkin">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="96.15" ty="222.85"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="4" y="4"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ColorPickerSkins/ColorPicker_backgroundSkin">
+                  <matrix>
+                    <Matrix a="0.444854736328125" d="0.444793701171875" tx="269.95" ty="41.3"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="134.55" y="95"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ColorPickerSkins/ColorPicker_downSkin">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="89.8" ty="101.65"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="12" y="12"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ColorPickerSkins/ColorPicker_textFieldSkin">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="37.8" ty="290.4"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="37" y="16.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ColorPickerSkins/ColorPicker_overSkin">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="89" ty="69.6"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ColorPickerSkins/ColorPicker_colorWell">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="90.7" ty="174.45"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ColorPickerSkins/ColorPicker_swatchSelectedSkin">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="95.25" ty="255.9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="5.95" y="6"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/Shared/panelBackground_Base">
+                  <matrix>
+                    <Matrix a="0.20367431640625" d="0.203643798828125" tx="335.55" ty="254.3"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="136" y="95.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/Shared/panelBackground_Shadow">
+                  <matrix>
+                    <Matrix a="0.20361328125" d="0.203582763671875" tx="334.95" ty="183.75"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="139" y="96.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="asset names" color="#808080" locked="true" autoNamed="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMRectangleObject objectWidth="388.95" objectHeight="183" x="-1.55" y="30.3" lockFlag="true" topLeftRadius="10" topRightRadius="10" bottomLeftRadius="10" bottomRightRadius="10">
+                  <matrix>
+                    <Matrix a="1.57962036132813" d="1.96287536621094" tx="2.45" ty="-59.7"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="192.9" y="121.8"/>
+                  </transformationPoint>
+                  <fill>
+                    <SolidColor color="#EEEEEE"/>
+                  </fill>
+                  <stroke>
+                    <SolidStroke scaleMode="normal">
+                      <fill>
+                        <SolidColor color="#CCCCCC"/>
+                      </fill>
+                    </SolidStroke>
+                  </stroke>
+                </DOMRectangleObject>
+                <DOMStaticText width="102.2" height="14.5" isSelectable="false">
+                  <matrix>
+                    <Matrix d="1.003173828125" tx="427.65" ty="44.3"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Background Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="157.25" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix d="1.003173828125" tx="427.65" ty="178.25"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Panel Background Shadow</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="139.85" height="31" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix d="1.003173828125" tx="427.65" ty="259.05"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Panel Background Base&#xD;</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="45.75" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="126.55" ty="43.3"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Up Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="72.55" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="128.05" ty="142.4"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Disable Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="60" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="128.05" ty="178.3"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Color Well</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="71.75" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix d="1.003173828125" tx="128.05" ty="216.3"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Swatch Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="97.1" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix d="1.003173828125" tx="128.05" ty="256.3"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Swatch Selected</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="57.3" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="126.55" ty="73.2"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Over Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="62.4" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix d="0.9998779296875" tx="127.75" ty="107.15"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Down Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="55.9" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix d="1.003173828125" tx="127.75" ty="294.15"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Text Field</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="avatar" color="#4FFF4F" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/_private/Component_avatar">
+                  <matrix>
+                    <Matrix a="0.300003051757813" d="1.09091186523438"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="40" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="ComponentShim" color="#FF4FFF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMCompiledClipInstance libraryItemName="Component Assets/_private/ComponentShim" uniqueID="28">
+                  <matrix>
+                    <Matrix d="1.00311279296875" tx="10" ty="10"/>
+                  </matrix>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='6.28'>
+</component>
+]]></dataBindingXML>
+                </DOMCompiledClipInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="enabled">
+      <Inspectable name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="selectedColor">
+      <Inspectable name="selectedColor" variable="selectedColor" category="" verbose="0" defaultValue="#000000" type="Color"/>
+   </property>
+   <property id="showTextField">
+      <Inspectable name="showTextField" variable="showTextField" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+   <property id="visible">
+      <Inspectable name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+  <classProperties><![CDATA[<classDefs>
+	<classDef id="Date"/>
+	<classDef id="Date"/>
+	<classDef id="Boolean"/>
+	<classDef id="Namespace"/>
+	<classDef id="Class"/>
+	<classDef id="uint"/>
+	<classDef id="Object"/>
+	<classDef id="Number"/>
+	<classDef id="int"/>
+	<classDef id="String"/>
+	<classDef id="Function"/>
+	<classDef id="Array"/>
+	<classDef id="builtin.as$91.MethodClosure"/>
+	<classDef id="Object"/>
+	<classDef id="Boolean"/>
+	<classDef id="Namespace"/>
+	<classDef id="Class"/>
+	<classDef id="uint"/>
+	<classDef id="Number"/>
+	<classDef id="int"/>
+	<classDef id="String"/>
+	<classDef id="Function"/>
+	<classDef id="Array"/>
+	<classDef id="builtin.as$91.MethodClosure"/>
+	<classDef id="RegExp"/>
+	<classDef id="RegExp"/>
+	<classDef id="flash.display.Sprite"/>
+	<classDef id="flash.display.Sprite"/>
+	<classDef id="flash.display.DisplayObjectContainer"/>
+	<classDef id="flash.display.DisplayObjectContainer"/>
+	<classDef id="flash.display.InteractiveObject"/>
+	<classDef id="flash.display.InteractiveObject"/>
+	<classDef id="flash.display.DisplayObject"/>
+	<classDef id="flash.display.DisplayObject"/>
+	<classDef id="flash.display.IBitmapDrawable"/>
+	<classDef id="flash.display.IBitmapDrawable"/>
+	<classDef id="flash.events.WeakFunctionClosure"/>
+	<classDef id="flash.events.EventDispatcher"/>
+	<classDef id="flash.events.WeakMethodClosure"/>
+	<classDef id="flash.events.WeakFunctionClosure"/>
+	<classDef id="flash.events.WeakMethodClosure"/>
+	<classDef id="flash.events.EventDispatcher"/>
+	<classDef id="flash.events.IEventDispatcher"/>
+	<classDef id="flash.events.IEventDispatcher"/>
+	<classDef id="flash.events.Event"/>
+	<classDef id="flash.events.Event"/>
+	<classDef id="flash.display.Stage"/>
+	<classDef id="flash.display.Stage"/>
+	<classDef id="flash.geom.Rectangle"/>
+	<classDef id="flash.geom.Rectangle"/>
+	<classDef id="flash.geom.Point"/>
+	<classDef id="flash.geom.Point"/>
+	<classDef id="flash.display.LoaderInfo"/>
+	<classDef id="flash.display.LoaderInfo"/>
+	<classDef id="flash.geom.Transform"/>
+	<classDef id="flash.geom.Transform"/>
+	<classDef id="flash.accessibility.AccessibilityProperties"/>
+	<classDef id="flash.accessibility.AccessibilityProperties"/>
+	<classDef id="flash.ui.ContextMenu"/>
+	<classDef id="flash.ui.ContextMenu"/>
+	<classDef id="flash.accessibility.AccessibilityImplementation"/>
+	<classDef id="flash.accessibility.AccessibilityImplementation"/>
+	<classDef id="flash.text.TextSnapshot"/>
+	<classDef id="flash.text.TextSnapshot"/>
+	<classDef id="flash.media.SoundTransform"/>
+	<classDef id="flash.media.SoundTransform"/>
+	<classDef id="flash.display.Graphics"/>
+	<classDef id="flash.display.Graphics"/>
+	<classDef id="flash.events.KeyboardEvent"/>
+	<classDef id="flash.events.KeyboardEvent"/>
+	<classDef id="flash.events.FocusEvent"/>
+	<classDef id="flash.events.FocusEvent"/>
+	<classDef id="flash.text.TextField"/>
+	<classDef id="flash.text.TextField"/>
+	<classDef id="flash.utils.Dictionary"/>
+	<classDef id="flash.utils.Dictionary"/>
+	<classDef id="flash.geom.ColorTransform"/>
+	<classDef id="flash.geom.ColorTransform"/>
+	<classDef id="flash.events.MouseEvent"/>
+	<classDef id="flash.events.MouseEvent"/>
+	<classDef id="SecurityError"/>
+	<classDef id="URIError"/>
+	<classDef id="ReferenceError"/>
+	<classDef id="ArgumentError"/>
+	<classDef id="EvalError"/>
+	<classDef id="SyntaxError"/>
+	<classDef id="UninitializedError"/>
+	<classDef id="TypeError"/>
+	<classDef id="DefinitionError"/>
+	<classDef id="Error"/>
+	<classDef id="RangeError"/>
+	<classDef id="VerifyError"/>
+	<classDef id="Error"/>
+	<classDef id="SecurityError"/>
+	<classDef id="URIError"/>
+	<classDef id="ReferenceError"/>
+	<classDef id="ArgumentError"/>
+	<classDef id="EvalError"/>
+	<classDef id="SyntaxError"/>
+	<classDef id="UninitializedError"/>
+	<classDef id="TypeError"/>
+	<classDef id="DefinitionError"/>
+	<classDef id="RangeError"/>
+	<classDef id="VerifyError"/>
+	<classDef id="flash.text.TextFormat"/>
+	<classDef id="flash.text.TextFormat"/>
+	<classDef id="flash.system.IME"/>
+	<classDef id="flash.system.IME"/>
+	<classDef id="flash.system.IMEConversionMode"/>
+	<classDef id="flash.system.IMEConversionMode"/>
+	<classDef id="Math"/>
+	<classDef id="Math"/>
+	<classDef id="flash.text.TextFormatAlign"/>
+	<classDef id="flash.text.TextFormatAlign"/>
+	<classDef id="flash.ui.Keyboard"/>
+	<classDef id="flash.ui.Keyboard"/>
+	<classDef id="flash.text.TextFieldType"/>
+	<classDef id="flash.text.TextFieldType"/>
+	<classDef id="XMLList"/>
+	<classDef id="XML"/>
+	<classDef id="QName"/>
+	<classDef id="XMLList"/>
+	<classDef id="XML"/>
+	<classDef id="QName"/>
+	<classDef id="flash.geom.Matrix"/>
+	<classDef id="flash.geom.Matrix"/>
+	<classDef id="flash.display.BitmapData"/>
+	<classDef id="flash.display.BitmapData"/>
+	<classDef id="flash.utils.ByteArray"/>
+	<classDef id="flash.utils.ByteArray"/>
+	<classDef id="flash.display.Loader"/>
+	<classDef id="flash.display.Loader"/>
+	<classDef id="flash.system.ApplicationDomain"/>
+	<classDef id="flash.system.ApplicationDomain"/>
+	<classDef id="flash.ui.ContextMenuBuiltInItems"/>
+	<classDef id="flash.ui.ContextMenuBuiltInItems"/>
+	<classDef id="flash.text.TextRun"/>
+	<classDef id="flash.text.TextRun"/>
+	<classDef id="flash.text.TextLineMetrics"/>
+	<classDef id="flash.text.TextLineMetrics"/>
+	<classDef id="flash.text.StyleSheet"/>
+	<classDef id="flash.text.StyleSheet"/>
+	<classDef id="flash.events.TimerEvent"/>
+	<classDef id="flash.events.TimerEvent"/>
+	<classDef id="flash.utils.Timer"/>
+	<classDef id="flash.utils.Timer"/>
+	<classDef id="flash.display.SimpleButton"/>
+	<classDef id="flash.display.SimpleButton"/>
+	<classDef id="flash.events.ProgressEvent"/>
+	<classDef id="flash.events.ProgressEvent"/>
+	<classDef id="flash.events.IOErrorEvent"/>
+	<classDef id="flash.events.IOErrorEvent"/>
+	<classDef id="flash.errors.IOError"/>
+	<classDef id="flash.errors.EOFError"/>
+	<classDef id="flash.errors.StackOverflowError"/>
+	<classDef id="flash.errors.InvalidSWFError"/>
+	<classDef id="flash.errors.ScriptTimeoutError"/>
+	<classDef id="flash.errors.IllegalOperationError"/>
+	<classDef id="flash.errors.MemoryError"/>
+	<classDef id="flash.errors.IOError"/>
+	<classDef id="flash.errors.StackOverflowError"/>
+	<classDef id="flash.errors.InvalidSWFError"/>
+	<classDef id="flash.errors.ScriptTimeoutError"/>
+	<classDef id="flash.errors.IllegalOperationError"/>
+	<classDef id="flash.errors.MemoryError"/>
+	<classDef id="flash.errors.EOFError"/>
+	<classDef id="flash.events.HTTPStatusEvent"/>
+	<classDef id="flash.events.HTTPStatusEvent"/>
+	<classDef id="flash.events.ContextMenuEvent"/>
+	<classDef id="flash.events.ContextMenuEvent"/>
+	<classDef id="flash.events.IMEEvent"/>
+	<classDef id="flash.events.IMEEvent"/>
+	<classDef id="flash.events.TextEvent"/>
+	<classDef id="flash.events.TextEvent"/>
+	<classDef id="flash.events.FullScreenEvent"/>
+	<classDef id="flash.events.FullScreenEvent"/>
+	<classDef id="flash.utils.IDataInput"/>
+	<classDef id="flash.utils.IDataInput"/>
+	<classDef id="flash.utils.IDataOutput"/>
+	<classDef id="flash.utils.IDataOutput"/>
+	<classDef id="flash.events.ErrorEvent"/>
+	<classDef id="flash.events.ErrorEvent"/>
+	<classDef id="flash.events.ActivityEvent"/>
+	<classDef id="flash.events.ActivityEvent"/>
+	<classDef id="flash.filters.BitmapFilter"/>
+	<classDef id="flash.filters.BitmapFilter"/>
+	<classDef id="flash.system.LoaderContext"/>
+	<classDef id="flash.system.LoaderContext"/>
+	<classDef id="flash.net.URLRequest"/>
+	<classDef id="flash.net.URLRequest"/>
+	<classDef id="flash.system.SecurityDomain"/>
+	<classDef id="flash.system.SecurityDomain"/>
+	<classDef id="fl.managers.IFocusManagerComponent"/>
+	<classDef id="fl.core.InvalidationType"/>
+	<classDef id="fl.managers.IFocusManager"/>
+	<classDef id="fl.managers.StyleManager"/>
+	<classDef id="fl.managers.IFocusManagerGroup"/>
+	<classDef id="fl.controls.ButtonLabelPlacement"/>
+	<classDef id="fl.events.ComponentEvent"/>
+	<classDef id="fl.events.ColorPickerEvent"/>
+	<classDef id="fl.managers.FocusManager"/>
+	<classDef id="fl.core.UIComponent"/>
+	<classDef id="fl.controls.ColorPicker"/>
+	<classDef id="fl.controls.BaseButton"/>
+	<classDef id="fl.controls.LabelButton"/>
+	<classDef id="fl.controls.Button"/>
+</classDefs>
+<class id="fl.controls.ColorPicker" >
+	<Style name="embedFonts" type="Boolean" />
+	<Style name="upSkin" type="Class" />
+	<Style name="columnCount" type="Number" format="Length" />
+	<Style name="swatchHeight" type="Number" format="Length" />
+	<Style name="swatchWidth" type="Number" format="Length" />
+	<Style name="swatchSelectedSkin" type="Class" />
+	<Style name="swatchSkin" type="Class" />
+	<Style name="background" type="Class" />
+	<Style name="textFieldSkin" type="Class" />
+	<Style name="downSkin" type="Class" />
+	<Style name="colorWell" type="Class" />
+	<Style name="backgroundPadding" type="Number" format="Length" />
+	<Style name="overSkin" type="Class" />
+	<Style name="textPadding" type="Number" format="Length" />
+	<Style name="disabledSkin" type="Class" />
+	<Style name="swatchPadding" type="Number" format="Length" />
+	<Event name="enter" type="fl.events.ColorPickerEvent" />
+	<Event name="itemRollOut" type="fl.events.ColorPickerEvent" />
+	<Event name="itemRollOver" type="fl.events.ColorPickerEvent" />
+	<Event name="change" type="fl.events.ColorPickerEvent" />
+	<Event name="close" type="flash.events.Event" />
+	<Event name="open" type="flash.events.Event" />
+	<__go_to_ctor_definition_help file="C:\devsrc\staging\main\Not Localized\All Language\All OS Not Localized\Common\Configuration\Component Source\ActionScript 3.0\User Interface\fl\controls\ColorPicker.as" pos="17162" />
+	<Style name="disabledTextFormat" type="flash.text.TextFormat" />
+	<Style name="textFormat" type="flash.text.TextFormat" />
+	<Style name="focusRectPadding" type="Number" format="Length" />
+	<Style name="focusRectSkin" type="Class" />
+	<Event name="hide" type="fl.events.ComponentEvent" />
+	<Event name="show" type="fl.events.ComponentEvent" />
+	<Event name="resize" type="fl.events.ComponentEvent" />
+	<Event name="move" type="fl.events.ComponentEvent" />
+	<__go_to_ctor_definition_help file="C:\devsrc\staging\main\Not Localized\All Language\All OS Not Localized\Common\Configuration\Component Source\ActionScript 3.0\User Interface\fl\core\UIComponent.as" pos="14965" />
+	<Event name="tabIndexChange" type="flash.events.Event" />
+	<Event name="tabEnabledChange" type="flash.events.Event" />
+	<Event name="tabChildrenChange" type="flash.events.Event" />
+	<Event name="keyUp" type="flash.events.KeyboardEvent" />
+	<Event name="keyDown" type="flash.events.KeyboardEvent" />
+	<Event name="rollOver" type="flash.events.MouseEvent" />
+	<Event name="rollOut" type="flash.events.MouseEvent" />
+	<Event name="mouseWheel" type="flash.events.MouseEvent" />
+	<Event name="mouseUp" type="flash.events.MouseEvent" />
+	<Event name="mouseOver" type="flash.events.MouseEvent" />
+	<Event name="mouseOut" type="flash.events.MouseEvent" />
+	<Event name="mouseMove" type="flash.events.MouseEvent" />
+	<Event name="mouseDown" type="flash.events.MouseEvent" />
+	<Event name="doubleClick" type="flash.events.MouseEvent" />
+	<Event name="click" type="flash.events.MouseEvent" />
+	<Event name="mouseFocusChange" type="flash.events.FocusEvent" />
+	<Event name="keyFocusChange" type="flash.events.FocusEvent" />
+	<Event name="focusOut" type="flash.events.FocusEvent" />
+	<Event name="focusIn" type="flash.events.FocusEvent" />
+	<Event name="render" type="flash.events.Event" />
+	<Event name="removedFromStage" type="flash.events.Event" />
+	<Event name="removed" type="flash.events.Event" />
+	<Event name="enterFrame" type="flash.events.Event" />
+	<Event name="addedToStage" type="flash.events.Event" />
+	<Event name="added" type="flash.events.Event" />
+	<Event name="deactivate" type="flash.events.Event" />
+	<Event name="activate" type="flash.events.Event" />
+	<method id="selectedColor" returnType="uint" isProperty="true" permissions="readwrite">
+		<Inspectable type="Color" defaultValue="#000000" />
+	</method>
+	<method id="hexValue" returnType="String" isProperty="true" permissions="readonly">
+	</method>
+	<method id="enabled" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="true" verbose="1" />
+	</method>
+	<method id="editable" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="showTextField" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="true" />
+	</method>
+	<method id="colors" returnType="Array" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="imeMode" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="textField" returnType="TextField" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="componentInspectorSetting" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="width" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="height" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="x" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="y" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="scaleX" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="scaleY" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="visible" returnType="Boolean" isProperty="true" permissions="readwrite">
+		<Inspectable defaultValue="true" verbose="1" />
+	</method>
+	<method id="focusEnabled" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="mouseFocusEnabled" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="focusManager" returnType="IFocusManager" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="version" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="focusTarget" returnType="IFocusManagerComponent" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="graphics" returnType="Graphics" isProperty="true" permissions="readonly">
+	</method>
+	<method id="buttonMode" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="dropTarget" returnType="DisplayObject" isProperty="true" permissions="readonly">
+	</method>
+	<method id="hitArea" returnType="Sprite" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="useHandCursor" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="soundTransform" returnType="SoundTransform" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="numChildren" returnType="int" isProperty="true" permissions="readonly">
+	</method>
+	<method id="textSnapshot" returnType="TextSnapshot" isProperty="true" permissions="readonly">
+	</method>
+	<method id="tabChildren" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="mouseChildren" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="tabEnabled" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="tabIndex" returnType="int" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="focusRect" returnType="Object" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="mouseEnabled" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="doubleClickEnabled" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="contextMenu" returnType="ContextMenu" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="accessibilityImplementation" returnType="AccessibilityImplementation" isProperty="true" permissions="readwrite">
+		<Inspectable environment="none" />
+	</method>
+	<method id="root" returnType="DisplayObject" isProperty="true" permissions="readonly">
+	</method>
+	<method id="stage" returnType="Stage" isProperty="true" permissions="readonly">
+	</method>
+	<method id="name" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="parent" returnType="DisplayObjectContainer" isProperty="true" permissions="readonly">
+	</method>
+	<method id="mask" returnType="DisplayObject" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="mouseX" returnType="Number" isProperty="true" permissions="readonly">
+	</method>
+	<method id="mouseY" returnType="Number" isProperty="true" permissions="readonly">
+	</method>
+	<method id="rotation" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="alpha" returnType="Number" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="cacheAsBitmap" returnType="Boolean" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="opaqueBackground" returnType="Object" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="scrollRect" returnType="Rectangle" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="filters" returnType="Array" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="blendMode" returnType="String" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="transform" returnType="Transform" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="scale9Grid" returnType="Rectangle" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="loaderInfo" returnType="LoaderInfo" isProperty="true" permissions="readonly">
+	</method>
+	<method id="accessibilityProperties" returnType="AccessibilityProperties" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="open" returnType="void" isProperty="false">
+	</method>
+	<method id="close" returnType="void" isProperty="false">
+	</method>
+	<method id="ColorPicker" isConstructor="true" isProperty="false">
+	</method>
+	<method id="setSize" returnType="void" isProperty="false">
+	</method>
+	<method id="setStyle" returnType="void" isProperty="false">
+	</method>
+	<method id="clearStyle" returnType="void" isProperty="false">
+	</method>
+	<method id="getStyle" returnType="Object" isProperty="false">
+	</method>
+	<method id="move" returnType="void" isProperty="false">
+	</method>
+	<method id="validateNow" returnType="void" isProperty="false">
+	</method>
+	<method id="invalidate" returnType="void" isProperty="false">
+	</method>
+	<method id="setSharedStyle" returnType="void" isProperty="false">
+	</method>
+	<method id="drawFocus" returnType="void" isProperty="false">
+	</method>
+	<method id="setFocus" returnType="void" isProperty="false">
+	</method>
+	<method id="getFocus" returnType="InteractiveObject" isProperty="false">
+	</method>
+	<method id="drawNow" returnType="void" isProperty="false">
+	</method>
+	<method id="UIComponent" isConstructor="true" isProperty="false">
+	</method>
+	<method id="startDrag" returnType="void" isProperty="false">
+	</method>
+	<method id="stopDrag" returnType="void" isProperty="false">
+	</method>
+	<method id="Sprite" isConstructor="true" isProperty="false">
+	</method>
+	<method id="addChild" returnType="DisplayObject" isProperty="false">
+	</method>
+	<method id="addChildAt" returnType="DisplayObject" isProperty="false">
+	</method>
+	<method id="removeChild" returnType="DisplayObject" isProperty="false">
+	</method>
+	<method id="removeChildAt" returnType="DisplayObject" isProperty="false">
+	</method>
+	<method id="getChildIndex" returnType="int" isProperty="false">
+	</method>
+	<method id="setChildIndex" returnType="void" isProperty="false">
+	</method>
+	<method id="getChildAt" returnType="DisplayObject" isProperty="false">
+	</method>
+	<method id="getChildByName" returnType="DisplayObject" isProperty="false">
+	</method>
+	<method id="getObjectsUnderPoint" returnType="Array" isProperty="false">
+	</method>
+	<method id="areInaccessibleObjectsUnderPoint" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="contains" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="swapChildrenAt" returnType="void" isProperty="false">
+	</method>
+	<method id="swapChildren" returnType="void" isProperty="false">
+	</method>
+	<method id="DisplayObjectContainer" isConstructor="true" isProperty="false">
+	</method>
+	<method id="InteractiveObject" isConstructor="true" isProperty="false">
+	</method>
+	<method id="globalToLocal" returnType="Point" isProperty="false">
+	</method>
+	<method id="localToGlobal" returnType="Point" isProperty="false">
+	</method>
+	<method id="getBounds" returnType="Rectangle" isProperty="false">
+	</method>
+	<method id="getRect" returnType="Rectangle" isProperty="false">
+	</method>
+	<method id="hitTestObject" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="hitTestPoint" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="DisplayObject" isConstructor="true" isProperty="false">
+	</method>
+	<method id="toString" returnType="String" isProperty="false">
+	</method>
+	<method id="addEventListener" returnType="void" isProperty="false">
+	</method>
+	<method id="removeEventListener" returnType="void" isProperty="false">
+	</method>
+	<method id="dispatchEvent" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="hasEventListener" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="willTrigger" returnType="Boolean" isProperty="false">
+	</method>
+	<method id="EventDispatcher" isConstructor="true" isProperty="false">
+	</method>
+	<method id="Object" isConstructor="true" isProperty="false">
+	</method>
+</class>]]></classProperties>
+  <customIcon>
+    <CustomIcon rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" href="hadu7x0lui.dat"/>
+  </customIcon>
+</DOMComponentItem>

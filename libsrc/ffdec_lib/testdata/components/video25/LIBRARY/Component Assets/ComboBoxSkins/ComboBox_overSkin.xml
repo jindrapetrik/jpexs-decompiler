@@ -1,0 +1,125 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ComboBoxSkins/ComboBox_overSkin" itemID="44f7476d-00000193" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="ComboBox_overSkin" scaleGridLeft="5" scaleGridRight="125" scaleGridTop="13.25" scaleGridBottom="17.6" lastModified="1168287312" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="ComboBox_overSkin">
+      <layers>
+        <DOMLayer name="icon" color="#FFFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!2700 240|2700 260!2700 260|2720 260!2720 260|2720 240!2720 240|2740 240!2740 240|2740 220!2740 220|2760 220!2760 220|2760 200!2760 200|2780 200!2780 200|2780 180!2780 180|2640 180!2640 180|2640 200!2640 200|2660 200!2660 200|2660 220
+!2660 220|2680 220!2680 220|2680 240!2680 240|2700 240"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="highlight" color="#FF4FFF" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.00640869140625" c="0.018310546875" d="0" tx="61.5" ty="6.75"/>
+                        </matrix>
+                        <GradientEntry color="#CCCCCC" alpha="0" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="
+!2940 240S2|2520 240!2520 240|2520 20!2520 20|2880 20!2880 20[2939 20 2940 80!2940 80|2940 240"/>
+                    <Edge fillStyle0="1" edges="
+!2500 20|80 20!80 20[20 20 20 80!20 80|20 240!20 240|2500 240!2500 240|2500 20"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="fill" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="-0.013427734375" d="0" tx="11" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#EEEEEE" alpha="0.650980392156863" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.741176470588235" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="
+!2940 360[2940 419 2883 420!2883 420|2520 420!2520 420|2520 20!2520 20|2883 20!2883 20[2940 21 2940 80!2940 80|2940 360"/>
+                    <Edge fillStyle0="1" edges="
+!2500 20|78 20!78 20[21 21 20 78!20 78|20 363!20 363[21 419 78 420!78 420|2500 420!2500 420|2500 20"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="border" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="0.013427734375" d="0" tx="137" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.0124359130859375" c="0.018310546875" d="0" tx="125.9" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#0075C0" ratio="0"/>
+                        <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="
+!2880 0|80 0!80 0[#4A.06 0 68.5 0.5!68.5 0.5[0 #5.F9 0 80!0 80|0 360!0 360[0 #171.EB 1 378.5!1 378.5[#1.7F #17D.F 2 385!2 385[#2.2F #181.DC 2.5 386.5!2.5 386.5[#2.B1 #183.54 3 388!3 388[#3.3 #184.C4 3.5 389.5!3.5 389.5[#3.DF #186.E8 4.5
+ 392.5!4.5 392.5[#8.A9 #196.97 17 416.5!17 416.5|53.5 437.5!53.5 437.5[#41.81 440 80 440!80 440|2880 440!2880 440[2954 440 2960 372!2960 372[2960 366 2960 360!2960 360|2960 80!2960 80[2960 74 2960 68!2960 68[2954 0 2880 0!2520 20|2883
+ 20!2883 20[2940 21 2940 80!2940 80|2940 360!2940 360[2940 419 2883 420!2883 420|2520 420"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="
+!2520 420|2500 420"/>
+                    <Edge fillStyle0="1" edges="
+!2500 420|78 420!78 420[#15.67 #1A3.06 20 363!20 363|20 77.5!20 77.5[#15.3E #14.FB 78 20!78 20|2500 20"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="
+!2500 20|2520 20"/>
+                    <Edge fillStyle1="2" edges="
+!2520 20|2520 420!2500 420|2500 20"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -217,6 +217,23 @@ public abstract class AVM2Item extends GraphTargetItem {
             if (!Configuration.as3QNameObfuscatedPropsInSquareBrackets.get()) {
                 isValidName = true;
             }
+
+            FullMultinameAVM2Item multiname = (FullMultinameAVM2Item) propertyName;
+            if (isAttribute && multiname.namespace != null) {
+                // E4X namespace qualifiers cannot contain property expressions
+                // such as this.xmlNamespace. A QName keeps the runtime namespace
+                // and also works for attribute assignment and deletion.
+                writer.append(operator).append("@[new QName(");
+                multiname.namespace.toString(writer, localData);
+                writer.append(",");
+                if (multiname.name != null) {
+                    multiname.name.toString(writer, localData);
+                } else {
+                    int nameIndex = localData.constantsAvm2.getMultiname(multinameIndex).name_index;
+                    new StringAVM2Item(null, null, nameIndex == 0 ? "*" : localData.constantsAvm2.getString(nameIndex)).toString(writer, localData);
+                }
+                return writer.append(")]");
+            }
             
             if (isValidName) {
                 if (((FullMultinameAVM2Item) propertyName).name != null) {

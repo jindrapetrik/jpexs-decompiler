@@ -1,0 +1,30 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/DataGridSkins/HeaderSortArrow_ascIcon" itemID="451cf28f-0000006b" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="HeaderSortArrow_ascIcon" lastModified="1168289527">
+  <timeline>
+    <DOMTimeline name="HeaderSortArrow_ascIcon">
+      <layers>
+        <DOMLayer name="icon" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!140 0|0 0!0 0|0 20!0 20|20 20!20 20|20 40!20 40|40 40!40 40|40 60!40 60|60 60!60 60|60 80!60 80|80 80!80 80|80 60!80 60|100 60!100 60|100 40!100 40|120 40!120 40|120 20!120 20|140 20!140 20|140 0"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

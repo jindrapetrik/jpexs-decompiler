@@ -1,0 +1,125 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgDown" itemID="4270306f-000002db" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgDown" sourceLastModified="1157562248" scaleGridLeft="6" scaleGridRight="20" scaleGridTop="6" scaleGridBottom="17" lastModified="1157562248" sourceItemID="4270306f-000002db">
+  <timeline>
+    <DOMTimeline name="BackBgDown">
+      <layers>
+        <DOMLayer name="Gllow" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#00FF00" alpha="0.352941176470588"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <SolidColor color="#00FF00"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!460 0|120 0!120 0[70 0 35 35!35 35[0 70 0 120!0 120|0 340!0 340[0 390 35 425!35 425[70 460 120 460!120 460|460 460!460 460|460 440!460 440[460 230 460 20!460 20|460 0"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!440 20|120 20!120 20[79 20 49 49!49 49[20 79 20 120!20 120|20 340!20 340[20 381 49 410!49 410[79 440 120 440!120 440|440 440!440 440|440 20!420 420|120 420!120 420[87 420 63 396!63 396[40 373 40 340!40 340|40 120!40 120[40 87 63 63!63
+ 63[87 40 120 40!120 40|420 40!420 40|420 420"/>
+                    <Edge fillStyle0="1" edges="
+!77 77[95 60 120 60!120 60|400 60!400 60|400 400!400 400|401 401!401 401|120 400!120 400[95 400 77 382!77 382[60 365 60 340!60 340|60 120!60 120[60 95 77 77"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Dimension" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="-1.52587890625e-005" b="-0.009765625" c="-0.009796142578125" d="0" tx="23.05" ty="12.05"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="0.010986328125" c="-0.010986328125" d="-1.52587890625e-005" tx="23" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="2" edges="
+!420 420|120 420!120 420[87 420 63 396!63 396[40 373 40 340!40 340|40 120!40 120[40 87 63 63!63 63[87 40 120 40!120 40|420 40!420 40|420 420"/>
+                    <Edge fillStyle0="2" edges="
+!60 121|60 120!60 120|64 97!64 97[#44.6A #56.17 77 77!77 77[#57.8F #43.08 100.5 63!100.5 63|117 60!117 60[#75.C #3C.04 118.5 60!118.5 60[#77.38 60 120 60!120 60|401 59!401 59|400 60"/>
+                    <Edge fillStyle0="1" edges="
+!400 60|120.5 61!120.5 61[#77.B7 61 119 61!119 61[#76.3F #3D.04 117.5 61!117.5 61|101 64!101 64[#57.D4 #44.6C 77 79!77 79[#44.7E 87.5 64 98!64 98|60 121"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="
+!60 121|60 342.5!60 342.5|64.5 364.5!64.5 364.5[#44.AC #177.2F 77 384!77 384[#57.CE #189.F9 101 398!101 398|117.5 401!117.5 401[#76.3F #190.FC 119 401!119 401[#77.B7 401 120.5 401!120.5 401|401 401!401 401|401 61!401 61|402 60!402 60
+|400 60"/>
+                    <Edge cubics="!420 40(;420,40 420,420 420,420q420 40 420 420);"/>
+                    <Edge cubics="!400 60(;400,60 401,59 401,59q400 60 401 59);"/>
+                    <Edge cubics="!119 60(;118,60 118,60 117,60q119 60 117 60);"/>
+                    <Edge cubics="!120 60(;119,60 119,60 119,60q120 60 119 60);"/>
+                    <Edge cubics="!77 77(;71,83 67,90 64,97q77 77Q69 85q64 97);"/>
+                    <Edge cubics="!101 63(;92,66 84,70 77,77q101 63Q86 68q77 77);"/>
+                    <Edge cubics="!101 63(;92,66 84,71 77,78q101 63Q88 68q77 78);"/>
+                    <Edge cubics="!77 78(;72,84 67,90 64,97q77 78Q67 90q64 97);"/>
+                    <Edge cubics="!64 97(;64,97 60,120 60,120q64 97 60 120);"/>
+                    <Edge cubics="!40 120(;40,98 48,79 63,63q40 120Q40 88q63 63);"/>
+                    <Edge cubics="!117 60(;117,60 101,63 101,63q117 60 101 63);"/>
+                    <Edge cubics="!63 63(;79,48 98,40 120,40q63 63Q88 40q120 40);"/>
+                    <Edge cubics="!60 342(60,342;60,342 65,364 65,364q60 342 65 364);"/>
+                    <Edge cubics="!60 340(60,340;60,341 60,341 60,342q60 340 60 342);"/>
+                    <Edge cubics="!77 383(;84,390 92,394 101,397q77 383Q86 392q101 397);"/>
+                    <Edge cubics="!119 400(;119,400 119,400 120,400q119 400 120 400)120,400;"/>
+                    <Edge cubics="!117 400(117,400;118,400 118,400 119,400q117 400 119 400);"/>
+                    <Edge cubics="!101 397(;101,397 117,400 117,400q101 397 117 400);"/>
+                    <Edge cubics="!65 364(;68,371 72,377 77,383q65 364Q69 374q77 383);"/>
+                    <Edge cubics="!120 420(;98,420 79,412 63,396q120 420Q87 420q63 396);"/>
+                    <Edge cubics="!63 396(;48,381 40,362 40,340q63 396Q40 373q40 340);"/>
+                    <Edge cubics="!400 400(;400,400 348,401 348,401q400 400 348 401);"/>
+                    <Edge cubics="!401 401(;401,401 400,400 400,400q401 401 400 400);"/>
+                    <Edge cubics="!348 401(;348,401 401,401 401,401q348 401 401 401);"/>
+                    <Edge cubics="!400 400(;400,400 400,60 400,60q400 400 400 60);"/>
+                    <Edge cubics="!120 400(;120,400 348,401 348,401q120 400 348 401);"/>
+                    <Edge cubics="!60 120(;60,120 60,340 60,340q60 120 60 340);"/>
+                    <Edge cubics="!401 59(;401,59 120,60 120,60q401 59 120 60);"/>
+                    <Edge cubics="!40 340(;40,340 40,120 40,120q40 340 40 120)40,120;"/>
+                    <Edge cubics="!420 420(420,420;420,420 120,420 120,420q420 420 120 420);"/>
+                    <Edge cubics="!120 40(;120,40 420,40 420,40q120 40 420 40);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Color Plate" color="#FF4FFF" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#666666"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="
+!420 40|120 40!120 40[#69.A6 40 93 44.5!93 44.5[#4C.9 #32.01 63 63!63 63[40 87 40 120!40 120|40 340!40 340[40 373 63 396!63 396[#4C.9 #199.9 93 415.5!93 415.5[#5F.53 #1A0.54 97.5 417!97.5 417[#6C.4A 420 120 420!120 420|420 420!420 420
+|420 40"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,104 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgNormal" itemID="42703088-000002dd" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgNormal" sourceLastModified="1157562250" scaleGridLeft="6" scaleGridRight="20" scaleGridTop="6" scaleGridBottom="17" lastModified="1157562250" sourceItemID="42703088-000002dd">
+  <timeline>
+    <DOMTimeline name="BackBgNormal">
+      <layers>
+        <DOMLayer name="Glow" color="#FF4FFF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Dimension" color="#FF4F4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="0.010986328125" c="-0.010986328125" d="-1.52587890625e-005" tx="23" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="-1.52587890625e-005" b="0.009765625" c="-0.009765625" d="0" tx="23" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!420 420|120 420!120 420[87 420 63 396!63 396[40 373 40 340!40 340|40 120!40 120[40 87 63 63!63 63[87 40 120 40!120 40|420 40!420 40|420 420"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!120 60|400 60!400 60|400 400!400 400|401 401!401 401|120 400!120 400[95 400 77 382!77 382[60 365 60 340!60 340|60 120!60 120[60 95 77 77!77 77[95 60 120 60"/>
+                    <Edge cubics="!77 382(;66,371 60,357 60,340q77 382Q60 365q60 340);"/>
+                    <Edge cubics="!120 400(;103,400 89,394 77,382q120 400Q95 400q77 382);"/>
+                    <Edge cubics="!120 420(;98,420 79,412 63,396q120 420Q87 420q63 396);"/>
+                    <Edge cubics="!63 396(63,396;48,381 40,362 40,340q63 396Q40 373q40 340);"/>
+                    <Edge cubics="!401 401(401,401;401,401 400,400 400,400q401 401 400 400);"/>
+                    <Edge cubics="!401 401(;401,401 120,400 120,400q401 401 120 400);"/>
+                    <Edge cubics="!420 420(;420,420 120,420 120,420q420 420 120 420);"/>
+                    <Edge cubics="!120 60(;120,60 400,60 400,60q120 60 400 60);"/>
+                    <Edge cubics="!120 40(120,40;120,40 420,40 420,40q120 40 420 40)420,40;"/>
+                    <Edge cubics="!420 40(;420,40 420,420 420,420q420 40 420 420)420,420;"/>
+                    <Edge cubics="!60 340(;60,340 60,120 60,120q60 340 60 120);"/>
+                    <Edge cubics="!400 60(;400,60 400,400 400,400q400 60 400 400)400,400;"/>
+                    <Edge cubics="!40 340(40,340;40,340 40,120 40,120q40 340 40 120);"/>
+                    <Edge cubics="!40 120(;40,98 48,79 63,63q40 120Q40 88q63 63);"/>
+                    <Edge cubics="!63 63(63,63;79,48 98,40 120,40q63 63Q88 40q120 40);"/>
+                    <Edge cubics="!60 120(60,120;60,103 66,89 77,77q60 120Q60 96q77 77);"/>
+                    <Edge cubics="!77 77(;89,66 103,60 120,60q77 77Q96 60q120 60);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Color Plate" color="#9933CC" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#666666"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!420 40|120 40!120 40[#69.A6 40 93 44.5!93 44.5[#4C.9 #32.01 63 63!63 63[40 87 40 120!40 120|40 340!40 340[40 373 63 396!63 396[#4C.9 #199.9 93 415.5!93 415.5[#5F.53 #1A0.54 97.5 417!97.5 417[#6C.4A 420 120 420!120 420|420 420!420 420
+|420 40"/>
+                    <Edge cubics="!440 420(440,420;440,420 740,420 740,420q440 420 740 420);"/>
+                    <Edge cubics="!63 396(63,396;48,381 40,362 40,340q63 396Q40 373q40 340)40,340;"/>
+                    <Edge cubics="!120 420(120,420;120,420 420,420 420,420q120 420 420 420);"/>
+                    <Edge cubics="!740 40(;762,40 781,48 796,63q740 40Q773 40q796 63);"/>
+                    <Edge cubics="!740 40(;740,40 440,40 440,40q740 40 440 40)440,40;"/>
+                    <Edge cubics="!420 40(420,40;420,40 120,40 120,40q420 40 120 40);"/>
+                    <Edge cubics="!796 63(;812,79 820,98 820,120q796 63Q820 87q820 120);"/>
+                    <Edge cubics="!820 120(820,120;820,120 820,340 820,340q820 120 820 340)820,340;"/>
+                    <Edge cubics="!420 420(420,420;420,420 420,40 420,40q420 420 420 40);"/>
+                    <Edge cubics="!440 40(440,40;440,40 440,420 440,420q440 40 440 420);"/>
+                    <Edge cubics="!93 45(93,45;102,42 111,40 120,40q93 45Q108 40q120 40);"/>
+                    <Edge cubics="!63 63(;72,54 82,48 93,45q63 63Q77 50q93 45);"/>
+                    <Edge cubics="!98 417(;96,416 94,416 93,416q98 417 93 416);"/>
+                    <Edge cubics="!120 420(;112,420 105,419 98,417q120 420 98 417);"/>
+                    <Edge cubics="!93 416(;82,412 72,405 63,396q93 416Q77 410q63 396);"/>
+                    <Edge cubics="!40 340(;40,340 40,120 40,120q40 340 40 120);"/>
+                    <Edge cubics="!796 396(796,396;781,412 762,420 740,420q796 396Q774 420q740 420);"/>
+                    <Edge cubics="!63 63(;48,79 40,98 40,120q63 63Q40 88q40 120);"/>
+                    <Edge cubics="!820 340(;820,362 812,381 796,396q820 340Q820 374q796 396);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

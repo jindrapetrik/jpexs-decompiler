@@ -1,0 +1,87 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/NumericStepperSkins/NumericStepperDownArrow_overSkin" itemID="45097b6b-0000011a" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="NumericStepperDownArrow_overSkin" scaleGridLeft="5.25" scaleGridRight="15.75" scaleGridTop="1.65" scaleGridBottom="2.25" lastModified="1168289575" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="NumericStepperDownArrow_overSkin">
+      <layers>
+        <DOMLayer name="icon" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/NumericStepperSkins/NumericStepperDownArrow_icon" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix tx="6" ty="4"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="skin" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <LinearGradient>
+                            <matrix>
+                              <Matrix a="0" b="-0.013427734375" c="0.013458251953125" d="0" tx="10"/>
+                            </matrix>
+                            <GradientEntry color="#E6E6E6" alpha="0.4" ratio="0"/>
+                            <GradientEntry color="#FFFFFF" alpha="0.6" ratio="1"/>
+                          </LinearGradient>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!400 0|400 160!400 160[400 188 386 205!386 205[371 219 343 220!343 220|0 220!0 220|0 0!0 0|400 0"/>
+                        <Edge cubics="!386 205(;376,214 362,219 343,220q386 205Q371 219q343 220);"/>
+                        <Edge cubics="!400 160(;400,179 395,194 386,205q400 160Q400 188q386 205);"/>
+                        <Edge cubics="!400 0(;400,0 400,160 400,160q400 0 400 160);"/>
+                        <Edge cubics="!0 220(;0,220 0,0 0,0q0 220 0 0);"/>
+                        <Edge cubics="!400 0(;400,0 0,0 0,0q400 0 0 0);"/>
+                        <Edge cubics="!343 220(343,220;343,220 0,220 0,220q343 220 0 220)0,220;"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <LinearGradient>
+                            <matrix>
+                              <Matrix a="0" b="-0.013427734375" c="0.013427734375" d="0" tx="9.95"/>
+                            </matrix>
+                            <GradientEntry color="#0075BF" ratio="0"/>
+                            <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                          </LinearGradient>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!420 160[420 240 340 240!340 240|0 240!0 240|0 220!0 220|343 220!343 220[371 219 386 205!386 205[400 188 400 160!400 160|400 0!400 0|420 0!420 0|420 160"/>
+                        <Edge cubics="!420 0(420,0;420,0 420,160 420,160q420 0 420 160);"/>
+                        <Edge cubics="!340 240(340,240;340,240 0,240 0,240q340 240 0 240);"/>
+                        <Edge cubics="!0 220(0,220;0,220 343,220 343,220q0 220 343 220);"/>
+                        <Edge cubics="!0 240(0,240;0,240 0,220 0,220q0 240 0 220);"/>
+                        <Edge cubics="!343 220(343,220;362,219 376,214 386,205q343 220Q371 219q386 205);"/>
+                        <Edge cubics="!386 205(386,205;395,194 400,179 400,160q386 205Q400 188q400 160);"/>
+                        <Edge cubics="!400 160(400,160;400,160 400,0 400,0q400 160 400 0);"/>
+                        <Edge cubics="!420 160(420,160;420,213 393,240 340,240q420 160Q420 240q340 240);"/>
+                        <Edge cubics="!400 0(400,0;400,0 420,0 420,0q400 0 420 0);"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

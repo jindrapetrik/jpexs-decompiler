@@ -1,0 +1,199 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<assets>
+    <asset className="BackButtonDisabled" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonDisabled" />
+    <asset className="BackButtonDown" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonDown" />
+    <asset className="BackButtonNormal" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonNormal" />
+    <asset className="BackButtonOver" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonOver" />
+    <asset className="BufferingPatternSymbol" name="Component Assets/FLV Playback Skins/Buffering Bar/BufferingPatternSymbol" />
+    <asset className="Button_disabledSkin" name="Component Assets/ButtonSkins/Button_disabledSkin" />
+    <asset className="Button_downSkin" name="Component Assets/ButtonSkins/Button_downSkin" />
+    <asset className="Button_emphasizedSkin" name="Component Assets/ButtonSkins/Button_emphasizedSkin" />
+    <asset className="Button_overSkin" name="Component Assets/ButtonSkins/Button_overSkin" />
+    <asset className="Button_selectedDisabledSkin" name="Component Assets/ButtonSkins/Button_selectedDisabledSkin" />
+    <asset className="Button_selectedDownSkin" name="Component Assets/ButtonSkins/Button_selectedDownSkin" />
+    <asset className="Button_selectedOverSkin" name="Component Assets/ButtonSkins/Button_selectedOverSkin" />
+    <asset className="Button_selectedUpSkin" name="Component Assets/ButtonSkins/Button_selectedUpSkin" />
+    <asset className="Button_upSkin" name="Component Assets/ButtonSkins/Button_upSkin" />
+    <asset className="CaptionButtonOff" name="Component Assets/FLV Playback Skins/Caption Button/CaptionButtonOff" />
+    <asset className="CaptionButtonOffDisabled" name="Component Assets/FLV Playback Skins/Caption Button/CaptionButtonOffDisabled" />
+    <asset className="CaptionButtonOffDown" name="Component Assets/FLV Playback Skins/Caption Button/CaptionButtonOffDown" />
+    <asset className="CaptionButtonOffNormal" name="Component Assets/FLV Playback Skins/Caption Button/CaptionButtonOffNormal" />
+    <asset className="CaptionButtonOffOver" name="Component Assets/FLV Playback Skins/Caption Button/CaptionButtonOffOver" />
+    <asset className="CaptionButtonOn" name="Component Assets/FLV Playback Skins/Caption Button/CaptionButtonOn" />
+    <asset className="CaptionButtonOnDisabled" name="Component Assets/FLV Playback Skins/Caption Button/CaptionButtonOnDisabled" />
+    <asset className="CaptionButtonOnDown" name="Component Assets/FLV Playback Skins/Caption Button/CaptionButtonOnDown" />
+    <asset className="CaptionButtonOnNormal" name="Component Assets/FLV Playback Skins/Caption Button/CaptionButtonOnNormal" />
+    <asset className="CaptionButtonOnOver" name="Component Assets/FLV Playback Skins/Caption Button/CaptionButtonOnOver" />
+    <asset className="CellRenderer_disabledSkin" name="Component Assets/CellRendererSkins/CellRenderer_disabledSkin" />
+    <asset className="CellRenderer_downSkin" name="Component Assets/CellRendererSkins/CellRenderer_downSkin" />
+    <asset className="CellRenderer_overSkin" name="Component Assets/CellRendererSkins/CellRenderer_overSkin" />
+    <asset className="CellRenderer_selectedDisabledSkin" name="Component Assets/CellRendererSkins/CellRenderer_selectedDisabledSkin" />
+    <asset className="CellRenderer_selectedDownSkin" name="Component Assets/CellRendererSkins/CellRenderer_selectedDownSkin" />
+    <asset className="CellRenderer_selectedOverSkin" name="Component Assets/CellRendererSkins/CellRenderer_selectedOverSkin" />
+    <asset className="CellRenderer_selectedUpSkin" name="Component Assets/CellRendererSkins/CellRenderer_selectedUpSkin" />
+    <asset className="CellRenderer_upSkin" name="Component Assets/CellRendererSkins/CellRenderer_upSkin" />
+    <asset className="CheckBox_disabledIcon" name="Component Assets/CheckBoxSkins/CheckBox_disabledIcon" />
+    <asset className="CheckBox_downIcon" name="Component Assets/CheckBoxSkins/CheckBox_downIcon" />
+    <asset className="CheckBox_overIcon" name="Component Assets/CheckBoxSkins/CheckBox_overIcon" />
+    <asset className="CheckBox_selectedDisabledIcon" name="Component Assets/CheckBoxSkins/CheckBox_selectedDisabledIcon" />
+    <asset className="CheckBox_selectedDownIcon" name="Component Assets/CheckBoxSkins/CheckBox_selectedDownIcon" />
+    <asset className="CheckBox_selectedOverIcon" name="Component Assets/CheckBoxSkins/CheckBox_selectedOverIcon" />
+    <asset className="CheckBox_selectedUpIcon" name="Component Assets/CheckBoxSkins/CheckBox_selectedUpIcon" />
+    <asset className="CheckBox_upIcon" name="Component Assets/CheckBoxSkins/CheckBox_upIcon" />
+    <asset className="ColorPicker_backgroundSkin" name="Component Assets/ColorPickerSkins/ColorPicker_backgroundSkin" />
+    <asset className="ColorPicker_colorWell" name="Component Assets/ColorPickerSkins/ColorPicker_colorWell" />
+    <asset className="ColorPicker_disabledSkin" name="Component Assets/ColorPickerSkins/ColorPicker_disabledSkin" />
+    <asset className="ColorPicker_downSkin" name="Component Assets/ColorPickerSkins/ColorPicker_downSkin" />
+    <asset className="ColorPicker_overSkin" name="Component Assets/ColorPickerSkins/ColorPicker_overSkin" />
+    <asset className="ColorPicker_swatchSelectedSkin" name="Component Assets/ColorPickerSkins/ColorPicker_swatchSelectedSkin" />
+    <asset className="ColorPicker_swatchSkin" name="Component Assets/ColorPickerSkins/ColorPicker_swatchSkin" />
+    <asset className="ColorPicker_textFieldSkin" name="Component Assets/ColorPickerSkins/ColorPicker_textFieldSkin" />
+    <asset className="ColorPicker_upSkin" name="Component Assets/ColorPickerSkins/ColorPicker_upSkin" />
+    <asset className="ColumnStretch_cursor" name="Component Assets/DataGridSkins/ColumnStretch_cursor" />
+    <asset className="ComboBox_disabledSkin" name="Component Assets/ComboBoxSkins/ComboBox_disabledSkin" />
+    <asset className="ComboBox_downSkin" name="Component Assets/ComboBoxSkins/ComboBox_downSkin" />
+    <asset className="ComboBox_overSkin" name="Component Assets/ComboBoxSkins/ComboBox_overSkin" />
+    <asset className="ComboBox_upSkin" name="Component Assets/ComboBoxSkins/ComboBox_upSkin" />
+    <asset className="DataGridCellEditor_skin" name="Component Assets/DataGridSkins/DataGridCellEditor_skin" />
+    <asset className="DataGrid_skin" name="Component Assets/DataGridSkins/DataGrid_skin" />
+    <asset className="ForwardButtonDisabled" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonDisabled" />
+    <asset className="ForwardButtonDown" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonDown" />
+    <asset className="ForwardButtonNormal" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonNormal" />
+    <asset className="ForwardButtonOver" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonOver" />
+    <asset className="FullScreenButtonOff" name="Component Assets/FLV Playback Skins/FullScreen Button/FullScreenButtonOff" />
+    <asset className="FullScreenButtonOffDisabled" name="Component Assets/FLV Playback Skins/FullScreen Button/FullScreenButtonOffDisabled" />
+    <asset className="FullScreenButtonOffDown" name="Component Assets/FLV Playback Skins/FullScreen Button/FullScreenButtonOffDown" />
+    <asset className="FullScreenButtonOffNormal" name="Component Assets/FLV Playback Skins/FullScreen Button/FullScreenButtonOffNormal" />
+    <asset className="FullScreenButtonOffOver" name="Component Assets/FLV Playback Skins/FullScreen Button/FullScreenButtonOffOver" />
+    <asset className="FullScreenButtonOn" name="Component Assets/FLV Playback Skins/FullScreen Button/FullScreenButtonOn" />
+    <asset className="FullScreenButtonOnDisabled" name="Component Assets/FLV Playback Skins/FullScreen Button/FullScreenButtonOnDisabled" />
+    <asset className="FullScreenButtonOnDown" name="Component Assets/FLV Playback Skins/FullScreen Button/FullScreenButtonOnDown" />
+    <asset className="FullScreenButtonOnNormal" name="Component Assets/FLV Playback Skins/FullScreen Button/FullScreenButtonOnNormal" />
+    <asset className="FullScreenButtonOnOver" name="Component Assets/FLV Playback Skins/FullScreen Button/FullScreenButtonOnOver" />
+    <asset className="HeaderRenderer_disabledSkin" name="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_disabledSkin" />
+    <asset className="HeaderRenderer_downSkin" name="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_downSkin" />
+    <asset className="HeaderRenderer_overSkin" name="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_overSkin" />
+    <asset className="HeaderRenderer_selectedDisabledSkin" name="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_selectedDisabledSkin" />
+    <asset className="HeaderRenderer_selectedDownSkin" name="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_selectedDownSkin" />
+    <asset className="HeaderRenderer_selectedOverSkin" name="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_selectedOverSkin" />
+    <asset className="HeaderRenderer_selectedUpSkin" name="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_selectedUpSkin" />
+    <asset className="HeaderRenderer_upSkin" name="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_upSkin" />
+    <asset className="HeaderSortArrow_ascIcon" name="Component Assets/DataGridSkins/HeaderSortArrow_ascIcon" />
+    <asset className="HeaderSortArrow_descIcon" name="Component Assets/DataGridSkins/HeaderSortArrow_descIcon" />
+    <asset className="List_skin" name="Component Assets/ListSkins/List_skin" />
+    <asset className="MuteButtonOff" name="Component Assets/FLV Playback Skins/Mute Button/MuteButtonOff" />
+    <asset className="MuteButtonOffDisabled" name="Component Assets/FLV Playback Skins/Mute Button/MuteButtonOffDisabled" />
+    <asset className="MuteButtonOffDown" name="Component Assets/FLV Playback Skins/Mute Button/MuteButtonOffDown" />
+    <asset className="MuteButtonOffNormal" name="Component Assets/FLV Playback Skins/Mute Button/MuteButtonOffNormal" />
+    <asset className="MuteButtonOffOver" name="Component Assets/FLV Playback Skins/Mute Button/MuteButtonOffOver" />
+    <asset className="MuteButtonOn" name="Component Assets/FLV Playback Skins/Mute Button/MuteButtonOn" />
+    <asset className="MuteButtonOnDisabled" name="Component Assets/FLV Playback Skins/Mute Button/MuteButtonOnDisabled" />
+    <asset className="MuteButtonOnDown" name="Component Assets/FLV Playback Skins/Mute Button/MuteButtonOnDown" />
+    <asset className="MuteButtonOnNormal" name="Component Assets/FLV Playback Skins/Mute Button/MuteButtonOnNormal" />
+    <asset className="MuteButtonOnOver" name="Component Assets/FLV Playback Skins/Mute Button/MuteButtonOnOver" />
+    <asset className="NumericStepperDownArrow_disabledSkin" name="Component Assets/NumericStepperSkins/NumericStepperDownArrow_disabledSkin" />
+    <asset className="NumericStepperDownArrow_downSkin" name="Component Assets/NumericStepperSkins/NumericStepperDownArrow_downSkin" />
+    <asset className="NumericStepperDownArrow_overSkin" name="Component Assets/NumericStepperSkins/NumericStepperDownArrow_overSkin" />
+    <asset className="NumericStepperDownArrow_upSkin" name="Component Assets/NumericStepperSkins/NumericStepperDownArrow_upSkin" />
+    <asset className="NumericStepperUpArrow_disabledSkin" name="Component Assets/NumericStepperSkins/NumericStepperUpArrow_disabledSkin" />
+    <asset className="NumericStepperUpArrow_downSkin" name="Component Assets/NumericStepperSkins/NumericStepperUpArrow_downSkin" />
+    <asset className="NumericStepperUpArrow_overSkin" name="Component Assets/NumericStepperSkins/NumericStepperUpArrow_overSkin" />
+    <asset className="NumericStepperUpArrow_upSkin" name="Component Assets/NumericStepperSkins/NumericStepperUpArrow_upSkin" />
+    <asset className="PauseButtonDisabled" name="Component Assets/FLV Playback Skins/Pause Button/PauseButtonDisabled" />
+    <asset className="PauseButtonDown" name="Component Assets/FLV Playback Skins/Pause Button/PauseButtonDown" />
+    <asset className="PauseButtonNormal" name="Component Assets/FLV Playback Skins/Pause Button/PauseButtonNormal" />
+    <asset className="PauseButtonOver" name="Component Assets/FLV Playback Skins/Pause Button/PauseButtonOver" />
+    <asset className="PlayButtonDisabled" name="Component Assets/FLV Playback Skins/Play Button/PlayButtonDisabled" />
+    <asset className="PlayButtonDown" name="Component Assets/FLV Playback Skins/Play Button/PlayButtonDown" />
+    <asset className="PlayButtonNormal" name="Component Assets/FLV Playback Skins/Play Button/PlayButtonNormal" />
+    <asset className="PlayButtonOver" name="Component Assets/FLV Playback Skins/Play Button/PlayButtonOver" />
+    <asset className="ProgressBar_barSkin" name="Component Assets/ProgressBarSkins/ProgressBar_barSkin" />
+    <asset className="ProgressBar_indeterminateSkin" name="Component Assets/ProgressBarSkins/ProgressBar_indeterminateSkin" />
+    <asset className="ProgressBar_trackSkin" name="Component Assets/ProgressBarSkins/ProgressBar_trackSkin" />
+    <asset className="RadioButton_disabledIcon" name="Component Assets/RadioButtonSkins/RadioButton_disabledIcon" />
+    <asset className="RadioButton_downIcon" name="Component Assets/RadioButtonSkins/RadioButton_downIcon" />
+    <asset className="RadioButton_overIcon" name="Component Assets/RadioButtonSkins/RadioButton_overIcon" />
+    <asset className="RadioButton_selectedDisabledIcon" name="Component Assets/RadioButtonSkins/RadioButton_selectedDisabledIcon" />
+    <asset className="RadioButton_selectedDownIcon" name="Component Assets/RadioButtonSkins/RadioButton_selectedDownIcon" />
+    <asset className="RadioButton_selectedOverIcon" name="Component Assets/RadioButtonSkins/RadioButton_selectedOverIcon" />
+    <asset className="RadioButton_selectedUpIcon" name="Component Assets/RadioButtonSkins/RadioButton_selectedUpIcon" />
+    <asset className="RadioButton_upIcon" name="Component Assets/RadioButtonSkins/RadioButton_upIcon" />
+    <asset className="ScrollArrowDown_disabledSkin" name="Component Assets/ScrollBarSkins/ScrollArrowDown_disabledSkin" />
+    <asset className="ScrollArrowDown_downSkin" name="Component Assets/ScrollBarSkins/ScrollArrowDown_downSkin" />
+    <asset className="ScrollArrowDown_overSkin" name="Component Assets/ScrollBarSkins/ScrollArrowDown_overSkin" />
+    <asset className="ScrollArrowDown_upSkin" name="Component Assets/ScrollBarSkins/ScrollArrowDown_upSkin" />
+    <asset className="ScrollArrowUp_disabledSkin" name="Component Assets/ScrollBarSkins/ScrollArrowUp_disabledSkin" />
+    <asset className="ScrollArrowUp_downSkin" name="Component Assets/ScrollBarSkins/ScrollArrowUp_downSkin" />
+    <asset className="ScrollArrowUp_overSkin" name="Component Assets/ScrollBarSkins/ScrollArrowUp_overSkin" />
+    <asset className="ScrollArrowUp_upSkin" name="Component Assets/ScrollBarSkins/ScrollArrowUp_upSkin" />
+    <asset className="ScrollBar_thumbIcon" name="Component Assets/ScrollBarSkins/ScrollBar_thumbIcon" />
+    <asset className="ScrollPane_disabledSkin" name="Component Assets/ScrollPaneSkins/ScrollPane_disabledSkin" />
+    <asset className="ScrollPane_upSkin" name="Component Assets/ScrollPaneSkins/ScrollPane_upSkin" />
+    <asset className="ScrollThumb_downSkin" name="Component Assets/ScrollBarSkins/ScrollThumb_downSkin" />
+    <asset className="ScrollThumb_overSkin" name="Component Assets/ScrollBarSkins/ScrollThumb_overSkin" />
+    <asset className="ScrollThumb_upSkin" name="Component Assets/ScrollBarSkins/ScrollThumb_upSkin" />
+    <asset className="ScrollTrack_skin" name="Component Assets/ScrollBarSkins/ScrollTrack_skin" />
+    <asset className="SeekBarHandle" name="Component Assets/FLV Playback Skins/Seek Bar/SeekBarHandle" />
+    <asset className="SeekBarProgress" name="Component Assets/FLV Playback Skins/Seek Bar/SeekBarProgress" />
+    <asset className="SliderThumb_disabledSkin" name="Component Assets/SliderSkins/SliderThumb_disabledSkin" />
+    <asset className="SliderThumb_downSkin" name="Component Assets/SliderSkins/SliderThumb_downSkin" />
+    <asset className="SliderThumb_overSkin" name="Component Assets/SliderSkins/SliderThumb_overSkin" />
+    <asset className="SliderThumb_upSkin" name="Component Assets/SliderSkins/SliderThumb_upSkin" />
+    <asset className="SliderTick_skin" name="Component Assets/SliderSkins/SliderTick_skin" />
+    <asset className="SliderTrack_disabledSkin" name="Component Assets/SliderSkins/SliderTrack_disabledSkin" />
+    <asset className="SliderTrack_skin" name="Component Assets/SliderSkins/SliderTrack_skin" />
+    <asset className="StopButtonDisabled" name="Component Assets/FLV Playback Skins/Stop Button/StopButtonDisabled" />
+    <asset className="StopButtonDown" name="Component Assets/FLV Playback Skins/Stop Button/StopButtonDown" />
+    <asset className="StopButtonNormal" name="Component Assets/FLV Playback Skins/Stop Button/StopButtonNormal" />
+    <asset className="StopButtonOver" name="Component Assets/FLV Playback Skins/Stop Button/StopButtonOver" />
+    <asset className="TextArea_disabledSkin" name="Component Assets/TextAreaSkins/TextArea_disabledSkin" />
+    <asset className="TextArea_upSkin" name="Component Assets/TextAreaSkins/TextArea_upSkin" />
+    <asset className="TextInput_disabledSkin" name="Component Assets/TextInputSkins/TextInput_disabledSkin" />
+    <asset className="TextInput_upSkin" name="Component Assets/TextInputSkins/TextInput_upSkin" />
+    <asset className="TileList_skin" name="Component Assets/TileListSkins/TileList_skin" />
+    <asset className="VolumeBarHandle" name="Component Assets/FLV Playback Skins/Volume Bar/VolumeBarHandle" />
+    <asset className="VolumeBarProgress" name="Component Assets/FLV Playback Skins/Volume Bar/VolumeBarFullnessFill" />
+    <asset className="fl.controls.ScrollBar" name="Component Assets/ScrollBar" />
+    <asset className="fl.controls.dataGridClasses.HeaderRenderer" name="Component Assets/DataGridSkins/HeaderRenderer" />
+    <asset className="fl.controls.listClasses.CellRenderer" name="Component Assets/CellRenderer" />
+    <asset className="fl.core.ComponentShim" name="Component Assets/_private/ComponentShim" />
+    <asset className="focusRectSkin" name="Component Assets/Shared/focusRectSkin" />
+    <asset generatedClass="BackBgDown" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgDown" />
+    <asset generatedClass="BackBgNormal" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgNormal" />
+    <asset generatedClass="BackBgOver" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgOver" />
+    <asset generatedClass="BackBorder" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Back Button/BackBorder" />
+    <asset generatedClass="BackIcon" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackIcon" />
+    <asset generatedClass="BufferingPattern" name="Component Assets/FLV Playback Skins/Buffering Bar/BufferingPattern" />
+    <asset generatedClass="CaptionOffIcon" name="Component Assets/FLV Playback Skins/Caption Button/Assets/CaptionOffIcon" />
+    <asset generatedClass="CaptionOnIcon" name="Component Assets/FLV Playback Skins/Caption Button/Assets/CaptionOnIcon" />
+    <asset generatedClass="CheckBox_selectedIcon" name="Component Assets/CheckBoxSkins/CheckBox_selectedIcon" />
+    <asset generatedClass="Component_avatar" name="Component Assets/_private/Component_avatar" />
+    <asset generatedClass="ForwardBackBorder" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/ForwardBackBorder" />
+    <asset generatedClass="ForwardBgDown" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgDown" />
+    <asset generatedClass="ForwardBgNormal" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgNormal" />
+    <asset generatedClass="ForwardBgOver" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgOver" />
+    <asset generatedClass="ForwardBorder" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardBorder" />
+    <asset generatedClass="ForwardIcon" name="Component Assets/FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardIcon" />
+    <asset generatedClass="FullScreenOffIcon" name="Component Assets/FLV Playback Skins/FullScreen Button/Assets/FullScreenOffIcon" />
+    <asset generatedClass="FullScreenOnIcon" name="Component Assets/FLV Playback Skins/FullScreen Button/Assets/FullScreenOnIcon" />
+    <asset generatedClass="MuteOffIcon" name="Component Assets/FLV Playback Skins/Mute Button/Assets/MuteOffIcon" />
+    <asset generatedClass="MuteOnIcon" name="Component Assets/FLV Playback Skins/Mute Button/Assets/MuteOnIcon" />
+    <asset generatedClass="NumericStepperDownArrow_icon" name="Component Assets/NumericStepperSkins/NumericStepperDownArrow_icon" />
+    <asset generatedClass="NumericStepperUpArrow_icon" name="Component Assets/NumericStepperSkins/NumericStepperUpArrow_icon" />
+    <asset generatedClass="PauseIcon" name="Component Assets/FLV Playback Skins/Pause Button/Assets/PauseIcon" />
+    <asset generatedClass="PlayIcon" name="Component Assets/FLV Playback Skins/Play Button/Assets/PlayIcon" />
+    <asset generatedClass="RadioButton_selectedIcon" name="Component Assets/RadioButtonSkins/RadioButton_selectedIcon" />
+    <asset generatedClass="ScrollArrowDown_icon" name="Component Assets/ScrollBarSkins/ScrollArrowDown_icon" />
+    <asset generatedClass="ScrollArrowUp_icon" name="Component Assets/ScrollBarSkins/ScrollArrowUp_icon" />
+    <asset generatedClass="SeekBarHandleHit" name="Component Assets/FLV Playback Skins/Seek Bar/SeekBarHandleHit" />
+    <asset generatedClass="SquareBgDown" name="Component Assets/FLV Playback Skins/_SquareButton/SquareBgDown" />
+    <asset generatedClass="SquareBgNormal" name="Component Assets/FLV Playback Skins/_SquareButton/SquareBgNormal" />
+    <asset generatedClass="SquareBgOver" name="Component Assets/FLV Playback Skins/_SquareButton/SquareBgOver" />
+    <asset generatedClass="StopIcon" name="Component Assets/FLV Playback Skins/Stop Button/Assets/StopIcon" />
+    <asset generatedClass="VolumeBarFullness" name="Component Assets/FLV Playback Skins/Volume Bar/VolumeBarFullness" />
+    <asset generatedClass="VolumeBarFullnessMask" name="Component Assets/FLV Playback Skins/Volume Bar/VolumeBarFullnessMask" />
+    <asset generatedClass="VolumeBarHandleHit" name="Component Assets/FLV Playback Skins/Volume Bar/VolumeBarHandleHit" />
+    <asset generatedClass="arrowIcon" name="Component Assets/Shared/arrowIcon" />
+    <asset generatedClass="panelBackground_Base" name="Component Assets/Shared/panelBackground_Base" />
+    <asset generatedClass="panelBackground_Shadow" name="Component Assets/Shared/panelBackground_Shadow" />
+</assets>

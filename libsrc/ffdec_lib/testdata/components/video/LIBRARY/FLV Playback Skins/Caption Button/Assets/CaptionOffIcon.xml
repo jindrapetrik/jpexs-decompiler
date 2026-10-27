@@ -1,0 +1,27 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Caption Button/Assets/CaptionOffIcon" itemID="455b9f54-000002d6" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Caption Button/Assets/CaptionOffIcon" sourceLastModified="1168906900" lastModified="1168906900" sourceItemID="455b9f54-000002d6">
+  <timeline>
+    <DOMTimeline name="CaptionOffIcon">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF" alpha="0.650980392156863"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!240 140S2|220 140!220 140|220 160!220 160|200 160!200 160|200 180!200 180|100 180!100 180|100 200!100 200|80 200!80 200|80 220!80 220|60 220!60 220|60 240!60 240|40 240!40 240|40 160!40 160|20 160!20 160|20 140!20 140|0 140!0 140|0 40
+!0 40|20 40!20 40|20 20!20 20|40 20!40 20|40 0!40 0|200 0!200 0|200 20!200 20|220 20!220 20|220 40!220 40|240 40!240 40|240 140"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

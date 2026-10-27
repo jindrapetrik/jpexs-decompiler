@@ -317,6 +317,12 @@ public class TraitClass extends Trait implements TraitWithSlot {
         classInfo.static_traits.toString(usedDeobfuscations, swfVersion, packageName, first, abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path + "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>(), isInterface);
 
         List<String> ignoredInstanceTraitNames = new ArrayList<>();
+        for (Trait t : instanceInfo.instance_traits.traits) {
+            if (t instanceof TraitMethodGetterSetter && convertData.ignoredInstanceMethods.contains(
+                    abc.findBody(((TraitMethodGetterSetter) t).method_info))) {
+                ignoredInstanceTraitNames.add(t.getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), false, false));
+            }
+        }
         if (convertData.ignoreFrameScripts) {
             ignoredInstanceTraitNames.addAll(frameTraitNames);
         }

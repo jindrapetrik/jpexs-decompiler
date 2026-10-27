@@ -1,0 +1,43 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ScrollPaneSkins/ScrollPane_disabledSkin" itemID="4509c368-00000206" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="ScrollPane_disabledSkin" scaleGridLeft="11" scaleGridRight="261" scaleGridTop="47" scaleGridBottom="171" lastModified="1168290335" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="ScrollPane_disabledSkin">
+      <layers>
+        <DOMLayer name="panel base" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/Shared/panelBackground_Base" selected="true">
+                  <transformationPoint>
+                    <Point x="136" y="95.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="drop shadow" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/Shared/panelBackground_Shadow">
+                  <matrix>
+                    <Matrix tx="-3" ty="-1"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <filters>
+                    <DropShadowFilter alpha="0.6" angle="90" blurX="3" blurY="3" distance="2" hideObject="true" knockout="true" quality="2"/>
+                  </filters>
+                  <color>
+                    <Color alphaMultiplier="0.5"/>
+                  </color>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

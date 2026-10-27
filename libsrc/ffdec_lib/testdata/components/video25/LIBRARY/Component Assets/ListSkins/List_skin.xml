@@ -1,0 +1,31 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ListSkins/List_skin" itemID="44d01cb5-00000051" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="List_skin" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\User Interface.fla" sourceLibraryItemHRef="Component Assets/ListSkins/List_skin" sourceLastModified="1169163244" scaleGridLeft="5.9" scaleGridRight="266.3" scaleGridTop="5.7" scaleGridBottom="186.45" lastModified="1169163244" lastUniqueIdentifier="6" sourceItemID="00000000-7fffffff">
+  <timeline>
+    <DOMTimeline name="List_skin">
+      <layers>
+        <DOMLayer name="Layer 2" color="#9933CC" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape isDrawingObject="true">
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <SolidColor color="#CCCCCC"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!5420 40[5440 60 5440 90!5440 90|5440 3820!5440 3820|20 3820!20 3820|20 90!20 90[20 60 40 40!40 40[60 20 90 20!90 20|5370 20!5370 20[5399 20 5420 40"/>
+                    <Edge fillStyle0="2" edges="!5370 0|90 0!90 0[52 0 26 26!26 26[0 52 0 90!0 90|0 3830!0 3830[0 3834 3 3837!3 3837[6 3840 10 3840!10 3840|5450 3840!5450 3840[5454 3840 5457 3837!5457 3837[5460 3834 5460 3830!5460 3830|5460 90!5460 90[5460 52 5434 26!5434 26[5407 0
+ 5370 0"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

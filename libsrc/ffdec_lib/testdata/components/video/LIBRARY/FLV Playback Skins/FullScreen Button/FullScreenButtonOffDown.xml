@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/FullScreen Button/FullScreenButtonOffDown" itemID="456dd6de-00000683" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="FullScreenButtonOffDown" linkageClassName="FullScreenButtonOffDown" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/FullScreen Button/FullScreenButtonOffDown" sourceLastModified="1165901831" lastModified="1165901831" lastUniqueIdentifier="6" sourceItemID="455b7b50-000003b7">
+  <timeline>
+    <DOMTimeline name="FullScreenButtonOffDown">
+      <layers>
+        <DOMLayer name="Icon" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/FullScreen Button/Assets/FullScreenOffIcon" name="icon_mc" selected="true">
+                  <matrix>
+                    <Matrix a="1.0037841796875" tx="6" ty="6"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="5.55" y="5.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Button" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/_SquareButton/SquareBgDown" name="button_mc">
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,65 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/NumericStepperSkins/NumericStepperUpArrow_downSkin" itemID="45097b71-0000011d" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="NumericStepperUpArrow_downSkin" scaleGridLeft="5.2" scaleGridRight="15.7" scaleGridTop="9" scaleGridBottom="10" lastModified="1168289601" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="NumericStepperUpArrow_downSkin">
+      <layers>
+        <DOMLayer name="icon" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/NumericStepperSkins/NumericStepperUpArrow_icon" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix tx="5.95" ty="4"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="skin" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="0.01336669921875" d="0" tx="9.9" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="0.013427734375" d="0" tx="9.95" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#99D7FE" ratio="0"/>
+                        <GradientEntry color="#D9F0FE" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="3">
+                      <SolidColor color="#008AE0"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" fillStyle1="3" edges="!397.5 220|417.5 220"/>
+                    <Edge fillStyle1="3" edges="!417.5 220|418 220!418 220|418 240!418 240|-0.5 240!-0.5 240|-0.5 220"/>
+                    <Edge fillStyle1="2" edges="!-0.5 220|-0.5 20"/>
+                    <Edge fillStyle1="1" edges="!-0.5 20|-0.5 0!-0.5 0|338 0!338 0[#1A1.9 0 417.5 80!417.5 80|417.5 220"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!397.5 220|397.5 80!397.5 80[#18D.97 #24.25 366 24!366 24|341 20!341 20|-0.5 20"/>
+                    <Edge fillStyle0="2" fillStyle1="3" edges="!-0.5 220|397.5 220"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

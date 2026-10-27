@@ -1,0 +1,85 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/CellRendererSkins/CellRenderer_upSkin" itemID="453f806e-000004da" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="CellRenderer_upSkin" scaleGridLeft="1" scaleGridRight="151" scaleGridTop="1" scaleGridBottom="21" lastModified="1169163238">
+  <timeline>
+    <DOMTimeline name="CellRenderer_upSkin">
+      <layers>
+        <DOMLayer name="border" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#B7BABC"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="0.00787353515625" c="-0.00787353515625" d="0" tx="143.5" ty="7.55"/>
+                        </matrix>
+                        <GradientEntry color="#5B5D5E" ratio="0"/>
+                        <GradientEntry color="#B7BABC" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="2" edges="!3020 415|3020 420!3020 420|20 420!20 420|20 415"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!20 415|0 415"/>
+                    <Edge fillStyle0="2" edges="!0 415|0 440!0 440|3040 440!3040 440|3040 415"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!3040 415|3020 415"/>
+                    <Edge fillStyle1="1" edges="!3020 415|3020 20"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!3020 20|3040 20"/>
+                    <Edge fillStyle1="1" edges="!3040 20|3040 415"/>
+                    <Edge fillStyle0="2" edges="!3040 20|3040 0!3040 0|0 0!0 0|0 20"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!0 20|20 20"/>
+                    <Edge fillStyle0="2" edges="!20 20|3020 20"/>
+                    <Edge fillStyle0="1" edges="!20 415|20 20!0 20|0 415"/>
+                    <Edge cubics="!20 20(;20,20 3020,20 3020,20q20 20 3020 20);"/>
+                    <Edge cubics="!3020 420(;3020,420 20,420 20,420q3020 420 20 420);"/>
+                    <Edge cubics="!0 440(;0,440 3040,440 3040,440q0 440 3040 440);"/>
+                    <Edge cubics="!3040 0(;3040,0 0,0 0,0q3040 0 0 0)0,0;"/>
+                    <Edge cubics="!3040 25(;3040,25 3040,0 3040,0q3040 25 3040 0);"/>
+                    <Edge cubics="!3020 20(;3020,20 3020,25 3020,25q3020 20 3020 25);"/>
+                    <Edge cubics="!3040 440(;3040,440 3040,420 3040,420q3040 440 3040 420);"/>
+                    <Edge cubics="!3040 420(;3040,420 3040,25 3040,25q3040 420 3040 25);"/>
+                    <Edge cubics="!3040 420(;3040,420 3020,420 3020,420q3040 420 3020 420);"/>
+                    <Edge cubics="!3020 25(;3020,25 3020,420 3020,420q3020 25 3020 420);"/>
+                    <Edge cubics="!3020 25(;3020,25 3040,25 3040,25q3020 25 3040 25);"/>
+                    <Edge cubics="!0 25(;0,25 20,25 20,25q0 25 20 25);"/>
+                    <Edge cubics="!20 25(;20,25 20,20 20,20q20 25 20 20);"/>
+                    <Edge cubics="!0 0(;0,0 0,25 0,25q0 0 0 25);"/>
+                    <Edge cubics="!20 420(;20,420 0,420 0,420q20 420 0 420);"/>
+                    <Edge cubics="!0 420(;0,420 0,440 0,440q0 420 0 440);"/>
+                    <Edge cubics="!20 420(;20,420 20,25 20,25q20 420 20 25)20,25;"/>
+                    <Edge cubics="!0 25(;0,25 0,420 0,420q0 25 0 420);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="fill" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!3039.5 440.5|-0.5 440.5!-0.5 440.5|-0.5 0.5!-0.5 0.5|3039.5 0.5!3039.5 0.5|3039.5 440.5"/>
+                    <Edge cubics="!0 441(;0,441 0,1 0,1q0 441 0 1);"/>
+                    <Edge cubics="!3040 1(;3040,1 3040,441 3040,441q3040 1 3040 441);"/>
+                    <Edge cubics="!0 1(;0,1 3040,1 3040,1q0 1 3040 1);"/>
+                    <Edge cubics="!3040 441(;3040,441 0,441 0,441q3040 441 0 441);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

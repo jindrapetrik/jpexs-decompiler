@@ -1,0 +1,24 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/NumericStepperSkins/NumericStepperUpArrow_icon" itemID="456df2b3-00000196" symbolType="graphic" lastModified="1168289607" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="NumericStepperUpArrow_icon">
+      <layers>
+        <DOMLayer name="icon" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/Shared/arrowIcon" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix a="-1" d="-1" tx="7" ty="4"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,99 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="VolumeBar" itemID="42950911-00000320" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="VolumeBar" linkageClassName="VolumeBar" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef="VolumeBar" sourceLastModified="1166032325" lastModified="1166032325" lastUniqueIdentifier="6" sourceItemID="42950911-00000320" customIconID="0" persistLivePreview11="true" editFrameIndex="1" requiredMinimumPlayerVersion="8" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="VolumeBar">
+      <layers>
+        <DOMLayer name="script" color="#FFFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();
+this.handleLinkageID = "VolumeBarHandle";
+this.handleLeftMargin = 0;
+this.handleRightMargin = 0;
+this.handleY = 11;
+this.fullness_mc.fill_mc.slideReveal = true;
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="handle" color="#FF4FFF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Volume Bar/VolumeBarHandle" selected="true">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Fullness" color="#4FFF4F" outline="true" useOutlineView="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Volume Bar/VolumeBarFullness" name="fullness_mc">
+                  <matrix>
+                    <Matrix tx="0.8" ty="1"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="25" y="3.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Outlines" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#CCCCCC"/>
+                    </FillStyle>
+                  </fills>
+                  <strokes>
+                    <StrokeStyle index="1">
+                      <SolidStroke scaleMode="normal">
+                        <fill>
+                          <SolidColor alpha="0.352941176470588"/>
+                        </fill>
+                      </SolidStroke>
+                    </StrokeStyle>
+                  </strokes>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!20 160|1008.5 160!1008.5 160|1008.5 27.5"/>
+                    <Edge strokeStyle="1" edges="!1008.5 27.5|20 160"/>
+                    <Edge fillStyle1="1" edges="!1008.5 27.5|1008.5 20!1008.5 20|1019.5 20!1019.5 20|1019.5 180!1019.5 180|20 180!20 180|20 160"/>
+                    <Edge cubics="!1800 26(;1800,26 1880,20 1880,20q1800 26 1880 20);"/>
+                    <Edge cubics="!1780 28(;1780,28 1800,26 1800,26q1780 28 1800 26);"/>
+                    <Edge cubics="!1800 26(;1800,26 1800,180 1800,180q1800 26 1800 180);"/>
+                    <Edge cubics="!1800 20(;1800,20 1800,26 1800,26q1800 20 1800 26);"/>
+                    <Edge cubics="!1780 28(;1780,28 1780,20 1780,20q1780 28 1780 20);"/>
+                    <Edge cubics="!1780 160(;1780,160 1780,28 1780,28q1780 160 1780 28);"/>
+                    <Edge cubics="!1780 20(;1780,20 1800,20 1800,20q1780 20 1800 20);"/>
+                    <Edge cubics="!20 180(;20,180 20,160 20,160q20 180 20 160);"/>
+                    <Edge cubics="!20 160(;20,160 1780,28 1780,28q20 160 1780 28);"/>
+                    <Edge cubics="!20 160(;20,160 1780,160 1780,160q20 160 1780 160);"/>
+                    <Edge cubics="!1800 180(;1800,180 20,180 20,180q1800 180 20 180);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <customIcon>
+    <CustomIcon rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" href="79cdenm5cj.dat"/>
+  </customIcon>
+</DOMComponentItem>

@@ -194,6 +194,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -250,6 +251,8 @@ public class XFLConverter {
     private final Random random = new Random(123); // predictable random
 
     private int tweenDetectionQuality = 100;
+
+    private ComponentConverter componentConverter;
 
     /**
      * Adds "(depth xxx)" to layer name
@@ -2688,6 +2691,7 @@ public class XFLConverter {
         Set<Integer> classicTweenInstanceStarts = new HashSet<>();
         Map<String, double[]> motionRegistrationPoints = new HashMap<>();
         Map<Integer, MorphShapeTween.Sample> morphSamples = new HashMap<>();
+        boolean componentLayer = false;
 
         //Add ShowFrameTag to the end when there is one last missing
         List<Tag> timTags = timelineTags.toArrayList();
@@ -2729,6 +2733,9 @@ public class XFLConverter {
                         newCharacter = character;
                     }
                     character = newCharacter;
+                    if (componentConverter != null && componentConverter.isComponent(character)) {
+                        componentLayer = true;
+                    }
                     if (character != null) {
                         if (po.flagMove()) {
                             Amf3Value metadata2 = po.getAmfData();
@@ -2926,7 +2933,7 @@ public class XFLConverter {
         if (writer2.length() > 0) {
             String shapeFrames = MorphShapeTween.detect(writer2.toString(), morphSamples, classicTweenInstanceStarts);
             String framesXml = ClassicTweenDetector.detect(shapeFrames, classicTweenInstanceStarts,
-                    swf.frameRate, motionRegistrationPoints, tweenDetectionQuality);
+                    swf.frameRate, motionRegistrationPoints, componentLayer ? 0 : tweenDetectionQuality);
             if (framesXml.contains("tweenType=\"motion object\"")) {
                 if (prevStr.contains("<DOMLayer")) {
                     prevStr = prevStr.replaceFirst("<DOMLayer", "<DOMLayer animationType=\"motion object\"");
@@ -3699,7 +3706,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private static Map<Integer, String> getFrameScriptsFromPack(AbcIndexing abcIndex, ScriptPack pack) throws InterruptedException {
+    private Map<Integer, String> getFrameScriptsFromPack(AbcIndexing abcIndex, ScriptPack pack) throws InterruptedException {
 
         int swfVersion = -1;
         if (pack.getOpenable() instanceof SWF) {
@@ -3783,7 +3790,11 @@ public class XFLConverter {
                         callStack = new ArrayList<>();
                         callStack.add(frameBody);
 
-                        frameBody.convert(swfVersion, callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
+                        ConvertData frameConvertData = new ConvertData();
+                        if (componentConverter != null) {
+                            frameConvertData.ignoredInstanceMethods = componentConverter.getIgnoredMethods();
+                        }
+                        frameBody.convert(swfVersion, callStack, abcIndex, frameConvertData, "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
 
                         if (frameBody.convertedItems != null) {
                             for (int i = 0; i < frameBody.convertedItems.size(); i++) {
@@ -5615,6 +5626,8 @@ public class XFLConverter {
         Map<CharacterTag, String> characterVariables = getCharacterVariables(swf.getTags());
         boolean hasAmfMetadata = hasAmfMetadata(swf);
 
+        componentConverter = useAS3 && settings.exportScript && cbfFlaVersion == null ? new ComponentConverter(swf) : null;
+
         String backgroundColor = "#ffffff";
         SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
         if (setBgColorTag != null) {
@@ -5677,6 +5690,8 @@ public class XFLConverter {
 
             Reference<Integer> lastImportedId = new Reference<>(0);
             Map<CharacterTag, String> characterNameMap = new IdentityHashMap<>();
+            Set<String> componentFolders = componentConverter == null ? Collections.emptySet()
+                    : componentConverter.initializeLibraryNames(characters, characterNameMap);
 
             Set<CharacterTag> charactersExportedInFirstFrame = new LinkedIdentityHashSet<>();
             Map<CharacterTag, String> characterImportLinkageURL = new IdentityHashMap<>();
@@ -5733,14 +5748,24 @@ public class XFLConverter {
             }
             
             
-            if (hasImport) {                
+            if (hasImport || !componentFolders.isEmpty()) {
                 domDocument.writeStartElement("folders");
-                domDocument.writeStartElement("DOMFolderItem", new String[] {
-                    "name", "imported",
-                    "itemID", generateItemId(lastItemIdNumber),
-                    "isExpanded", "false"
-                });
-                domDocument.writeEndElement();
+                if (hasImport) {
+                    domDocument.writeStartElement("DOMFolderItem", new String[]{
+                        "name", "imported",
+                        "itemID", generateItemId(lastItemIdNumber),
+                        "isExpanded", "false"
+                    });
+                    domDocument.writeEndElement();
+                }
+                for (String folder : componentFolders) {
+                    domDocument.writeStartElement("DOMFolderItem", new String[]{
+                        "name", folder,
+                        "itemID", generateItemId(lastItemIdNumber),
+                        "isExpanded", Boolean.toString("Component Assets".equals(folder))
+                    });
+                    domDocument.writeEndElement();
+                }
                 domDocument.writeEndElement(); //folders
             }
             
@@ -5780,6 +5805,9 @@ public class XFLConverter {
         
         checkInterrupted();
         String domDocumentStr = prettyFormatXML(domDocument.toString());
+        if (componentConverter != null) {
+            domDocumentStr = componentConverter.convert(domDocumentStr, files, datfiles);
+        }
 
         if (settings.exportScript) {
             for (Tag t : swf.getTags()) {
@@ -6258,6 +6286,9 @@ public class XFLConverter {
             if (useAS3 && settings.exportScript) {
                 try {
                     ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, !Configuration.exportFlaAs3DisableScriptLayer.get(), false, true, "/_assets/", Configuration.linkAllClasses.get(), true);
+                    if (componentConverter != null) {
+                        scriptExportSettings.ignoredInstanceMethods = componentConverter.getIgnoredMethods();
+                    }
                     swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, null);
                 } catch (Exception ex) {
                     checkInterrupted();

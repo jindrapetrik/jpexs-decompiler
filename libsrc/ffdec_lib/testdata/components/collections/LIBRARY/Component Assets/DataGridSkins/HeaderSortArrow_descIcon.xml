@@ -1,0 +1,30 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/DataGridSkins/HeaderSortArrow_descIcon" itemID="451cf27e-00000069" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="HeaderSortArrow_descIcon" lastModified="1168289534">
+  <timeline>
+    <DOMTimeline name="HeaderSortArrow_descIcon">
+      <layers>
+        <DOMLayer name="icon" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!140 80|0 80!0 80|0 60!0 60|20 60!20 60|20 40!20 40|40 40!40 40|40 20!40 20|60 20!60 20|60 0!60 0|80 0!80 0|80 20!80 20|100 20!100 20|100 40!100 40|120 40!120 40|120 60!120 60|140 60!140 60|140 80"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

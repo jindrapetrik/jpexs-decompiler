@@ -568,6 +568,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             ConvertData convertData = new ConvertData();
             convertData.ignoreFrameScripts = exportSettings.ignoreFrameScripts;
             convertData.ignoreAccessibility = exportSettings.ignoreAccessibility;
+            convertData.ignoredInstanceMethods = exportSettings.ignoredInstanceMethods;
             convertData.exportEmbed = exportSettings.exportEmbed;
             convertData.exportEmbedFlaMode = exportSettings.exportEmbedFlaMode;
             convertData.assetsDir = exportSettings.assetsDir;

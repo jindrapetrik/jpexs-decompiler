@@ -1,0 +1,65 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ScrollBarSkins/ScrollTrack_skin" itemID="44fdb956-000002bc" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="ScrollTrack_skin" lastModified="1168290301">
+  <timeline>
+    <DOMTimeline name="ScrollTrack_skin">
+      <layers>
+        <DOMLayer name="skin" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape isDrawingObject="true">
+                      <matrix>
+                        <Matrix tx="-659" ty="-679"/>
+                      </matrix>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#585F63"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!13480 13580|13480 16540!13480 16540|13460 16540!13460 16540|13460 13580!13460 13580|13480 13580"/>
+                      </edges>
+                    </DOMShape>
+                    <DOMShape isDrawingObject="true">
+                      <matrix>
+                        <Matrix tx="-659" ty="-679"/>
+                      </matrix>
+                      <fills>
+                        <FillStyle index="1">
+                          <LinearGradient>
+                            <matrix>
+                              <Matrix a="0.008544921875" b="-0.000152587890625" c="0.000152587890625" d="0.008544921875" tx="667" ty="759.85"/>
+                            </matrix>
+                            <GradientEntry color="#94999B" ratio="0"/>
+                            <GradientEntry color="#E7E7E7" ratio="1"/>
+                          </LinearGradient>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!13460 13580|13460 16540!13460 16540|13200 16540!13200 16540|13200 13580!13200 13580|13460 13580"/>
+                      </edges>
+                    </DOMShape>
+                    <DOMShape selected="true" isDrawingObject="true">
+                      <matrix>
+                        <Matrix tx="-659" ty="-679"/>
+                      </matrix>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#585F63"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!13200 13580|13200 16540!13200 16540|13180 16540!13180 16540|13180 13580!13180 13580|13200 13580"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

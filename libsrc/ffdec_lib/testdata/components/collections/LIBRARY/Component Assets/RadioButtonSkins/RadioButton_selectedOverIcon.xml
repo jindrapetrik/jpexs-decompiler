@@ -1,0 +1,82 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/RadioButtonSkins/RadioButton_selectedOverIcon" itemID="44b1a612-00000137" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="RadioButton_selectedOverIcon" lastModified="1168289876" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="RadioButton_selectedOverIcon">
+      <layers>
+        <DOMLayer name="icon" color="#FFFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/RadioButtonSkins/RadioButton_selectedIcon">
+                  <matrix>
+                    <Matrix tx="5" ty="5"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="2" y="2"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="highlight" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.00372314453125" c="0.0073089599609375" d="0" tx="5.9" ty="4.05"/>
+                        </matrix>
+                        <GradientEntry color="#CCCCCC" alpha="0" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!55 56[90 21 140 21!140 21[190 21 225 56!225 56[228 59 231 62!231 62[260 95 260 141!260 141|20 141!20 141[20 95 50 62!50 62[52 59 55 56"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="fill" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.0073089599609375" c="0.0073089599609375" d="0" tx="5.95" ty="6.3"/>
+                        </matrix>
+                        <GradientEntry color="#EEEEEE" alpha="0.650980392156863" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.741176470588235" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.009613037109375" c="0.009613037109375" d="0" tx="7.25" ty="7"/>
+                        </matrix>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="2" edges="!239 41[198 0 140 0!140 0[82 0 41 41!41 41[0 82 0 140!0 140[0 198 41 239!41 239[82 280 140 280!140 280[198 280 239 239!239 239[280 198 280 140!280 140[280 82 239 41"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!260 140[260 190 225 225!225 225[190 260 140 260!140 260[90 260 55 225!55 225[20 190 20 140!20 140[20 90 55 55!55 55[90 20 140 20!140 20[190 20 225 55!225 55[260 90 260 140"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

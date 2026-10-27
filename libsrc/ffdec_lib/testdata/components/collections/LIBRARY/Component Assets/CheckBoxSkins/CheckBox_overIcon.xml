@@ -1,0 +1,80 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/CheckBoxSkins/CheckBox_overIcon" itemID="4397078d-00000c43" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="CheckBox_overIcon" linkageClassName="CheckBox_overIcon" lastModified="1168287083">
+  <timeline>
+    <DOMTimeline name="CheckBox_overIcon">
+      <layers>
+        <DOMLayer name="highlight" color="#FFFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.00408935546875" c="0.0083160400390625" d="0" tx="6" ty="4.35"/>
+                        </matrix>
+                        <GradientEntry color="#EEEEEE" alpha="0" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!260 150|20 150!20 150|20 20!20 20|260 20!260 20|260 150"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="fill" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.0083160400390625" c="0.0083160400390625" d="0" tx="6" ty="7.15"/>
+                        </matrix>
+                        <GradientEntry color="#EEEEEE" alpha="0.650980392156863" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.741176470588235" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!20 260|20 20!20 20|260 20!260 20|260 260!260 260|20 260"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="border" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.0088653564453125" c="0.0088653564453125" d="0" tx="7.8" ty="6.45"/>
+                        </matrix>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!20 260|20 20!20 20|260 20!260 20|260 260!260 260|20 260!0 0|0 280!0 280|280 280!280 280|280 0!280 0|0 0"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>
