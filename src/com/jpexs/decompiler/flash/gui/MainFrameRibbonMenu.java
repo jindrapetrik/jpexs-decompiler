@@ -33,6 +33,7 @@ import java.util.Map;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -383,7 +384,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             final ActionListener subLoader = menuLoaders.get(sub);
             AbstractCommandButton but = null;
             if (subType == TYPE_MENUITEM || (subType == TYPE_MENU && subAction != null)) {
-                if (parts.length == 4) {
+                if (parts.length >= 4) {
                     JMenuItem menuItem = new JMenuItem(subTitle);
                     if (subIcon != null) {
                         menuItem.setIcon(View.getIcon(subIcon, 16));
@@ -442,7 +443,22 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             }
         }
 
-        //if (parts.length == 3)
+        if (parts.length >= 5) {
+            JMenu menu = new JMenu(title);
+            if (icon != null) {
+                menu.setIcon(View.getIcon(icon, 16));
+            }
+            for (String sub : subs) {
+                if (sub.equals("-")) {
+                    menu.addSeparator();
+                } else if (menuItems.get(sub) instanceof JMenuItem) {
+                    menu.add((JMenuItem) menuItems.get(sub));
+                }
+            }
+            menuItems.put(path, menu);
+            return;
+        }
+
         if (parts.length == 4) {
             JCommandButton popupButton;
             if (icon != null) {
@@ -464,15 +480,9 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 }
 
                 Object o = menuItems.get(sub);
-                int subPriority = menuPriorities.get(sub);
-                int subType = menuType.get(sub);
-                ActionListener subAction = menuActions.get(sub);
-                if (subType != TYPE_MENU || (subAction != null)) {
-                    if (o instanceof JMenuItem) {
-                        JMenuItem mi = (JMenuItem) o;
-                        popupMenu.add((JMenuItem) o);
-                        cnt++;
-                    }
+                if (o instanceof JMenuItem) {
+                    popupMenu.add((JMenuItem) o);
+                    cnt++;
                 }
             }
             if (cnt > 0) {

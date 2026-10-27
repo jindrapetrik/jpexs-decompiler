@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               width="1100" height="850" minWidth="760" minHeight="600"
+               backgroundColor="#e9eef4" creationComplete="initializeDemo()">
+    <fx:Style>
+        @namespace s "library://ns.adobe.com/flex/spark";
+        @namespace mx "library://ns.adobe.com/flex/mx";
+        .title { fontSize: 24; fontWeight: bold; color: #18446a; }
+        .card { backgroundColor: #ffffff; borderColor: #b8c9da; borderVisible: true; }
+        s|Button { cornerRadius: 6; }
+        mx|DataGrid { alternatingItemColors: #ffffff, #eef4fa; headerStyleName: gridHeader; }
+        .gridHeader { fontWeight: bold; color: #18446a; }
+        s|Button:hover { color: #aa5500; }
+    </fx:Style>
+    <fx:Script><![CDATA[
+        import flash.events.MouseEvent;
+        import mx.controls.Alert;
+        import mx.events.FlexEvent;
+        [Bindable] private var greeting:String = "Welcome to Flex";
+        [Bindable] private var clickCount:int = 0;
+        [Bindable] private var userName:String = "Alex";
+        private static const DEMO_VERSION:String = "1.0";
+        public static function getDemoVersion():String { return DEMO_VERSION; }
+        private function initializeDemo():void { status.text = "Ready, version " + getDemoVersion(); }
+        private function greet(event:MouseEvent):void {
+            clickCount++;
+            Alert.show("Hello " + userName + "; clicks: " + clickCount, "MXML showcase");
+        }
+        private function toggleDetails():void { currentState = currentState == "compact" ? "details" : "compact"; }
+    ]]></fx:Script>
+    <fx:Declarations>
+        <s:ArrayCollection id="products">
+            <fx:Object name="Coffee" price="49" stock="12"/>
+            <fx:Object name="Tea" price="35" stock="20"/>
+            <fx:Object name="Chocolate" price="65" stock="8"/>
+        </s:ArrayCollection>
+        <s:ArrayCollection id="categories">
+            <fx:String>Drinks</fx:String><fx:String>Sweets</fx:String><fx:String>Other</fx:String>
+        </s:ArrayCollection>
+        <mx:CurrencyFormatter id="currency" currencySymbol="USD" alignSymbol="right" precision="2"/>
+        <mx:NumberValidator id="quantityValidator" source="{quantity}" property="value" minValue="1" maxValue="100"/>
+        <s:RadioButtonGroup id="delivery"/>
+        <s:Fade id="fadeIn" duration="250" alphaFrom="0" alphaTo="1"/>
+    </fx:Declarations>
+    <s:states>
+        <s:State name="compact"/>
+        <s:State name="details" stateGroups="expanded"/>
+    </s:states>
+    <s:transitions>
+        <s:Transition fromState="compact" toState="details">
+            <s:Fade target="{detailsLabel}" duration="150"/>
+        </s:Transition>
+    </s:transitions>
+    <fx:Binding source="nameInput.text" destination="userName" twoWay="true"/>
+    <s:VGroup width="100%" height="100%" gap="12" paddingLeft="20" paddingRight="20" paddingTop="16" paddingBottom="16">
+        <s:Label styleName="title" text="{greeting + ', ' + userName + '!'}"/>
+        <s:HGroup width="100%" verticalAlign="middle" gap="10">
+            <s:TextInput id="nameInput" text="Alex" prompt="Your name" width="180"/>
+            <s:Button label="Say hello" click="greet(event)" toolTip="Show a greeting"/>
+            <s:Button label="{currentState == 'compact' ? 'Show details' : 'Hide details'}" click="toggleDetails()"/>
+            <s:Label text="{'Click count: ' + clickCount}" color="#336699"/>
+        </s:HGroup>
+        <s:Panel title="Settings and components" width="100%" styleName="card">
+            <s:layout><s:VerticalLayout gap="8" paddingLeft="12" paddingRight="12" paddingTop="12" paddingBottom="12"/></s:layout>
+            <s:HGroup gap="12" verticalAlign="middle">
+                <s:CheckBox id="canEdit" label="Enable editing" selected="true"/>
+                <s:TextInput text="{userName}" enabled="{canEdit.selected}"/>
+                <s:TextInput id="nameMirror" text="@{userName}" width="120"/>
+                <s:NumericStepper id="quantity" minimum="1" maximum="100" value="3" stepSize="1"/>
+                <s:Label text="{'Quantity: ' + quantity.value}"/>
+            </s:HGroup>
+            <s:HGroup gap="12" verticalAlign="middle">
+                <s:DropDownList id="category" dataProvider="{categories}" selectedIndex="0" width="160"/>
+                <s:ComboBox dataProvider="{categories}" selectedIndex="1" width="160"/>
+                <s:RadioButton label="Pickup" group="{delivery}" value="pickup" selected="true"/>
+                <s:RadioButton label="Mail" group="{delivery}" value="post"/>
+                <s:ToggleButton label="Toggle"/>
+            </s:HGroup>
+            <s:HGroup gap="12" verticalAlign="middle">
+                <s:HSlider id="slider" minimum="0" maximum="100" value="40" width="220"/>
+                <s:VSlider minimum="0" maximum="100" value="60" height="65"/>
+                <s:Spinner minimum="0" maximum="20" value="5"/>
+                <mx:ProgressBar mode="manual" minimum="0" maximum="100" label="Progress"/>
+                <mx:DateField formatString="MM/DD/YYYY"/>
+                <mx:ColorPicker selectedColor="#336699"/>
+            </s:HGroup>
+        </s:Panel>
+        <s:HGroup width="100%" height="210" gap="12">
+            <s:List id="productList" dataProvider="{products}" labelField="name" width="200" height="100%" selectedIndex="0">
+                <s:itemRenderer>
+                    <fx:Component>
+                        <s:ItemRenderer width="100%" autoDrawBackground="true">
+                            <s:HGroup paddingLeft="6" paddingTop="4" paddingBottom="4">
+                                <s:Label text="{data.name}" fontWeight="bold"/>
+                                <s:Label text="{data.price + ' USD'}"/>
+                            </s:HGroup>
+                        </s:ItemRenderer>
+                    </fx:Component>
+                </s:itemRenderer>
+            </s:List>
+            <mx:DataGrid id="grid" dataProvider="{products}" width="100%" height="100%" rowCount="4">
+                <mx:columns>
+                    <mx:DataGridColumn dataField="name" headerText="Product"/>
+                    <mx:DataGridColumn dataField="price" headerText="Price"/>
+                    <mx:DataGridColumn dataField="stock" headerText="In stock"/>
+                </mx:columns>
+            </mx:DataGrid>
+            <s:TextArea width="200" height="100%" text="Multiline text.&#10;XML: &amp; &lt; &gt; &quot; and a literal \{brace}."/>
+        </s:HGroup>
+        <s:BorderContainer width="100%" height="100" backgroundColor="#ffffff" borderColor="#b8c9da" cornerRadius="8">
+            <s:layout><s:HorizontalLayout gap="18" verticalAlign="middle" paddingLeft="12"/></s:layout>
+            <s:Rect width="70" height="50" radiusX="8" radiusY="8">
+                <s:fill><s:SolidColor color="#4c90cf" alpha="0.9"/></s:fill>
+                <s:stroke><s:SolidColorStroke color="#18446a" weight="2"/></s:stroke>
+            </s:Rect>
+            <s:Ellipse width="60" height="50"><s:fill><s:SolidColor color="#e4a83f"/></s:fill></s:Ellipse>
+            <s:Line xFrom="0" yFrom="0" xTo="80" yTo="40"><s:stroke><s:SolidColorStroke color="#537d45" weight="3"/></s:stroke></s:Line>
+            <s:Label text="Spark graphics, fills and strokes"/>
+        </s:BorderContainer>
+        <s:Label id="detailsLabel" text="Detailed mode" includeIn="details" fontSize="18" color="#537d45" showEffect="{fadeIn}"/>
+        <s:Label id="stateLabel" text="Compact mode" text.details="{userName + ' - detailed mode'}" color.details="#aa5500"/>
+        <s:Label id="status" text="Initializing..." fontStyle="italic"/>
+    </s:VGroup>
+</s:Application>

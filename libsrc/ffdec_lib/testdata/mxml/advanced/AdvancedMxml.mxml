@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
+    xmlns:components="components.*" width="640" height="480" implements="interfaces.IShowcase" backgroundColor.alternate="#EEF4FF">
+    <fx:Script><![CDATA[
+        [Bindable] private var person:String = "Alex";
+        [Bindable] private var status:String = "Normal handler";
+        private function normalClick():void { status = "Normal handler clicked"; }
+        private function alternateClick():void { status = "Alternate handler clicked"; }
+        public namespace showcase = "urn:showcase:code";
+        use namespace showcase;
+        showcase function qualifiedCaption():String { return "A custom namespace method"; }
+        public function callQualifiedCaption():String { return qualifiedCaption(); }
+        public function compareLabels(first:spark.components.Label, second:mx.controls.Label):String {
+            return first.text + second.text;
+        }
+    ]]></fx:Script>
+    <fx:Style><![CDATA[
+        @namespace s "library://ns.adobe.com/flex/spark";
+        @namespace components "components.*";
+        @font-face {
+            src: url("../../as3_embed/assets/font.ttf");
+            fontFamily: "RecoveredShowcaseFont";
+            embedAsCFF: false;
+            unicodeRange: U+0020,U+0041-005A;
+        }
+        .outer s|Label { color: #224466; }
+        components|StatusBadge { fontSize: 18; }
+    ]]></fx:Style>
+    <fx:Declarations>
+        <fx:XML id="dynamicCatalog" format="e4x"><catalog><person code="{person}">{person}</person></catalog></fx:XML>
+        <fx:XML id="namespacedCatalog" format="e4x"><catalog xmlns="urn:showcase:data"><person code="{person}">{person}</person></catalog></fx:XML>
+        <mx:HTTPService id="service" url="https://example.invalid/api" resultFormat="e4x">
+            <mx:request><fx:Object query="{person}"/></mx:request>
+        </mx:HTTPService>
+    </fx:Declarations>
+    <s:states><s:State name="normal"/><s:State id="alternateState" name="alternate"/></s:states>
+    <s:layout><s:VerticalLayout gap="12"/></s:layout>
+    <s:Group styleName="outer"><s:Label text="Nested CSS selector"/></s:Group>
+    <components:StatusBadge text="Custom component CSS selector"/>
+    <s:Button id="stateButton" label="State event handler" click="normalClick()" click.alternate="alternateClick()"/>
+    <s:Label text="{status}"/>
+    <s:Label id="policyLabel" includeIn="alternate" text="A state item with explicit lifetime" itemCreationPolicy="immediate" itemDestructionPolicy="auto"/>
+    <mx:Text text="ASSET" fontFamily="RecoveredShowcaseFont" fontSize="24"/>
+    <mx:Label id="effectLabel" text="A descriptor effect" showEffect="Fade"/>
+</s:Application>

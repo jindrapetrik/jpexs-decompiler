@@ -80,6 +80,10 @@ public class TraitSlotConstAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
 
+        if (!trait.isVisible(isStatic, localData.abc)) {
+            return writer;
+        }
+
         writer.endMethod();
         writer.endTrait();
 

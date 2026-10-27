@@ -37,11 +37,22 @@ alias /?
         binaryData - Binary data (Default format:  Raw data)
         symbolClass - Symbol-Class mapping (Default format: CSV)
         text - Texts (Default format: Plain text)
-        all - Every resource (but not FLA and XFL)
+        all - Every resource (but not FLA, XFL, MXML or IDE projects)
         fla - Everything to FLA compressed format
         xfl - Everything to uncompressed FLA format (XFL)
-    You can export multiple types of items by using colon ",".
+        mxml - Flex MXML export
+        flashdevelop - FlashDevelop project with AS3 sources
+        flashdevelop_mxml - FlashDevelop project with recovered MXML sources
+        intellij - IntelliJ IDEA project with AS3 sources
+        intellij_mxml - IntelliJ IDEA project with MXML sources
+        vscode - VS Code project with AS3 sources
+        vscode_mxml - VS Code project with MXML sources
+    You can export multiple types of items by separating them with commas.
     DO NOT PUT space between comma (,) and next value.
+    
+    AS3 projects require an AS3 SWF without main-timeline display/sound content.
+    AS3 FlashDevelop and VS Code exports default to Flash Player; use
+    -format flashdevelop:air or -format vscode:air for an AIR project.    
 
 -dumpSWF <infile>
     Dump list of SWF tags to console.
@@ -408,7 +419,9 @@ Pre-options:
         font:ttf - TTF format for Fonts
         font:woff - WOFF format for Fonts
         font4:cff - CFF format for DefineFont4
-        fla:<flaversion> or xfl:<flaversion> - Specify FLA format version
+        flashdevelop:flash or flashdevelop:air - Platform for AS3 FlashDevelop projects
+        vscode:flash or vscode:air - Platform for AS3 VS Code projects
+        fla:<flaversion> or xfl:<flaversion> - Specify FLA format version        
     Values for <flaversion>:
         f1,f2,f3,f4,f5,mx,mx2004,f8,cs3,cs4,cs5,cs5.5,cs6,cc
     You can set multiple formats at once using comma (,)

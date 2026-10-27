@@ -590,168 +590,174 @@ public class AS3ScriptExporter {
         }
 
         if (exportSettings.exportEmbedFlaMode || exportSettings.exportEmbed) {
-
-            if (CancellableWorker.isInterrupted()) {
-                return ret;
-            }
-
-            final String ASSETS_DIR = outdir + exportSettings.assetsDir;
-            List<Tag> exportTagList = new ArrayList<>();
-            List<CharacterTag> assetsTagList = new ArrayList<>();
-
-            for (ScriptPack item : packs) {
-                if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
-                    continue;
-                }
-                String className = item.getClassPath().toRawString();
-                CharacterTag ct = swf.getCharacterByClass(className);
-                if (ct == null) {
-                    continue;
-                }
-                if (ct instanceof DefineBinaryDataTag) {
-                    exportTagList.add(ct);
-                }
-                if (ct instanceof ImageTag) {
-                    int classIndex = item.abc.findClassByName(className);
-                    if (exportSettings.exportEmbedFlaMode && classIndex != -1 && swf.getAbcIndex().isInstanceOf(item.abc, classIndex, DottedChain.parseNoSuffix("flash.display.BitmapData"))) {
-                        continue;
-                    }
-                    exportTagList.add(ct);
-                }
-                if (!exportSettings.exportEmbedFlaMode) {
-                    if (ct instanceof DefineSpriteTag) {
-                        assetsTagList.add((DefineSpriteTag) ct);
-                    }
-                    if (ct instanceof DefineSoundTag) {
-                        DefineSoundTag st = (DefineSoundTag) ct;
-                        if (st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3) {
-                            exportTagList.add(ct);
-                        } else {
-                            assetsTagList.add(st);
-                        }
-                    }
-                    if (ct instanceof FontTag) {
-                        exportTagList.add(ct);
-                    }
-                }
-                if (ct instanceof DefineFont4Tag) {
-                    exportTagList.add(ct);
-                }
-            }
-            ReadOnlyTagList rttl = new ReadOnlyTagList(exportTagList);
             try {
-                BinaryDataExporter bde = new BinaryDataExporter();
-                bde.exportBinaryData(handler, ASSETS_DIR, rttl, new BinaryDataExportSettings(BinaryDataExportMode.RAW), evl);
-                if (CancellableWorker.isInterrupted()) {
-                    return ret;
-                }
-                ImageExporter ie = new ImageExporter();
-                ie.exportImages(handler, ASSETS_DIR, rttl, new ImageExportSettings(ImageExportMode.PNG_GIF_JPEG), evl);
-                if (CancellableWorker.isInterrupted()) {
-                    return ret;
-                }
-                SoundExporter se = new SoundExporter();
-                se.exportSounds(handler, ASSETS_DIR, rttl, new SoundExportSettings(SoundExportMode.MP3_WAV), evl);
-                if (CancellableWorker.isInterrupted()) {
-                    return ret;
-                }
-                FontExporter fe = new FontExporter();
-                fe.exportFonts(handler, ASSETS_DIR, rttl, new FontExportSettings(FontExportMode.TTF), evl);
-                if (CancellableWorker.isInterrupted()) {
-                    return ret;
-                }
-                Font4Exporter f4e = new Font4Exporter();
-                f4e.exportFonts(handler, ASSETS_DIR, rttl, new Font4ExportSettings(Font4ExportMode.CFF), evl);
-                if (CancellableWorker.isInterrupted()) {
-                    return ret;
-                }
-                if (!assetsTagList.isEmpty()) {
-                    new RetryTask(() -> {
-                        Path.createDirectorySafe(new File(ASSETS_DIR));
-                        try (FileOutputStream fos = new FileOutputStream(ASSETS_DIR + "/assets.swf")) {
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            SWFOutputStream sos2 = new SWFOutputStream(baos, swf.version, swf.getCharset());
-                            sos2.writeRECT(swf.displayRect);
-                            sos2.writeUFIXED8(swf.frameRate);
-                            sos2.writeUI16(1);
-                            FileAttributesTag fa = swf.getFileAttributes();
-                            if (fa != null) {
-                                fa.writeTag(sos2);
-                            }
-                            SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
-                            if (setBgColorTag != null) {
-                                setBgColorTag.writeTag(sos2);
-                            }
-
-                            Set<Integer> neededCharacters = new LinkedHashSet<>();
-                            Set<String> neededCharacterClasses = new LinkedHashSet<>();
-                            List<Integer> symbolClassIds = new ArrayList<>();
-                            List<String> symbolClassNames = new ArrayList<>();
-                            for (CharacterTag st : assetsTagList) {
-                                st.getNeededCharactersDeep(neededCharacters, neededCharacterClasses);
-                                neededCharacters.add(swf.getCharacterId(st));
-                            }
-                            
-                            //TODO: handle neededCharacterClasses?
-                            
-                            for (int n : neededCharacters) {
-                                CharacterTag ct = (CharacterTag) swf.getCharacter(n);
-                                if (ct == null) {
-                                    continue;
-                                }
-                                if (ct instanceof DefineBitsTag) {
-                                    //Convert DefineBits+(global)JPEGTables to standalone DefineBitsJPEG2 so they do not share same JPEGTables anymore
-                                    DefineBitsTag db = (DefineBitsTag) ct;
-                                    InputStream isd = db.getOriginalImageData();
-                                    if (isd == null) {
-                                        continue;
-                                    }
-                                    DefineBitsJPEG2Tag dbj2 = new DefineBitsJPEG2Tag(swf);
-                                    dbj2.characterID = db.characterID;
-                                    dbj2.imageData = new ByteArrayRange(Helper.readStream(isd));
-                                    dbj2.writeTag(sos2);
-                                } else {
-                                    ct.writeTag(sos2);
-                                }
-                                symbolClassIds.add(ct.getCharacterId());
-                                symbolClassNames.add("symbol" + ct.getCharacterId());
-                                List<CharacterIdTag> cidTags = swf.getCharacterIdTags(n);
-                                for (CharacterIdTag t : cidTags) {
-                                    if (t instanceof PlaceObjectTypeTag) {
-                                        continue;
-                                    }
-                                    if (t instanceof RemoveTag) {
-                                        continue;
-                                    }
-                                    ((Tag) t).writeTag(sos2);
-                                }
-                            }
-
-                            ExportAssetsTag ea = new ExportAssetsTag(swf);
-                            ea.names = symbolClassNames;
-                            ea.tags = symbolClassIds;
-                            ea.writeTag(sos2);
-
-                            new ShowFrameTag(swf).writeTag(sos2);
-                            new EndTag(swf).writeTag(sos2);
-
-                            SWFOutputStream sos = new SWFOutputStream(fos, swf.version, swf.getCharset());
-                            sos.write("FWS".getBytes());
-                            sos.write(swf.version);
-                            byte[] data = baos.toByteArray();
-                            long fileSize = sos.getPos() + data.length + 4;
-                            sos.writeUI32(fileSize);
-                            sos.write(data);
-                        }
-                    }, handler).run();
-                }
+                exportEmbeddedAssets(handler, outdir, swf, packs, exportSettings, evl);
             } catch (IOException ex) {
-                Logger.getLogger(AS3ScriptExporter.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, "Error exporting embedded assets", ex);
             } catch (InterruptedException ex) {
                 return ret;
             }
         }
-
         return ret;
+    }
+
+    /**
+     * Exports the embedded media referenced by the supplied script packs.
+     * Shared by the ActionScript and MXML source exporters.
+     */
+    void exportEmbeddedAssets(AbortRetryIgnoreHandler handler, String outdir, SWF swf,
+            List<ScriptPack> packs, ScriptExportSettings exportSettings, EventListener evl) throws IOException, InterruptedException {
+        if (CancellableWorker.isInterrupted()) {
+            throw new InterruptedException();
+        }
+        final String ASSETS_DIR = outdir + exportSettings.assetsDir;
+        List<Tag> exportTagList = new ArrayList<>();
+        List<CharacterTag> assetsTagList = new ArrayList<>();
+
+        for (ScriptPack item : packs) {
+            if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
+                continue;
+            }
+            String className = item.getClassPath().toRawString();
+            CharacterTag ct = swf.getCharacterByClass(className);
+            if (ct == null) {
+                continue;
+            }
+            if (ct instanceof DefineBinaryDataTag) {
+                exportTagList.add(ct);
+            }
+            if (ct instanceof ImageTag) {
+                int classIndex = item.abc.findClassByName(className);
+                if (exportSettings.exportEmbedFlaMode && classIndex != -1 && swf.getAbcIndex().isInstanceOf(item.abc, classIndex, DottedChain.parseNoSuffix("flash.display.BitmapData"))) {
+                    continue;
+                }
+                exportTagList.add(ct);
+            }
+            if (!exportSettings.exportEmbedFlaMode) {
+                if (ct instanceof DefineSpriteTag) {
+                    assetsTagList.add((DefineSpriteTag) ct);
+                }
+                if (ct instanceof DefineSoundTag) {
+                    DefineSoundTag st = (DefineSoundTag) ct;
+                    if (st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3) {
+                        exportTagList.add(ct);
+                    } else {
+                        assetsTagList.add(st);
+                    }
+                }
+                if (ct instanceof FontTag) {
+                    exportTagList.add(ct);
+                }
+            }
+            if (ct instanceof DefineFont4Tag) {
+                exportTagList.add(ct);
+            }
+        }
+        ReadOnlyTagList rttl = new ReadOnlyTagList(exportTagList);
+        BinaryDataExporter bde = new BinaryDataExporter();
+        bde.exportBinaryData(handler, ASSETS_DIR, rttl, new BinaryDataExportSettings(BinaryDataExportMode.RAW), evl);
+        if (CancellableWorker.isInterrupted()) {
+            throw new InterruptedException();
+        }
+        ImageExporter ie = new ImageExporter();
+        ie.exportImages(handler, ASSETS_DIR, rttl, new ImageExportSettings(ImageExportMode.PNG_GIF_JPEG), evl);
+        if (CancellableWorker.isInterrupted()) {
+            throw new InterruptedException();
+        }
+        SoundExporter se = new SoundExporter();
+        se.exportSounds(handler, ASSETS_DIR, rttl, new SoundExportSettings(SoundExportMode.MP3_WAV), evl);
+        if (CancellableWorker.isInterrupted()) {
+            throw new InterruptedException();
+        }
+        FontExporter fe = new FontExporter();
+        fe.exportFonts(handler, ASSETS_DIR, rttl, new FontExportSettings(FontExportMode.TTF), evl);
+        if (CancellableWorker.isInterrupted()) {
+            throw new InterruptedException();
+        }
+        Font4Exporter f4e = new Font4Exporter();
+        f4e.exportFonts(handler, ASSETS_DIR, rttl, new Font4ExportSettings(Font4ExportMode.CFF), evl);
+        if (CancellableWorker.isInterrupted()) {
+            throw new InterruptedException();
+        }
+        if (!assetsTagList.isEmpty()) {
+            new RetryTask(() -> {
+                Path.createDirectorySafe(new File(ASSETS_DIR));
+                try (FileOutputStream fos = new FileOutputStream(ASSETS_DIR + "/assets.swf")) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    SWFOutputStream sos2 = new SWFOutputStream(baos, swf.version, swf.getCharset());
+                    sos2.writeRECT(swf.displayRect);
+                    sos2.writeUFIXED8(swf.frameRate);
+                    sos2.writeUI16(1);
+                    FileAttributesTag fa = swf.getFileAttributes();
+                    if (fa != null) {
+                        fa.writeTag(sos2);
+                    }
+                    SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
+                    if (setBgColorTag != null) {
+                        setBgColorTag.writeTag(sos2);
+                    }
+
+                    Set<Integer> neededCharacters = new LinkedHashSet<>();
+                    Set<String> neededCharacterClasses = new LinkedHashSet<>();
+                    List<Integer> symbolClassIds = new ArrayList<>();
+                    List<String> symbolClassNames = new ArrayList<>();
+                    for (CharacterTag st : assetsTagList) {
+                        st.getNeededCharactersDeep(neededCharacters, neededCharacterClasses);
+                        neededCharacters.add(swf.getCharacterId(st));
+                    }
+
+                    //TODO: handle neededCharacterClasses?
+
+                    for (int n : neededCharacters) {
+                        CharacterTag ct = (CharacterTag) swf.getCharacter(n);
+                        if (ct == null) {
+                            continue;
+                        }
+                        if (ct instanceof DefineBitsTag) {
+                            //Convert DefineBits+(global)JPEGTables to standalone DefineBitsJPEG2 so they do not share same JPEGTables anymore
+                            DefineBitsTag db = (DefineBitsTag) ct;
+                            InputStream isd = db.getOriginalImageData();
+                            if (isd == null) {
+                                continue;
+                            }
+                            DefineBitsJPEG2Tag dbj2 = new DefineBitsJPEG2Tag(swf);
+                            dbj2.characterID = db.characterID;
+                            dbj2.imageData = new ByteArrayRange(Helper.readStream(isd));
+                            dbj2.writeTag(sos2);
+                        } else {
+                            ct.writeTag(sos2);
+                        }
+                        symbolClassIds.add(ct.getCharacterId());
+                        symbolClassNames.add("symbol" + ct.getCharacterId());
+                        List<CharacterIdTag> cidTags = swf.getCharacterIdTags(n);
+                        for (CharacterIdTag t : cidTags) {
+                            if (t instanceof PlaceObjectTypeTag) {
+                                continue;
+                            }
+                            if (t instanceof RemoveTag) {
+                                continue;
+                            }
+                            ((Tag) t).writeTag(sos2);
+                        }
+                    }
+
+                    ExportAssetsTag ea = new ExportAssetsTag(swf);
+                    ea.names = symbolClassNames;
+                    ea.tags = symbolClassIds;
+                    ea.writeTag(sos2);
+
+                    new ShowFrameTag(swf).writeTag(sos2);
+                    new EndTag(swf).writeTag(sos2);
+
+                    SWFOutputStream sos = new SWFOutputStream(fos, swf.version, swf.getCharset());
+                    sos.write("FWS".getBytes());
+                    sos.write(swf.version);
+                    byte[] data = baos.toByteArray();
+                    long fileSize = sos.getPos() + data.length + 4;
+                    sos.writeUI32(fileSize);
+                    sos.write(data);
+                }
+            }, handler).run();
+        }
     }
 }

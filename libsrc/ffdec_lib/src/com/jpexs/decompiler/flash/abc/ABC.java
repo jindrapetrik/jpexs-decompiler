@@ -2921,6 +2921,31 @@ public class ABC implements Openable {
     }
 
     /**
+     * Resolves a namespace declared on the current class as well as package namespaces.
+     *
+     * @param m Member multiname
+     * @param classIndex Current class, or -1 outside a class
+     * @return Namespace declaration name
+     */
+    public DottedChain findCustomNsOfMultiname(Multiname m, int classIndex) {
+        DottedChain global = findCustomNsOfMultiname(m);
+        if (global != null && !global.isEmpty() || classIndex < 0 || classIndex >= instance_info.size()
+                || m.getSimpleNamespaceKind(constants) != Namespace.KIND_NAMESPACE) {
+            return global;
+        }
+        String uri = m.getSimpleNamespaceName(constants).toRawString();
+        List<Trait> traits = new ArrayList<>(class_info.get(classIndex).static_traits.traits);
+        traits.addAll(instance_info.get(classIndex).instance_traits.traits);
+        for (Trait trait : traits) {
+            if (trait instanceof TraitSlotConst && ((TraitSlotConst) trait).isNamespace()
+                    && uri.equals(constants.getNamespace(((TraitSlotConst) trait).value_index).getName(constants).toRawString())) {
+                return DottedChain.parseWithSuffix(trait.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true));
+            }
+        }
+        return global;
+    }
+
+    /**
      * Clears packs cache.
      */
     public void clearPacksCache() {

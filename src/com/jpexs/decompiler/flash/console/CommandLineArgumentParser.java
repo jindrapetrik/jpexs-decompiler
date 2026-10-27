@@ -88,6 +88,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
+import com.jpexs.decompiler.flash.exporters.script.MxmlExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
@@ -103,7 +104,11 @@ import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SymbolClassExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.XmlSwfExportSettings;
+import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfMxmlProjectExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -264,6 +269,9 @@ import org.fusesource.jansi.AnsiConsole;
  * @author JPEXS
  */
 public class CommandLineArgumentParser {
+
+    static final List<String> PROJECT_EXPORT_TYPES = Collections.unmodifiableList(Arrays.asList(
+            "flashdevelop", "flashdevelop_mxml", "intellij", "intellij_mxml", "vscode", "vscode_mxml"));
 
     private static final Logger logger = Logger.getLogger(CommandLineArgumentParser.class.getName());
 
@@ -2256,7 +2264,8 @@ public class CommandLineArgumentParser {
             "text",
             "all",
             "fla",
-            "xfl"
+            "xfl",
+            "mxml"
         };
 
         String[] removedExportFormats = new String[]{
@@ -2389,7 +2398,7 @@ public class CommandLineArgumentParser {
                     if (Arrays.asList(removedExportFormats).contains(exportFormat)) {
                         System.err.println("Error: Export format : " + exportFormat + " was REMOVED. Run application with --help parameter to see available formats.");
                         System.exit(1);
-                    } else if (!Arrays.asList(validExportItems).contains(exportFormat)) {
+                    } else if (!Arrays.asList(validExportItems).contains(exportFormat) && !PROJECT_EXPORT_TYPES.contains(exportFormat)) {
                         System.err.println("Invalid export item:" + exportFormat);
                         badArguments("export");
                     }
@@ -2542,6 +2551,20 @@ public class CommandLineArgumentParser {
                     exportFla(false, outDir, inFile, swf, multipleExportTypes, formats, handler, tweenQuality);
                 }
 
+                if (exportFormats.contains("mxml")) {
+                    System.out.println("Exporting MXML (experimental)...");
+                    File result = exportMxml(swf, outDir, multipleExportTypes);
+                    System.out.println("Exported MXML: " + result);
+                }
+
+                for (String projectType : PROJECT_EXPORT_TYPES) {
+                    if (exportFormats.contains(projectType)) {
+                        System.out.println("Exporting " + projectType + " project...");
+                        File result = exportProject(swf, outDir, projectType, multipleExportTypes, formats, handler, evl);
+                        System.out.println("Exported " + projectType + " project: " + result);
+                    }
+                }
+
                 if (!singleFile) {
                     long stopTimeSwf = System.currentTimeMillis();
                     long time = stopTimeSwf - startTimeSwf;
@@ -2566,6 +2589,71 @@ public class CommandLineArgumentParser {
         System.out.println("Export finished. Total export time: " + Helper.formatTimeSec(time));
         System.out.println(exportOK ? "OK" : "FAIL");
         System.exit(exportOK ? 0 : 1);
+    }
+
+    static File exportMxml(SWF swf, String outDir, boolean multipleExportTypes) throws IOException, InterruptedException {
+        File target = new File(outDir, multipleExportTypes ? "mxml" : "");
+        return new MxmlExporter().exportMxml(swf, target);
+    }
+
+    static File exportProject(SWF swf, String outDir, String exportType, boolean multipleExportTypes,
+            Map<String, String> formats, AbortRetryIgnoreHandler handler, EventListener listener) throws IOException, InterruptedException {
+        if (!PROJECT_EXPORT_TYPES.contains(exportType)) {
+            throw new IllegalArgumentException("Unknown project export type: " + exportType);
+        }
+        boolean mxml = exportType.endsWith("_mxml");
+        String kind = mxml ? exportType.substring(0, exportType.length() - "_mxml".length()) : exportType;
+        SwfMxmlProjectExporter.ProjectType type;
+        boolean supported;
+        switch (kind) {
+            case "flashdevelop":
+                type = SwfMxmlProjectExporter.ProjectType.FLASH_DEVELOP;
+                supported = SwfFlashDevelopExporter.canExportSwf(swf);
+                break;
+            case "intellij":
+                type = SwfMxmlProjectExporter.ProjectType.INTELLIJ_IDEA;
+                supported = SwfIntelliJIdeaExporter.canExportSwf(swf);
+                break;
+            case "vscode":
+                type = SwfMxmlProjectExporter.ProjectType.VS_CODE;
+                supported = SwfVsCodeExporter.canExportSwf(swf);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown project export type: " + exportType);
+        }
+        if (mxml ? !MxmlExporter.canExportSwf(swf) : !supported) {
+            throw new IOException("SWF is not supported for " + exportType + " project export");
+        }
+        String platform = formats.getOrDefault(kind, "flash");
+        if (!mxml && !"intellij".equals(kind) && !"flash".equals(platform) && !"air".equals(platform)) {
+            throw new IllegalArgumentException("Invalid " + kind + " project format: " + platform + ". Use flash or air.");
+        }
+        File directory = new File(outDir, multipleExportTypes ? exportType : "").toPath().toAbsolutePath().normalize().toFile();
+        String name = Path.getFileNameWithoutExtension(new File(swf.getShortFileName()));
+        if (name.isEmpty() || "-".equals(name)) {
+            name = "project";
+        }
+        File destination = "flashdevelop".equals(kind) ? new File(directory, name + ".as3proj") : directory;
+        if (mxml) {
+            new SwfMxmlProjectExporter().exportProject(swf, destination, type);
+        } else {
+            Files.createDirectories(directory.toPath());
+            boolean air = "air".equals(platform);
+            switch (type) {
+                case FLASH_DEVELOP:
+                    new SwfFlashDevelopExporter().exportFlashDevelopProject(swf, destination, air, handler, listener);
+                    break;
+                case INTELLIJ_IDEA:
+                    new SwfIntelliJIdeaExporter().exportIntelliJIdeaProject(swf, destination, handler, listener);
+                    break;
+                case VS_CODE:
+                    new SwfVsCodeExporter().exportVsCodeProject(swf, destination, air, handler, listener);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown project export type: " + exportType);
+            }
+        }
+        return destination;
     }
 
     private static void exportFla(boolean compressed, String outDir, File inFile, SWF swf, boolean multipleExportTypes, Map<String, String> formats, AbortRetryIgnoreHandler handler, int tweenQuality) throws IOException, InterruptedException {

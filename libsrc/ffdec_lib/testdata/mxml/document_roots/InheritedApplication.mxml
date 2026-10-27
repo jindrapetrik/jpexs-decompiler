@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<app:ApplicationBase xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark" xmlns:app="app.*"
+    width="500" height="300" applicationCaption="An inherited application">
+    <app:layout><s:VerticalLayout gap="12"/></app:layout>
+    <s:Label id="inheritedLabel" text="{formatCaption()}"/>
+    <s:Button label="Run inherited handler" click="recordClick()"/>
+</app:ApplicationBase>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableComponent xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark" width="440" height="40">
+    <fx:Metadata>
+        [SkinState("normal")]
+        [SkinState("highlighted")]
+        [Event(name="activated", type="flash.events.Event")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        import spark.components.Label;
+
+        [SkinPart(required="true")]
+        public var labelDisplay:Label;
+
+        [SkinPart(required="false")]
+        [Bindable]
+        public var detailDisplay:Label;
+
+        [Bindable]
+        public var caption:String = "Custom control";
+
+        override protected function getCurrentSkinState():String {
+            return enabled ? "normal" : "highlighted";
+        }
+    ]]></fx:Script>
+</s:SkinnableComponent>

@@ -679,7 +679,7 @@ public abstract class Trait implements Cloneable, Serializable {
         }
         Multiname m = getName(abc);
         if (m != null) {
-            DottedChain dc = abc.findCustomNsOfMultiname(m);
+            DottedChain dc = abc.findCustomNsOfMultiname(m, classIndex);
             String nsname = dc != null ? dc.getLast() : null;
 
             int nskind = m.getSimpleNamespaceKind(abc.constants);

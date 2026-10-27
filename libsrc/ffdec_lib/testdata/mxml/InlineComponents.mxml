@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               width="500" height="400">
+    <fx:Script><![CDATA[
+        public function titleFor(item:Object):String { return "Item: " + item.name; }
+        public function record(value:String):void { status.text = value; }
+    ]]></fx:Script>
+    <fx:Declarations>
+        <s:ArrayCollection id="items">
+            <fx:Object name="Parent">
+                <fx:children><fx:Array><fx:String>Child A</fx:String><fx:String>Child B</fx:String></fx:Array></fx:children>
+            </fx:Object>
+        </s:ArrayCollection>
+        <fx:Component id="sharedRenderer">
+            <s:ItemRenderer>
+                <s:Label text="{String(data).toUpperCase()}"/>
+            </s:ItemRenderer>
+        </fx:Component>
+    </fx:Declarations>
+    <s:VGroup>
+        <s:List id="firstList" dataProvider="{items}" width="300" height="180">
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:ItemRenderer>
+                        <fx:Script><![CDATA[
+                            import flash.events.MouseEvent;
+                            import mx.collections.ArrayCollection;
+                            private function handleClick(event:MouseEvent):void { outerDocument.record(data.name); }
+                        ]]></fx:Script>
+                        <s:VGroup>
+                            <s:Label id="caption" text="{outerDocument.titleFor(data)}" click="handleClick(event)"/>
+                            <s:List id="nestedList" dataProvider="{new ArrayCollection(data.children)}" width="250" height="80">
+                                <s:itemRenderer>
+                                    <fx:Component>
+                                        <s:ItemRenderer>
+                                            <s:Label text="{outerDocument.data.name + ': ' + data}"/>
+                                        </s:ItemRenderer>
+                                    </fx:Component>
+                                </s:itemRenderer>
+                            </s:List>
+                        </s:VGroup>
+                    </s:ItemRenderer>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:List>
+        <s:List id="secondList" dataProvider="{new ArrayCollection(['one', 'two'])}" itemRenderer="{sharedRenderer}" width="300" height="100"/>
+        <s:Label id="status" text="Ready"/>
+    </s:VGroup>
+</s:Application>

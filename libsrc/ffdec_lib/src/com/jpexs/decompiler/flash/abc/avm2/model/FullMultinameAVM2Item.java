@@ -225,6 +225,15 @@ public class FullMultinameAVM2Item extends AVM2Item {
                     }
                     
                     DottedChain customNs = customNsRef.getVal();
+                    boolean localNamespace = false;
+                    DottedChain globalNamespace = localData.abc.findCustomNsOfMultiname(constants.getMultiname(multinameIndex));
+                    if (customNs == null && (globalNamespace == null || globalNamespace.isEmpty())) {
+                        DottedChain resolved = localData.abc.findCustomNsOfMultiname(constants.getMultiname(multinameIndex), localData.classIndex);
+                        if (resolved != null && !resolved.isEmpty()) {
+                            customNs = resolved;
+                            localNamespace = true;
+                        }
+                    }
                     
                     Boolean isAmbiguous = null;
                     if (parentType instanceof TypeItem) { //not ApplyTypeAVM2Item or UnboundedTypeItem
@@ -238,7 +247,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
                         isAmbiguous = true;
                     }*/
                     
-                    if (isAmbiguous == null || isAmbiguous) {
+                    if (localNamespace || isAmbiguous == null || isAmbiguous) {
                         if (customNs != null) {
                             String nsname = customNs.getLast();
                             String identifier = IdentifiersDeobfuscation.printIdentifier(localData.abc.getSwf(), localData.usedDeobfuscations, true, nsname);                    

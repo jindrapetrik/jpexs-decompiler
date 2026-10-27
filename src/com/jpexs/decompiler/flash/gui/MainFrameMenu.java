@@ -25,8 +25,10 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.exporters.script.MxmlExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfMxmlProjectExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
@@ -494,6 +496,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         return false;
+    }
+
+    protected void exportMxmlActionPerformed(ActionEvent evt, SwfMxmlProjectExporter.ProjectType type) {
+        if (openable instanceof SWF) {
+            mainFrame.getPanel().exportMxml((SWF) openable, type);
+        }
     }
 
     protected void exportFlashDevelopActionPerformed(ActionEvent evt) {
@@ -1103,11 +1111,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean canExportFlashDevelop = false;
         boolean canExportIdea = false;
         boolean canExportVsCode = false;
+        boolean canExportMxml = false;
         if (swf != null) {
             isAs3 = swf.isAS3();
             canExportFlashDevelop = SwfFlashDevelopExporter.canExportSwf(swf);
             canExportIdea = SwfIntelliJIdeaExporter.canExportSwf(swf);
             canExportVsCode = SwfVsCodeExporter.canExportSwf(swf);
+            canExportMxml = MxmlExporter.canExportSwf(swf);
         }
         if (abcSelected) {
             isAs3 = true;
@@ -1180,12 +1190,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/export/exportAll", openableSelected && !isWorking);
         setMenuEnabled("_/exportFla", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportFla", allSameSwf && openableSelected && !isWorking);
-        //setMenuEnabled("_/exportFlashDevelop", swfSelected && !isWorking && canExportFlashDevelop);
-        setMenuEnabled("/file/export/exportMore/exportFlashDevelop", allSameSwf && openableSelected && isAs3 && !isWorking && canExportFlashDevelop);
-        //setMenuEnabled("_/exportIdea", swfSelected && !isWorking && canExportIdea);
-        setMenuEnabled("/file/export/exportMore/exportIdea", allSameSwf && openableSelected && isAs3 && !isWorking && canExportIdea);
-        //setMenuEnabled("_/exportVsCode", swfSelected && !isWorking && canExportVsCode);
-        setMenuEnabled("/file/export/exportMore/exportVsCode", allSameSwf && openableSelected && isAs3 && !isWorking && canExportVsCode);
+        boolean projectExportAvailable = allSameSwf && swfSelected && !isWorking;
+        setProjectExportEnabled("/file/export/exportMore/exportFlashDevelop", projectExportAvailable && canExportFlashDevelop, projectExportAvailable && canExportMxml);
+        setProjectExportEnabled("/file/export/exportMore/exportIdea", projectExportAvailable && canExportIdea, projectExportAvailable && canExportMxml);
+        setProjectExportEnabled("/file/export/exportMore/exportVsCode", projectExportAvailable && canExportVsCode, projectExportAvailable && canExportMxml);
+        setMenuEnabled("/file/export/exportMore/exportMxmlMXML", projectExportAvailable && canExportMxml);
         setMenuEnabled("/file/export/exportMore/exportJava", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportMore/exportSwc", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportMore/exportExe", swfSelected && !isWorking);
@@ -1298,6 +1307,19 @@ public abstract class MainFrameMenu implements MenuBuilder {
         manager.addKeyEventDispatcher(keyEventDispatcher = this::dispatchKeyEvent);
     }
 
+    private void setProjectExportEnabled(String path, boolean as3, boolean mxml) {
+        setMenuEnabled(path, as3 || mxml);
+        setMenuEnabled(path + "/as3", as3);
+        setMenuEnabled(path + "/mxml", mxml);
+    }
+
+    private void addProjectExportMenu(String path, String title, String icon, ActionListener as3Action, SwfMxmlProjectExporter.ProjectType type) {
+        addMenuItem(path, title, icon, null, PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem(path + "/as3", "AS3", "as16", as3Action, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem(path + "/mxml", "MXML", "exportxml16", evt -> exportMxmlActionPerformed(evt, type), PRIORITY_MEDIUM, null, true, null, false);
+        finishMenu(path);
+    }
+
     public void createMenuBar() {
         initMenu();
 
@@ -1352,9 +1374,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addMenuItem("/file/export/exportMore", translate("menu.export.file"), "export16", null, PRIORITY_MEDIUM, null, false, null, false);
         addMenuItem("/file/export/exportMore/exportXml", "XML", "exportxml16", this::exportXmlActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/export/exportMore/exportFlashDevelop", "Flash Develop", "exportflashdevelop16", this::exportFlashDevelopActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/export/exportMore/exportIdea", "IntelliJ Idea", "exportidea16", this::exportIdeaActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/export/exportMore/exportVsCode", "Visual Studio Code", "exportvscode16", this::exportVsCodeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addProjectExportMenu("/file/export/exportMore/exportFlashDevelop", "FlashDevelop", "exportflashdevelop16", this::exportFlashDevelopActionPerformed, SwfMxmlProjectExporter.ProjectType.FLASH_DEVELOP);
+        addProjectExportMenu("/file/export/exportMore/exportIdea", "IntelliJ IDEA", "exportidea16", this::exportIdeaActionPerformed, SwfMxmlProjectExporter.ProjectType.INTELLIJ_IDEA);
+        addProjectExportMenu("/file/export/exportMore/exportVsCode", "VS Code", "exportvscode16", this::exportVsCodeActionPerformed, SwfMxmlProjectExporter.ProjectType.VS_CODE);
+        addMenuItem("/file/export/exportMore/exportMxmlMXML", "MXML", "exportxml16",
+                evt -> exportMxmlActionPerformed(evt, SwfMxmlProjectExporter.ProjectType.MXML), PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/export/exportMore/exportJava", "Java", "exportjava16", this::exportJavaActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/export/exportMore/exportSwc", "SWC", "bundleswc16", this::exportSwcActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/export/exportMore/exportExe", "EXE", "saveasexe16", this::saveAsExeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);

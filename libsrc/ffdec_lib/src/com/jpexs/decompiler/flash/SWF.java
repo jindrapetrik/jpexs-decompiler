@@ -6209,6 +6209,37 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return true;
     }
 
+    /** Finds cached or directly returned bootstrap information. */
+    private NewObjectAVM2Item findFlexInfoObject(List<GraphTargetItem> items) {
+        if (items == null) {
+            return null;
+        }
+        for (GraphTargetItem item : items) {
+            if (item instanceof IfItem) {
+                NewObjectAVM2Item found = findFlexInfoObject(((IfItem) item).onTrue);
+                if (found == null) {
+                    found = findFlexInfoObject(((IfItem) item).onFalse);
+                }
+                if (found != null) {
+                    return found;
+                }
+            }
+            GraphTargetItem value = item.value;
+            while (value instanceof com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item
+                    || value instanceof com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item) {
+                value = value.value;
+            }
+            if (value instanceof NewObjectAVM2Item) {
+                for (NameValuePair pair : ((NewObjectAVM2Item) value).pairs) {
+                    if (pair.name instanceof StringAVM2Item && "mainClassName".equals(((StringAVM2Item) pair.name).getValue())) {
+                        return (NewObjectAVM2Item) value;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Gets Flex Main class.
      *
@@ -6234,7 +6265,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     int cindex = ((TraitClass) firstTrait).class_info;
                     Multiname superName = documentPack.abc.constants.getMultiname(documentPack.abc.instance_info.get(cindex).super_index);
                     String parentClass = superName.getNameWithNamespace(new LinkedHashSet<>(), documentPack.abc, documentPack.abc.constants, true).toRawString();
-                    if ("mx.managers.SystemManager".equals(parentClass)) {
+                    if ("mx.managers.SystemManager".equals(parentClass)
+                            || "mx.managers.WindowedSystemManager".equals(parentClass)
+                            || "mx.core.FlexModuleFactory".equals(parentClass)) {
                         for (Trait t : documentPack.abc.instance_info.get(cindex).instance_traits.traits) {
                             if ((t instanceof TraitMethodGetterSetter) && "info".equals(t.getName(documentPack.abc).getName(new LinkedHashSet<>(), documentPack.abc, documentPack.abc.constants, new ArrayList<>(), true, true))) {
 
@@ -6247,106 +6280,96 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                         swfVersion = ((SWF) documentPack.getOpenable()).version;
                                     }
                                     documentPack.abc.findBody(mi).convert(swfVersion, callStack, getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
-                                    List<GraphTargetItem> infos = documentPack.abc.findBody(mi).convertedItems;
-                                    if (!infos.isEmpty()) {
-                                        if (infos.get(0) instanceof IfItem) {
-                                            IfItem ift = ((IfItem) infos.get(0));
-                                            if (!ift.onTrue.isEmpty()) {
-                                                if (ift.onTrue.get(0) instanceof InitPropertyAVM2Item) {
-                                                    if (ift.onTrue.get(0).value instanceof NewObjectAVM2Item) {
-                                                        NewObjectAVM2Item no = (NewObjectAVM2Item) ift.onTrue.get(0).value;
-                                                        List<String> compiledLocales = new ArrayList<>();
-                                                        List<String> compiledResourceBundleNames = new ArrayList<>();
-                                                        List<String> mixins = new ArrayList<>();
-                                                        String mainClassName = null;
-                                                        //currentDomain,preloader
-                                                        /*double width = 0;
-                                                         double height = 0;
-                                                         */
-                                                        for (NameValuePair nvp : no.pairs) {
-                                                            if (nvp.name instanceof StringAVM2Item) {
-                                                                String n = ((StringAVM2Item) nvp.name).getValue();
-                                                                switch (n) {
-                                                                    case "compiledLocales":
-                                                                        if (nvp.value instanceof NewArrayAVM2Item) {
-                                                                            NewArrayAVM2Item na = (NewArrayAVM2Item) nvp.value;
-                                                                            for (GraphTargetItem tv : na.values) {
-                                                                                compiledLocales.add("" + tv.getResult());
-                                                                            }
-                                                                        }
-                                                                        break;
-                                                                    case "compiledResourceBundleNames":
-                                                                        if (nvp.value instanceof NewArrayAVM2Item) {
-                                                                            NewArrayAVM2Item na = (NewArrayAVM2Item) nvp.value;
-                                                                            for (GraphTargetItem tv : na.values) {
-                                                                                compiledResourceBundleNames.add("" + tv.getResult());
-                                                                            }
-                                                                        }
-                                                                        break;
-                                                                    case "mixins":
-                                                                        if (nvp.value instanceof NewArrayAVM2Item) {
-                                                                            NewArrayAVM2Item na = (NewArrayAVM2Item) nvp.value;
-                                                                            for (GraphTargetItem tv : na.values) {
-                                                                                mixins.add("" + tv.getResult());
-                                                                            }
-                                                                        }
-                                                                        break;
-                                                                    /*case "width":
-                                                                     width = Double.parseDouble("" + nvp.value.getResult());
-                                                                     break;
-                                                                     case "height":
-                                                                     height = Double.parseDouble("" + nvp.value.getResult());
-                                                                     break;*/
-                                                                    case "mainClassName":
-                                                                        mainClassName = "" + nvp.value.getResult();
-                                                                        break;
-                                                                }
+                                    NewObjectAVM2Item no = findFlexInfoObject(documentPack.abc.findBody(mi).convertedItems);
+                                    if (no != null) {
+                                        List<String> compiledLocales = new ArrayList<>();
+                                        List<String> compiledResourceBundleNames = new ArrayList<>();
+                                        List<String> mixins = new ArrayList<>();
+                                        String mainClassName = null;
+                                        //currentDomain,preloader
+                                        /*double width = 0;
+                                         double height = 0;
+                                         */
+                                        for (NameValuePair nvp : no.pairs) {
+                                            if (nvp.name instanceof StringAVM2Item) {
+                                                String n = ((StringAVM2Item) nvp.name).getValue();
+                                                switch (n) {
+                                                    case "compiledLocales":
+                                                        if (nvp.value instanceof NewArrayAVM2Item) {
+                                                            NewArrayAVM2Item na = (NewArrayAVM2Item) nvp.value;
+                                                            for (GraphTargetItem tv : na.values) {
+                                                                compiledLocales.add("" + tv.getResult());
                                                             }
                                                         }
-
-                                                        ignoredClasses.add(documentClass);
-                                                        for (String loc : compiledLocales) {
-                                                            ignoredClasses.add(loc + "$" + "controls" + "_properties");
-                                                            for (String res : compiledResourceBundleNames) {
-                                                                ignoredClasses.add(loc + "$" + res + "_properties");
+                                                        break;
+                                                    case "compiledResourceBundleNames":
+                                                        if (nvp.value instanceof NewArrayAVM2Item) {
+                                                            NewArrayAVM2Item na = (NewArrayAVM2Item) nvp.value;
+                                                            for (GraphTargetItem tv : na.values) {
+                                                                compiledResourceBundleNames.add("" + tv.getResult());
                                                             }
                                                         }
-                                                        ignoredClasses.addAll(mixins);
+                                                        break;
+                                                    case "mixins":
+                                                        if (nvp.value instanceof NewArrayAVM2Item) {
+                                                            NewArrayAVM2Item na = (NewArrayAVM2Item) nvp.value;
+                                                            for (GraphTargetItem tv : na.values) {
+                                                                mixins.add("" + tv.getResult());
+                                                            }
+                                                        }
+                                                        break;
+                                                    /*case "width":
+                                                     width = Double.parseDouble("" + nvp.value.getResult());
+                                                     break;
+                                                     case "height":
+                                                     height = Double.parseDouble("" + nvp.value.getResult());
+                                                     break;*/
+                                                    case "mainClassName":
+                                                        mainClassName = "" + nvp.value.getResult();
+                                                        break;
+                                                }
+                                            }
+                                        }
 
-                                                        //find internal classes used in mixins
-                                                        for (ScriptPack p : getAS3Packs()) {
-                                                            for (String m : mixins) {
-                                                                if (m.equals(p.getClassPath().toRawString())) {
-                                                                    for (int ti : p.traitIndices) {
-                                                                        Trait tr = p.abc.script_info.get(p.scriptIndex).traits.traits.get(ti);
-                                                                        if (tr instanceof TraitClass) {
-                                                                            int ci = ((TraitClass) tr).class_info;
-                                                                            int cinit = p.abc.class_info.get(ci).cinit_index;
-                                                                            callStack = new ArrayList<>();
-                                                                            callStack.add(p.abc.findBody(cinit));
-                                                                            p.abc.findBody(cinit).convert(swfVersion, callStack, getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
-                                                                            List<GraphTargetItem> cinitBody = p.abc.findBody(cinit).convertedItems;
-                                                                            for (GraphTargetItem cit : cinitBody) {
-                                                                                if (cit instanceof SetPropertyAVM2Item) {
-                                                                                    if (cit.value instanceof GetLexAVM2Item) {
-                                                                                        GetLexAVM2Item gl = (GetLexAVM2Item) cit.value;
-                                                                                        ignoredClasses.add(gl.propertyName.getNameWithNamespace(new LinkedHashSet<>(), p.abc, p.abc.constants, true).toRawString());
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
+                                        ignoredClasses.add(documentClass);
+                                        for (String loc : compiledLocales) {
+                                            ignoredClasses.add(loc + "$" + "controls" + "_properties");
+                                            for (String res : compiledResourceBundleNames) {
+                                                ignoredClasses.add(loc + "$" + res + "_properties");
+                                            }
+                                        }
+                                        ignoredClasses.addAll(mixins);
+
+                                        //find internal classes used in mixins
+                                        for (ScriptPack p : getAS3Packs()) {
+                                            for (String m : mixins) {
+                                                if (m.equals(p.getClassPath().toRawString())) {
+                                                    for (int ti : p.traitIndices) {
+                                                        Trait tr = p.abc.script_info.get(p.scriptIndex).traits.traits.get(ti);
+                                                        if (tr instanceof TraitClass) {
+                                                            int ci = ((TraitClass) tr).class_info;
+                                                            int cinit = p.abc.class_info.get(ci).cinit_index;
+                                                            callStack = new ArrayList<>();
+                                                            callStack.add(p.abc.findBody(cinit));
+                                                            p.abc.findBody(cinit).convert(swfVersion, callStack, getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new Traits(), true, new HashSet<>(), new ArrayList<>(), new LinkedHashSet<>());
+                                                            List<GraphTargetItem> cinitBody = p.abc.findBody(cinit).convertedItems;
+                                                            for (GraphTargetItem cit : cinitBody) {
+                                                                if (cit instanceof SetPropertyAVM2Item) {
+                                                                    if (cit.value instanceof GetLexAVM2Item) {
+                                                                        GetLexAVM2Item gl = (GetLexAVM2Item) cit.value;
+                                                                        ignoredClasses.add(gl.propertyName.getNameWithNamespace(new LinkedHashSet<>(), p.abc, p.abc.constants, true).toRawString());
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                        ignoredNs.add("mx");
-                                                        ignoredNs.add("spark");
-                                                        ignoredNs.add("flashx");
-                                                        return mainClassName;
                                                     }
                                                 }
                                             }
                                         }
+                                        ignoredNs.add("mx");
+                                        ignoredNs.add("spark");
+                                        ignoredNs.add("flashx");
+                                        return mainClassName;
                                     }
                                 } catch (InterruptedException e) {
                                     //ignore

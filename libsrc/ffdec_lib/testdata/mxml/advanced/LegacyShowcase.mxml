@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:rpc="mx.rpc.remoting.mxml.*" layout="vertical" width="640" height="480">
+    <mx:Script><![CDATA[
+        import mx.collections.ArrayCollection;
+        [Bindable] private var records:ArrayCollection = new ArrayCollection([
+            {name: "First repeated row", children: [{name: "Nested first row"}]},
+            {name: "Second repeated row", children: [{name: "Nested second row"}]}]);
+        [Bindable] private var selectedName:String = "No selection";
+        private function selectRow(value:String):void { selectedName = value; }
+    ]]></mx:Script>
+    <mx:Metadata>[Event(name="selectionAccepted", type="flash.events.Event")]</mx:Metadata>
+    <rpc:Operation id="standaloneOperation" name="standalone"/>
+    <mx:RemoteObject id="remote" destination="showcaseService">
+        <mx:method name="loadRecords"/>
+    </mx:RemoteObject>
+    <mx:WebService id="service" wsdl="https://example.invalid/service?wsdl">
+        <mx:operation name="findRecord"><mx:request><name>{selectedName}</name></mx:request></mx:operation>
+    </mx:WebService>
+    <mx:Label text="Legacy MXML components and repeated content" fontSize="20"/>
+    <mx:VBox>
+        <mx:Repeater id="rows" dataProvider="{records}">
+            <mx:Button id="rowButton" label="{'rows.mx_internal::getItemAt(param2[0]) ' + rows.currentIndex + ': ' + rows.currentItem.name}" click="selectRow(event.currentTarget.getRepeaterItem().name)"/>
+            <mx:VBox><mx:Repeater id="nestedRows" dataProvider="{rows.currentItem.children}">
+                <mx:Label id="nestedLabel" text="{rows.currentItem.name + ': ' + nestedRows.currentIndex + ': ' + nestedRows.currentItem.name}"/>
+            </mx:Repeater></mx:VBox>
+        </mx:Repeater>
+    </mx:VBox>
+    <mx:Label text="{selectedName}"/>
+    <mx:ViewStack id="pages" width="100%" height="100%">
+        <mx:Canvas label="Details"><mx:Label text="First deferred view"/></mx:Canvas>
+        <mx:Canvas label="Calendar"><mx:DateChooser/></mx:Canvas>
+    </mx:ViewStack>
+</mx:Application>

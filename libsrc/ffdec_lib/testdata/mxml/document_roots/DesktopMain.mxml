@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark"
+    width="520" height="360" title="Desktop MXML recovery">
+    <fx:Script><![CDATA[
+        [Bindable]
+        private var message:String = "An AIR application exported from SWF";
+        private function updateMessage():void {
+            message = "The desktop button was clicked";
+        }
+    ]]></fx:Script>
+    <s:layout><s:VerticalLayout paddingLeft="20" paddingTop="20" gap="12"/></s:layout>
+    <s:Label id="desktopLabel" text="{message}"/>
+    <s:Button id="desktopButton" label="Update desktop message" click="updateMessage()"/>
+</s:WindowedApplication>

@@ -78,6 +78,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
+import com.jpexs.decompiler.flash.exporters.script.MxmlExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
@@ -96,6 +97,7 @@ import com.jpexs.decompiler.flash.exporters.settings.XmlSwfExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfMxmlProjectExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
@@ -3570,6 +3572,85 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 ViewMessages.showMessageDialog(MainPanel.this, translate("message.rename.notfound.identifier"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
             }
         }
+    }
+
+    public void exportMxml(final SWF swf, SwfMxmlProjectExporter.ProjectType type) {
+        if (Main.isWorking() || !MxmlExporter.canExportSwf(swf) || checkEdited()) {
+            return;
+        }
+        FileChooser chooser = View.getFileChooserWithIcon("exportxml");
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("contextmenu.exportMxml." + type.name()));
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (type == SwfMxmlProjectExporter.ProjectType.FLASH_DEVELOP) {
+            chooser.setFileFilter(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return file.isDirectory() || file.getName().toLowerCase(Locale.ENGLISH).endsWith(".as3proj");
+                }
+
+                @Override
+                public String getDescription() {
+                    return translate("filter.as3proj");
+                }
+            });
+            String name = swf.getShortFileName().replaceFirst("(?i)\\.swf$", "");
+            chooser.setSelectedFile(new File(Configuration.lastExportDir.get(), (name.isEmpty() ? "untitled" : name) + ".as3proj"));
+        } else {
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        }
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        File selected = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsoluteFile();
+        if (type == SwfMxmlProjectExporter.ProjectType.FLASH_DEVELOP
+                && !selected.getName().toLowerCase(Locale.ENGLISH).endsWith(".as3proj")) {
+            selected = new File(selected.getPath() + ".as3proj");
+        }
+        final File destination = selected;
+        final File directory = type == SwfMxmlProjectExporter.ProjectType.FLASH_DEVELOP ? destination.getParentFile() : destination;
+        Configuration.lastExportDir.set(directory.getAbsolutePath());
+        final long started = System.currentTimeMillis();
+        new CancellableWorker("exportMxml") {
+            private boolean success;
+
+            @Override
+            protected Void doInBackground() throws Exception {
+                try {
+                    new SwfMxmlProjectExporter().exportProject(swf, destination, type);
+                    success = true;
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, "MXML export error", ex);
+                    View.execInEventDispatch(() -> ViewMessages.showMessageDialog(MainPanel.this,
+                            translate("error.export") + ": " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE));
+                }
+                return null;
+            }
+
+            @Override
+            protected void onStart() {
+                Main.startWork(translate("work.exporting.mxml") + "...", this, true);
+            }
+
+            @Override
+            protected void done() {
+                Main.stopWork();
+                if (!success || isCancelled()) {
+                    return;
+                }
+                View.execInEventDispatch(() -> setStatus(translate("export.finishedin")
+                        .replace("%time%", Helper.formatTimeSec(System.currentTimeMillis() - started))));
+                if (Configuration.openFolderAfterFlaExport.get()) {
+                    try {
+                        Desktop.getDesktop().open(directory);
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }.execute();
     }
 
     public void exportFlashDevelop(final SWF swf) {

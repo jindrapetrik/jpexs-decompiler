@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application
+    xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark"
+    width="500"
+    height="350">
+
+    <fx:Script>
+        <![CDATA[
+            import mx.controls.Alert;
+
+            private function greet():void {
+                Alert.show(
+                    "Hello " + nameInput.text,
+                    "My first application"
+                );
+            }
+        ]]>
+    </fx:Script>
+
+    <s:VGroup
+        horizontalCenter="0"
+        verticalCenter="0"
+        gap="15">
+
+        <s:Label
+            text="My first Flex application"
+            fontSize="22"/>
+
+        <s:TextInput
+            id="nameInput"
+            text="Alex"/>
+
+        <s:Button
+            label="Say hello"
+            click="greet()"/>
+
+    </s:VGroup>
+
+</s:Application>

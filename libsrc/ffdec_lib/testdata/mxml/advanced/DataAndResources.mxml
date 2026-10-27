@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
+    xmlns:model="model.*" width="640" height="480">
+    <fx:Metadata>[ResourceBundle("showcase")]</fx:Metadata>
+    <fx:Declarations>
+        <fx:XML id="catalog" format="e4x">
+            <catalog xmlns="urn:showcase"><item code="one">First &amp; best</item><item code="two">Second</item></catalog>
+        </fx:XML>
+        <fx:XMLList id="entries"><entry code="a">Alpha</entry><entry code="b">Beta</entry></fx:XMLList>
+        <fx:Vector id="numbers" type="int" fixed="true"><fx:int>2</fx:int><fx:int>4</fx:int><fx:int>8</fx:int></fx:Vector>
+        <fx:Vector id="products" type="model.Product"><model:Product name="First product" price="12"/><model:Product name="Second product" price="24"/></fx:Vector>
+        <fx:Model id="configuration"><settings><title>Data declarations</title><enabled>true</enabled><tags><tag>alpha</tag><tag>beta</tag></tags></settings></fx:Model>
+        <fx:Date id="launchDate" fullYear="2026" month="9" date="27"/>
+    </fx:Declarations>
+    <fx:Script><![CDATA[
+        [Bindable]
+        private var person:String = "Alex";
+        private function formatSummary():String {
+            return "Products: " + products.length + ", numbers: " + numbers.join(", ");
+        }
+    ]]></fx:Script>
+    <s:layout><s:VerticalLayout paddingLeft="20" paddingTop="20" gap="12"/></s:layout>
+    <s:Label id="localizedTitle" text="@Resource(bundle='showcase', key='title')"/>
+    <s:Image id="localizedImage" source="@Resource(bundle='showcase', key='icon')" width="48" height="48"/>
+    <s:Label id="localizedGreeting" text="{resourceManager.getString('showcase','greeting',[person])}"/>
+    <s:Label id="dataSummary" text="{formatSummary()}"/>
+    <s:Label id="xmlSummary" text="{entries[0].toString()}"/>
+    <s:Button label="Switch locale" click="resourceManager.localeChain = ['en_GB']"/>
+</s:Application>
