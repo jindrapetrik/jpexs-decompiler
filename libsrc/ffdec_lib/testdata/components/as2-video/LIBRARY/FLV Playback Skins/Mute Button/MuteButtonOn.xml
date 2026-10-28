@@ -1,0 +1,75 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Mute Button/MuteButtonOn" itemID="429df986-0000042a" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="MuteButtonOn" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Mute Button/MuteButtonOn" sourceLastModified="1165901895" lastModified="1165901895" sourceItemID="429df986-0000042a">
+  <timeline>
+    <DOMTimeline name="MuteButtonOn">
+      <layers>
+        <DOMLayer name="script" color="#FFFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();
+this.upLinkageID = "MuteButtonOnNormal";
+this.overLinkageID = "MuteButtonOnOver";
+this.downLinkageID = "MuteButtonOnDown";
+this.disabledLinkageID = "MuteButtonOnDisabled";
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="contents" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Mute Button/MuteButtonOnNormal" name="placeholder_mc">
+                  <matrix>
+                    <Matrix d="1.00057983398438"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Mute Button/MuteButtonOnNormal">
+                  <matrix>
+                    <Matrix d="1.00057983398438"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Mute Button/MuteButtonOnOver">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="38"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Mute Button/MuteButtonOnDown">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="76"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Mute Button/MuteButtonOnDisabled">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="111"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

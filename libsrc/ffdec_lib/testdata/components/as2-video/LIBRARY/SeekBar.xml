@@ -1,0 +1,120 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="SeekBar" itemID="429df456-00000347" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="SeekBar" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef="SeekBar" sourceLastModified="1166032307" lastModified="1166032307" lastUniqueIdentifier="4" sourceItemID="429df456-00000347" customIconID="0" persistLivePreview11="true" editFrameIndex="1" requiredMinimumPlayerVersion="8" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="SeekBar">
+      <layers>
+        <DOMLayer name="script" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();
+this.handleLinkageID = "SeekBarHandle";
+this.handleLeftMargin = 2;
+this.handleRightMargin = 2;
+this.handleY = 11;
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="assets" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Seek Bar/SeekBarHandle">
+                  <matrix>
+                    <Matrix tx="40" ty="22.85"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point y="2.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="progress" color="#FF4FFF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Seek Bar/SeekBarProgress" name="progress_mc">
+                  <matrix>
+                    <Matrix tx="1" ty="1"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="18.8" y="3.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="outline" color="#FFFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#333333"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <SolidColor color="#999999"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!19.5 179|0 179!0 179|0 -0.5!0 -0.5|95 -0.5!95 -0.5|95 0!95 0|2000 0"/>
+                    <Edge fillStyle1="2" edges="!2000 0|2000 -0.5!2000 -0.5|2020 -0.5!2020 -0.5|2020 161!2020 161|2019.5 161!2019.5 161|2019.5 178.5!2019.5 178.5|1924.5 178.5!1924.5 178.5|1924.5 179!1924.5 179|19.5 179"/>
+                    <Edge fillStyle0="2" edges="!2000 20|2000 160!2000 160|20 160"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!20 160|19.5 160!19.5 160|19.5 179!2000 0|2000 20"/>
+                    <Edge fillStyle0="1" edges="!20 160|20 20!20 20|2000 20"/>
+                    <Edge cubics="!0 0(;0,0 95,0 95,0q0 0 95 0);"/>
+                    <Edge cubics="!2000 0(;2000,0 2000,20 2000,20q2000 0 2000 20);"/>
+                    <Edge cubics="!20 182(;20,182 0,182 0,182q20 182 0 182);"/>
+                    <Edge cubics="!95 0(;95,0 2000,0 2000,0q95 0 2000 0);"/>
+                    <Edge cubics="!2000 20(;2000,20 20,20 20,20q2000 20 20 20);"/>
+                    <Edge cubics="!0 182(;0,182 0,0 0,0q0 182 0 0);"/>
+                    <Edge cubics="!2000 0(;2000,0 2020,0 2020,0q2000 0 2020 0);"/>
+                    <Edge cubics="!2020 0(;2020,0 2020,161 2020,161q2020 0 2020 161);"/>
+                    <Edge cubics="!2020 161(;2020,161 2020,179 2020,179q2020 161 2020 179);"/>
+                    <Edge cubics="!2020 179(;2020,179 1925,179 1925,179q2020 179 1925 179);"/>
+                    <Edge cubics="!2000 20(;2000,20 2000,160 2000,160q2000 20 2000 160);"/>
+                    <Edge cubics="!20 179(;20,179 20,182 20,182q20 179 20 182);"/>
+                    <Edge cubics="!20 160(;20,160 20,179 20,179q20 160 20 179);"/>
+                    <Edge cubics="!20 20(;20,20 20,160 20,160q20 20 20 160);"/>
+                    <Edge cubics="!1925 179(;1925,179 20,179 20,179q1925 179 20 179);"/>
+                    <Edge cubics="!20 160(;20,160 2000,160 2000,160q20 160 2000 160);"/>
+                    <Edge cubics="!0 182(;0,182 20,182 20,182q0 182 20 182);"/>
+                    <Edge cubics="!20 182(;20,182 20,202 20,202q20 182 20 202);"/>
+                    <Edge cubics="!20 202(;20,202 0,202 0,202q20 202 0 202);"/>
+                    <Edge cubics="!0 202(;0,202 0,182 0,182q0 202 0 182);"/>
+                    <Edge cubics="!0 180(;0,180 20,180 20,180q0 180 20 180);"/>
+                    <Edge cubics="!20 180(;20,180 20,200 20,200q20 180 20 200);"/>
+                    <Edge cubics="!20 200(;20,200 0,200 0,200q20 200 0 200);"/>
+                    <Edge cubics="!0 200(;0,200 0,180 0,180q0 200 0 180);"/>
+                    <Edge cubics="!-5 180(;-5,180 20,180 20,180q-5 180 20 180);"/>
+                    <Edge cubics="!20 180(;20,180 20,200 20,200q20 180 20 200);"/>
+                    <Edge cubics="!20 200(;11,198 8,204 7,205q20 200Q13 199q7 205);"/>
+                    <Edge cubics="!7 205(;7,205 -14,205 -14,205q7 205 -14 205);"/>
+                    <Edge cubics="!-14 205(;-14,205 -14,185 -14,185q-14 205 -14 185);"/>
+                    <Edge cubics="!-14 185(;-13,185 -6,181 -5,180q-14 185 -5 180);"/>
+                    <Edge cubics="!0 179(;0,179 20,179 20,179q0 179 20 179);"/>
+                    <Edge cubics="!20 179(;20,179 20,199 20,199q20 179 20 199);"/>
+                    <Edge cubics="!20 199(;20,199 0,199 0,199q20 199 0 199);"/>
+                    <Edge cubics="!0 199(;0,199 0,179 0,179q0 199 0 179);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <customIcon>
+    <CustomIcon rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" href="79cdtnm5cj.dat"/>
+  </customIcon>
+</DOMComponentItem>

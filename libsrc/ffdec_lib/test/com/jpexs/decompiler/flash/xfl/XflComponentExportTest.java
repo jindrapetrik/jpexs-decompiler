@@ -617,4 +617,214 @@ public class XflComponentExportTest {
         }
     }
 
+    private org.w3c.dom.Document document(Map<String, byte[]> files) throws Exception {
+        return ComponentConverter.parse(text(files.get("DOMDocument.xml")));
+    }
+
+    private org.w3c.dom.Element named(org.w3c.dom.Document document, String type, String name) {
+        for (org.w3c.dom.Element element : ComponentConverter.elements(document.getDocumentElement(), type)) {
+            if (name.equals(element.getAttribute("name"))) {
+                return element;
+            }
+        }
+        throw new AssertionError("Missing " + type + " " + name);
+    }
+
+    @Test(dataProvider = "formats")
+    public void restoresAllAs2UiComponentsAndOriginalBytecode(boolean compressed) throws Exception {
+        Path directory = Files.createTempDirectory("ffdec-as2-ui-");
+        try {
+            SWF swf = movie("as2-ui");
+            byte[] original = bytes(swf);
+            Map<String, byte[]> files = export(swf, directory, compressed, true);
+            org.w3c.dom.Document document = document(files);
+            Assert.assertEquals(ComponentConverter.elements(document.getDocumentElement(), "DOMCompiledClipItem").size(), 22);
+            Assert.assertTrue(ComponentConverter.elements(document.getDocumentElement(), "DOMCompiledClipInstance").size() >= 21);
+            org.w3c.dom.Element button = named(document, "DOMCompiledClipItem", "Button");
+            Assert.assertEquals(button.getAttribute("actionscriptClass"), "mx.controls.Button");
+            Assert.assertEquals(button.getAttribute("rootSymbolLinkageID"), "Button");
+            Assert.assertTrue(ComponentConverter.elements(button, "AssetMapItem").size() > 30);
+            Assert.assertEquals(ComponentConverter.elements(button, "customIcon").size(), 1);
+            String source = text(files.get("DOMDocument.xml"));
+            Assert.assertTrue(source.contains("Sample Button"));
+            org.w3c.dom.Element instance = named(document, "DOMCompiledClipInstance", "sampleButton");
+            Assert.assertEquals(ComponentConverter.elements(instance, "parametersAsXML").get(0).getFirstChild().getNodeType(),
+                    org.w3c.dom.Node.CDATA_SECTION_NODE);
+            Assert.assertTrue(source.contains("January,February,March"));
+            Assert.assertFalse(source.contains("on(construct)"));
+            SWF runtime = new SWF(new ByteArrayInputStream(files.get("bin/component_runtime.swf")), false);
+            int preservedScripts = 0;
+            for (Tag tag : swf.getTags()) {
+                if (tag instanceof com.jpexs.decompiler.flash.tags.DoInitActionTag) {
+                    com.jpexs.decompiler.flash.tags.DoInitActionTag originalScript = (com.jpexs.decompiler.flash.tags.DoInitActionTag) tag;
+                    for (Tag runtimeTag : runtime.getTags()) {
+                        if (runtimeTag instanceof com.jpexs.decompiler.flash.tags.DoInitActionTag
+                                && ((com.jpexs.decompiler.flash.tags.DoInitActionTag) runtimeTag).spriteId == originalScript.spriteId) {
+                            Assert.assertEquals(runtimeTag.getData(), tag.getData());
+                            preservedScripts++;
+                        }
+                    }
+                }
+            }
+            Assert.assertTrue(preservedScripts > 60);
+            for (Tag tag : runtime.getTags()) {
+                Assert.assertFalse(tag instanceof PlaceObjectTypeTag || tag instanceof com.jpexs.decompiler.flash.tags.DoActionTag);
+            }
+            SWF preview = new SWF(new ByteArrayInputStream(files.get("bin/" + button.getAttribute("livePreview11ScmHRef"))), false);
+            Assert.assertFalse(preview.isAS3());
+            Assert.assertEquals(preview.displayRect.getWidth(), 2000);
+            Assert.assertTrue(preview.getTags().toArrayList().stream().anyMatch(tag -> tag instanceof PlaceObjectTypeTag));
+            Assert.assertFalse(files.keySet().stream().anyMatch(path -> path.endsWith(".as")));
+            Assert.assertEquals(bytes(swf), original);
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test
+    public void restoresAs2MediaAndVideoComponents() throws Exception {
+        for (String fixture : new String[]{"as2-media", "as2-video"}) {
+            Path directory = Files.createTempDirectory("ffdec-" + fixture);
+            try {
+                Map<String, byte[]> files = export(movie(fixture), directory, true, true);
+                org.w3c.dom.Document document = document(files);
+                if (fixture.equals("as2-media")) {
+                    Assert.assertEquals(ComponentConverter.elements(document.getDocumentElement(), "DOMCompiledClipItem").size(), 4);
+                    Assert.assertEquals(named(document, "DOMCompiledClipItem", "FLVPlayback").getAttribute("actionscriptClass"), "mx.video.FLVPlayback");
+                    Assert.assertTrue(text(files.get("DOMDocument.xml")).contains("ClearOverPlaySeekMute.swf"));
+                } else {
+                    Assert.assertEquals(ComponentConverter.elements(document.getDocumentElement(), "DOMComponentInstance").size(), 10);
+                    int components = 0;
+                    for (Map.Entry<String, byte[]> file : files.entrySet()) {
+                        if (file.getKey().startsWith("LIBRARY/") && file.getKey().endsWith(".xml")) {
+                            org.w3c.dom.Document item = ComponentConverter.parse(text(file.getValue()));
+                            if (item.getDocumentElement().getLocalName().equals("DOMComponentItem")) {
+                                components++;
+                                Assert.assertFalse(item.getDocumentElement().getAttribute("name").contains("/"));
+                            } else {
+                                Assert.assertTrue(item.getDocumentElement().getAttribute("name").startsWith("Component Assets/"));
+                            }
+                        }
+                    }
+                    Assert.assertEquals(components, 10);
+                }
+            } finally {
+                cleanup(directory);
+            }
+        }
+    }
+
+    private PlaceObjectTypeTag as2ButtonInstance(SWF swf) {
+        int buttonId = swf.getCharacterByExportName("Button").getCharacterId();
+        for (Tag tag : swf.getTags()) {
+            if (tag instanceof PlaceObjectTypeTag && ((PlaceObjectTypeTag) tag).getCharacterId() == buttonId) {
+                return (PlaceObjectTypeTag) tag;
+            }
+        }
+        throw new AssertionError("Missing AS2 Button instance");
+    }
+
+    @Test
+    public void retainsAs2UserHandlersAndFrameScriptsOutsideCompiledRuntime() throws Exception {
+        SWF swf = movie("as2-ui");
+        PlaceObjectTypeTag button = as2ButtonInstance(swf);
+        com.jpexs.decompiler.flash.types.CLIPACTIONS actions = button.getClipActions();
+        com.jpexs.decompiler.flash.types.CLIPACTIONRECORD release = new com.jpexs.decompiler.flash.types.CLIPACTIONRECORD(swf, (Tag) button);
+        release.setParentClipActions(actions);
+        release.eventFlags.clipEventRelease = true;
+        release.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, release)
+                .actionsFromString("on(release) { trace(\"Keep user handler\"); }", swf.getCharset()));
+        actions.clipActionRecords.add(release);
+        com.jpexs.decompiler.flash.tags.DoActionTag frame = new com.jpexs.decompiler.flash.tags.DoActionTag(swf);
+        frame.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, frame)
+                .actionsFromString("trace(\"Keep frame code\");", swf.getCharset()));
+        swf.addTag(0, frame);
+        Path directory = Files.createTempDirectory("ffdec-as2-handlers-");
+        try {
+            Map<String, byte[]> files = export(swf, directory, true, true);
+            String source = text(files.get("DOMDocument.xml"));
+            Assert.assertTrue(source.contains("Keep user handler"));
+            Assert.assertTrue(source.contains("Keep frame code"));
+            Assert.assertTrue(source.contains("DOMCompiledClipInstance"));
+            Assert.assertFalse(source.contains("on(construct)"));
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test
+    public void leavesUnknownAs2ConstructCodeIntact() throws Exception {
+        SWF swf = movie("as2-ui");
+        com.jpexs.decompiler.flash.types.CLIPACTIONRECORD record = as2ButtonInstance(swf).getClipActions().clipActionRecords.get(0);
+        record.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, record)
+                .actionsFromString("on(construct) { label = computeLabel(); }", swf.getCharset()));
+        ComponentConverter converter = new ComponentConverter(swf);
+        Assert.assertFalse(converter.isComponent(swf.getCharacterByExportName("Button")));
+        Assert.assertFalse(converter.isConsumedClipAction(record));
+        Assert.assertFalse(converter.isBundledAs2Character(swf.getCharacterByExportName("__Packages.mx.controls.Button").getCharacterId()));
+    }
+
+    @Test
+    public void restoresNestedAs2Instances() throws Exception {
+        SWF swf = movie("as2-ui");
+        PlaceObjectTypeTag button = as2ButtonInstance(swf);
+        swf.removeTag((Tag) button);
+        DefineSpriteTag wrapper = new DefineSpriteTag(swf);
+        wrapper.frameCount = 1;
+        wrapper.addTag((Tag) button);
+        wrapper.addTag(new ShowFrameTag(swf));
+        swf.addTag(wrapper);
+        swf.addTag(new PlaceObject2Tag(swf, false, 30, wrapper.spriteId, new MATRIX(), null, -1, "wrapper", -1, null));
+        Path directory = Files.createTempDirectory("ffdec-as2-nested-");
+        try {
+            Map<String, byte[]> files = export(swf, directory, true, true);
+            boolean found = false;
+            for (Map.Entry<String, byte[]> file : files.entrySet()) {
+                if (file.getKey().startsWith("LIBRARY/") && file.getKey().endsWith(".xml")) {
+                    String source = text(file.getValue());
+                    if (source.contains("DOMCompiledClipInstance")) {
+                        Assert.assertTrue(source.contains("Sample Button"));
+                        found = true;
+                    }
+                }
+            }
+            Assert.assertTrue(found);
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test
+    public void ordinaryAs2SymbolsWithComponentNamesAreNotConverted() throws Exception {
+        SWF swf = new SWF();
+        DefineSpriteTag symbol = new DefineSpriteTag(swf);
+        symbol.frameCount = 1;
+        symbol.addTag(new ShowFrameTag(swf));
+        swf.addTag(symbol);
+        com.jpexs.decompiler.flash.tags.ExportAssetsTag exports = new com.jpexs.decompiler.flash.tags.ExportAssetsTag(swf);
+        exports.tags.add(symbol.spriteId);
+        exports.names.add("Button");
+        DefineSpriteTag classSymbol = new DefineSpriteTag(swf);
+        swf.addTag(classSymbol);
+        exports.tags.add(classSymbol.spriteId);
+        exports.names.add("__Packages.mx.controls.Button");
+        swf.addTag(exports);
+        Assert.assertFalse(new ComponentConverter(swf).isComponent(symbol));
+    }
+
+    @Test
+    public void retainsMixedAs2EventsAndHonorsScriptExportSetting() throws Exception {
+        SWF swf = movie("as2-ui");
+        com.jpexs.decompiler.flash.types.CLIPACTIONRECORD record = as2ButtonInstance(swf).getClipActions().clipActionRecords.get(0);
+        record.eventFlags.clipEventEnterFrame = true;
+        Assert.assertFalse(new ComponentConverter(swf).isConsumedClipAction(record));
+        Path directory = Files.createTempDirectory("ffdec-as2-noscript-");
+        try {
+            Map<String, byte[]> files = export(movie("as2-ui"), directory, true, false);
+            Assert.assertFalse(text(files.get("DOMDocument.xml")).contains("DOMCompiledClipItem"));
+        } finally {
+            cleanup(directory);
+        }
+    }
+
 }

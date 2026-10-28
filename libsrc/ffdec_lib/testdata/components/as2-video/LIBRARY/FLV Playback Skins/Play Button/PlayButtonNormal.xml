@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Play Button/PlayButtonNormal" itemID="42707763-00000335" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="PlayButtonNormal" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Play Button/PlayButtonNormal" sourceLastModified="1157562309" lastModified="1157562309" lastUniqueIdentifier="2" sourceItemID="42707763-00000335">
+  <timeline>
+    <DOMTimeline name="PlayButtonNormal">
+      <layers>
+        <DOMLayer name="Icon" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Play Button/Assets/PlayIcon" name="icon_mc">
+                  <matrix>
+                    <Matrix tx="8" ty="9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Button" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/_SquareButton/SquareBgNormal" name="button_mc">
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

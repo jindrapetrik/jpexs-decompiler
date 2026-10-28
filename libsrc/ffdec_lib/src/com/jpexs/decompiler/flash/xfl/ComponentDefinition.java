@@ -28,12 +28,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * Authoring schemas of the standard AS3 components shipped with Flash CS6.
+ * Authoring schemas of the standard components shipped with Flash CS6.
  * These contain Inspector metadata only, never component implementations.
  */
 final class ComponentDefinition {
 
     final String name;
+
+    final boolean compiled;
 
     final String className;
 
@@ -93,6 +95,7 @@ final class ComponentDefinition {
 
     private ComponentDefinition(Element element) {
         name = element.getAttribute("name");
+        compiled = "true".equals(element.getAttribute("compiled"));
         className = element.getAttribute("className");
         minimumPlayerVersion = element.getAttribute("minimumPlayerVersion");
         width = Integer.parseInt(element.getAttribute("width"));
@@ -114,7 +117,11 @@ final class ComponentDefinition {
     }
 
     static Map<String, ComponentDefinition> load(SWF swf) throws IOException {
-        try (InputStream input = ComponentDefinition.class.getResourceAsStream("component_definitions.xml")) {
+        return load(swf, "component_definitions.xml");
+    }
+
+    static Map<String, ComponentDefinition> load(SWF swf, String resource) throws IOException {
+        try (InputStream input = ComponentDefinition.class.getResourceAsStream(resource)) {
             if (input == null) {
                 throw new IOException("Missing standard component schemas");
             }

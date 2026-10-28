@@ -1,0 +1,35 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Seek Bar/SeekBarProgress" itemID="4296ba97-00000213" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="SeekBarProgress" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Seek Bar/SeekBarProgress" sourceLastModified="1157562317" lastModified="1157562317" sourceItemID="4296ba97-00000213">
+  <timeline>
+    <DOMTimeline name="SeekBarProgress">
+      <layers>
+        <DOMLayer name="Bar - Dimension" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isFloating="true">
+                  <matrix>
+                    <Matrix a="4.94999694824219"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.0054931640625" c="-0.0002899169921875" d="0" tx="10" ty="3.5"/>
+                        </matrix>
+                        <GradientEntry color="#333333" ratio="0"/>
+                        <GradientEntry color="#999999" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!400 0S1|0 0!0 0|0 140!0 140|400 140!400 140|400 0"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

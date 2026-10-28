@@ -61,6 +61,8 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
+import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -95,7 +97,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 /**
- * Restores the authoring representation of standard AS3 components.
+ * Restores the authoring representation of standard AS2 and AS3 components.
  * Only complete, literal Flash-generated parameter initializers are consumed.
  * Unknown components and initializers remain ordinary symbols and source code.
  */
@@ -106,6 +108,8 @@ final class ComponentConverter {
     private static final String NS = "http://ns.adobe.com/xfl/2008/";
 
     private final SWF swf;
+
+    private final As2ComponentConverter as2;
 
     private final Map<String, ComponentDefinition> definitions = new LinkedHashMap<>();
 
@@ -132,6 +136,10 @@ final class ComponentConverter {
 
     ComponentConverter(SWF swf) throws IOException, InterruptedException {
         this.swf = swf;
+        as2 = swf.isAS3() ? null : new As2ComponentConverter(swf);
+        if (as2 != null) {
+            return;
+        }
         for (ComponentDefinition definition : ComponentDefinition.load(swf).values()) {
             CharacterTag character = swf.getCharacterByClass(definition.className);
             boolean dependenciesPresent = true;
@@ -166,6 +174,18 @@ final class ComponentConverter {
         ignoredMethods.removeIf(body -> blockedClasses.contains(methodDefinitions.get(body).className));
     }
 
+    boolean isBundledAs2Character(int characterId) {
+        return as2 != null && as2.isBundledCharacter(characterId);
+    }
+
+    String as2Parameters(CharacterTag character, CLIPACTIONS actions) throws XMLStreamException {
+        return as2 == null ? "" : as2.parameters(character, actions);
+    }
+
+    boolean isConsumedClipAction(CLIPACTIONRECORD record) {
+        return as2 != null && as2.isConsumedClipAction(record);
+    }
+
     static void checkInterrupted() throws InterruptedException {
         if (CancellableWorker.isInterrupted()) {
             throw new InterruptedException();
@@ -177,15 +197,18 @@ final class ComponentConverter {
     }
 
     boolean isComponent(CharacterTag character) {
-        return components.containsKey(character);
+        return as2 == null ? components.containsKey(character) : as2.isComponent(character);
     }
 
     Set<String> initializeLibraryNames(Set<CharacterTag> characters, Map<CharacterTag, String> names) throws IOException, InterruptedException {
+        if (as2 != null) {
+            return as2.initializeLibraryNames(characters, names);
+        }
         return components.isEmpty() ? Collections.emptySet()
                 : new ComponentLibrary().initializeNames(swf, characters, components, definitions.keySet(), names);
     }
 
-    private static void appendIcon(Element root, ComponentDefinition definition, Map<String, byte[]> datfiles) throws IOException {
+    static void appendIcon(Element root, ComponentDefinition definition, Map<String, byte[]> datfiles) throws IOException {
         if (!definition.iconId.isEmpty()) {
             root.setAttribute("customIconID", definition.iconId);
         }
@@ -557,7 +580,7 @@ final class ComponentConverter {
         }
     }
 
-    private static Document parse(String xml) throws Exception {
+    static Document parse(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
@@ -565,7 +588,7 @@ final class ComponentConverter {
         return factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
     }
 
-    private static String xml(Document document) throws Exception {
+    static String xml(Document document) throws Exception {
         XFLXmlWriter writer = new XFLXmlWriter();
         writer.setMakeNewLines(false);
         writeNode(document.getDocumentElement(), writer);
@@ -579,7 +602,16 @@ final class ComponentConverter {
             Set<String> written = new HashSet<>();
             // Flash CS6 requires identifying attributes before dependent ones,
             // notably libraryItemName before component-instance properties.
-            for (String name : new String[]{"xmlns:xsi", "xmlns", "libraryItemName", "name", "itemID", "xflVersion", "linkageClassName", "linkageExportForAS"}) {
+            String[] attributeOrder = "DOMCompiledClipItem".equals(node.getNodeName())
+                    ? new String[]{"name", "itemID", "linkageExportForAS", "linkageIdentifier", "linkageClassName",
+                        "sourceLastImported", "tooltip", "customIconID", "actionscriptClass", "swfScmHRef",
+                        "swfScmSourceFilename", "persistLivePreview11", "editFrameIndex", "requiredMinimumPlayerVersion",
+                        "requiredMinimumASVersion", "parametersAreLocked", "swcPath", "rootSymbolLinkageID",
+                        "movieRectRight", "movieRectBottom", "playerVersion", "actionscriptVersion"}
+                    : "SwcItem".equals(node.getNodeName())
+                    ? new String[]{"name", "implementation", "version", "isTopLevel", "intrinsicClass", "intrinsicScript"}
+                    : new String[]{"xmlns:xsi", "xmlns", "libraryItemName", "name", "itemID", "xflVersion", "linkageClassName", "linkageExportForAS"};
+            for (String name : attributeOrder) {
                 Node attribute = attributes.getNamedItem(name);
                 if (attribute != null) {
                     writer.writeAttribute(name, attribute.getNodeValue());
@@ -607,7 +639,7 @@ final class ComponentConverter {
         }
     }
 
-    private static String parameterXml(ComponentDefinition definition, Map<String, String> values) throws XMLStreamException {
+    static String parameterXml(ComponentDefinition definition, Map<String, String> values) throws XMLStreamException {
         XFLXmlWriter writer = new XFLXmlWriter();
         for (ComponentDefinition.Parameter parameter : definition.parameters.values()) {
             writer.writeStartElement("property", new String[]{"id", parameter.id});
@@ -622,7 +654,7 @@ final class ComponentConverter {
         return "   " + writer.toString() + "\n";
     }
 
-    private static void appendParameters(Element element, ComponentDefinition definition, Map<String, String> values) throws XMLStreamException {
+    static void appendParameters(Element element, ComponentDefinition definition, Map<String, String> values) throws XMLStreamException {
         Document document = element.getOwnerDocument();
         Element parameters = document.createElementNS(NS, "parametersAsXML");
         String text = parameterXml(definition, values);
@@ -634,7 +666,7 @@ final class ComponentConverter {
         element.appendChild(parameters);
     }
 
-    private static List<Element> elements(Element root, String name) {
+    static List<Element> elements(Element root, String name) {
         List<Element> result = new ArrayList<>();
         NodeList nodes = root.getElementsByTagNameNS(NS, name);
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -710,6 +742,9 @@ final class ComponentConverter {
     }
 
     String convert(String documentXml, Map<String, byte[]> files, Map<String, byte[]> datfiles) throws IOException, InterruptedException {
+        if (as2 != null) {
+            return as2.convert(documentXml, files, datfiles);
+        }
         if (components.isEmpty()) {
             return documentXml;
         }

@@ -1,0 +1,30 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardIcon" itemID="427030e6-000002e7" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardIcon" sourceLastModified="1117169979" lastModified="1117169979" sourceItemID="427030e6-000002e7">
+  <timeline>
+    <DOMTimeline name="ForwardIcon">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isFloating="true">
+                  <matrix>
+                    <Matrix a="-1" tx="6"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF" alpha="0.650980392156863"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!120 0S1|100 0!100 0|100 20!100 20|80 20!80 20|80 40!80 40|60 40!60 40|60 0!60 0|40 0!40 0|40 20!40 20|20 20!20 20|20 40!20 40|0 40!0 40|0 60!0 60|20 60!20 60|20 80!20 80|40 80!40 80|40 100!40 100|60 100!60 100|60 60!60 60|80 60!80 60
+|80 80!80 80|100 80!100 80|100 100!100 100|120 100!120 100|120 0"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

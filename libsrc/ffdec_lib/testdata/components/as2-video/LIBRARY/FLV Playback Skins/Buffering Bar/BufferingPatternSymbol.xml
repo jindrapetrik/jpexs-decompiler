@@ -1,0 +1,36 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Buffering Bar/BufferingPatternSymbol" itemID="4294fc6c-0000072a" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="BufferingPatternSymbol" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Buffering Bar/BufferingPatternSymbol" sourceLastModified="1157562221" lastModified="1157562221" lastUniqueIdentifier="3" sourceItemID="4294fc6c-0000072a">
+  <timeline>
+    <DOMTimeline name="BufferingPatternSymbol">
+      <layers>
+        <DOMLayer name="Load Graphic" color="#FF4FFF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" duration="23" tweenType="motion" motionTweenSync="true" motionTweenSnap="true" keyMode="24065">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Buffering Bar/BufferingPattern">
+                  <matrix>
+                    <Matrix ty="-0.5"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="249.85" y="3.95"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="23" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Buffering Bar/BufferingPattern">
+                  <matrix>
+                    <Matrix tx="-98.3" ty="-0.55"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="249.85" y="3.95"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

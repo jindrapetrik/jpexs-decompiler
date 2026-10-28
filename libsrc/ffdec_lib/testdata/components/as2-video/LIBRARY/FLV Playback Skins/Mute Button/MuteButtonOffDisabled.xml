@@ -1,0 +1,43 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Mute Button/MuteButtonOffDisabled" itemID="42707491-00000130" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="MuteButtonOffDisabled" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Mute Button/MuteButtonOffDisabled" sourceLastModified="1165901890" lastModified="1165901890" lastUniqueIdentifier="5" sourceItemID="42707491-00000130">
+  <timeline>
+    <DOMTimeline name="MuteButtonOffDisabled">
+      <layers>
+        <DOMLayer name="Icon" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Mute Button/Assets/MuteOffIcon" selected="true">
+                  <matrix>
+                    <Matrix tx="6" ty="6"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="5.5" y="4.5"/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0.3515625"/>
+                  </color>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Button" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/_SquareButton/SquareBgNormal" name="button_mc">
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0.3515625"/>
+                  </color>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Stop Button/Assets/StopIcon" itemID="42707935-00000655" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Stop Button/Assets/StopIcon" sourceLastModified="1157562318" lastModified="1157562318" sourceItemID="42707935-00000655">
+  <timeline>
+    <DOMTimeline name="StopIcon">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isFloating="true">
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF" alpha="0.650980392156863"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!0 100|0 0!0 0|100 0!100 0|100 100!100 100|0 100"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

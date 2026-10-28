@@ -1,0 +1,30 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Mute Button/Assets/MuteOffIcon" itemID="427074e8-00000138" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Mute Button/Assets/MuteOffIcon" sourceLastModified="1165901843" lastModified="1165901843" sourceItemID="427074e8-00000138">
+  <timeline>
+    <DOMTimeline name="MuteOffIcon">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isFloating="true">
+                  <matrix>
+                    <Matrix tx="-6" ty="-6"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF" alpha="0.650980392156863"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!340 240|260 240!260 240|260 220!260 220|340 220!340 220|340 240!180 160|200 160!200 160|200 140!200 140|220 140!220 140|220 320!220 320|200 320!200 320|200 300!200 300|180 300!180 300|180 280!180 280|160 280!160 280|160 260!160 260|120
+ 260!120 260|120 200!120 200|160 200!160 200|160 180!160 180|180 180!180 180|180 160"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

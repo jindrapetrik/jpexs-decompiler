@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Mute Button/MuteButtonOnDown" itemID="4270745b-0000006e" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="MuteButtonOnDown" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Mute Button/MuteButtonOnDown" sourceLastModified="1165901885" lastModified="1165901885" lastUniqueIdentifier="7" sourceItemID="4270745b-0000006e">
+  <timeline>
+    <DOMTimeline name="MuteButtonOnDown">
+      <layers>
+        <DOMLayer name="Icon" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Mute Button/Assets/MuteOnIcon" name="icon_mc">
+                  <matrix>
+                    <Matrix tx="6" ty="6"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="5.5" y="5.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Button" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/_SquareButton/SquareBgDown" name="button_mc">
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

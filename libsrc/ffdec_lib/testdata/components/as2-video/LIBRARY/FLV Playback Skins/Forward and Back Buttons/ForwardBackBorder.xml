@@ -1,0 +1,33 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Forward and Back Buttons/ForwardBackBorder" itemID="42710868-00000091" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Forward and Back Buttons/ForwardBackBorder" sourceLastModified="1157562239" lastModified="1157562239" sourceItemID="00000000-7fffffff">
+  <timeline>
+    <DOMTimeline name="ForwardBackBorder">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="0.013427734375" d="0" tx="23" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!810 410[782 440 740 440!740 440|120 440!120 440[79 440 49 410!49 410[20 381 20 340!20 340|20 120!20 120[20 79 49 49!49 49[79 20 120 20!120 20|740 20!740 20[781 20 810 49!810 49[840 79 840 120!840 120|840 340!840 340[840 382 810 410"/>
+                    <Edge fillStyle1="1" edges="!825 425[790 460 740 460!740 460|120 460!120 460[70 460 35 425!35 425[0 390 0 340!0 340|0 120!0 120[0 70 35 35!35 35[70 0 120 0!120 0|740 0!740 0[790 0 825 35!825 35[860 70 860 120!860 120|860 340!860 340[860 390 825 425"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,30 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackIcon" itemID="42703081-000002dc" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackIcon" sourceLastModified="1157562252" lastModified="1157562252" sourceItemID="42703081-000002dc">
+  <timeline>
+    <DOMTimeline name="BackIcon">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isFloating="true">
+                  <matrix>
+                    <Matrix tx="-9" ty="-9"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF" alpha="0.650980392156863"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!280 180|280 200!280 200|260 200!260 200|260 220!260 220|240 220!240 220|240 180!240 180|220 180!220 180|220 200!220 200|200 200!200 200|200 220!200 220|180 220!180 220|180 240!180 240|200 240!200 240|200 260!200 260|220 260!220 260|220
+ 280!220 280|240 280!240 280|240 240!240 240|260 240!260 240|260 260!260 260|280 260!280 260|280 280!280 280|300 280!300 280|300 180!300 180|280 180"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,103 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgDown" itemID="427030bc-000002e1" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgDown" sourceLastModified="1117169965" scaleGridLeft="3" scaleGridRight="17" scaleGridTop="6" scaleGridBottom="17" lastModified="1117169965" sourceItemID="427030bc-000002e1">
+  <timeline>
+    <DOMTimeline name="ForwardBgDown">
+      <layers>
+        <DOMLayer name="Gllow" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#00FF00" alpha="0.352941176470588"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <SolidColor color="#00FF00"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!460 120|460 340!460 340[460 390 425 425!425 425[390 460 340 460!340 460|0 460!0 460|0 440!0 440[0 230 0 20!0 20|0 0!0 0|340 0!340 0[390 0 425 35!425 35[460 70 460 120"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!440 120|440 340!440 340[440 381 411 410!411 410[381 440 340 440!340 440|20 440!20 440|20 20!20 20|340 20!340 20[381 20 411 49!411 49[440 79 440 120!420 120[420 87 397 63!397 63[373 40 340 40!340 40|40 40!40 40|40 420!40 420|340 420!340
+ 420[373 420 397 396!397 396[420 373 420 340!420 340|420 120"/>
+                    <Edge fillStyle1="1" edges="
+!383 77[365 60 340 60!340 60|60 60!60 60|60 400!60 400|59 401!59 401|340 400!340 400[365 400 383 382!383 382[400 365 400 340!400 340|400 120!400 120[400 95 383 77"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Dimension" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="0.010986328125" c="0.010986328125" d="-1.52587890625e-005" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="1.52587890625e-005" b="-0.009765625" c="0.009765625" d="0" ty="12"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="
+!420 120[420 87 397 63!397 63[373 40 340 40!340 40|40 40!40 40|40 420!40 420|340 420!340 420[373 420 397 396!397 396[420 373 420 340!420 340|420 120"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="
+!60 400|60 60!60 60|59 59!59 59|340 60!340 60[#154.C8 60 341.5 60!341.5 60[342.25 #3C.04 343 60!343 60|359.5 63"/>
+                    <Edge fillStyle0="1" edges="
+!359.5 63[#174.71 #43.08 383 77!383 77[#187.96 #56.17 396 97"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="
+!396 97|400 120!400 120|400 340!400 340[400 #154.C8 400 341.5!400 341.5|395.5 363.5!395.5 363.5[#187.53 #176.2F 383 383!383 383[#174.71 #188.F9 359.5 397!359.5 397|343 400!343 400[342.25 #18F.FC 341.5 400!341.5 400[#154.C8 400 340 400
+!340 400|112.5 400.5"/>
+                    <Edge fillStyle0="1" edges="
+!112.5 400.5|59 401!59 401|60 400"/>
+                    <Edge fillStyle0="2" edges="
+!60 400|112.5 400.5"/>
+                    <Edge fillStyle1="2" edges="
+!359.5 63[#174.6B #43.6C 383 78!383 78[391.5 86.5 396 97"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Color Plate" color="#FF4FFF" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape isFloating="true">
+                  <matrix>
+                    <Matrix a="-1" tx="23"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#666666"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="
+!420 40S1|120 40!120 40[#69.A6 40 93 44.5!93 44.5[#4C.9 #32.01 63 63!63 63[40 87 40 120!40 120|40 340!40 340[40 373 63 396!63 396[#4C.9 #199.9 93 415.5!93 415.5[#5F.53 #1A0.54 97.5 417!97.5 417[#6C.4A 420 120 420!120 420|420 420!420 420
+|420 40"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

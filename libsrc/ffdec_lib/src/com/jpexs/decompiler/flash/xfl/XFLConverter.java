@@ -1476,7 +1476,7 @@ public class XFLConverter {
         return (DEBUG_EXPORT_LAYER_DEPTHS ? "MaskedSymbol " : "Symbol ") + symbolId;
     }
 
-    private static void convertSymbolInstance(int frame, AccessibilityBag accessibility, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value metadata, CharacterTag tag, FLAVersion flaVersion, XFLXmlWriter writer, boolean small, Integer morphFrame) throws XMLStreamException, InterruptedException {
+    private void convertSymbolInstance(int frame, AccessibilityBag accessibility, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value metadata, CharacterTag tag, FLAVersion flaVersion, XFLXmlWriter writer, boolean small, Integer morphFrame) throws XMLStreamException, InterruptedException {
         if (matrix == null) {
             matrix = new MATRIX();
         }
@@ -1618,11 +1618,16 @@ public class XFLConverter {
             StringBuilder sbActions = new StringBuilder();
             for (CLIPACTIONRECORD rec : clipActions.clipActionRecords) {
                 checkInterrupted();
-                sbActions.append(convertActionScript12(rec));
+                if (componentConverter == null || !componentConverter.isConsumedClipAction(rec)) {
+                    sbActions.append(convertActionScript12(rec));
+                }
             }
             writer.writeCData(sbActions.toString());
             writer.writeEndElement();
             writer.writeEndElement();
+        }
+        if (componentConverter != null) {
+            writer.writeCharactersRaw(componentConverter.as2Parameters(tag, clipActions));
         }
         if (metadata != null && (metadata.getValue() instanceof ObjectType)) {
             ObjectType metadataObject = (ObjectType) metadata.getValue();
@@ -5626,7 +5631,7 @@ public class XFLConverter {
         Map<CharacterTag, String> characterVariables = getCharacterVariables(swf.getTags());
         boolean hasAmfMetadata = hasAmfMetadata(swf);
 
-        componentConverter = useAS3 && settings.exportScript && cbfFlaVersion == null ? new ComponentConverter(swf) : null;
+        componentConverter = settings.exportScript && cbfFlaVersion == null ? new ComponentConverter(swf) : null;
 
         String backgroundColor = "#ffffff";
         SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
@@ -5816,7 +5821,8 @@ public class XFLConverter {
                     DoInitActionTag dia = (DoInitActionTag) t;
                     int chid = dia.getCharacterId();
                     CharacterTag character = swf.getCharacter(chid);
-                    if (character instanceof DefineSpriteTag) {
+                    if (character instanceof DefineSpriteTag
+                            && (componentConverter == null || !componentConverter.isBundledAs2Character(chid))) {
                         DefineSpriteTag sprite = (DefineSpriteTag) character;
                         if (sprite.getTags().isEmpty()) {
                             String data = convertActionScript12(dia);

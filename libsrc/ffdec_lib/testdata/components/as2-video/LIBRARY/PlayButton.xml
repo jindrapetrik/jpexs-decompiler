@@ -1,0 +1,78 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="PlayButton" itemID="4249d20e-000000f7" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="PlayButton" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef="PlayButton" sourceLastModified="1166032286" lastModified="1166032286" lastUniqueIdentifier="5" sourceItemID="4249d20e-000000f7" customIconID="0" persistLivePreview11="true" editFrameIndex="2" requiredMinimumPlayerVersion="8" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="PlayButton">
+      <layers>
+        <DOMLayer name="script" color="#FFFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();
+this.upLinkageID = "PlayButtonNormal";
+this.overLinkageID = "PlayButtonOver";
+this.downLinkageID = "PlayButtonDown";
+this.disabledLinkageID = "PlayButtonDisabled";
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="contents" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Play Button/PlayButtonNormal" name="placeholder_mc">
+                  <matrix>
+                    <Matrix d="1.00057983398438"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Play Button/PlayButtonNormal">
+                  <matrix>
+                    <Matrix d="1.00057983398438"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Play Button/PlayButtonOver">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="34"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Play Button/PlayButtonDown">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="69"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Play Button/PlayButtonDisabled" selected="true">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="102"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <customIcon>
+    <CustomIcon rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" href="79cb7nm5cj.dat"/>
+  </customIcon>
+</DOMComponentItem>
