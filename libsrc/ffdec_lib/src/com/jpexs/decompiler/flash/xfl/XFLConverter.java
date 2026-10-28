@@ -5636,9 +5636,10 @@ public class XFLConverter {
         boolean hasAmfMetadata = hasAmfMetadata(swf);
 
         componentConverter = settings.exportScript && (cbfFlaVersion == null
-                || !useAS3 && cbfFlaVersion.ordinal() >= FlaFormatVersion.MX.ordinal())
+                || !useAS3 && cbfFlaVersion.ordinal() >= FlaFormatVersion.F5.ordinal())
                 ? new ComponentConverter(swf, cbfFlaVersion != null
-                        && cbfFlaVersion.ordinal() < FlaFormatVersion.MX2004.ordinal()) : null;
+                        && cbfFlaVersion.ordinal() < FlaFormatVersion.MX2004.ordinal(),
+                        cbfFlaVersion != null && cbfFlaVersion.ordinal() < FlaFormatVersion.MX.ordinal()) : null;
 
         String backgroundColor = "#ffffff";
         SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();

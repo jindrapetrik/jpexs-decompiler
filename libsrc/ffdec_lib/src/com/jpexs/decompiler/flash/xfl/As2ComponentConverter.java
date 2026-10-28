@@ -20,7 +20,9 @@ import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.InitArrayActionItem;
+import com.jpexs.decompiler.flash.action.model.NewObjectActionItem;
 import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.SetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
@@ -73,7 +75,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Restores Flash MX v1 and AS2 components. Compiled clips keep their bytecode;
+ * Restores Flash 5 Smart Clips, Flash MX v1 and AS2 components. Compiled clips keep their bytecode;
  * MX components retain their editable timelines and class initialization scripts.
  * The bundled declarations describe the Inspector and SWC dependency graph;
  * all executable code and visual assets come from the input SWF.
@@ -104,7 +106,7 @@ final class As2ComponentConverter {
 
     private final Map<CharacterTag, String> libraryNames = new IdentityHashMap<>();
 
-    As2ComponentConverter(SWF swf, boolean legacyOnly) throws IOException, InterruptedException {
+    As2ComponentConverter(SWF swf, boolean legacyOnly, boolean smartClipsOnly) throws IOException, InterruptedException {
         this.swf = swf;
         try (InputStream input = getClass().getResourceAsStream("as2_swc_definitions.xml")) {
             if (input == null) {
@@ -149,8 +151,20 @@ final class As2ComponentConverter {
         }
         List<ComponentDefinition> definitions = new ArrayList<>(ComponentDefinition.load(swf, "as2_component_definitions.xml").values());
         definitions.addAll(ComponentDefinition.load(swf, "as1_component_definitions.xml").values());
+        definitions.addAll(ComponentDefinition.load(swf, "f5_smartclip_definitions.xml").values());
+        SmartClipRuntime smartClips = new SmartClipRuntime(swf);
         for (ComponentDefinition definition : definitions) {
-            if (legacyOnly && !definition.legacy) {
+            if (smartClipsOnly && !definition.smartClip
+                    || legacyOnly && !definition.legacy && !definition.smartClip) {
+                continue;
+            }
+            if (definition.smartClip) {
+                for (CharacterTag character : swf.getCharacters(false).values()) {
+                    if (character instanceof DefineSpriteTag && definition.runtimeSignature.equals(
+                            smartClips.signature((DefineSpriteTag) character))) {
+                        components.put(character, definition);
+                    }
+                }
                 continue;
             }
             CharacterTag character = swf.getCharacterByExportName(definition.exportName);
@@ -327,15 +341,17 @@ final class As2ComponentConverter {
                 continue;
             }
             for (CLIPACTIONRECORD record : actions.clipActionRecords) {
-                if (!record.eventFlags.clipEventConstruct && !record.eventFlags.clipEventInitialize) {
+                boolean smartClipLoad = definition != null && definition.smartClip && record.eventFlags.clipEventLoad;
+                if (!record.eventFlags.clipEventConstruct && !record.eventFlags.clipEventInitialize && !smartClipLoad) {
                     continue;
                 }
                 // Mixed event handlers must be retained intact.
                 CLIPEVENTFLAGS flags = record.eventFlags;
                 if (flags.clipEventConstruct && flags.clipEventInitialize
+                        || smartClipLoad && (flags.clipEventConstruct || flags.clipEventInitialize)
                         || flags.clipEventKeyUp || flags.clipEventKeyDown || flags.clipEventMouseUp
                         || flags.clipEventMouseDown || flags.clipEventMouseMove || flags.clipEventUnload
-                        || flags.clipEventEnterFrame || flags.clipEventLoad || flags.clipEventData
+                        || flags.clipEventEnterFrame || flags.clipEventLoad && !smartClipLoad || flags.clipEventData
                         || flags.clipEventDragOver || flags.clipEventDragOut || flags.clipEventRollOver
                         || flags.clipEventRollOut || flags.clipEventPress || flags.clipEventRelease
                         || flags.clipEventReleaseOutside || flags.clipEventKeyPress) {
@@ -359,6 +375,16 @@ final class As2ComponentConverter {
                 Map<String, String> values = new LinkedHashMap<>();
                 Map<String, List<String>> arrays = new LinkedHashMap<>();
                 for (GraphTargetItem item : tree) {
+                    // Flash 5 emits _name through SetProperty rather than SetVariable.
+                    if (definition.smartClip && item instanceof SetPropertyActionItem) {
+                        SetPropertyActionItem property = (SetPropertyActionItem) item;
+                        String value = literal(property.value);
+                        if (!"".equals(literal(property.target)) || property.propertyIndex != 13
+                                || value == null || values.put("_name", value) != null) {
+                            return false;
+                        }
+                        continue;
+                    }
                     if (item instanceof SetMemberActionItem) {
                         SetMemberActionItem member = (SetMemberActionItem) item;
                         String name = member.object instanceof GetVariableActionItem
@@ -386,6 +412,8 @@ final class As2ComponentConverter {
                             array.add(literal(child));
                         }
                         arrays.put(name, array);
+                    } else if (emptyArray(assignment.value) && "Array".equals(parameter == null ? "" : parameter.type)) {
+                        arrays.put(name, new ArrayList<>());
                     }
                     if (value == null || values.put(name, value) != null) {
                         return false;
@@ -414,6 +442,9 @@ final class As2ComponentConverter {
     }
 
     private static String parameterValue(GraphTargetItem item, ComponentDefinition.Parameter parameter) {
+        if ("Array".equals(parameter.type) && emptyArray(item)) {
+            return "";
+        }
         if ("Array".equals(parameter.type) && item instanceof InitArrayActionItem) {
             List<String> values = new ArrayList<>();
             for (GraphTargetItem child : ((InitArrayActionItem) item).values) {
@@ -428,6 +459,12 @@ final class As2ComponentConverter {
             return String.join(",", values);
         }
         return literal(item);
+    }
+
+    private static boolean emptyArray(GraphTargetItem item) {
+        return item instanceof NewObjectActionItem
+                && "Array".equalsIgnoreCase(literal(((NewObjectActionItem) item).objectName))
+                && ((NewObjectActionItem) item).arguments.isEmpty();
     }
 
     boolean isComponent(CharacterTag character) {
@@ -705,6 +742,12 @@ final class As2ComponentConverter {
                     component.setAttribute("requiredMinimumASVersion", "2");
                     component.setAttribute("requiredMinimumPlayerVersion", definition.minimumPlayerVersion);
                     component.setAttribute("parametersAreLocked", "true");
+                    if (definition.smartClip) {
+                        component.setAttribute("requiredMinimumASVersion", "0");
+                        component.setAttribute("tooltip", definition.name);
+                        component.setAttribute("descriptionType", "text");
+                        component.setAttribute("symbolDescription", definition.description);
+                    }
                     if (definition.legacy) {
                         component.setAttribute("requiredMinimumASVersion", "1");
                         component.setAttribute("tooltip", definition.name);

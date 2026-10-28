@@ -1243,4 +1243,193 @@ public class XflComponentExportTest {
         }
     }
 
+    @Test(dataProvider = "formats")
+    public void restoresFlash5SmartClipsFromNativeSwf(boolean compressed) throws Exception {
+        Path directory = Files.createTempDirectory("ffdec-f5-smartclips-");
+        try {
+            SWF swf = movie("f5-smartclips");
+            byte[] original = bytes(swf);
+            Assert.assertEquals(swf.version, 5);
+            Map<String, byte[]> files = export(swf, directory, compressed, true);
+            org.w3c.dom.Element document = xml(text(files.get("DOMDocument.xml"))).getDocumentElement();
+            List<org.w3c.dom.Element> instances = ComponentConverter.elements(document, "DOMComponentInstance");
+            Assert.assertEquals(instances.size(), 3);
+            for (String name : new String[]{"CheckBox", "Menu", "RadioButton"}) {
+                org.w3c.dom.Element item = xml(text(files.get("LIBRARY/" + name + ".xml"))).getDocumentElement();
+                Assert.assertEquals(item.getLocalName(), "DOMComponentItem");
+                Assert.assertEquals(item.getAttribute("requiredMinimumPlayerVersion"), "5");
+                Assert.assertTrue(item.getAttribute("symbolDescription").contains("Summary"));
+                Assert.assertFalse(item.hasAttribute("linkageClassName"));
+            }
+            String scene = text(files.get("DOMDocument.xml"));
+            Assert.assertTrue(scene.contains("checkbox1"));
+            Assert.assertTrue(scene.contains("radioBox1"));
+            Assert.assertTrue(scene.contains("defaultValue1,defaultValue2,defaultValue3,defaultValue4,defaultValue5"));
+            Assert.assertTrue(scene.contains("enumeration=\"true,false\""));
+            Assert.assertTrue(scene.contains("enumeration=\"Auto,Mac,Win\""));
+            Assert.assertFalse(scene.contains("onClipEvent(load)"), "Do not duplicate the generated parameter initializer");
+            int labels = 0;
+            for (Map.Entry<String, byte[]> file : files.entrySet()) {
+                if (!file.getKey().startsWith("LIBRARY/") || !file.getKey().endsWith(".xml")) {
+                    continue;
+                }
+                org.w3c.dom.Element item = xml(text(file.getValue())).getDocumentElement();
+                for (org.w3c.dom.Element field : ComponentConverter.elements(item, "DOMDynamicText")) {
+                    String label = ComponentConverter.elements(field, "characters").get(0).getTextContent();
+                    Assert.assertTrue(java.util.Arrays.asList("Checkbox", "Radio Button", "List Value").contains(label));
+                    for (org.w3c.dom.Element format : ComponentConverter.elements(field, "DOMTextAttrs")) {
+                        double size = Double.parseDouble(format.getAttribute("size"));
+                        Assert.assertTrue(size == 12 || size == 13, "Editor label must retain its original font size: " + size);
+                    }
+                    labels++;
+                }
+            }
+            Assert.assertTrue(labels >= 12, "All native text fields must remain visible, including repeated keyframes");
+            Assert.assertEquals(bytes(swf), original);
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test
+    public void binaryFlash5ExportRestoresSmartClipParameters() throws Exception {
+        Path directory = Files.createTempDirectory("ffdec-f5-binary-smartclips-");
+        try {
+            SWF swf = movie("f5-smartclips");
+            byte[] original = bytes(swf);
+            Path file = directory.resolve("smartclips.fla");
+            swf.exportXfl(null, file.toString(), "smartclips.swf", "Test", "Test", "1", false,
+                    FLAVersion.F5, new XFLExportSettings(), null);
+            BinaryFlaDocument output = new BinaryFlaReader().read(file.toFile());
+            Map<Long, String> names = new LinkedHashMap<>();
+            int definitions = 0;
+            for (FlaRecord descriptor : output.getLibraryDescriptors()) {
+                names.put(((Number) descriptor.get("libraryId")).longValue(), (String) descriptor.get("name"));
+                List<FlaRecord> properties = mxEntries((FlaRecord) descriptor.get("properties"));
+                if (!properties.isEmpty()) {
+                    definitions++;
+                    Assert.assertEquals(properties.size(), "Menu".equals(descriptor.get("name")) ? 2 : 4);
+                }
+            }
+            Assert.assertEquals(definitions, 3);
+            List<FlaRecord> instances = new ArrayList<>();
+            for (FlaRecord scene : output.getSceneDescriptors()) {
+                mxInstances(output.getStream((String) scene.get("streamName")).getRoot(), instances);
+            }
+            Assert.assertEquals(instances.size(), 3);
+            for (FlaRecord instance : instances) {
+                String name = names.get(((Number) instance.get("libraryId")).longValue());
+                FlaRecord properties = (FlaRecord) instance.get("properties");
+                Assert.assertEquals(mxEntries(properties).size(), "Menu".equals(name) ? 2 : 4);
+                Assert.assertEquals(((Number) properties.get("revision")).intValue(), 1);
+                Assert.assertEquals(instance.get("legacyParametersAreLocked"), 1L);
+                for (FlaRecord parameter : mxEntries(properties)) {
+                    FlaRecord value = (FlaRecord) parameter.get("value");
+                    if ("items".equals(parameter.get("name"))) {
+                        Assert.assertEquals(((Number) value.get("type")).intValue(), 2);
+                        Assert.assertEquals(mxEntries(value).size(), 5);
+                        Assert.assertEquals(mxEntries(value).get(4).get("value"), "defaultValue5");
+                    }
+                    if ("checked".equals(parameter.get("name"))) {
+                        Assert.assertEquals(((Number) value.get("type")).intValue(), 4);
+                        Assert.assertEquals(((Number) value.get("selectedIndex")).intValue(), 1);
+                    }
+                }
+            }
+            Assert.assertEquals(bytes(swf), original);
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test
+    public void flash5SmartClipRecognitionPreservesUnknownRuntimeAndInitializers() throws Exception {
+        SWF swf = movie("f5-smartclips");
+        DefineSpriteTag checkbox = (DefineSpriteTag) swf.getCharacter(11);
+        Assert.assertTrue(new ComponentConverter(swf).isComponent(checkbox));
+        com.jpexs.decompiler.flash.tags.DoActionTag custom = new com.jpexs.decompiler.flash.tags.DoActionTag(swf);
+        custom.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, custom)
+                .actionsFromString("trace('Custom runtime');", swf.getCharset()));
+        checkbox.addTag(0, custom);
+        Assert.assertFalse(new ComponentConverter(swf).isComponent(checkbox));
+        Path directory = Files.createTempDirectory("ffdec-f5-custom-smartclip-");
+        try {
+            Map<String, byte[]> files = export(swf, directory, false, true);
+            Assert.assertTrue(text(files.get("DOMDocument.xml")).contains("checkbox1"));
+            Assert.assertTrue(files.values().stream().anyMatch(data -> text(data).contains("Custom runtime")));
+            Assert.assertFalse(text(files.get("DOMDocument.xml")).contains("libraryItemName=\"CheckBox\""));
+            files = export(movie("f5-smartclips"), directory, true, false);
+            Assert.assertFalse(text(files.get("DOMDocument.xml")).contains("DOMComponentInstance"));
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test
+    public void flash5SmartClipsUseEditedInstanceValuesInsideNestedSymbols() throws Exception {
+        SWF swf = movie("f5-smartclips");
+        DefineSpriteTag wrapper = new DefineSpriteTag(swf);
+        wrapper.frameCount = 1;
+        for (Tag tag : new ArrayList<>(swf.getTags().toArrayList())) {
+            if (!(tag instanceof PlaceObjectTypeTag)) {
+                continue;
+            }
+            PlaceObjectTypeTag place = (PlaceObjectTypeTag) tag;
+            if (place.getCharacterId() == 11) {
+                com.jpexs.decompiler.flash.types.CLIPACTIONRECORD initializer = place.getClipActions().clipActionRecords.get(0);
+                initializer.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, initializer)
+                        .actionsFromString("onClipEvent(load){ _name='editedCheckbox'; checked='true'; label='Edited label'; style='Mac'; }", swf.getCharset()));
+            }
+            if (place.getCharacterId() == 40) {
+                com.jpexs.decompiler.flash.types.CLIPACTIONRECORD initializer = place.getClipActions().clipActionRecords.get(0);
+                initializer.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, initializer)
+                        .actionsFromString("onClipEvent(load){ items=new Array(); items[0]='First'; items[1]='Second'; style='Win'; }", swf.getCharset()));
+            }
+            swf.removeTag(tag);
+            wrapper.addTag(tag);
+        }
+        wrapper.addTag(new ShowFrameTag(swf));
+        swf.addTag(wrapper);
+        swf.addTag(0, new PlaceObject2Tag(swf, false, 1, wrapper.spriteId, new MATRIX(), null, -1, "wrapper", -1, null));
+        Path directory = Files.createTempDirectory("ffdec-f5-edited-smartclips-");
+        try {
+            byte[] original = bytes(swf);
+            Map<String, byte[]> files = export(swf, directory, true, true);
+            String nested = files.entrySet().stream()
+                    .filter(entry -> entry.getKey().startsWith("LIBRARY/") && entry.getKey().endsWith(".xml"))
+                    .map(entry -> text(entry.getValue())).filter(source -> source.contains("DOMComponentInstance"))
+                    .findFirst().orElseThrow(() -> new AssertionError("Missing nested Smart Clips"));
+            Assert.assertTrue(nested.contains("editedCheckbox"));
+            Assert.assertTrue(nested.contains("Edited label"));
+            Assert.assertTrue(nested.contains("defaultValue=\"true\""));
+            Assert.assertTrue(nested.contains("defaultValue=\"Mac\""));
+            Assert.assertTrue(nested.contains("defaultValue=\"First,Second\""));
+            Assert.assertTrue(nested.contains("defaultValue=\"Win\""));
+            Assert.assertFalse(nested.contains("onClipEvent(load)"));
+            Assert.assertEquals(bytes(swf), original);
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test(dataProvider = "formats")
+    public void deviceFontLabelsKeepTheirSizeDuringNormalization(boolean inPlace) throws Exception {
+        SWF swf = movie("f5-smartclips");
+        byte[] original = bytes(swf);
+        Map<Integer, com.jpexs.decompiler.flash.tags.base.FontTag> fonts = new LinkedHashMap<>();
+        Map<Integer, com.jpexs.decompiler.flash.tags.base.TextTag> texts = new LinkedHashMap<>();
+        new com.jpexs.decompiler.flash.FontNormalizer().normalizeFonts(swf, inPlace, fonts, texts);
+        int count = 0;
+        for (com.jpexs.decompiler.flash.tags.base.CharacterTag character : swf.getCharacters(false).values()) {
+            if (character instanceof com.jpexs.decompiler.flash.tags.DefineEditTextTag) {
+                com.jpexs.decompiler.flash.tags.DefineEditTextTag field = (com.jpexs.decompiler.flash.tags.DefineEditTextTag)
+                        texts.getOrDefault(character.getCharacterId(), (com.jpexs.decompiler.flash.tags.DefineEditTextTag) character);
+                Assert.assertTrue(field.fontHeight == 240 || field.fontHeight == 260);
+                count++;
+            }
+        }
+        Assert.assertEquals(count, 12);
+        Assert.assertEquals(bytes(swf), original);
+    }
+
 }

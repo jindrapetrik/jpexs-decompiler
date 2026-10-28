@@ -139,8 +139,12 @@ final class ComponentConverter {
     }
 
     ComponentConverter(SWF swf, boolean legacyOnly) throws IOException, InterruptedException {
+        this(swf, legacyOnly, false);
+    }
+
+    ComponentConverter(SWF swf, boolean legacyOnly, boolean smartClipsOnly) throws IOException, InterruptedException {
         this.swf = swf;
-        as2 = swf.isAS3() ? null : new As2ComponentConverter(swf, legacyOnly);
+        as2 = swf.isAS3() ? null : new As2ComponentConverter(swf, legacyOnly, smartClipsOnly);
         if (as2 != null || legacyOnly) {
             return;
         }
