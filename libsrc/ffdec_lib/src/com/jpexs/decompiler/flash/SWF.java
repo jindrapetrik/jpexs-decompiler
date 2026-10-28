@@ -3281,9 +3281,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      *
      * @param classNames List of class names
      * @return List of ScriptPacks
-     * @throws Exception On error
      */
-    public List<ScriptPack> getScriptPacksByClassNames(List<String> classNames) throws Exception {
+    public List<ScriptPack> getScriptPacksByClassNames(List<String> classNames) {
         Set<ScriptPack> resultSet = new HashSet<>();
 
         List<ABCContainerTag> abcList = getAbcList();
