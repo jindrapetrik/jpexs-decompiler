@@ -1,0 +1,28 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/CheckBox Name" itemID="3bd76da6-000000b6" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/CheckBox Name" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd76da6-000000b6">
+  <timeline>
+    <DOMTimeline name="CheckBox Name">
+      <layers>
+        <DOMLayer name="asset" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#D4D0D8"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!1898 154|297 154!297 154|297 175!297 175|447.5 175!447.5 175|447.5 174!447.5 174|1798 174!1798 174|1798 175!1798 175|1898 175!1898 175|1898 154!186 99[183 99 177 104!177 104|108 178!108 178|76 142!76 142|68 138!68 138[57 138 57 149!57
+ 149|56 187!56 187|59 194!59 194|101 237!101 237|102 237!102 237|106 238!106 238|114 234!114 234|194 154!194 154|198 146!198 146|198 111!198 111[198 99 186 99!13 275|233 275!233 275|233 55!233 55|13 55!13 55|13 275!33 75|213 75!213 75
+|213 255!213 255|33 255!33 255|33 75"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

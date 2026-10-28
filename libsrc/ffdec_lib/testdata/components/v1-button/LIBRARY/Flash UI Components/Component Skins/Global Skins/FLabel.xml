@@ -1,0 +1,104 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Component Skins/Global Skins/FLabel" itemID="3bddf6ef-000001df" linkageExportForAS="true" linkageIdentifier="FLabelSymbol" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Component Skins/Global Skins/FLabel" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bddf6ef-000001df" displayAsComponent="false" customIconID="0" persistLivePreview11="true" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="FLabel">
+      <layers>
+        <DOMLayer name="Class Methods" color="#FF4F4F" locked="true" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip 0
+
+
+_global.FLabelClass = function()
+{
+	if (this.hostComponent==undefined) {
+		this.hostComponent = (this._parent.controller==undefined) ? this._parent : this._parent.controller;
+	}
+	if (this.customTextStyle==undefined) {
+		if (this.hostComponent.textStyle==undefined) {
+			this.hostComponent.textStyle= new TextFormat();
+		}
+		this.textStyle = this.hostComponent.textStyle;
+		this.enable = true;
+	}
+}
+
+FLabelClass.prototype = new MovieClip();
+Object.registerClass("FLabelSymbol", FLabelClass);
+
+
+//::: PUBLIC METHODS
+
+FLabelClass.prototype.setLabel = function(label)
+{
+
+	var val = this.hostComponent.styleTable.embedFonts.value;
+	if (val!=undefined) {
+		this.labelField.embedFonts = val;
+	}
+	this.labelField.setNewTextFormat(this.textStyle);
+	this.labelField.text = label;
+	this.labelField._height = this.labelField.textHeight + 2;
+}
+
+
+FLabelClass.prototype.setSize = function(width) // note that height is textFormat-based.
+{
+	this.labelField._width = width;
+}
+
+FLabelClass.prototype.setEnabled = function(enable)
+{
+	this.enable=enable;
+	var tmpColor = this.hostComponent.styleTable[ (enable) ? "textColor" : "textDisabled" ].value;
+	if (tmpColor==undefined) {
+		tmpColor = (enable) ? 0x000000 : 0x888888;
+	}
+	this.setColor(tmpColor);
+}
+
+FLabelClass.prototype.getLabel = function()
+{
+	return this.labelField.text;
+}
+
+FLabelClass.prototype.setColor = function(col)
+{
+	this.labelField.textColor = col;
+}
+
+#endinitclip]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Label Asset" color="#4F80FF" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" name="Symbol_32" labelType="name" keyMode="9728">
+              <elements>
+                <DOMDynamicText name="labelField" fontRenderingMode="device" width="81" height="14.5" renderAsHTML="true">
+                  <matrix>
+                    <Matrix d="1.00288391113281" tx="2" ty="2"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters> </characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" useScreenSpacing="true" face="_sans"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_disabled/fsb_upArrow_disabled_rightOut" itemID="3bd4ab94-00001ec7" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_disabled/fsb_upArrow_disabled_rightOut" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd4ab94-00001ec7">
+  <timeline>
+    <DOMTimeline name="fsb_upArrow_disabled_rightOut">
+      <layers>
+        <DOMLayer name="element" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#808080"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!0 300|0 320!0 320|320 320!320 320|320 0!320 0|300 0!300 0|300 300!300 300|0 300"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

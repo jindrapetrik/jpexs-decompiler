@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_check" itemID="3bde089a-000002df" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_check" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bde089a-000002df">
+  <timeline>
+    <DOMTimeline name="fcb_check">
+      <layers>
+        <DOMLayer name="element" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!142 12[142 0 130 0!130 0[127 0 121 5!121 5|52 79!52 79|20 43!20 43|12 39!12 39[1 39 1 50!1 50|0 88!0 88|3 95!3 95|45 138!45 138|46 138!46 138|50 139!50 139|58 135!58 135|138 55!138 55|142 47!142 47|142 12"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

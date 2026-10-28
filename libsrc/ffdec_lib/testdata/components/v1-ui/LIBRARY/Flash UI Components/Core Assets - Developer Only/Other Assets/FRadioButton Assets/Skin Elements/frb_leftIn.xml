@@ -1,0 +1,30 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_leftIn" itemID="3bbe8e96-0000003f" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_leftIn" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bbe8e96-0000003f">
+  <timeline>
+    <DOMTimeline name="frb_leftIn" guides='&lt;guidelines&gt;&lt;guideline direction="h"&gt;0&lt;/guideline&gt;&lt;guideline direction="v"&gt;0&lt;/guideline&gt;&lt;guideline direction="h"&gt;6&lt;/guideline&gt;&lt;guideline direction="v"&gt;6&lt;/guideline&gt;&lt;/guidelines&gt;'>
+      <layers>
+        <DOMLayer name="element" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" name="Symbol_23" labelType="name" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#D4D0D8"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!137 24[111 0 80 0!80 0[47 0 24 24!24 24[0 47 0 80!0 80[0 115 24 137!24 137|38 123!38 123[20 105 20 80!20 80[20 55 38 38!38 38[55 20 80 20!80 20[105 20 123 38!123 38|137 24"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

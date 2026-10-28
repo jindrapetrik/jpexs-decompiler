@@ -1,0 +1,44 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Component Skins/FScrollBar Skins/fsb_ScrollTrack" itemID="3b9d3e88-00000370" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Component Skins/FScrollBar Skins/fsb_ScrollTrack" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3b9d3e88-00000370">
+  <timeline>
+    <DOMTimeline name="fsb_ScrollTrack">
+      <layers>
+        <DOMLayer name="README" color="#FF4F4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[var component = _parent;
+//::: don't delete the above
+
+//::: SKIN ELEMENT REGISTRATION
+/*      To add styleFormat properties to your skins :
+   1) Break up your skin into individual movie clips (skinElements)
+   2) add a registerSkinElement line of code for each skinElement
+
+component.registerSkinElement(skinElement, propertyName)
+// makes the skinElement Listen to the propertyName specified (eg: "background")
+
+																	  n*/
+component.registerSkinElement(track_mc, "scrollTrack");
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Skin Elements" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/ scrollTrack" name="track_mc">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

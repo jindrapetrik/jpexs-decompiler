@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_leftOut" itemID="3bbe8e7f-0000003d" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_leftOut" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bbe8e7f-0000003d">
+  <timeline>
+    <DOMTimeline name="frb_leftOut" guides='&lt;guidelines&gt;&lt;guideline direction="v"&gt;0&lt;/guideline&gt;&lt;guideline direction="h"&gt;0&lt;/guideline&gt;&lt;guideline direction="v"&gt;8&lt;/guideline&gt;&lt;guideline direction="h"&gt;8&lt;/guideline&gt;&lt;/guidelines&gt;'>
+      <layers>
+        <DOMLayer name="element" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" name="Symbol_22" labelType="name" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <matrix>
+                    <Matrix tx="-55.9" ty="732.3"/>
+                  </matrix>
+                  <members>
+                    <DOMShape>
+                      <matrix>
+                        <Matrix tx="-55.9" ty="732.3"/>
+                      </matrix>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#808080"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!1275 -14602|1289 -14616!1289 -14616[1259 -14646 1218 -14646!1218 -14646[1177 -14646 1147 -14617!1147 -14617[1118 -14587 1118 -14546!1118 -14546[1118 -14503 1148 -14475!1148 -14475|1162 -14489!1162 -14489[1138 -14511 1138 -14546!1138
+ -14546[1138 -14579 1162 -14602!1162 -14602[1185 -14626 1218 -14626!1218 -14626[1249 -14626 1275 -14602"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

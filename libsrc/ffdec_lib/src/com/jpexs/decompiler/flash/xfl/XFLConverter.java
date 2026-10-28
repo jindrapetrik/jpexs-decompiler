@@ -4551,7 +4551,11 @@ public class XFLConverter {
             }
         };
         List<ActionTreeOperation> treeOps = new ArrayList<>();
-        treeOps.add(getRegisterClassOp);
+        // MX v1 classes live in #initclip scripts. Converting their registration
+        // to AS2 linkageClassName would make Flash look for external .as classes.
+        if (componentConverter == null || !componentConverter.isLegacyAs2Character(symbolId)) {
+            treeOps.add(getRegisterClassOp);
+        }
 
         String initClipScript = "";
         if (sprite != null) {
@@ -5631,7 +5635,10 @@ public class XFLConverter {
         Map<CharacterTag, String> characterVariables = getCharacterVariables(swf.getTags());
         boolean hasAmfMetadata = hasAmfMetadata(swf);
 
-        componentConverter = settings.exportScript && cbfFlaVersion == null ? new ComponentConverter(swf) : null;
+        componentConverter = settings.exportScript && (cbfFlaVersion == null
+                || !useAS3 && cbfFlaVersion.ordinal() >= FlaFormatVersion.MX.ordinal())
+                ? new ComponentConverter(swf, cbfFlaVersion != null
+                        && cbfFlaVersion.ordinal() < FlaFormatVersion.MX2004.ordinal()) : null;
 
         String backgroundColor = "#ffffff";
         SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();

@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.action.model.InitArrayActionItem;
 import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
+import com.jpexs.decompiler.flash.action.special.ActionEnd;
+import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -30,6 +32,7 @@ import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -70,7 +73,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Restores Flash's AS2 compiled components without decompiling their runtime.
+ * Restores Flash MX v1 and AS2 components. Compiled clips keep their bytecode;
+ * MX components retain their editable timelines and class initialization scripts.
  * The bundled declarations describe the Inspector and SWC dependency graph;
  * all executable code and visual assets come from the input SWF.
  */
@@ -88,6 +92,10 @@ final class As2ComponentConverter {
 
     private final Map<String, String> assetNames = new LinkedHashMap<>();
 
+    private final Map<String, String> legacyAssetNames = new LinkedHashMap<>();
+
+    private final Set<Integer> legacyAssets = new LinkedHashSet<>();
+
     private final Map<String, Element> declarations = new LinkedHashMap<>();
 
     private final Map<CLIPACTIONRECORD, Map<String, String>> initializers = new IdentityHashMap<>();
@@ -96,7 +104,7 @@ final class As2ComponentConverter {
 
     private final Map<CharacterTag, String> libraryNames = new IdentityHashMap<>();
 
-    As2ComponentConverter(SWF swf) throws IOException, InterruptedException {
+    As2ComponentConverter(SWF swf, boolean legacyOnly) throws IOException, InterruptedException {
         this.swf = swf;
         try (InputStream input = getClass().getResourceAsStream("as2_swc_definitions.xml")) {
             if (input == null) {
@@ -129,14 +137,32 @@ final class As2ComponentConverter {
         } catch (Exception ex) {
             throw new IOException("Cannot read AS2 component asset names", ex);
         }
-        for (ComponentDefinition definition : ComponentDefinition.load(swf, "as2_component_definitions.xml").values()) {
-            CharacterTag character = swf.getCharacterByExportName(definition.name);
+        try (InputStream input = getClass().getResourceAsStream("as1_component_definitions.xml")) {
+            Document metadata = ComponentConverter.parse(Utf8Helper.decode(Helper.readStream(input)));
+            NodeList assets = metadata.getElementsByTagName("asset");
+            for (int i = 0; i < assets.getLength(); i++) {
+                Element asset = (Element) assets.item(i);
+                legacyAssetNames.put(asset.getAttribute("exportName"), asset.getAttribute("path"));
+            }
+        } catch (Exception ex) {
+            throw new IOException("Cannot read Flash MX component asset names", ex);
+        }
+        List<ComponentDefinition> definitions = new ArrayList<>(ComponentDefinition.load(swf, "as2_component_definitions.xml").values());
+        definitions.addAll(ComponentDefinition.load(swf, "as1_component_definitions.xml").values());
+        for (ComponentDefinition definition : definitions) {
+            if (legacyOnly && !definition.legacy) {
+                continue;
+            }
+            CharacterTag character = swf.getCharacterByExportName(definition.exportName);
             // A matching instance name alone is not evidence of an AS2 component.
             if (!(character instanceof DefineSpriteTag)) {
                 continue;
             }
             if (definition.compiled && (swf.getCharacterByExportName("__Packages." + definition.className) == null
                     || !hasRegistration(character, definition))) {
+                continue;
+            }
+            if (definition.legacy && !hasRegistration(character, definition)) {
                 continue;
             }
             if (!definition.compiled && ((DefineSpriteTag) character).getTags().size() < 2) {
@@ -154,6 +180,15 @@ final class As2ComponentConverter {
         }
         if (components.isEmpty()) {
             return;
+        }
+        if (components.values().stream().anyMatch(definition -> definition.legacy)) {
+            for (String name : legacyAssetNames.keySet()) {
+                CharacterTag character = swf.getCharacterByExportName(name);
+                if (character != null) {
+                    legacyAssets.add(character.getCharacterId());
+                    character.getNeededCharactersDeep(legacyAssets, new HashSet<>());
+                }
+            }
         }
         Set<String> dependencies = new LinkedHashSet<>();
         for (ComponentDefinition definition : components.values()) {
@@ -187,6 +222,8 @@ final class As2ComponentConverter {
             components.clear();
             initializers.clear();
             bundled.clear();
+            // Keep MX registrations and init order even when an instance's user
+            // code requires ordinary-symbol export instead of an Inspector.
             return;
         }
 
@@ -207,10 +244,14 @@ final class As2ComponentConverter {
                 if (!(call.scriptObject instanceof GetVariableActionItem)
                         || !"Object".equals(literal(((GetVariableActionItem) call.scriptObject).name))
                         || !"registerClass".equals(literal(call.methodName)) || call.arguments.size() != 2
-                        || !definition.name.equals(literal(call.arguments.get(0)))) {
+                        || !definition.exportName.equals(literal(call.arguments.get(0)))) {
                     continue;
                 }
                 GraphTargetItem target = call.arguments.get(1);
+                if (definition.legacy && target instanceof GetVariableActionItem
+                        && definition.className.equals(literal(((GetVariableActionItem) target).name))) {
+                    return true;
+                }
                 if (target instanceof CallFunctionActionItem) {
                     CallFunctionActionItem function = (CallFunctionActionItem) target;
                     if ("eval".equals(literal(function.functionName)) && function.arguments.size() == 1
@@ -279,9 +320,10 @@ final class As2ComponentConverter {
             if (place.getCharacterId() >= 0) {
                 placedCharacters.put(place.getDepth(), place.getCharacterId());
             }
-            ComponentDefinition definition = components.get(swf.getCharacter(placedCharacters.getOrDefault(place.getDepth(), -1)));
+            int characterId = placedCharacters.getOrDefault(place.getDepth(), -1);
+            ComponentDefinition definition = components.get(swf.getCharacter(characterId));
             CLIPACTIONS actions = place.getClipActions();
-            if (definition == null || actions == null) {
+            if (actions == null || definition == null && !legacyAssets.contains(characterId)) {
                 continue;
             }
             for (CLIPACTIONRECORD record : actions.clipActionRecords) {
@@ -297,7 +339,20 @@ final class As2ComponentConverter {
                         || flags.clipEventDragOver || flags.clipEventDragOut || flags.clipEventRollOver
                         || flags.clipEventRollOut || flags.clipEventPress || flags.clipEventRelease
                         || flags.clipEventReleaseOutside || flags.clipEventKeyPress) {
+                    if (definition == null) {
+                        continue;
+                    }
                     return false;
+                }
+                if (definition == null) {
+                    // MX compiles these empty handlers from private SmartClip
+                    // parameters. They have no source representation in MX;
+                    // emitting on(initialize) causes compiler errors on save.
+                    if (flags.clipEventInitialize && record.getActions().stream()
+                            .allMatch(action -> action instanceof ActionEnd || action instanceof ActionConstantPool)) {
+                        initializers.put(record, Collections.emptyMap());
+                    }
+                    continue;
                 }
                 List<GraphTargetItem> tree = Action.actionsToTree(new LinkedHashSet<>(), false,
                         new HashMap<>(), false, false, record.getActions(), swf.version, 0, "", swf.getCharset());
@@ -383,6 +438,10 @@ final class As2ComponentConverter {
         return bundled.contains(characterId);
     }
 
+    boolean isLegacyCharacter(int characterId) {
+        return legacyAssets.contains(characterId);
+    }
+
     boolean isConsumedClipAction(CLIPACTIONRECORD record) {
         return initializers.containsKey(record);
     }
@@ -407,29 +466,41 @@ final class As2ComponentConverter {
 
     Set<String> initializeLibraryNames(Set<CharacterTag> characters, Map<CharacterTag, String> names) throws InterruptedException {
         Set<String> used = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-        Set<String> folders = new LinkedHashSet<>();
+        // Flash reads these in order; children preceding their parents create
+        // stray empty folders at the Library root when the document is saved.
+        Set<String> folders = new TreeSet<>();
         for (Map.Entry<CharacterTag, ComponentDefinition> entry : components.entrySet()) {
-            names.put(entry.getKey(), entry.getValue().name);
-            used.add(entry.getValue().name);
+            String stem = entry.getValue().name;
+            String name = stem;
+            if (used.contains(name) && entry.getValue().legacy) {
+                stem += " v1";
+                name = stem;
+            }
+            for (int suffix = 2; !used.add(name); suffix++) {
+                name = stem + " " + suffix;
+            }
+            names.put(entry.getKey(), name);
         }
         // Compiled-clip dependencies are opaque, just as when inserted from the
-        // native Components panel. The video controls have editable skins.
+        // native Components panel. MX components and video controls have editable skins.
         for (CharacterTag character : new ArrayList<>(characters)) {
             if (bundled.contains(character.getCharacterId()) && !components.containsKey(character)) {
                 characters.remove(character);
             }
         }
-        Set<Integer> videoAssets = new LinkedHashSet<>();
+        Set<Integer> editableAssets = new LinkedHashSet<>(legacyAssets);
         for (Map.Entry<CharacterTag, ComponentDefinition> entry : components.entrySet()) {
             if (!entry.getValue().compiled) {
-                entry.getKey().getNeededCharactersDeep(videoAssets, new HashSet<>());
+                entry.getKey().getNeededCharactersDeep(editableAssets, new HashSet<>());
             }
         }
         for (CharacterTag character : characters) {
             ComponentConverter.checkInterrupted();
-            if (!components.containsKey(character) && videoAssets.contains(character.getCharacterId())) {
+            if (!components.containsKey(character) && editableAssets.contains(character.getCharacterId())) {
                 String export = swf.getExportName(character.getCharacterId());
-                String stem = assetNames.getOrDefault(export, "Component Assets/" + (export == null ? "Symbol " + character.getCharacterId() : export));
+                String stem = legacyAssets.contains(character.getCharacterId()) && legacyAssetNames.containsKey(export)
+                        ? legacyAssetNames.get(export)
+                        : assetNames.getOrDefault(export, "Component Assets/" + (export == null ? "Symbol " + character.getCharacterId() : export));
                 String name = stem;
                 for (int suffix = 2; !used.add(name); suffix++) {
                     name = stem + " " + suffix;
@@ -477,20 +548,22 @@ final class As2ComponentConverter {
         return item;
     }
 
-    private byte[] runtime() throws IOException, InterruptedException {
+    private byte[] runtime(Set<Integer> characters) throws IOException, InterruptedException {
         ByteArrayOutputStream original = new ByteArrayOutputStream();
         swf.saveTo(original);
         SWF runtime = new SWF(new ByteArrayInputStream(original.toByteArray()), false);
         for (Tag tag : new ArrayList<>(runtime.getTags().toArrayList())) {
             ComponentConverter.checkInterrupted();
-            boolean keep = tag instanceof CharacterTag && bundled.contains(((CharacterTag) tag).getCharacterId())
-                    || tag instanceof DoInitActionTag && bundled.contains(((DoInitActionTag) tag).spriteId)
-                    || tag instanceof DefineScalingGridTag && bundled.contains(((DefineScalingGridTag) tag).characterId)
+            boolean keep = tag instanceof CharacterTag && characters.contains(((CharacterTag) tag).getCharacterId())
+                    || tag instanceof DoInitActionTag && characters.contains(((DoInitActionTag) tag).spriteId)
+                    || tag instanceof DefineScalingGridTag && characters.contains(((DefineScalingGridTag) tag).characterId)
+                    // DefineBits depends on shared JPEG tables outside the character graph.
+                    || tag instanceof JPEGTablesTag
                     || tag instanceof FileAttributesTag;
             if (tag instanceof ExportAssetsTag) {
                 ExportAssetsTag exports = (ExportAssetsTag) tag;
                 for (int i = exports.tags.size() - 1; i >= 0; i--) {
-                    if (!bundled.contains(exports.tags.get(i))) {
+                    if (!characters.contains(exports.tags.get(i))) {
                         exports.tags.remove(i);
                         exports.names.remove(i);
                     }
@@ -511,6 +584,10 @@ final class As2ComponentConverter {
 
     private byte[] preview(byte[] runtimeBytes, CharacterTag character, ComponentDefinition definition) throws Exception {
         SWF preview = new SWF(new ByteArrayInputStream(runtimeBytes), false);
+        // MX v1 uses the case-insensitive AVM1 semantics of SWF 6.
+        if (!definition.legacy) {
+            preview.version = Math.max(8, preview.version);
+        }
         for (Tag tag : new ArrayList<>(preview.getTags().toArrayList())) {
             if (tag instanceof ShowFrameTag) {
                 preview.removeTag(tag);
@@ -518,7 +595,9 @@ final class As2ComponentConverter {
         }
         DoActionTag dimensions = new DoActionTag(preview);
         dimensions.setActions(new ActionScript2Parser(preview, dimensions)
-                .actionsFromString("previewWidth = " + definition.width + "; previewHeight = " + definition.height + ";", preview.getCharset()));
+                .actionsFromString("previewWidth = " + definition.width + "; previewHeight = " + definition.height
+                        + "; previewLegacy = " + definition.legacy + "; previewKind = '" + definition.name
+                        + "'; previewLinkageID = '" + definition.exportName + "';", preview.getCharset()));
         preview.addTag(dimensions);
         try (InputStream input = getClass().getResourceAsStream("component_preview_as2.bin")) {
             if (input == null) {
@@ -542,7 +621,7 @@ final class As2ComponentConverter {
     }
 
     String convert(String documentXml, Map<String, byte[]> files, Map<String, byte[]> datfiles) throws IOException, InterruptedException {
-        if (components.isEmpty()) {
+        if (components.isEmpty() && legacyAssets.isEmpty()) {
             return documentXml;
         }
         try {
@@ -554,7 +633,8 @@ final class As2ComponentConverter {
                 Node symbols = ComponentConverter.elements(root, "symbols").stream().findFirst().orElse(null);
                 root.insertBefore(media, symbols == null ? root.getFirstChild() : symbols);
             }
-            byte[] runtimeBytes = bundled.isEmpty() ? null : runtime();
+            byte[] runtimeBytes = bundled.isEmpty() ? null : runtime(bundled);
+            byte[] legacyRuntime = legacyAssets.isEmpty() ? null : runtime(legacyAssets);
             Map<String, ComponentDefinition> symbols = new LinkedHashMap<>();
             for (Map.Entry<CharacterTag, ComponentDefinition> entry : components.entrySet()) {
                 ComponentConverter.checkInterrupted();
@@ -625,6 +705,15 @@ final class As2ComponentConverter {
                     component.setAttribute("requiredMinimumASVersion", "2");
                     component.setAttribute("requiredMinimumPlayerVersion", definition.minimumPlayerVersion);
                     component.setAttribute("parametersAreLocked", "true");
+                    if (definition.legacy) {
+                        component.setAttribute("requiredMinimumASVersion", "1");
+                        component.setAttribute("tooltip", definition.name);
+                        String previewFile = "component_v1_" + definition.name.toLowerCase(Locale.ROOT) + ".swf";
+                        datfiles.put(previewFile, preview(legacyRuntime, entry.getKey(), definition));
+                        component.setAttribute("livePreviewScmHRef", previewFile);
+                        component.setAttribute("livePreviewScmSourceFilename", previewFile);
+                        component.setAttribute("persistLivePreview11", "true");
+                    }
                     ComponentConverter.appendParameters(component, definition, Collections.emptyMap());
                     ComponentConverter.appendIcon(component, definition, datfiles);
                     files.put(file, Utf8Helper.getBytes(ComponentConverter.xml(item)));
@@ -637,10 +726,30 @@ final class As2ComponentConverter {
                 }
             }
             convertInstances(document, symbols);
+            Map<String, Integer> initPriorities = new HashMap<>();
+            int priority = 1;
+            for (Tag tag : swf.getTags()) {
+                if (tag instanceof DoInitActionTag && legacyAssets.contains(((DoInitActionTag) tag).spriteId)) {
+                    initPriorities.put(libraryNames.get(swf.getCharacter(((DoInitActionTag) tag).spriteId)), priority++);
+                }
+            }
             for (String path : new ArrayList<>(files.keySet())) {
                 if (path.endsWith(".xml")) {
                     Document item = ComponentConverter.parse(Utf8Helper.decode(files.get(path)));
-                    if (convertInstances(item, symbols)) {
+                    boolean changed = convertInstances(item, symbols);
+                    Integer initPriority = initPriorities.get(item.getDocumentElement().getAttribute("name"));
+                    if (initPriority != null) {
+                        for (Element script : ComponentConverter.elements(item.getDocumentElement(), "script")) {
+                            String source = script.getTextContent();
+                            String ordered = source.replaceFirst("#initclip[ \\t]*\\r?\\n", "#initclip " + initPriority + "\r\n");
+                            if (!source.equals(ordered)) {
+                                script.setTextContent("");
+                                script.appendChild(item.createCDATASection(ordered));
+                                changed = true;
+                            }
+                        }
+                    }
+                    if (changed) {
                         files.put(path, Utf8Helper.getBytes(ComponentConverter.xml(item)));
                     }
                 }

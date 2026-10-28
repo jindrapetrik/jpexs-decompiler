@@ -1,0 +1,72 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Component Skins/FRadioButton Skins/ frb_frame" itemID="3bd77b69-000002ab" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Component Skins/FRadioButton Skins/ frb_frame" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd77b69-000002ab">
+  <timeline>
+    <DOMTimeline name=" frb_frame" guides='&lt;guidelines&gt;&lt;guideline direction="v"&gt;0&lt;/guideline&gt;&lt;guideline direction="h"&gt;0&lt;/guideline&gt;&lt;guideline direction="v"&gt;10&lt;/guideline&gt;&lt;guideline direction="h"&gt;10&lt;/guideline&gt;&lt;/guidelines&gt;'>
+      <layers>
+        <DOMLayer name="README" color="#FF4F4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[var component = _parent._parent;
+//::: don't delete the above
+
+//::: SKIN ELEMENT REGISTRATION
+/*      To add styleFormat properties to your skins :
+   1) Break up your skin into individual movie clips (skinElements)
+   2) add a registerSkinElement line of code for each skinElement
+
+component.registerSkinElement(skinElement, propertyName)
+// makes the skinElement Listen to the propertyName specified (eg: "background")
+
+																	  n*/
+component.registerSkinElement(shadow_mc, "shadow");
+component.registerSkinElement(darkshadow_mc, "darkshadow");
+component.registerSkinElement(highlight_mc, "highlight");
+component.registerSkinElement(highlight3D_mc, "highlight3D");
+
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="skin elements" color="#4F80FF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_leftOut" name="darkshadow_mc">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_leftIn" name="shadow_mc">
+                  <matrix>
+                    <Matrix tx="1" ty="1"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_rightIn" name="highlight_mc">
+                  <matrix>
+                    <Matrix tx="2.2" ty="2.2"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_rightOut" name="highlight3D_mc">
+                  <matrix>
+                    <Matrix tx="1.5" ty="1.5"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

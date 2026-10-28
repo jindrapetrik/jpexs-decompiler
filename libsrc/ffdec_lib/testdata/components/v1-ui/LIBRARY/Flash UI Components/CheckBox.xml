@@ -1,0 +1,464 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/ CheckBox" itemID="3bd472cc-00000281" linkageExportForAS="true" linkageIdentifier="FCheckBoxSymbol" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/ CheckBox" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd472cc-00000281" tooltip="Check Box" customIconID="2" descriptionType="reference" livePreviewScmHRef="ikbpqnmjzz.swf" livePreviewScmSourceFilename="check_live.swf" persistLivePreview11="true" symbolDescription="UI Components/FCheckBox" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name=" CheckBox">
+      <layers>
+        <DOMLayer name="Actions: Class" color="#4F80FF" locked="true" current="true" isSelected="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip 1
+
+function FCheckBoxClass()
+{
+	this.init();
+}
+
+FCheckBoxClass.prototype = new FUIComponentClass();
+Object.registerClass("FCheckBoxSymbol", FCheckBoxClass);
+	
+FCheckBoxClass.prototype.init = function()
+{
+	super.setSize(this._width,this._height);
+	this.boundingBox_mc.unloadMovie();
+	this.attachMovie("fcb_hitArea","fcb_hitArea_mc",1);
+	this.attachMovie("fcb_states", "fcb_states_mc",2);
+	this.attachMovie("FLabelSymbol","fLabel_mc",3);
+	super.init();
+	this.setChangeHandler(this.changeHandler);
+	this._xscale = 100;
+	this._yscale = 100;
+	this.setSize(this.width,this.height);
+	if ( this.initialValue == undefined ) {
+		this.setCheckState(false);
+	}  else {
+		this.setCheckState(this.initialValue);
+	}
+	if(this.label != undefined){
+		this.setLabel(this.label);
+	}
+	// ACCESSIBILITY DEFINED :: _accImpl object defined in base class
+		this.ROLE_SYSTEM_CHECKBUTTON = 0x2c;
+		this.STATE_SYSTEM_CHECKED = 0x10;
+		this.EVENT_OBJECT_STATECHANGE = 0x800a;
+		this.EVENT_OBJECT_NAMECHANGE = 0x800c;
+		this._accImpl.master = this;
+		this._accImpl.stub = false;
+		this._accImpl.get_accRole = this.get_accRole;
+		this._accImpl.get_accName = this.get_accName;	
+		this._accImpl.get_accState = this.get_accState;
+		this._accImpl.get_accDefaultAction = this.get_accDefaultAction;
+		this._accImpl.accDoDefaultAction = this.accDoDefaultAction;
+	
+}
+
+FCheckBoxClass.prototype.setLabelPlacement = function( pos )
+{
+	this.setLabel(this.getLabel());
+	this.txtFormat( pos );
+	var halfLabelH = this.fLabel_mc._height/2;
+	var halfFrameH = this.fcb_states_mc._height/2;
+	var vertCenter = (halfFrameH - halfLabelH );
+	var checkWidth = this.fcb_states_mc._width;
+	var frame = this.fcb_states_mc
+	var label = this.fLabel_mc;
+	var w = 0;
+	
+	if (frame._width > this.width){
+		w  = 0;
+	} else {
+		w  = this.width - frame._width;
+	}
+	this.fLabel_mc.setSize(w);
+
+	if (pos == "right" || pos == undefined){
+		this.labelPlacement = "right";
+		this.fcb_states_mc._x  = 0;
+		this.fLabel_mc._x = checkWidth;
+		this.txtFormat("left");
+	} else if (pos == "left"){
+		this.labelPlacement = "left";
+		this.fLabel_mc._x = 0;
+		this.fcb_states_mc._x = this.width - checkWidth;
+		this.txtFormat("right");
+	}
+	this.fLabel_mc._y = vertCenter;
+	this.fcb_hitArea_mc._y = vertCenter;
+}
+
+FCheckBoxClass.prototype.txtFormat = function( pos )
+{
+	var txtS = this.textStyle;
+	var sTbl = this.styleTable;
+	txtS.align = (sTbl.textAlign.value == undefined) ? txtS.align = pos : undefined;
+	txtS.leftMargin = (sTbl.textLeftMargin.value == undefined) ? txtS.leftMargin = 0 : undefined;
+	txtS.rightMargin = (sTbl.textRightMargin.value == undefined) ? txtS.rightMargin = 0 : undefined
+	if(this.flabel_mc._height > this.height){
+		super.setSize(this.width,this.flabel_mc._height);
+	}else{
+		super.setSize(this.width,this.height);
+	}
+	this.fLabel_mc.labelField.setTextFormat(this.textStyle);
+	this.setEnabled(this.enable)
+}
+
+FCheckBoxClass.prototype.setHitArea = function(w,h)
+{
+	var hit = this.fcb_hitArea_mc;
+	this.hitArea = hit;
+	if ( this.fcb_states_mc._width > w ){
+		hit._width = this.fcb_states_mc._width;
+	}else{ 
+		hit._width = w;
+	}	
+	hit._visible = false;
+	if(arguments.length > 1){
+		hit._height = h;
+	}
+}
+
+FCheckBoxClass.prototype.setSize = function(w)
+{
+	this.setLabel(this.getLabel());
+	this.setLabelPlacement(this.labelPlacement);
+	if(this.fcb_states_mc._height < this.flabel_mc.labelField._height){
+		super.setSize(w,this.flabel_mc.labelField._height);
+	}
+	this.setHitArea(this.width,this.height);
+	this.setLabelPlacement(this.labelPlacement);
+	
+}
+
+FCheckBoxClass.prototype.drawFocusRect = function()
+{
+	this.drawRect(-2, -2, this._width+6, this._height-1);
+}
+
+FCheckBoxClass.prototype.onPress = function()
+{
+	this.pressFocus();
+	_root.focusRect.removeMovieClip();
+	var states = this.fcb_states_mc;
+	if (this.getValue()) {
+		states.gotoAndStop( "checkedPress" );
+	} else {
+		states.gotoAndStop( "press" );
+	}
+}
+
+FCheckBoxClass.prototype.onRelease = function()
+{
+	this.fcb_states_mc.gotoAndStop( "up" );
+	this.setValue(!( this.checked ));
+}
+
+FCheckBoxClass.prototype.onReleaseOutside = function()
+{
+	var states = this.fcb_states_mc;
+	if (this.getValue()) {
+		states.gotoAndStop( "checkedEnabled" );
+	} else {
+		states.gotoAndStop("up");
+	}
+}
+
+FCheckBoxClass.prototype.onDragOut = function()
+{
+	var states = this.fcb_states_mc;
+	if (this.getValue()) {
+		states.gotoAndStop( "checkedEnabled" );
+	} else {
+		states.gotoAndStop("up");
+	}
+}
+
+FCheckBoxClass.prototype.onDragOver = function()
+{
+	var states = this.fcb_states_mc;
+	if (this.getValue()) {
+		states.gotoAndStop( "checkedPress" );
+	} else {
+		states.gotoAndStop("press");
+	}
+}
+
+
+FCheckBoxClass.prototype.setValue = function( checkedValue )
+{
+	if ( checkedValue || checkedValue == undefined) {
+		this.setCheckState( checkedValue );
+	} else if (checkedValue == false){
+		this.setCheckState( checkedValue );
+	}
+	this.executeCallBack();
+	
+	if(Accessibility.isActive()){
+			Accessibility.sendEvent( this, 0, this.EVENT_OBJECT_STATECHANGE,true );
+		}
+	
+}
+
+FCheckBoxClass.prototype.setCheckState = function( checkedValue )
+{
+	var states = this.fcb_states_mc;
+	if ( this.enable ) {
+		this.flabel_mc.setEnabled(true);
+		if ( checkedValue || checkedValue == undefined) {
+			states.gotoAndStop( "checkedEnabled" );
+			this.enabled = true;
+			this.checked = true;
+		} 
+		else
+		{
+			states.gotoAndStop("up");
+			this.enabled = true;
+			this.checked = false;
+		}
+	} 
+	else 
+	{
+		this.flabel_mc.setEnabled(false);
+		if ( checkedValue || checkedValue == undefined) {
+			states.gotoAndStop( "checkedDisabled" );
+			this.enabled = false;
+			this.checked = true;
+		} 
+		else 
+		{
+			states.gotoAndStop( "uncheckedDisabled" );										   
+			this.enabled = false;
+			this.checked = false;
+			this.focusRect.removeMovieClip()
+		}
+	}
+}
+
+FCheckBoxClass.prototype.getValue = function()
+{
+	return (this.checked);
+}
+
+FCheckBoxClass.prototype.setEnabled = function( enable )
+{
+	if(enable == true || enable == undefined){
+		 this.enable = true;
+		 Super.setEnabled(true);
+	} else {
+		this.enable = false;
+		Super.setEnabled(false);
+	}
+	this.setCheckState(this.checked);
+}
+
+FCheckBoxClass.prototype.getEnabled = function()
+{
+	return(this.enable);
+}
+
+FCheckBoxClass.prototype.setLabel = function( label )
+{
+	this.fLabel_mc.setLabel(label);
+	this.txtFormat();
+	// ACCESSIBILITY
+	if(Accessibility.isActive()){
+		Accessibility.sendEvent( this, 0, this.EVENT_OBJECT_NAMECHANGE );
+	}
+}
+
+FCheckBoxClass.prototype.getLabel = function()
+{
+	return (this.fLabel_mc.labelField.text);
+}
+
+FCheckBoxClass.prototype.setTextColor = function( color )
+{
+	this.fLabel_mc.labelField.textColor = color;
+}
+
+FCheckBoxClass.prototype.myOnKeyDown = function( )
+{
+	if (Key.getCode() == Key.SPACE && this.pressOnce == undefined && this.enabled == true) {
+		this.setValue(!this.getValue());
+		this.pressOnce = true;
+	}
+}
+
+FCheckBoxClass.prototype.myOnKeyUp = function( )
+{
+	if (Key.getCode() == Key.SPACE) {
+		this.pressOnce = undefined;
+	}
+}
+
+// START ACCESSIBILITY METHODS
+
+FCheckBoxClass.prototype.get_accRole = function(childId)
+{
+	return this.master.ROLE_SYSTEM_CHECKBUTTON;
+}
+
+FCheckBoxClass.prototype.get_accName = function(childId)
+{
+	return this.master.getLabel();
+}
+
+FCheckBoxClass.prototype.get_accState = function(childId)
+{
+	if (this.master.getValue())	{
+		return this.master.STATE_SYSTEM_CHECKED;
+	}else{
+		return 0;
+	}
+}
+
+FCheckBoxClass.prototype.get_accDefaultAction = function(childId)
+{
+	if ( this.master.getValue() ){
+		return "UnCheck";
+	}else{
+		return "Check";
+	}
+}
+
+FCheckBoxClass.prototype.accDoDefaultAction = function(childId)
+{
+	this.master.setValue( !this.master.getValue() );
+}
+	
+// END ACCESSIBILITY METHODS ::mr::
+
+
+#endinitclip 
+
+boundingBox_mc._visible = false;
+deadPreview._visible = false;
+
+
+
+
+
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Name" color="#FF4FFF" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/CheckBox Name" name="deadPreview">
+                  <matrix>
+                    <Matrix tx="1" ty="-1.75"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Bounding Box" color="#9933CC" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Component Skins/Global Skins/FBoundingBox" name="boundingBox_mc">
+                  <matrix>
+                    <Matrix a="1.00003051757813" d="0.1300048828125"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Assets" color="#4F80FF" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Component Skins/Global Skins/FLabel" name="flabelAsset" uniqueID="1">
+                  <matrix>
+                    <Matrix a="0.0112152099609375" d="0.0176239013671875"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0"/>
+                  </color>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='2.1'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/fcb_states" name="fcbStatesAsset">
+                  <matrix>
+                    <Matrix a="0.0769195556640625" d="0.0769195556640625"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0"/>
+                  </color>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_hitArea" name="fcbHitAreaAsset">
+                  <matrix>
+                    <Matrix a="0.0467376708984375" d="0.0467376708984375"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0"/>
+                  </color>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Superclass" color="#808080" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent" selected="true" uniqueID="2">
+                  <matrix>
+                    <Matrix tx="67.8" ty="8.85"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='2.2'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="label">
+      <Inspectable name="Label" variable="label" category="" verbose="0" defaultValue="Check Box" type="Default"/>
+   </property>
+   <property id="initialValue">
+      <Inspectable name="Initial Value" variable="initialValue" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="labelPlacement">
+      <Inspectable name="Label Placement" variable="labelPlacement" category="" verbose="0" defaultValue="right" enumeration="left,right" type="List"/>
+   </property>
+   <property id="changeHandler">
+      <Inspectable name="Change Handler" variable="changeHandler" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

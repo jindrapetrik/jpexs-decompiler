@@ -1,0 +1,47 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_ScrollThumb" itemID="3b9d3e88-00000358" linkageExportForAS="true" linkageIdentifier="ScrollThumb" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_ScrollThumb" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3b9d3e88-00000358">
+  <timeline>
+    <DOMTimeline name="fsb_ScrollThumb">
+      <layers>
+        <DOMLayer name="Actions" color="#FF4F4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 1" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Component Skins/FScrollBar Skins/fsb_thumb_top" name="mc_sliderTop">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Component Skins/FScrollBar Skins/fsb_thumb_middle" name="mc_sliderMid">
+                  <matrix>
+                    <Matrix ty="18.5"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Component Skins/FScrollBar Skins/fsb_thumb_bottom" name="mc_sliderBot">
+                  <matrix>
+                    <Matrix ty="54.9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

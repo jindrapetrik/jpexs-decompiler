@@ -1,0 +1,87 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" gridColor="#C0C0C0" guidesColor="#00FF00" frameRate="12" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" gridSpacingX="18" gridSpacingY="18" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <folders>
+          <DOMFolderItem name="Flash UI Components" itemID="3c195532-0000017b" isExpanded="true"/>
+          <DOMFolderItem name="Flash UI Components/Component Skins" itemID="3bd4722e-00000170" isExpanded="true"/>
+          <DOMFolderItem name="Flash UI Components/Component Skins/FPushButton Skins" itemID="3bd47233-000001bf" isExpanded="true"/>
+          <DOMFolderItem name="Flash UI Components/Component Skins/Global Skins" itemID="3bd4722e-0000016f" isExpanded="true"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only" itemID="3bd4722e-00000173" isExpanded="true"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree" itemID="3bd4722e-00000177" isExpanded="true"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets" itemID="3bd64376-000000aa" isExpanded="true"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets" itemID="3bd4ac6b-00001ecc" isExpanded="true"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements" itemID="3bd47233-000001c0"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled" itemID="3bd4aac2-00001ea9"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over" itemID="3bd4aa99-00001ea7"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press" itemID="3bd4aaab-00001ea8"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up" itemID="3bd4aa66-00001ea6"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols" itemID="3bd76a48-000000b2" isExpanded="true"/>
+     </folders>
+     <symbols>
+          <Include href="Flash UI Components/ PushButton.xml" itemID="3bd472da-00000284" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FPushButton Skins/fpb_disabled.xml" loadImmediate="false" itemID="3bde3b5d-000000c1" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FPushButton Skins/fpb_down.xml" loadImmediate="false" itemID="3bde3b63-000000c2" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FPushButton Skins/fpb_over.xml" loadImmediate="false" itemID="3bde3b67-000000c3" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FPushButton Skins/fpb_up.xml" loadImmediate="false" itemID="3bde3b6d-000000c4" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/Global Skins/FBoundingBox.xml" itemID="3b9d3e88-0000038e" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/Global Skins/FLabel.xml" itemID="3bddf6ef-000001df" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Component Version .xml" loadImmediate="false" itemID="3bddfa05-000000b7" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent.xml" itemID="3c3baa9b-00000254" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/boundingBox.xml" loadImmediate="false" itemID="3bcb68bf-000000af" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/fpb_states.xml" itemID="3bd4c7d3-0000211e" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled/fpb_face_disabled.xml" loadImmediate="false" itemID="3bd47b84-000008c8" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled/fpb_leftInFrame_disabled.xml" loadImmediate="false" itemID="3bd47b91-0000092c" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled/fpb_leftOutFrame_disabled.xml" loadImmediate="false" itemID="3bd47b9f-00000991" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled/fpb_rightInFrame_disabled.xml" loadImmediate="false" itemID="3bd47b75-00000865" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled/fpb_rightOutFrame_disabled.xml" loadImmediate="false" itemID="3bd47b5f-00000803" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_face_over.xml" loadImmediate="false" itemID="3bd47a2e-000002ee" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_leftInFrame_over.xml" loadImmediate="false" itemID="3bd47a43-00000348" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_leftOutFrame_over.xml" loadImmediate="false" itemID="3bd47a4d-000003a3" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_rightInFrame_over.xml" loadImmediate="false" itemID="3bd47a62-0000045c" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_rightOutFrame_over.xml" loadImmediate="false" itemID="3bd47a57-000003ff" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press/fpb_face_press.xml" loadImmediate="false" itemID="3bd47ae6-000005cb" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press/fpb_leftInFrame_press.xml" loadImmediate="false" itemID="3bd476ee-0000028e" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press/fpb_leftOutFrame_press.xml" loadImmediate="false" itemID="3bd47b24-00000744" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press/fpb_rightInFrame_press.xml" loadImmediate="false" itemID="3bd47bd1-00000992" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press/fpb_rightOutFrame_press.xml" loadImmediate="false" itemID="3bd47b02-0000062a" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_face_up.xml" loadImmediate="false" itemID="3bd47718-00000292" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_hitArea.xml" itemID="3c4e4568-0000045f" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_leftInFrame_up.xml" loadImmediate="false" itemID="3bd476fc-00000290" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_leftOutFrame_up.xml" loadImmediate="false" itemID="3bd47721-00000293" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_rightInFrame_up.xml" loadImmediate="false" itemID="3bd47727-00000294" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_rightOutFrame_up.xml" loadImmediate="false" itemID="3bd4772e-00000295" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/PushButton Name.xml" loadImmediate="false" itemID="3bd76fb5-000000bc" lastModified="1015556309"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4F80FF" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="Flash UI Components/ PushButton" centerPoint3DX="222.35" centerPoint3DY="193.35" uniqueID="1">
+                                             <matrix>
+                                                  <Matrix tx="172.35" ty="183.35"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='1'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="label">
+      <Inspectable name="Label" variable="label" category="" verbose="0" defaultValue="Hello" type="Default"/>
+   </property>
+   <property id="clickHandler">
+      <Inspectable name="Click Handler" variable="clickHandler" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory/>
+</DOMDocument>

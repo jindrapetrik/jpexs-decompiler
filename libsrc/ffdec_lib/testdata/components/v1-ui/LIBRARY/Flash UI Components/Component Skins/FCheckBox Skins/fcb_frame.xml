@@ -1,0 +1,63 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Component Skins/FCheckBox Skins/ fcb_frame" itemID="3bd77b4b-000002a8" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Component Skins/FCheckBox Skins/ fcb_frame" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd77b4b-000002a8">
+  <timeline>
+    <DOMTimeline name=" fcb_frame" guides='&lt;guidelines&gt;&lt;guideline direction="v"&gt;0&lt;/guideline&gt;&lt;guideline direction="h"&gt;0&lt;/guideline&gt;&lt;guideline direction="v"&gt;13&lt;/guideline&gt;&lt;guideline direction="h"&gt;13&lt;/guideline&gt;&lt;/guidelines&gt;'>
+      <layers>
+        <DOMLayer name="README" color="#FF4F4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[var component = _parent._parent;
+//::: don't delete the above
+
+//::: SKIN ELEMENT REGISTRATION
+/*      To add styleFormat properties to your skins :
+   1) Break up your skin into individual movie clips (skinElements)
+   2) add a registerSkinElement line of code for each skinElement
+
+component.registerSkinElement(skinElement, propertyName)
+// makes the skinElement Listen to the propertyName specified (eg: "background")
+
+																		  n*/
+component.registerSkinElement(shadow_mc, "shadow");
+component.registerSkinElement(darkshadow_mc, "darkshadow");
+component.registerSkinElement(highlight_mc, "highlight");
+component.registerSkinElement(highlight3D_mc, "highlight3D");
+
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="skin elements" color="#4F80FF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_rightOut" name="highlight3D_mc">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_rightIn" name="highlight_mc">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_leftIn" name="shadow_mc">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_leftOut" name="darkshadow_mc">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

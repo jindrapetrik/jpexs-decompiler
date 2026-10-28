@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * Authoring schemas of the standard components shipped with Flash CS6.
+ * Authoring schemas of the standard components shipped with Flash MX and CS6.
  * These contain Inspector metadata only, never component implementations.
  */
 final class ComponentDefinition {
@@ -36,6 +36,10 @@ final class ComponentDefinition {
     final String name;
 
     final boolean compiled;
+
+    final boolean legacy;
+
+    final String exportName;
 
     final String className;
 
@@ -96,6 +100,8 @@ final class ComponentDefinition {
     private ComponentDefinition(Element element) {
         name = element.getAttribute("name");
         compiled = "true".equals(element.getAttribute("compiled"));
+        legacy = "true".equals(element.getAttribute("legacy"));
+        exportName = element.hasAttribute("exportName") ? element.getAttribute("exportName") : name;
         className = element.getAttribute("className");
         minimumPlayerVersion = element.getAttribute("minimumPlayerVersion");
         width = Integer.parseInt(element.getAttribute("width"));

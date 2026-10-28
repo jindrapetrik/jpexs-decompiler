@@ -1,0 +1,80 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem SubClasses/FListBoxItem" itemID="3b843836-0000002f" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="FListItemSymbol" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem SubClasses/FListBoxItem" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3b843836-0000002f">
+  <timeline>
+    <DOMTimeline name="FListBoxItem">
+      <layers>
+        <DOMLayer name="Actions" color="#4FFF4F" locked="true" current="true" isSelected="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip 3
+/*
+		FListItemClass
+		EXTENDS FSelectableItemClass
+		This is mostly a code stubb for extension purposes.
+*/
+
+function FListItemClass()
+{
+	this.init();
+}
+
+FListItemClass.prototype = new FSelectableItemClass();
+Object.registerClass("FListItemSymbol", FListItemClass);
+
+#endinitclip
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="SuperClass" color="#4FFF4F" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem" name="superClassAsset" uniqueID="1">
+                  <matrix>
+                    <Matrix a="0.0001220703125" d="0.0005340576171875"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4.2.1'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Virtual Assets" color="#FFFF4F" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Component Skins/Global Skins/FLabel" name="labelAsset" uniqueID="2">
+                  <matrix>
+                    <Matrix a="0.0114898681640625" d="0.0539093017578125"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4.2.2'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

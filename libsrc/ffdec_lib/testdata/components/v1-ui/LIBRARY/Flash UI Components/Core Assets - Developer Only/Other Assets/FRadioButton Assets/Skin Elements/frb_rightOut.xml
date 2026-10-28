@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_rightOut" itemID="3bbe8eaa-00000043" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_rightOut" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bbe8eaa-00000043">
+  <timeline>
+    <DOMTimeline name="frb_rightOut" guides='&lt;guidelines&gt;&lt;guideline direction="v"&gt;0&lt;/guideline&gt;&lt;guideline direction="h"&gt;0&lt;/guideline&gt;&lt;guideline direction="v"&gt;8&lt;/guideline&gt;&lt;guideline direction="h"&gt;8&lt;/guideline&gt;&lt;/guidelines&gt;'>
+      <layers>
+        <DOMLayer name="Layer 1" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <matrix>
+                    <Matrix tx="-57.4" ty="730.8"/>
+                  </matrix>
+                  <members>
+                    <DOMShape>
+                      <matrix>
+                        <Matrix tx="-57.4" ty="730.8"/>
+                      </matrix>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#808080"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!1289 -14616|1275 -14602!1275 -14602[1298 -14577 1298 -14546!1298 -14546[1298 -14512 1275 -14489!1275 -14489[1251 -14466 1218 -14466!1218 -14466[1183 -14466 1162 -14489!1162 -14489|1148 -14475!1148 -14475[1177 -14446 1218 -14446!1218
+ -14446[1259 -14446 1289 -14475!1289 -14475[1318 -14504 1318 -14546!1318 -14546[1318 -14587 1289 -14616"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

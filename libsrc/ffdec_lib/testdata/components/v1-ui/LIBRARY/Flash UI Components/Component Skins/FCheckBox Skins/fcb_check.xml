@@ -1,0 +1,48 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Component Skins/FCheckBox Skins/ fcb_check" itemID="3bd77b3e-000002a6" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Component Skins/FCheckBox Skins/ fcb_check" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd77b3e-000002a6">
+  <timeline>
+    <DOMTimeline name=" fcb_check" guides='&lt;guidelines&gt;&lt;guideline direction="v"&gt;2&lt;/guideline&gt;&lt;guideline direction="h"&gt;3&lt;/guideline&gt;&lt;guideline direction="v"&gt;10&lt;/guideline&gt;&lt;guideline direction="h"&gt;10&lt;/guideline&gt;&lt;/guidelines&gt;'>
+      <layers>
+        <DOMLayer name="README" color="#FF4F4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[var component = _parent._parent;
+//::: don't delete the above
+
+//::: SKIN ELEMENT REGISTRATION
+/*      To add styleFormat properties to your skins :
+   1) Break up your skin into individual movie clips (skinElements)
+   2) add a registerSkinElement line of code for each skinElement
+
+component.registerSkinElement(skinElement, propertyName)
+// makes the skinElement Listen to the propertyName specified (eg: "background")
+
+																		  n*/
+
+component.registerSkinElement(check_mc, "check");
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="skin element" color="#4F80FF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_check" name="check_mc">
+                  <matrix>
+                    <Matrix tx="2.9" ty="3.15"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

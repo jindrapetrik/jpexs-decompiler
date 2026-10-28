@@ -1,4 +1,5 @@
-// Generic authoring preview. Component implementations come from the input SWF.
+// Generic AVM1 authoring preview, compiled for SWF 6 to support Flash MX.
+// Component implementations come from the input SWF.
 _global.isLivePreview = true;
 Stage.align = "TL";
 Stage.scaleMode = "noScale";
@@ -84,9 +85,13 @@ function readPreviewValue() {
 }
 
 function currentPreview() {
-    if (typeof _root.instanceID == "undefined") return previewComponent;
-    var name = "previewInstance" + _root.instanceID;
-    if (!_root[name]) previewComponent.duplicateMovieClip(name, Number(_root.instanceID) + 100);
+    if (typeof _root.instanceID == "undefined" && !_root.previewLegacy) return previewComponent;
+    var id = typeof _root.instanceID == "undefined" ? 0 : Number(_root.instanceID);
+    var name = "previewInstance" + id;
+    if (!_root[name]) {
+        if (_root.previewLegacy) _root.attachMovie(_root.previewLinkageID, name, id + 100);
+        else previewComponent.duplicateMovieClip(name, id + 100);
+    }
     return _root[name];
 }
 
@@ -94,7 +99,10 @@ function onSizeMulti() {
     var component = currentPreview();
     var width = typeof _root.instanceID == "undefined" ? _root.previewWidth : Number(_root.instanceWidth);
     var height = typeof _root.instanceID == "undefined" ? _root.previewHeight : Number(_root.instanceHeight);
-    if (component.setSize && width > 0 && height > 0) component.setSize(width, height);
+    if (component.setSize && width > 0 && height > 0) {
+        if (_root.previewLegacy && _root.previewKind == "ScrollBar") component.setSize(component.horizontal ? width : height);
+        else component.setSize(width, height);
+    }
 }
 
 function onDrawMulti() {
@@ -105,17 +113,28 @@ function onDrawMulti() {
 }
 
 function onUpdate() {
-    var component = currentPreview();
+    var values = {};
     for (var key in xch) {
         var name = key.indexOf("def_") == 0 ? key.substring(4) : key;
-        component[name] = xch[key];
+        values[name] = xch[key];
     }
     if (_root.flashlet) {
         previewText = unescape(_root.flashlet);
         previewPosition = 0;
-        var values = readPreviewValue();
-        for (var property in values) component[property] = values[property];
+        var properties = readPreviewValue();
+        for (var property in properties) values[property] = properties[property];
     }
+    // MX components read their parameters in the constructor, before frame 1.
+    // Recreate the preview with the same initial-value object as the authoring host.
+    if (_root.previewLegacy) {
+        var id = typeof _root.instanceID == "undefined" ? 0 : Number(_root.instanceID);
+        var name = "previewInstance" + id;
+        if (_root[name]) _root[name].removeMovieClip();
+        _root.attachMovie(_root.previewLinkageID, name, id + 100, values);
+    }
+    var component = currentPreview();
+    for (var property in values) component[property] = values[property];
+    if (_root.previewLegacy && values.labels != undefined && component.setDataProvider) component.setDataProvider(values.labels);
     if (component.onUpdate) component.onUpdate();
     onSizeMulti();
     onDrawMulti();

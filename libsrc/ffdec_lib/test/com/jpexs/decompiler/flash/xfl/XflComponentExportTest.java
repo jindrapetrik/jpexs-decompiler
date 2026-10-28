@@ -17,6 +17,10 @@
 package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.flash.fla.reader.BinaryData;
+import com.jpexs.flash.fla.reader.BinaryFlaDocument;
+import com.jpexs.flash.fla.reader.BinaryFlaReader;
+import com.jpexs.flash.fla.reader.FlaRecord;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -32,14 +36,19 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineSceneAndFrameLabelDataTag;
+import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.helpers.ByteArrayRange;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -55,6 +64,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.imageio.ImageIO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -822,6 +832,412 @@ public class XflComponentExportTest {
         try {
             Map<String, byte[]> files = export(movie("as2-ui"), directory, true, false);
             Assert.assertFalse(text(files.get("DOMDocument.xml")).contains("DOMCompiledClipItem"));
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @DataProvider(name = "jpegComponentPreviews")
+    public Object[][] jpegComponentPreviews() {
+        return new Object[][]{
+            {"v1-ui", "FScrollBarSymbol", "component_v1_scrollbar.swf"},
+            {"as2-ui", "Button", "component_as2_button.swf"}
+        };
+    }
+
+    @Test(dataProvider = "jpegComponentPreviews")
+    public void componentPreviewsRetainJpegTablesAndDecodeTheirBitmaps(String fixture, String linkage, String previewFile) throws Exception {
+        Path directory = Files.createTempDirectory("ffdec-component-jpeg-");
+        try {
+            SWF swf = movie(fixture);
+            BufferedImage image = new BufferedImage(4, 3, BufferedImage.TYPE_INT_RGB);
+            for (int y = 0; y < image.getHeight(); y++) {
+                for (int x = 0; x < image.getWidth(); x++) {
+                    image.setRGB(x, y, 0xD0D0D0);
+                }
+            }
+            ByteArrayOutputStream jpeg = new ByteArrayOutputStream();
+            Assert.assertTrue(ImageIO.write(image, "jpeg", jpeg));
+            DefineBitsTag bitmap = new DefineBitsTag(swf);
+            bitmap.jpegData = new ByteArrayRange(jpeg.toByteArray());
+            swf.addTag(0, bitmap);
+            // DefineBits requires the tag even when the JPEG has its own tables.
+            JPEGTablesTag tables = new JPEGTablesTag(swf);
+            swf.addTag(0, tables);
+            DefineSpriteTag component = (DefineSpriteTag) swf.getCharacterByExportName(linkage);
+            component.addTag(0, new PlaceObject2Tag(swf, false, 300, bitmap.getCharacterId(),
+                    new MATRIX(), null, -1, "jpegSkin", -1, null));
+            byte[] original = bytes(swf);
+            Map<String, byte[]> files = export(swf, directory, true, true);
+            SWF preview = new SWF(new ByteArrayInputStream(files.get("bin/" + previewFile)), false);
+            Assert.assertNotNull(preview.getJtt(), "Missing JPEG tables turns the component skin red");
+            Assert.assertEquals(preview.getJtt().jpegData.getRangeData(), tables.jpegData.getRangeData());
+            ImageTag restored = (ImageTag) preview.getCharacter(bitmap.getCharacterId());
+            Assert.assertNotNull(restored);
+            BufferedImage expected = ImageIO.read(bitmap.getOriginalImageData());
+            BufferedImage actual = ImageIO.read(restored.getOriginalImageData());
+            Assert.assertEquals(actual.getWidth(), expected.getWidth());
+            Assert.assertEquals(actual.getHeight(), expected.getHeight());
+            Assert.assertEquals(actual.getRGB(0, 0, actual.getWidth(), actual.getHeight(), null, 0, actual.getWidth()),
+                    expected.getRGB(0, 0, expected.getWidth(), expected.getHeight(), null, 0, expected.getWidth()));
+            Assert.assertEquals(bytes(swf), original);
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @DataProvider(name = "v1Inputs")
+    public Object[][] v1Inputs() {
+        return new Object[][]{{"v1-ui", false}, {"v1-ui", true}, {"v1-ui-mx", false}, {"v1-ui-mx", true}};
+    }
+
+    @Test(dataProvider = "v1Inputs")
+    public void restoresFlashMxComponentsAndInitializationOrder(String fixture, boolean compressed) throws Exception {
+        Path directory = Files.createTempDirectory("ffdec-v1-ui-");
+        try {
+            SWF swf = movie(fixture);
+            Assert.assertEquals(swf.version, 6, "MX references must retain case-insensitive SWF 6 semantics");
+            byte[] original = bytes(swf);
+            Map<String, byte[]> files = export(swf, directory, compressed, true);
+            org.w3c.dom.Document main = document(files);
+            Assert.assertEquals(ComponentConverter.elements(main.getDocumentElement(), "DOMComponentInstance").size(), 7);
+            Assert.assertTrue(ComponentConverter.elements(main.getDocumentElement(), "DOMCompiledClipItem").isEmpty());
+            java.util.Set<String> folders = new java.util.HashSet<>();
+            for (org.w3c.dom.Element folder : ComponentConverter.elements(main.getDocumentElement(), "DOMFolderItem")) {
+                String name = folder.getAttribute("name");
+                Assert.assertTrue(name.startsWith("Component Assets"), name);
+                if (name.contains("/")) {
+                    Assert.assertTrue(folders.contains(name.substring(0, name.lastIndexOf('/'))), "Missing parent before " + name);
+                }
+                folders.add(name);
+            }
+            Map<String, org.w3c.dom.Element> byExport = new LinkedHashMap<>();
+            for (Map.Entry<String, byte[]> file : files.entrySet()) {
+                if (!file.getKey().startsWith("LIBRARY/") || !file.getKey().endsWith(".xml")) {
+                    continue;
+                }
+                org.w3c.dom.Element item = xml(text(file.getValue())).getDocumentElement();
+                if (item.hasAttribute("linkageIdentifier")) {
+                    byExport.put(item.getAttribute("linkageIdentifier"), item);
+                }
+                Assert.assertFalse(item.hasAttribute("linkageClassName"), item.getAttribute("name"));
+                if (!"DOMComponentItem".equals(item.getLocalName())) {
+                    Assert.assertTrue(item.getAttribute("name").startsWith("Component Assets/"), item.getAttribute("name"));
+                }
+            }
+            Map<String, ComponentDefinition> schemas = ComponentDefinition.load(swf, "as1_component_definitions.xml");
+            for (ComponentDefinition definition : schemas.values()) {
+                org.w3c.dom.Element item = byExport.get(definition.exportName);
+                Assert.assertNotNull(item, definition.name);
+                Assert.assertEquals(item.getLocalName(), "DOMComponentItem");
+                Assert.assertEquals(item.getAttribute("name"), definition.name);
+                Assert.assertEquals(item.getAttribute("customIconID"), definition.iconId);
+                SWF preview = new SWF(new ByteArrayInputStream(files.get("bin/" + item.getAttribute("livePreviewScmHRef"))), false);
+                Assert.assertFalse(preview.isAS3());
+                Assert.assertEquals(preview.version, swf.version);
+                Assert.assertEquals(preview.displayRect.getWidth(), definition.width * 20);
+                Assert.assertEquals(ComponentConverter.elements(item, "parametersAsXML").get(0).getFirstChild().getNodeType(),
+                        org.w3c.dom.Node.CDATA_SECTION_NODE);
+            }
+            int priority = 1;
+            for (Tag tag : swf.getTags()) {
+                if (!(tag instanceof com.jpexs.decompiler.flash.tags.DoInitActionTag)) {
+                    continue;
+                }
+                String name = swf.getExportName(((com.jpexs.decompiler.flash.tags.DoInitActionTag) tag).spriteId);
+                org.w3c.dom.Element item = byExport.get(name);
+                Assert.assertNotNull(item, name);
+                String source = ComponentConverter.elements(item, "script").get(0).getTextContent();
+                Assert.assertTrue(source.startsWith("#initclip " + priority++ + "\n"), source.substring(0, Math.min(50, source.length())));
+                if ("DOMComponentItem".equals(item.getLocalName())) {
+                    Assert.assertTrue(source.contains("Object.registerClass"), name);
+                }
+            }
+            String source = text(files.get("DOMDocument.xml"));
+            Assert.assertTrue(source.contains(fixture.equals("v1-ui") ? "Sample PushButton" : "Hello"));
+            if (fixture.equals("v1-ui")) {
+                Assert.assertTrue(source.contains("First,Second,Third"));
+            }
+            Assert.assertFalse(source.contains("on(initialize)"));
+            Assert.assertEquals(bytes(swf), original);
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test(dataProvider = "v1Inputs")
+    public void binaryMxExportRetainsEditableComponentDefinitionsAndInstanceValues(String fixture, boolean scripts) throws Exception {
+        Path directory = Files.createTempDirectory("ffdec-v1-binary-mx-");
+        try {
+            SWF swf = movie(fixture);
+            byte[] original = bytes(swf);
+            XFLExportSettings settings = new XFLExportSettings();
+            settings.compressed = true;
+            settings.exportScript = scripts;
+            Path file = directory.resolve("components.fla");
+            swf.exportXfl(null, file.toString(), "components.swf", "Test", "Test", "1", false, FLAVersion.MX, settings, null);
+            BinaryFlaDocument model = new BinaryFlaReader().read(file.toFile());
+            Assert.assertTrue(model.getIssues().isEmpty(), model.getIssues().toString());
+            Map<Long, String> components = new LinkedHashMap<>();
+            for (FlaRecord descriptor : model.getLibraryDescriptors()) {
+                if (Long.valueOf(1).equals(descriptor.get("legacyComponentEnabled"))) {
+                    components.put(((Number) descriptor.get("libraryId")).longValue(), (String) descriptor.get("name"));
+                    Assert.assertTrue(((Number) descriptor.get("legacyComponentIconId")).intValue() > 0);
+                    Assert.assertFalse(mxEntries((FlaRecord) descriptor.get("properties")).isEmpty());
+                    @SuppressWarnings("unchecked")
+                    List<FlaRecord> movies = (List<FlaRecord>) descriptor.get("legacyMovies");
+                    Assert.assertTrue(((BinaryData) movies.get(1).get("data")).size() > 0);
+                }
+            }
+            Assert.assertEquals(components.size(), scripts ? 7 : 0);
+            if (scripts) {
+                for (BinaryFlaDocument.Page page : model.getPages()) {
+                    List<FlaRecord> nested = new ArrayList<>();
+                    mxInstances(page.getRoot(), nested);
+                    for (FlaRecord instance : nested) {
+                        FlaRecord actions = (FlaRecord) instance.get("actions");
+                        Assert.assertTrue(actions == null || !String.valueOf(actions.get("source")).contains("on(initialize)"),
+                                "Empty private SmartClip initializers must not become invalid MX source");
+                    }
+                }
+                List<FlaRecord> instances = new ArrayList<>();
+                for (FlaRecord scene : model.getSceneDescriptors()) {
+                    mxInstances(model.getStream((String) scene.get("streamName")).getRoot(), instances);
+                }
+                int count = 0;
+                for (FlaRecord instance : instances) {
+                    String name = components.get(((Number) instance.get("libraryId")).longValue());
+                    if (name == null) {
+                        continue;
+                    }
+                    count++;
+                    for (FlaRecord parameter : mxEntries((FlaRecord) instance.get("properties"))) {
+                        FlaRecord value = (FlaRecord) parameter.get("value");
+                        if ("PushButton".equals(name) && "label".equals(parameter.get("variableName"))) {
+                            Assert.assertEquals(mxEntries(value).get(0).get("value"), fixture.equals("v1-ui") ? "Sample PushButton" : "Hello");
+                        }
+                        if (fixture.equals("v1-ui") && "labels".equals(parameter.get("variableName"))) {
+                            Assert.assertEquals(((Number) value.get("type")).intValue(), 2);
+                            Assert.assertEquals(mxEntries(value).size(), 3);
+                            Assert.assertEquals(mxEntries(value).get(1).get("value"), "Second");
+                        }
+                    }
+                }
+                Assert.assertEquals(count, 7);
+            }
+            Assert.assertEquals(bytes(swf), original);
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test
+    public void binaryMx2004ExportRetainsCompiledAs2ComponentsAndParameters() throws Exception {
+        Path directory = Files.createTempDirectory("ffdec-as2-binary-mx2004-");
+        try {
+            SWF swf = movie("as2-ui");
+            byte[] original = bytes(swf);
+            XFLExportSettings settings = new XFLExportSettings();
+            settings.compressed = true;
+            Path file = directory.resolve("components.fla");
+            swf.exportXfl(null, file.toString(), "components.swf", "Test", "Test", "1", false, FLAVersion.MX2004, settings, null);
+            BinaryFlaDocument model = new BinaryFlaReader().read(file.toFile());
+            Assert.assertTrue(model.getIssues().isEmpty(), model.getIssues().toString());
+            Assert.assertEquals(model.getMediaDescriptors().stream().filter(r -> "CSwfPage".equals(r.getClassName())).count(), 22L);
+            List<FlaRecord> instances = new ArrayList<>();
+            for (FlaRecord scene : model.getSceneDescriptors()) {
+                compiledInstances(model.getStream((String) scene.get("streamName")).getRoot(), instances);
+            }
+            Assert.assertEquals(instances.size(), 22);
+            FlaRecord button = instances.stream().filter(r -> "sampleButton".equals(r.get("instanceName"))).findFirst().get();
+            FlaRecord label = mxEntries((FlaRecord) button.get("properties")).stream()
+                    .filter(r -> "label".equals(r.get("variableName"))).findFirst().get();
+            Assert.assertEquals(mxEntries((FlaRecord) label.get("value")).get(0).get("value"), "Sample Button");
+            Assert.assertEquals(((Number) button.get("transformationPointX")).intValue(), button.getMatrix().getWords()[4]);
+            Assert.assertEquals(((Number) button.get("transformationPointY")).intValue(), button.getMatrix().getWords()[5]);
+            Assert.assertEquals(bytes(swf), original);
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    private void compiledInstances(FlaRecord record, List<FlaRecord> instances) {
+        if ("CPicSwf".equals(record.getClassName())) {
+            instances.add(record);
+        }
+        for (FlaRecord child : record.getChildren()) {
+            compiledInstances(child, instances);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<FlaRecord> mxEntries(FlaRecord r) {
+        return (List<FlaRecord>) r.get("entries");
+    }
+
+    @Test
+    public void privateMxInitializersAreRemovedOnlyWhenEmptyAndUnmixed() throws Exception {
+        SWF swf = movie("v1-ui-mx");
+        ComponentConverter converter = new ComponentConverter(swf);
+        com.jpexs.decompiler.flash.types.CLIPACTIONRECORD empty = null;
+        for (com.jpexs.decompiler.flash.tags.base.ASMSource source : swf.getASMs(false).values()) {
+            if (source instanceof com.jpexs.decompiler.flash.types.CLIPACTIONRECORD) {
+                com.jpexs.decompiler.flash.types.CLIPACTIONRECORD record = (com.jpexs.decompiler.flash.types.CLIPACTIONRECORD) source;
+                if (record.eventFlags.clipEventInitialize && record.getActions().stream().allMatch(action -> action.getActionCode() == 0)) {
+                    empty = record;
+                    break;
+                }
+            }
+        }
+        Assert.assertNotNull(empty, "Native MX must exercise an empty private initializer");
+        Assert.assertTrue(converter.isConsumedClipAction(empty));
+        empty.eventFlags.clipEventLoad = true;
+        Assert.assertFalse(new ComponentConverter(swf).isConsumedClipAction(empty));
+        empty.eventFlags.clipEventLoad = false;
+        empty.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, empty)
+                .actionsFromString("on(initialize){trace('Keep private MX handler');}", swf.getCharset()));
+        SWF.uncache(empty);
+        Assert.assertFalse(new ComponentConverter(swf).isConsumedClipAction(empty));
+    }
+
+    private void mxInstances(FlaRecord r, List<FlaRecord> instances) {
+        if (r.getClassName().equals("CPicSprite")) {
+            instances.add(r);
+        }
+        for (FlaRecord child : r.getChildren()) {
+            mxInstances(child, instances);
+        }
+    }
+
+    @Test(dataProvider = "formats")
+    public void restoresOriginalMxPushButton(boolean compressed) throws Exception {
+        Path directory = Files.createTempDirectory("ffdec-v1-button-");
+        try {
+            Map<String, byte[]> files = export(movie("v1-button"), directory, compressed, true);
+            Assert.assertEquals(ComponentConverter.elements(document(files).getDocumentElement(), "DOMComponentInstance").size(), 1);
+            org.w3c.dom.Element button = xml(text(files.get("LIBRARY/PushButton.xml"))).getDocumentElement();
+            Assert.assertEquals(button.getLocalName(), "DOMComponentItem");
+            Assert.assertEquals(button.getAttribute("customIconID"), "1");
+            Assert.assertEquals(button.getAttribute("linkageIdentifier"), "FPushButtonSymbol");
+            Assert.assertTrue(text(files.get("DOMDocument.xml")).contains("defaultValue=\"Hello\""));
+            Assert.assertFalse(files.containsKey("LIBRARY/CheckBox.xml"));
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test
+    public void unknownMxInitializeCodeKeepsItsRegistrationAndUserCode() throws Exception {
+        SWF swf = movie("v1-button");
+        PlaceObjectTypeTag button = null;
+        for (Tag tag : swf.getTags()) {
+            if (tag instanceof PlaceObjectTypeTag) {
+                button = (PlaceObjectTypeTag) tag;
+                break;
+            }
+        }
+        Assert.assertNotNull(button);
+        com.jpexs.decompiler.flash.types.CLIPACTIONRECORD record = button.getClipActions().clipActionRecords.get(0);
+        record.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, record)
+                .actionsFromString("on(initialize){ label = 'Hello'; customMxInit(); }", swf.getCharset()));
+        Path directory = Files.createTempDirectory("ffdec-v1-custom-init-");
+        try {
+            Map<String, byte[]> files = export(swf, directory, true, true);
+            Assert.assertTrue(ComponentConverter.elements(document(files).getDocumentElement(), "DOMComponentInstance").isEmpty());
+            Assert.assertTrue(text(files.get("DOMDocument.xml")).contains("customMxInit()"));
+            boolean registered = false;
+            for (Map.Entry<String, byte[]> file : files.entrySet()) {
+                if (file.getKey().startsWith("LIBRARY/") && file.getKey().endsWith(".xml")) {
+                    org.w3c.dom.Element item = xml(text(file.getValue())).getDocumentElement();
+                    if ("FPushButtonSymbol".equals(item.getAttribute("linkageIdentifier"))) {
+                        Assert.assertFalse(item.hasAttribute("linkageClassName"));
+                        Assert.assertTrue(text(file.getValue()).contains("Object.registerClass"));
+                        registered = true;
+                    }
+                }
+            }
+            Assert.assertTrue(registered);
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test
+    public void v1RequiresMatchingClassRegistrationAndHonorsScriptExportSetting() throws Exception {
+        SWF swf = movie("v1-button");
+        int id = swf.getCharacterByExportName("FPushButtonSymbol").getCharacterId();
+        for (Tag tag : swf.getTags()) {
+            if (tag instanceof com.jpexs.decompiler.flash.tags.DoInitActionTag
+                    && ((com.jpexs.decompiler.flash.tags.DoInitActionTag) tag).spriteId == id) {
+                com.jpexs.decompiler.flash.tags.DoInitActionTag action = (com.jpexs.decompiler.flash.tags.DoInitActionTag) tag;
+                action.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, action)
+                        .actionsFromString("Object.registerClass('FPushButtonSymbol', CustomClass);", swf.getCharset()));
+            }
+        }
+        Assert.assertFalse(new ComponentConverter(swf).isComponent(swf.getCharacter(id)));
+        Path directory = Files.createTempDirectory("ffdec-v1-no-script-");
+        try {
+            Map<String, byte[]> files = export(movie("v1-button"), directory, true, false);
+            Assert.assertTrue(ComponentConverter.elements(document(files).getDocumentElement(), "DOMComponentInstance").isEmpty());
+            Assert.assertFalse(text(files.get("DOMDocument.xml")).contains("parametersAsXML"));
+        } finally {
+            cleanup(directory);
+        }
+    }
+
+    @Test
+    public void nestedMxComponentKeepsUserHandlersOutsideItsPreview() throws Exception {
+        SWF swf = movie("v1-button");
+        PlaceObjectTypeTag button = null;
+        for (Tag tag : swf.getTags()) {
+            if (tag instanceof PlaceObjectTypeTag) {
+                button = (PlaceObjectTypeTag) tag;
+                break;
+            }
+        }
+        Assert.assertNotNull(button);
+        com.jpexs.decompiler.flash.types.CLIPACTIONS actions = button.getClipActions();
+        com.jpexs.decompiler.flash.types.CLIPACTIONRECORD release = new com.jpexs.decompiler.flash.types.CLIPACTIONRECORD(swf, (Tag) button);
+        release.setParentClipActions(actions);
+        release.eventFlags.clipEventRelease = true;
+        release.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, release)
+                .actionsFromString("on(release){ trace('Keep MX handler'); }", swf.getCharset()));
+        actions.clipActionRecords.add(release);
+        swf.removeTag((Tag) button);
+        DefineSpriteTag wrapper = new DefineSpriteTag(swf);
+        wrapper.frameCount = 1;
+        wrapper.addTag((Tag) button);
+        wrapper.addTag(new ShowFrameTag(swf));
+        swf.addTag(wrapper);
+        swf.addTag(new PlaceObject2Tag(swf, false, 30, wrapper.spriteId, new MATRIX(), null, -1, "wrapper", -1, null));
+        com.jpexs.decompiler.flash.tags.DoActionTag frame = new com.jpexs.decompiler.flash.tags.DoActionTag(swf);
+        frame.setActions(new com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser(swf, frame)
+                .actionsFromString("trace('Keep MX frame');", swf.getCharset()));
+        swf.addTag(0, frame);
+        Path directory = Files.createTempDirectory("ffdec-v1-nested-");
+        try {
+            Map<String, byte[]> files = export(swf, directory, true, true);
+            Assert.assertTrue(text(files.get("DOMDocument.xml")).contains("Keep MX frame"));
+            boolean nested = false;
+            for (Map.Entry<String, byte[]> file : files.entrySet()) {
+                if (file.getKey().startsWith("LIBRARY/") && file.getKey().endsWith(".xml")) {
+                    String source = text(file.getValue());
+                    if (source.contains("DOMComponentInstance") && source.contains("Keep MX handler")) {
+                        Assert.assertTrue(source.contains("Hello"));
+                        Assert.assertFalse(source.contains("on(initialize)"));
+                        nested = true;
+                    }
+                }
+            }
+            Assert.assertTrue(nested);
+            org.w3c.dom.Element item = xml(text(files.get("LIBRARY/PushButton.xml"))).getDocumentElement();
+            SWF preview = new SWF(new ByteArrayInputStream(files.get("bin/" + item.getAttribute("livePreviewScmHRef"))), false);
+            Assert.assertNull(preview.getCharacter(wrapper.spriteId));
+            for (Tag tag : preview.getTags()) {
+                if (tag instanceof com.jpexs.decompiler.flash.tags.DoActionTag) {
+                    Assert.assertFalse(java.util.Arrays.equals(tag.getData(), frame.getData()));
+                }
+            }
         } finally {
             cleanup(directory);
         }

@@ -1,0 +1,278 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/ ListBox" itemID="3bd472ce-00000282" linkageExportForAS="true" linkageIdentifier="FListBoxSymbol" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/ ListBox" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd472ce-00000282" tooltip="List Box" customIconID="4" descriptionType="reference" livePreviewScmHRef="ikbqlnmjzz.swf" livePreviewScmSourceFilename="D:\depot\main\frameworks\UIcontrols\live_previews\listBox_live.swf" persistLivePreview11="true" symbolDescription="UI Components/FListBox" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name=" ListBox">
+      <layers>
+        <DOMLayer name="Methods" color="#FF4F4F" current="true" isSelected="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip 3
+/*
+		FListBoxClass
+		EXTENDS FSelectableListClass
+		IMPLEMENTS FListItemClass
+		
+		This class is the manager of the items within it. 
+*/
+
+function FListBoxClass()
+{
+	this.itemSymbol = "FListItemSymbol";
+	this.init();
+	
+	// Test any params for undefined; if so, set defaults
+	
+	this.permaScrollBar = true;
+
+	for (var i=0; i<this.labels.length; i++) {
+		this.addItem(this.labels[i], this.data[i]);
+	}
+	this.boundingBox_mc.gotoAndStop(1);
+	this.width = this._width;
+	this.height = this._height;
+	this._yscale = this._xscale = 100;
+	this.setSize(this.width, this.height);
+	if (this.changeHandler.length>0) {
+		this.setChangeHandler(this.changeHandler);
+	}
+	
+}
+
+FListBoxClass.prototype = new FScrollSelectListClass();
+
+Object.registerClass("FListBoxSymbol", FListBoxClass);
+
+
+
+// 	::: PUBLIC METHODS
+
+FListBoxClass.prototype.getSelectedIndices = function() 
+{
+	var tmpArray = new Array();
+	for (var i in this.selected) {
+		tmpArray.push(this.selected[i].sIndex);
+	}
+	return (tmpArray.length>0) ? tmpArray : undefined;
+}
+
+FListBoxClass.prototype.getSelectedItems = function() 
+{
+	var indices = this.getSelectedIndices();
+	var tmpArray= new Array();
+	for (var i=0; i<indices.length; i++) {
+		tmpArray.push(this.getItemAt(indices[i]));
+	}
+	return (tmpArray.length>0) ? tmpArray : undefined;
+}
+
+FListBoxClass.prototype.getSelectMultiple = function() 
+{
+	return this.selectMultiple;
+}
+
+FListBoxClass.prototype.getRowCount = function() 
+{
+	return this.numDisplayed;
+}
+
+FListBoxClass.prototype.setSelectedIndices = function(indexArray) 
+{
+	this.clearSelected();
+	for (var i=0; i<indexArray.length; i++) {
+		this.selectItem(indexArray[i], true);
+	}
+	this.updateControl();
+}
+
+FListBoxClass.prototype.setSelectMultiple = function(flag) 
+{
+	this.selectMultiple = flag;
+}
+
+FListBoxClass.prototype.setRowCount = function(count) 
+{
+	var hgt = count *(this.itmHgt-2) + 2;
+	this.setSize(this.width, hgt);
+}
+
+FListBoxClass.prototype.setWidth = function(wdt)
+{
+	this.setSize(wdt, this.height);
+}
+
+FListBoxClass.prototype.setSize = function(w,h) 
+{
+	if (!this.enable) {
+		return;
+	}
+	w = Math.max(w, 20);
+	h = Math.max(h, 40);
+	this.container_mc.removeMovieClip();
+	
+	this.container_mc = this.createEmptyMovieClip("container", 3);
+
+	this.measureItmHgt();
+	this.numDisplayed = Math.floor(h / (this.itmHgt-2));
+	this.height = this.numDisplayed * (this.itmHgt-2) + 2;
+	super.setSize(w, this.height);
+}
+
+FListBoxClass.prototype.removeItemAt = function(index) 
+{
+	this.selectHolder = this.getSelectedIndices();
+	return super.removeItemAt(index);
+}
+
+
+//	:::  PRIVATE METHODS
+
+
+FListBoxClass.prototype.selectionHandler = function(itemNum) 
+{
+	if (this.clickFilter) {
+		var index = this.topDisplayed + itemNum;
+		if (this.getItemAt(index)==undefined) {
+			this.changeFlag=false;
+			return;
+		} else {
+			this.changeFlag = true;
+		}
+	
+		if ( ( !this.selectMultiple && !Key.isDown(Key.CONTROL) ) || ( !Key.isDown(Key.SHIFT) && !Key.isDown(Key.CONTROL) ) )  {
+			//Clear all other selections, this is a single click
+			this.clearSelected();
+			this.selectItem(index, true);
+			this.lastSelected = index;
+			this.container_mc["fListItem" + itemNum + "_mc"].drawItem(this.getItemAt(index), this.isSelected(index));
+		}
+		else if ( Key.isDown(Key.SHIFT) && this.selectMultiple) {
+			if (this.lastSelected==-1) {
+				this.lastSelected=index;
+			}
+			var incr = (this.lastSelected<index) ? 1 : -1;
+			this.clearSelected();
+			for (var i=this.lastSelected; i!=index; i+=incr) {
+				this.selectItem(i, true);
+				if (i>=this.topDisplayed && i<this.topDisplayed+this.numDisplayed) {
+					this.container_mc["fListItem" + (i-this.topDisplayed) + "_mc"].drawItem(this.getItemAt(i), this.isSelected(i));
+				}
+			}
+			this.selectItem(index, true);
+			this.container_mc["fListItem" + (index-this.topDisplayed) + "_mc"].drawItem(this.getItemAt(index), this.isSelected(index));
+		}
+		else if (key.isDown(Key.CONTROL)) {
+	
+			var selectedFlag = this.isSelected(index);
+			if (!this.selectMultiple) {
+				this.clearSelected();
+			}
+			if (!(!this.selectMultiple && selectedFlag)) {
+				this.selectItem(index, !selectedFlag);
+				this.container_mc["fListItem" + itemNum + "_mc"].drawItem(this.getItemAt(this.topDisplayed + itemNum), this.isSelected(this.topDisplayed+itemNum));
+			}
+			this.lastSelected=index;
+		}
+	} else {
+		this.clickFilter = true;
+	}
+}
+
+FListBoxClass.prototype.moveSelBy = function(itemNum) 
+{
+	super.moveSelBy(itemNum);
+	this.releaseHandler();
+}
+
+#endinitclip
+this.deadPreview._visible = false;
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Name" color="#4F80FF" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/ListBox Name" name="deadPreview" selected="true">
+                  <matrix>
+                    <Matrix tx="1" ty="1.25"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Bounding Box" color="#4F80FF" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Component Skins/Global Skins/FBoundingBox" name="boundingBox_mc">
+                  <matrix>
+                    <Matrix d="1.05000305175781"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="SuperClass" color="#808080" locked="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/ FSelectableList SubClasses/FScrollSelectList" name="superClassAsset" uniqueID="1">
+                  <matrix>
+                    <Matrix tx="8" ty="18"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4.1'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Item Assets" color="#FF4FFF" locked="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem SubClasses/FListBoxItem" name="itemAsset" selected="true">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="labels">
+      <Inspectable name="Labels" variable="labels" category="" verbose="0" defaultValue="" type="Array"/>
+   </property>
+   <property id="data">
+      <Inspectable name="Data" variable="data" category="" verbose="0" defaultValue="" type="Array"/>
+   </property>
+   <property id="selectMultiple">
+      <Inspectable name="Select Multiple" variable="selectMultiple" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="changeHandler">
+      <Inspectable name="Change Handler" variable="changeHandler" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

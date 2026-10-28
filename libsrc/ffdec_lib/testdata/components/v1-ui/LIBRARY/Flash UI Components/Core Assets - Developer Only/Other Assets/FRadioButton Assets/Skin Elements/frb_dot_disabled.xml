@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_dot_disabled" itemID="3bde081a-000002dd" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_dot_disabled" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bde081a-000002dd">
+  <timeline>
+    <DOMTimeline name="frb_dot_disabled">
+      <layers>
+        <DOMLayer name="element" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#666666"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!68 68[57 80 40 80!40 80[24 80 12 68!12 68[0 57 0 40!0 40[0 24 12 12!12 12[24 0 40 0!40 0[57 0 68 12!68 12[80 24 80 40!80 40[80 57 68 68"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

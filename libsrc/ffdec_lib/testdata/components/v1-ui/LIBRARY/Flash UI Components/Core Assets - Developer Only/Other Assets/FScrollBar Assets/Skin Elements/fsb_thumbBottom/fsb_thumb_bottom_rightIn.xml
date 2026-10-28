@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbBottom/fsb_thumb_bottom_rightIn" itemID="3bd4ab56-00001eb7" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbBottom/fsb_thumb_bottom_rightIn" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd4ab56-00001eb7">
+  <timeline>
+    <DOMTimeline name="fsb_thumb_bottom_rightIn">
+      <layers>
+        <DOMLayer name="element" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#E8E8E8"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!0 19|280 19!280 19|280 0!280 0|0 0!0 0|0 19"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

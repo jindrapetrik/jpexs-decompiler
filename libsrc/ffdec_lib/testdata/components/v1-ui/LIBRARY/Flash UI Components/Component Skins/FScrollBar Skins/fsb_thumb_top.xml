@@ -1,0 +1,71 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Component Skins/FScrollBar Skins/fsb_thumb_top" itemID="3b9d3e88-0000035b" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Component Skins/FScrollBar Skins/fsb_thumb_top" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3b9d3e88-0000035b">
+  <timeline>
+    <DOMTimeline name="fsb_thumb_top">
+      <layers>
+        <DOMLayer name="README" color="#FF4F4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[var component = _parent._parent;
+//::: don't delete the above
+
+//::: SKIN ELEMENT REGISTRATION
+/*      To add styleFormat properties to your skins :
+   1) Break up your skin into individual movie clips (skinElements)
+   2) add a registerSkinElement line of code for each skinElement
+
+component.registerSkinElement(skinElement, propertyName)
+// makes the skinElement Listen to the propertyName specified (eg: "background")
+
+																	  n*/
+component.registerSkinElement(shadow_mc, "shadow");
+component.registerSkinElement(darkshadow_mc, "darkshadow");
+component.registerSkinElement(highlight_mc, "highlight");
+component.registerSkinElement(highlight3D_mc, "highlight3D");
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Skin Elements" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbTop/fsb_thumb_top_leftOut" name="highlight3D_mc">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbTop/fsb_thumb_top_rightOut" name="darkshadow_mc">
+                  <matrix>
+                    <Matrix tx="15"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbTop/fsb_thumb_top_leftIn" name="highlight_mc">
+                  <matrix>
+                    <Matrix tx="1" ty="1"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbTop/fsb_thumb_top_rightIn" name="shadow_mc">
+                  <matrix>
+                    <Matrix tx="14" ty="1"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

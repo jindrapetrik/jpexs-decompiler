@@ -97,7 +97,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 /**
- * Restores the authoring representation of standard AS2 and AS3 components.
+ * Restores the authoring representation of standard AS1, AS2 and AS3 components.
  * Only complete, literal Flash-generated parameter initializers are consumed.
  * Unknown components and initializers remain ordinary symbols and source code.
  */
@@ -135,9 +135,13 @@ final class ComponentConverter {
     }
 
     ComponentConverter(SWF swf) throws IOException, InterruptedException {
+        this(swf, false);
+    }
+
+    ComponentConverter(SWF swf, boolean legacyOnly) throws IOException, InterruptedException {
         this.swf = swf;
-        as2 = swf.isAS3() ? null : new As2ComponentConverter(swf);
-        if (as2 != null) {
+        as2 = swf.isAS3() ? null : new As2ComponentConverter(swf, legacyOnly);
+        if (as2 != null || legacyOnly) {
             return;
         }
         for (ComponentDefinition definition : ComponentDefinition.load(swf).values()) {
@@ -176,6 +180,10 @@ final class ComponentConverter {
 
     boolean isBundledAs2Character(int characterId) {
         return as2 != null && as2.isBundledCharacter(characterId);
+    }
+
+    boolean isLegacyAs2Character(int characterId) {
+        return as2 != null && as2.isLegacyCharacter(characterId);
     }
 
     String as2Parameters(CharacterTag character, CLIPACTIONS actions) throws XMLStreamException {

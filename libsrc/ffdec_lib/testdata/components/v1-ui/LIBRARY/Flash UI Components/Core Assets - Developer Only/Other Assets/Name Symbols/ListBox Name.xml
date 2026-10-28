@@ -1,0 +1,30 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/ListBox Name" itemID="3bd76f2f-000000ba" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/ListBox Name" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd76f2f-000000ba">
+  <timeline>
+    <DOMTimeline name="ListBox Name">
+      <layers>
+        <DOMLayer name="asset" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#D4D0D8"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!1656 -26|1656 294!1656 294|1657 294!1657 294|1657 1627.5!1657 1627.5|1656 1627.5!1656 1627.5|1656 2071!1656 2071|1976 2071!1976 2071|1976 -26!1976 -26|1656 -26!1956 -6|1956 274!1956 274|1677 274!1677 274|1677 267.5!1677 267.5|1676 267.5
+!1676 267.5|1676 -6!1676 -6|1956 -6!1879 164|1820 96!1820 96[1818 95 1816 95!1816 95[1814 95 1813 96!1813 96|1753 164!1753 164|1753 165!1753 165[1752 167 1752 168!1752 168[1752 173 1757 173!1757 173|1875 173!1875 173[1880 173 1880 168
+!1880 168[1880 165 1879 164!1956 294|1956 1627.5!1956 1627.5|1955 1627.5!1955 1627.5|1955 1751!1955 1751|1677 1751!1677 1751|1677 294!1677 294|1956 294!1752 1877[1752 1880 1753 1881!1753 1881|1812 1949!1812 1949[1814 1950 1816 1950!1816
+ 1950[1818 1950 1819 1949!1819 1949|1879 1881!1879 1881|1879 1880!1879 1880[1880 1878 1880 1877!1880 1877[1880 1872 1875 1872!1875 1872|1757 1872!1757 1872[1752 1872 1752 1877!1956 1771|1956 2051!1956 2051|1676 2051!1676 2051|1676 1771
+!1676 1771|1956 1771"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>
