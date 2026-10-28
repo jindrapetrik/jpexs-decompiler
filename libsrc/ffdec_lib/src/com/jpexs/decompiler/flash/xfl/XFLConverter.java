@@ -4468,15 +4468,9 @@ public class XFLConverter {
         if (sprite == null && symbolId == -1) {
             String documentClass = swf.getDocumentClass();
             if (documentClass != null) {
-                try {
-                    List<ScriptPack> sps = swf.getScriptPacksByClassNames(Arrays.asList(documentClass));
-                    if (sps != null && !sps.isEmpty()) {
-                        characterScriptPack = sps.get(0);
-                    }
-                } catch (InterruptedException ex) {
-                    throw ex;
-                } catch (Exception ex) {
-                    //ignore
+                List<ScriptPack> sps = swf.getScriptPacksByClassNames(Arrays.asList(documentClass));
+                if (sps != null && !sps.isEmpty()) {
+                    characterScriptPack = sps.get(0);
                 }
             }
         }
@@ -5084,14 +5078,8 @@ public class XFLConverter {
         }
 
         List<String> allClasses = new ArrayList<>(characterClasses.values());
-        List<ScriptPack> packs = new ArrayList<>();
-        try {
-            packs = swf.getScriptPacksByClassNames(allClasses);
-        } catch (InterruptedException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            //ignore
-        }
+        List<ScriptPack> packs = swf.getScriptPacksByClassNames(allClasses);
+        
         for (ScriptPack pack : packs) {
             String packClass = pack.getClassPath().toRawString();
             if (classToId.containsKey(packClass)) {
@@ -5787,14 +5775,9 @@ public class XFLConverter {
 
             domDocument.writeEndElement();
         } catch (XMLStreamException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            throw ex;
-        } catch (Throwable ex) {
-            checkInterrupted();
-            logger.log(Level.SEVERE, null, ex);
+            throw new RuntimeException("Problem in XML export", ex);
         }
-
+        
         checkInterrupted();
         String domDocumentStr = prettyFormatXML(domDocument.toString());
 
