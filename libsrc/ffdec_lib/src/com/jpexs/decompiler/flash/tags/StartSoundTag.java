@@ -107,18 +107,18 @@ public class StartSoundTag extends Tag implements CharacterIdTag, StartSoundBase
     @Override
     public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         needed.add(soundId);
-    }        
+    }
 
     @Override
     public SOUNDINFO getSoundInfo() {
-       return soundInfo;
+        return soundInfo;
     }
 
     @Override
     public void setSoundInfo(SOUNDINFO soundInfo) {
         this.soundInfo = soundInfo;
     }
-    
+
     @Override
     public int getSoundId() {
         return soundId;

@@ -127,14 +127,6 @@ final class GeneratorTemplateConverter {
         instance(command, proxy, matrix, writer);
     }
 
-    void objectInstance(GenCommandTag command, CharacterTag character, String libraryName,
-            MATRIX matrix, XFLXmlWriter writer) throws XMLStreamException {
-        instance(command, character == null ? proxy : libraryName, matrix, writer);
-        if (character != null && character.getSwf().getCharacterIdTag(character.getCharacterId(), NameCharacterTag.ID) == null) {
-            removableMarkers.add(markers.get(command));
-        }
-    }
-
     private void instance(GenCommandTag command, String libraryName, MATRIX matrix,
             XFLXmlWriter writer) throws XMLStreamException {
         String marker = markers.get(command);
@@ -153,6 +145,14 @@ final class GeneratorTemplateConverter {
         writer.writeEndElement();
         writer.writeEndElement();
         writer.writeEndElement();
+    }
+        
+    void objectInstance(GenCommandTag command, CharacterTag character, String libraryName,
+            MATRIX matrix, XFLXmlWriter writer) throws XMLStreamException {
+        instance(command, character == null ? proxy : libraryName, matrix, writer);
+        if (character != null && character.getSwf().getCharacterIdTag(character.getCharacterId(), NameCharacterTag.ID) == null) {
+            removableMarkers.add(markers.get(command));
+        }
     }
 
     boolean isObjectCommand(CharacterTag character) {

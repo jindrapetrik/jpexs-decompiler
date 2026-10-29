@@ -97,11 +97,11 @@ public class StartSound2Tag extends Tag implements StartSoundBase {
     public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         int characterId = swf.getCharacterId(swf.getCharacterByClass(soundClassName));
         needed.add(characterId);
-    }        
-    
+    }
+
     @Override
     public SOUNDINFO getSoundInfo() {
-       return soundInfo;
+        return soundInfo;
     }
 
     @Override
