@@ -19,19 +19,27 @@ package com.jpexs.decompiler.flash.xfl;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
+import com.jpexs.decompiler.flash.tags.StartSound2Tag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.flash.fla.reader.BinaryFlaDocument;
 import com.jpexs.flash.fla.reader.BinaryFlaReader;
 import com.jpexs.flash.fla.reader.FlaRecord;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipFile;
@@ -154,6 +162,106 @@ public class XflVersionedExportTest {
         tag.depth = depth;
         tag.tabIndex = value;
         swf.addTag(tag);
+    }
+
+    private SWF soundMovie(boolean byClass) {
+        SWF swf = movie();
+        swf.frameCount = 3;
+        FileAttributesTag attributes = new FileAttributesTag(swf);
+        attributes.actionScript3 = true;
+        swf.addTag(attributes);
+        DefineSoundTag sound = new DefineSoundTag(swf);
+        sound.soundFormat = 3;
+        sound.soundRate = 3;
+        sound.soundSize = true;
+        sound.soundSampleCount = 32;
+        sound.soundData = new ByteArrayRange(new byte[64]);
+        swf.addTag(sound);
+        SymbolClassTag linkage = new SymbolClassTag(swf);
+        linkage.tags.add(sound.soundId);
+        linkage.names.add("TestSound");
+        swf.addTag(linkage);
+        swf.assignClassesToSymbols();
+        for (int frame = 0; frame < 3; frame++) {
+            if (frame != 1) {
+                SOUNDINFO info = new SOUNDINFO();
+                info.syncStop = frame == 2;
+                info.syncNoMultiple = frame == 0;
+                info.hasLoops = true;
+                info.loopCount = 3;
+                info.hasInPoint = true;
+                info.inPoint = 5;
+                info.hasOutPoint = true;
+                info.outPoint = 20;
+                if (byClass) {
+                    StartSound2Tag start = new StartSound2Tag(swf);
+                    start.soundClassName = "TestSound";
+                    start.soundInfo = info;
+                    swf.addTag(start);
+                } else {
+                    StartSoundTag start = new StartSoundTag(swf);
+                    start.soundId = sound.soundId;
+                    start.soundInfo = info;
+                    swf.addTag(start);
+                }
+            }
+            swf.addTag(new ShowFrameTag(swf));
+        }
+        return swf;
+    }
+
+    @Test
+    public void classBasedSoundEventsKeepTheirTimingAndPlaybackSettings() throws Exception {
+        Path file = Files.createTempFile("class-sound-", ".fla");
+        SWF source = soundMovie(true);
+        ByteArrayOutputStream before = new ByteArrayOutputStream();
+        source.saveTo(before);
+        try {
+            export(soundMovie(false), file, FLAVersion.CS6);
+            Document reference = document(file, "DOMDocument.xml");
+            export(source, file, FLAVersion.CS6);
+            Document result = document(file, "DOMDocument.xml");
+            NodeList expectedFrames = reference.getElementsByTagName("DOMFrame");
+            NodeList actualFrames = result.getElementsByTagName("DOMFrame");
+            assertEquals(actualFrames.getLength(), expectedFrames.getLength());
+            int events = 0;
+            for (int i = 0; i < expectedFrames.getLength(); i++) {
+                Element expected = (Element) expectedFrames.item(i);
+                Element actual = (Element) actualFrames.item(i);
+                for (String attribute : new String[]{"index", "duration", "soundName", "soundSync", "soundLoop", "inPoint44", "outPoint44"}) {
+                    assertEquals(actual.getAttribute(attribute), expected.getAttribute(attribute), attribute);
+                }
+                if (actual.hasAttribute("soundName")) {
+                    events++;
+                }
+            }
+            assertEquals(events, 2, "Keep both start and stop events");
+            export(source, file, FLAVersion.CS3);
+            List<FlaRecord> frames = mainFrames(file);
+            assertEquals(frames.stream().filter(f -> f.get("soundMediaId") instanceof Number
+                    && ((Number) f.get("soundMediaId")).longValue() != 0).count(), 2L);
+            ByteArrayOutputStream after = new ByteArrayOutputStream();
+            source.saveTo(after);
+            assertEquals(after.toByteArray(), before.toByteArray(), "Do not rewrite StartSound2 in the source");
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    @Test
+    public void unresolvedSoundClassDoesNotCreateAnInvalidSoundReference() throws Exception {
+        SWF swf = movie();
+        StartSound2Tag tag = new StartSound2Tag(swf);
+        tag.soundClassName = "MissingSound";
+        swf.addTag(tag);
+        swf.addTag(new ShowFrameTag(swf));
+        Path file = Files.createTempFile("missing-sound-", ".fla");
+        try {
+            export(swf, file, FLAVersion.CS6);
+            assertEquals(document(file, "DOMDocument.xml").getElementsByTagName("DOMSoundItem").getLength(), 0);
+        } finally {
+            Files.deleteIfExists(file);
+        }
     }
 
     @DataProvider(name = "tabIndexInstances")

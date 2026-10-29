@@ -95,6 +95,7 @@ import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -4099,9 +4100,23 @@ public class XFLConverter {
         List<SoundStreamFrameRange> soundStreamRanges = new ArrayList<>();
         int frame = 0;
         for (Tag t : timeLineTags) {
-            if (t instanceof StartSoundTag) {
-                StartSoundTag startSound = (StartSoundTag) t;
-                SWF swf = startSound.getSwf();
+            if (t instanceof StartSoundTag || t instanceof StartSound2Tag) {
+                SWF swf = t.getSwf();
+                StartSoundTag startSound;
+                if (t instanceof StartSound2Tag) {
+                    StartSound2Tag startSound2 = (StartSound2Tag) t;
+                    CharacterTag sound = swf.getCharacterByClass(startSound2.soundClassName);
+                    if (!(sound instanceof DefineSoundTag)) {
+                        logger.log(Level.WARNING, "Sound class {0} does not resolve to a DefineSound tag", startSound2.soundClassName);
+                        continue;
+                    }
+                    // Normalize the class-based event without changing the source tag.
+                    startSound = new StartSoundTag(swf);
+                    startSound.soundId = sound.getCharacterId();
+                    startSound.soundInfo = startSound2.soundInfo;
+                } else {
+                    startSound = (StartSoundTag) t;
+                }
                 DefineSoundTag s = swf.getSound(startSound.soundId);
                 if (s == null) {
                     logger.log(Level.WARNING, "Sound tag (ID={0}) was not found", startSound.soundId);
