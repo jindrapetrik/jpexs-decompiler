@@ -86,11 +86,16 @@ import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
+import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.GenCommandTag;
+import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.ProtectTag;
+import com.jpexs.decompiler.flash.tags.ScriptLimitsTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -174,6 +179,7 @@ import com.jpexs.flash.fla.converter.BinaryFlaConverter;
 import com.jpexs.flash.fla.converter.FlaFormatVersion;
 import com.jpexs.flash.fla.converter.XflReader;
 import com.jpexs.flash.fla.reader.BinaryFlaDocument;
+import com.jpexs.flash.fla.reader.FlaRecord;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LinkedIdentityHashSet;
@@ -5799,6 +5805,22 @@ public class XFLConverter {
             useAS3 = fa.actionScript3;
             useNetwork = fa.useNetwork;
         }
+        boolean protect = false;
+        boolean debuggingPermitted = false;
+        int scriptStuckDelay = 15;
+        for (Tag tag : swf.getTags()) {
+            if (tag instanceof ProtectTag) {
+                protect = true;
+            } else if (tag instanceof EnableDebuggerTag || tag instanceof EnableDebugger2Tag) {
+                debuggingPermitted = true;
+            } else if (tag instanceof ScriptLimitsTag) {
+                scriptStuckDelay = ((ScriptLimitsTag) tag).scriptTimeoutSeconds;
+            }
+        }
+        int hardwareAcceleration = fa == null ? 0 : fa.useGPU ? 2 : fa.useDirectBlit ? 1 : 0;
+        MetadataTag metadata = swf.getMetadata();
+        final byte[] metadataData = metadata == null || metadata.xmlMetadata == null || metadata.xmlMetadata.isEmpty()
+                ? null : Utf8Helper.getBytes(metadata.xmlMetadata);
 
         if (!useAS3 && flaVersion.minASVersion() > 2) {
             throw new IllegalArgumentException("FLA version " + flaVersion + " does not support AS1/2");
@@ -6152,7 +6174,7 @@ public class XFLConverter {
             publishSettings.writeElementValue("TopDown", "");
             publishSettings.writeElementValue("FireFox", "");
             publishSettings.writeElementValue("Report", 0);
-            publishSettings.writeElementValue("Protect", 0);
+            publishSettings.writeElementValue("Protect", protect ? 1 : 0);
             publishSettings.writeElementValue("OmitTraceActions", 0);
             publishSettings.writeElementValue("Quality", "80");
             publishSettings.writeElementValue("DeblockingFilter", 0);
@@ -6289,7 +6311,8 @@ public class XFLConverter {
             publishSettings.writeElementValue("PackagePaths", "");
             publishSettings.writeElementValue("AS3PackagePaths", ".");
             publishSettings.writeElementValue("AS3ConfigConst", "CONFIG::FLASH_AUTHORING=\"true\";");
-            publishSettings.writeElementValue("DebuggingPermitted", 0);
+            publishSettings.writeElementValue("DebuggingPermitted", debuggingPermitted ? 1 : 0);
+            // SWF stores a one-way password hash, while FLA expects the original password.
             publishSettings.writeElementValue("DebuggingPassword", "");
             publishSettings.writeElementValue("CompressMovie", swf.compression == SWFCompression.NONE ? 0 : 1);
             publishSettings.writeElementValue("CompressionType", swf.compression == SWFCompression.LZMA ? 1 : 0);
@@ -6306,9 +6329,9 @@ public class XFLConverter {
             publishSettings.writeElementValue("AS3ExportFrame", 1);
             publishSettings.writeElementValue("AS3Optimize", 1);
             publishSettings.writeElementValue("ExportSwc", 0);
-            publishSettings.writeElementValue("ScriptStuckDelay", 15);
+            publishSettings.writeElementValue("ScriptStuckDelay", scriptStuckDelay);
             publishSettings.writeElementValue("IncludeXMP", 1);
-            publishSettings.writeElementValue("HardwareAcceleration", 0);
+            publishSettings.writeElementValue("HardwareAcceleration", hardwareAcceleration);
             publishSettings.writeElementValue("AS3Flags", 4102);
             publishSettings.writeElementValue("DefaultLibraryLinkage", "rsl");
             publishSettings.writeElementValue("RSLPreloaderMethod", "wrap");
@@ -6476,6 +6499,11 @@ public class XFLConverter {
                             exportLog.progress("Writing archive entry: PublishSettings.xml");
                             out.putNextEntry(new ZipEntry("PublishSettings.xml"));
                             out.write(Utf8Helper.getBytes(publishSettingsF));
+                            if (metadataData != null) {
+                                exportLog.progress("Writing archive entry: META-INF/metadata.xml");
+                                out.putNextEntry(new ZipEntry("META-INF/metadata.xml"));
+                                out.write(metadataData);
+                            }
                             out.putNextEntry(new ZipEntry("LIBRARY/"));
                             if (fHasImport) {
                                 out.putNextEntry(new ZipEntry("LIBRARY/imported/"));
@@ -6508,6 +6536,11 @@ public class XFLConverter {
                 Path.createDirectorySafe(xflDataDir);
                 writeFile(handler, Utf8Helper.getBytes(domDocumentStr), xflDataDir.getAbsolutePath() + File.separator + "DOMDocument.xml", exportLog);
                 writeFile(handler, Utf8Helper.getBytes(publishSettingsStr), xflDataDir.getAbsolutePath() + File.separator + "PublishSettings.xml", exportLog);
+                if (metadataData != null) {
+                    File metadataDirectory = new File(xflDataDir, "META-INF");
+                    Path.createDirectorySafe(metadataDirectory);
+                    writeFile(handler, metadataData, new File(metadataDirectory, "metadata.xml").getAbsolutePath(), exportLog);
+                }
                 File libraryDir = new File(xflDataDir.getAbsolutePath() + File.separator + "LIBRARY");
                 libraryDir.mkdir();
                 if (hasImport) {
@@ -6587,6 +6620,17 @@ public class XFLConverter {
             exportLog.progress("Reading intermediate XFL for binary FLA: " + input);
         }
         BinaryFlaDocument document = new XflReader(Charset.forName(charset)).read(input);
+        if (version.ordinal() < FlaFormatVersion.MX2004.ordinal()) {
+            // These targets store a single property map instead of a profile list.
+            // XflReader places the selected profile last, matching native loading.
+            FlaRecord publishSettings = (FlaRecord) document.getContents().get("publishSettings");
+            if (publishSettings != null && publishSettings.get("profiles") instanceof List) {
+                List<?> profiles = (List<?>) publishSettings.get("profiles");
+                if (!profiles.isEmpty()) {
+                    publishSettings.set("legacyProperties", profiles.get(profiles.size() - 1));
+                }
+            }
+        }
         if (generator != null) {
             document = generator.restore(document);
         }
