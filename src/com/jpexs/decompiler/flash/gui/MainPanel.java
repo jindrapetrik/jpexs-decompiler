@@ -4020,7 +4020,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         swf.exportXfl(errorHandler, selfile.getAbsolutePath(), fSwfShortName, ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), version, settings, prog);
                     } catch (InterruptedException ex) {
                         Thread.currentThread().interrupt();
-                    } catch (Exception ex) {
+                    } catch (Throwable ex) {
                         logger.log(Level.SEVERE, "FLA export error", ex);
                         ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
