@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
+import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.FlashPlayerVersion;
 import com.jpexs.decompiler.flash.FontNormalizer;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
@@ -169,6 +170,7 @@ import com.jpexs.flash.fla.converter.BinaryFlaConversionResult;
 import com.jpexs.flash.fla.converter.BinaryFlaConverter;
 import com.jpexs.flash.fla.converter.FlaFormatVersion;
 import com.jpexs.flash.fla.converter.XflReader;
+import com.jpexs.flash.fla.reader.BinaryFlaDocument;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.LinkedIdentityHashSet;
@@ -234,6 +236,11 @@ public class XFLConverter {
 
     private static final Logger logger = Logger.getLogger(XFLConverter.class.getName());
 
+    /**
+     * Enables diagnostic log files next to exported FLA/XFL files.
+     */
+    public static final boolean EXPORT_LOG_ENABLED = false;
+
     public static final int KEY_MODE_NORMAL = 9728;
 
     public static final int KEY_MODE_CLASSIC_TWEEN = 22017;
@@ -277,9 +284,11 @@ public class XFLConverter {
 
         private final Stack<String> statuses = new Stack<>();
         private final ProgressListener progressListener;
+        private final XFLExportLog exportLog;
 
-        public StatusStack(ProgressListener progressListener) {
+        public StatusStack(ProgressListener progressListener, XFLExportLog exportLog) {
             this.progressListener = progressListener;
+            this.exportLog = exportLog;
         }
 
         public String getStatusString() {
@@ -297,12 +306,18 @@ public class XFLConverter {
 
         public void pushStatus(String status) throws InterruptedException {
             statuses.push(status);
+            log("START");
             update();
         }
 
         public void popStatus() throws InterruptedException {
+            log("DONE");
             statuses.pop();
             update();
+        }
+
+        public void log(String operation) {
+            exportLog.progress(getStatusString() + ": " + operation);
         }
     }
 
@@ -1143,7 +1158,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private static List<CharacterTag> getNonLibraryShapes(ReadOnlyTagList tags) {
+    private static List<CharacterTag> getNonLibraryShapes(ReadOnlyTagList tags, XFLExportLog exportLog) {
         Map<CharacterTag, Integer> usages = new IdentityHashMap<>();
         walkShapeUsages(tags, usages);
         List<CharacterTag> ret = new ArrayList<>();
@@ -1152,6 +1167,7 @@ public class XFLConverter {
                 if (usages.get(ch) < 2) {
                     if (ch instanceof ShapeTag) {
                         ShapeTag shp = (ShapeTag) ch;
+                        exportLog.progress("Analyzing library eligibility: character ID=" + shp.getCharacterId() + ", " + shp);
                         if (!shapeHasMultiLayers(shp.getShapes().shapeRecords)) {
                             ret.add(ch);
                         }
@@ -1166,12 +1182,13 @@ public class XFLConverter {
         return ret;
     }
 
-    private static Set<ShapeTag> getSmallShapes(SWF swf) {
+    private static Set<ShapeTag> getSmallShapes(SWF swf, XFLExportLog exportLog) {
         Set<ShapeTag> result = new LinkedHashSet<>();
         Map<Integer, CharacterTag> chars = swf.getCharacters(true);
         for (int id : chars.keySet()) {
             if (chars.get(id) instanceof ShapeTag) {
                 ShapeTag shape = (ShapeTag) chars.get(id);
+                exportLog.progress("Analyzing shape size: character ID=" + id + ", " + shape);
                 if (isShapeSmall(shape)) {
                     result.add(shape);
                 }
@@ -1180,7 +1197,7 @@ public class XFLConverter {
         return result;
     }
 
-    private static Set<CharacterTag> getCharactersAndAllDependent(SWF swf) {
+    private static Set<CharacterTag> getCharactersAndAllDependent(SWF swf, XFLExportLog exportLog) {
         Set<CharacterTag> ret = new LinkedIdentityHashSet<>();
 
         Set<CharacterTag> charsInThisSwf = new LinkedIdentityHashSet<>();
@@ -1190,29 +1207,31 @@ public class XFLConverter {
         ret.addAll(charsInThisSwf);
 
         for (CharacterTag ct : charsInThisSwf) {
-            walkNeededCharacters(ret, ct);
+            walkNeededCharacters(ret, ct, exportLog);
         }
 
-        walkNeededClasses(ret, swf.getTags());
+        exportLog.progress("Resolving classes used by placed objects");
+        walkNeededClasses(ret, swf.getTags(), exportLog);
         return ret;
     }
 
     
-    private static void walkNeededClasses(Set<CharacterTag> ret, ReadOnlyTagList tags) {
+    private static void walkNeededClasses(Set<CharacterTag> ret, ReadOnlyTagList tags, XFLExportLog exportLog) {
         for (Tag t : tags) {
             if (t instanceof DefineSpriteTag) {
                 DefineSpriteTag sprite = (DefineSpriteTag) t;
-                walkNeededClasses(ret, sprite.getTags());
+                walkNeededClasses(ret, sprite.getTags(), exportLog);
             }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
                 String cls = pt.getClassName();
                 if (cls != null) {
+                    exportLog.progress("Resolving placed class: " + cls);
                     CharacterTag ct = pt.getSwf().getCharacterByClass(cls);
                     if (ct != null) {
                         if (!ret.contains(ct)) {
                             ret.add(ct);
-                            walkNeededCharacters(ret, ct);
+                            walkNeededCharacters(ret, ct, exportLog);
                         }
                     }
                 }
@@ -1221,7 +1240,8 @@ public class XFLConverter {
     }
     
 
-    private static void walkNeededCharacters(Set<CharacterTag> result, CharacterTag ct) {
+    private static void walkNeededCharacters(Set<CharacterTag> result, CharacterTag ct, XFLExportLog exportLog) {
+        exportLog.progress("Collecting dependencies: character ID=" + ct.getCharacterId() + ", " + ct);
         Set<Integer> needed = new HashSet<>();
         Set<String> neededClasses = new HashSet<>();
         ct.getNeededCharactersDeep(needed, neededClasses);
@@ -1234,7 +1254,7 @@ public class XFLConverter {
                 continue;
             }
             result.add(nc);
-            walkNeededCharacters(result, nc);
+            walkNeededCharacters(result, nc, exportLog);
             /*if (nc instanceof DefineSpriteTag) {
                 DefineSpriteTag sp = (DefineSpriteTag) nc;
                 walkNeededClasses(result, sp.getTags());
@@ -1770,6 +1790,7 @@ public class XFLConverter {
                         symbolStr.writeStartElement("DOMLayer", new String[]{"name", "Layer 1"});
                         symbolStr.writeStartElement("frames");
                         for (int frame = 1; frame <= 4; frame++) {
+                            statusStack.log("Converting button sound state " + frame);
 
                             int soundChar = 0;
                             SOUNDINFO soundInfo = null;
@@ -1825,6 +1846,7 @@ public class XFLConverter {
 
                         loopframes:
                         for (int frame = 1; frame <= 4; frame++) {
+                            statusStack.log("Converting button state " + frame + ", depth=" + i);
 
                             for (BUTTONRECORD rec : records) {
                                 if (rec.placeDepth == i) {
@@ -2720,6 +2742,9 @@ public class XFLConverter {
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 if (po.getDepth() == depth) {
+                    statusStack.log("Placement at frame " + (frame + 2) + ", depth=" + depth
+                            + ", character ID=" + po.getCharacterId() + ", class=" + po.getClassName()
+                            + ", tag=" + t);
                     if (po instanceof MorphShapeEndings.EndPlacement) {
                         classicTweenInstanceStarts.remove(frame + 1);
                     } else if (!po.flagMove()) {
@@ -2846,6 +2871,8 @@ public class XFLConverter {
                     continue;
                 }
                 lastIn = true;
+                statusStack.log("Converting frame " + (frame + 1) + ", depth=" + depth
+                        + ", character=" + character + ", morph ratio=" + ratio);
 
                 XFLXmlWriter elementsWriter = new XFLXmlWriter();
 
@@ -2936,9 +2963,12 @@ public class XFLConverter {
         afterStr = "</frames>" + afterStr;
 
         if (writer2.length() > 0) {
+            statusStack.log("Detecting shape tweens; depth=" + depth + ", frames=" + (frame + 1));
             String shapeFrames = MorphShapeTween.detect(writer2.toString(), morphSamples, classicTweenInstanceStarts);
+            statusStack.log("Detecting classic/motion tweens; depth=" + depth + ", quality=" + tweenDetectionQuality);
             String framesXml = ClassicTweenDetector.detect(shapeFrames, classicTweenInstanceStarts,
                     swf.frameRate, motionRegistrationPoints, componentLayer ? 0 : tweenDetectionQuality);
+            statusStack.log("Tween detection completed; depth=" + depth);
             if (framesXml.contains("tweenType=\"motion object\"")) {
                 if (prevStr.contains("<DOMLayer")) {
                     prevStr = prevStr.replaceFirst("<DOMLayer", "<DOMLayer animationType=\"motion object\"");
@@ -3837,7 +3867,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private boolean convertActionScriptLayer(Scene scene, String initClipScript, AbcIndexing abcIndex, ReadOnlyTagList timeLineTags, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException, InterruptedException {
+    private boolean convertActionScriptLayer(Scene scene, String initClipScript, AbcIndexing abcIndex, ReadOnlyTagList timeLineTags, XFLXmlWriter writer, ScriptPack scriptPack, StatusStack statusStack) throws XMLStreamException, InterruptedException {
         boolean hasScript = false;
 
         String script = initClipScript;
@@ -3850,6 +3880,7 @@ public class XFLConverter {
         Map<Integer, String> frameToScriptMap = new HashMap<>();
 
         if (scriptPack != null) {
+            statusStack.log("Reading AS3 frame scripts: " + scriptPack.getClassPath());
             frameToScriptMap = getFrameScriptsFromPack(abcIndex, scriptPack);
         }
 
@@ -3857,6 +3888,7 @@ public class XFLConverter {
             checkInterrupted();
             if (t instanceof DoActionTag) {
                 DoActionTag da = (DoActionTag) t;
+                statusStack.log("Decompiling frame script; frame=" + (scene.startFrame + frame + 1) + ", tag=" + t);
                 script += convertActionScript12(da);
             }
             if (frameToScriptMap.containsKey(scene.startFrame + frame)) {
@@ -4478,6 +4510,8 @@ public class XFLConverter {
 
     //Note: symbolId argument might be a virtual symbol like MaskedSymbol
     private void convertTimelines(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, Map<CharacterTag, ScriptPack> characterScriptPacks, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, AbcIndexing abcIndex, CharacterTag sprite, int symbolId, String linkageIdentifier, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, String spriteName, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException, InterruptedException {
+        statusStack.pushStatus("timeline " + (spriteName == null ? "main" : spriteName) + " (symbol ID=" + symbolId + ")");
+        statusStack.log("Restoring morph shape endings");
         timelineTags = MorphShapeEndings.restore(timelineTags, morphShapeSymbols);
         ScriptPack characterScriptPack = sprite == null ? null : characterScriptPacks.containsKey(sprite) ? characterScriptPacks.get(sprite) : null;
 
@@ -4493,6 +4527,7 @@ public class XFLConverter {
 
         AccessibilityBag accessibility = new AccessibilityBag();
         if (characterScriptPack != null) {
+            statusStack.log("Reading accessibility: " + characterScriptPack.getClassPath());
             accessibility = getAccessibilityFromPack(swf.getAbcIndex(), characterScriptPack);
         }
 
@@ -4564,6 +4599,7 @@ public class XFLConverter {
                 if (t instanceof DoInitActionTag) {
                     DoInitActionTag dia = (DoInitActionTag) t;
                     if (dia.spriteId == sprite.getCharacterId()) {
+                        statusStack.log("Decompiling initialization script: " + dia);
                         initClipScript += convertActionScript12(dia, treeOps);
                     }
                 }
@@ -4663,12 +4699,17 @@ public class XFLConverter {
 
         for (Scene scene : scenes) {
             checkInterrupted();
+            statusStack.pushStatus("scene " + scene.name + " (frames " + (scene.startFrame + 1) + "-" + (scene.endFrame + 1) + ")");
             writer.writeStartElement("DOMTimeline", new String[]{"name", scene.name});
             writer.writeStartElement("layers");
 
             ReadOnlyTagList sceneTimelineTags = scene.timelineSubTags;
+            statusStack.log("Converting frame labels");
             int labelLayerCount = convertLabelsLayers(sceneTimelineTags, writer);
-            boolean hasScript = convertActionScriptLayer(scene, initClipScript, abcIndex, sceneTimelineTags, writer, scriptPack);
+            statusStack.pushStatus("ActionScript layer");
+            boolean hasScript = convertActionScriptLayer(scene, initClipScript, abcIndex, sceneTimelineTags, writer, scriptPack, statusStack);
+            statusStack.popStatus();
+            statusStack.log("Analyzing timeline masks and depths");
 
             int index = 0;
 
@@ -5023,11 +5064,14 @@ public class XFLConverter {
                 index++;
             }
 
+            statusStack.log("Converting sound layers");
             convertSoundLayer(scene, sceneTimelineTags, files, writer);
             writer.writeEndElement(); //layers
             writer.writeEndElement(); //DOMTimeline
+            statusStack.popStatus();
         }
-        writer.writeEndElement(); //timeline/s        
+        writer.writeEndElement(); //timeline/s
+        statusStack.popStatus();
     }
 
     private void writeEmptyLayer(XFLXmlWriter writer, int frameCount) throws XMLStreamException {
@@ -5054,6 +5098,8 @@ public class XFLConverter {
     private boolean writeLayer(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, AccessibilityBag accessibility, String symbolName, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, int index, BitSet onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<CharacterTag> nonLibraryShapes, ReadOnlyTagList timelineTags, FLAVersion flaVersion, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Set<ShapeTag> smallShapes) throws XMLStreamException, InterruptedException {
         XFLXmlWriter layerPrev = new XFLXmlWriter();
         statusStack.pushStatus("layer " + (index + 1));
+        statusStack.log("Converting depth=" + d + ", frame range=" + (startFrame + 1) + "-"
+                + (endFrame == Integer.MAX_VALUE ? "end" : endFrame + 1) + ", parent layer=" + parentLayer);
         //System.err.println("- writing layer " + (index + 1) + (startFrame == 0 && endFrame == Integer.MAX_VALUE ? ", all frames":  ", frame " + startFrame + " to " + endFrame));
         layerPrev.writeStartElement("DOMLayer", new String[]{
             "name", "Layer " + (index + 1) + (DEBUG_EXPORT_LAYER_DEPTHS ? " (depth " + d + ")" : ""),
@@ -5075,9 +5121,10 @@ public class XFLConverter {
         return writer.length() != prevLength;
     }
 
-    private static void writeFile(AbortRetryIgnoreHandler handler, final byte[] data, final String file) throws IOException, InterruptedException {
+    private static void writeFile(AbortRetryIgnoreHandler handler, final byte[] data, final String file, XFLExportLog exportLog) throws IOException, InterruptedException {
         checkInterrupted();
         new RetryTask(() -> {
+            exportLog.progress("Writing file: " + file + " (" + data.length + " bytes)");
             File fileObj = new File(file);
             File dir = fileObj.getParentFile();
             if (!dir.exists()) {
@@ -5086,6 +5133,7 @@ public class XFLConverter {
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 fos.write(data);
             }
+            exportLog.progress("File written: " + file);
         }, handler).run();
     }
 
@@ -5564,6 +5612,10 @@ public class XFLConverter {
     /**
      * Converts SWF to FLA/XFL
      *
+     * When {@link #EXPORT_LOG_ENABLED} is enabled, appends diagnostic progress to
+     * {@code <output filename>.export.log} next to the generated FLA or XFL file.
+     * Records are flushed as they are written.
+     *
      * @param handler AbortRetryIgnoreHandler
      * @param swf SWF to convert
      * @param swfFileName SWF file name
@@ -5579,6 +5631,49 @@ public class XFLConverter {
      * @throws InterruptedException On interrupt
      */
     public void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion, ProgressListener progressListener) throws IOException, InterruptedException {
+        File output = new File(outfile).getAbsoluteFile();
+        if (!EXPORT_LOG_ENABLED) {
+            convertSWF(handler, swf, swfFileName, output.getAbsolutePath(), settings,
+                    generator, generatorVerName, generatorVersion, parallel, flaVersion, progressListener, XFLExportLog.DISABLED);
+            return;
+        }
+        File logDirectory = output.getParentFile();
+        String logName = output.getName();
+        if (!settings.compressed && flaVersion.getCfbFlaVersion() == null) {
+            int dot = logName.lastIndexOf('.');
+            String baseName = dot < 0 ? logName : logName.substring(0, dot);
+            logDirectory = new File(logDirectory, baseName);
+            logName = baseName + ".xfl";
+        }
+        Files.createDirectories(logDirectory.toPath());
+        try (XFLExportLog exportLog = new XFLExportLog(new File(logDirectory, logName + ".export.log"))) {
+            try {
+                exportLog.progress("Source: " + swfFileName + "; output: " + output
+                        + "; generator: " + generatorVerName + " (" + generatorVersion + ")");
+                exportLog.progress("Settings: version=" + flaVersion + ", compressed=" + settings.compressed
+                        + ", exportScript=" + settings.exportScript + ", parallel=" + parallel
+                        + ", tweenDetectionQuality=" + settings.tweenDetectionQuality);
+                Runtime runtime = Runtime.getRuntime();
+                exportLog.progress("Environment: Java " + System.getProperty("java.version")
+                        + ", " + System.getProperty("os.name") + " " + System.getProperty("os.arch")
+                        + "; heap used=" + (runtime.totalMemory() - runtime.freeMemory())
+                        + ", max=" + runtime.maxMemory() + " bytes; SWF version=" + swf.version
+                        + ", frames=" + swf.frameCount + ", frameRate=" + swf.frameRate);
+                convertSWF(exportLog.wrap(handler), swf, swfFileName, output.getAbsolutePath(), settings,
+                        generator, generatorVerName, generatorVersion, parallel, flaVersion, progressListener, exportLog);
+                exportLog.finished();
+            } catch (InterruptedException ex) {
+                exportLog.problem("=== Export interrupted/cancelled ===", ex);
+                throw ex;
+            } catch (IOException | RuntimeException | Error ex) {
+                exportLog.problem("=== Export FAILED ===", ex);
+                throw ex;
+            }
+        }
+    }
+
+    private void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion, ProgressListener progressListener, XFLExportLog exportLog) throws IOException, InterruptedException {
+        exportLog.progress("Validating export settings");
         if (settings.tweenDetectionQuality < 0 || settings.tweenDetectionQuality > 100) {
             throw new IllegalArgumentException("Tween detection quality must be between 0 and 100");
         }
@@ -5625,14 +5720,21 @@ public class XFLConverter {
 
         final HashMap<String, byte[]> files = new HashMap<>();
         final HashMap<String, byte[]> datfiles = new HashMap<>();
+        exportLog.progress("Collecting morph shape usages and symbols");
         MorphShapeSymbols morphShapeSymbols = MorphShapeSymbols.collect(swf.getTags(), getMultiUsageMorphShapes(swf.getTags()));
-        List<CharacterTag> nonLibraryShapes = getNonLibraryShapes(swf.getTags());
+        exportLog.progress("Finding shapes outside the library");
+        List<CharacterTag> nonLibraryShapes = getNonLibraryShapes(swf.getTags(), exportLog);
 
-        Set<CharacterTag> characters = getCharactersAndAllDependent(swf);
+        exportLog.progress("Collecting characters and dependencies");
+        Set<CharacterTag> characters = getCharactersAndAllDependent(swf, exportLog);
+        exportLog.progress("Resolving linkage classes for " + characters.size() + " characters");
         Map<CharacterTag, String> characterClasses = getCharacterClasses(characters);
         String documentClass = swf.getDocumentClass();
+        exportLog.progress("Resolving character script packs; document class=" + documentClass);
         Map<CharacterTag, ScriptPack> characterScriptPacks = getCharacterScriptPacks(swf, characterClasses);
+        exportLog.progress("Resolving character variables");
         Map<CharacterTag, String> characterVariables = getCharacterVariables(swf.getTags());
+        exportLog.progress("Checking AMF metadata");
         boolean hasAmfMetadata = hasAmfMetadata(swf);
 
         componentConverter = settings.exportScript && (cbfFlaVersion == null
@@ -5654,6 +5756,7 @@ public class XFLConverter {
         XFLXmlWriter domDocument = new XFLXmlWriter();
         try {
 
+            exportLog.progress("Building DOMDocument; resolving document script pack");
             ScriptPack documentScriptPack = null;
             if (documentClass != null) {
                 List<ScriptPack> packs = swf.getScriptPacksByClassNames(Arrays.asList(documentClass));
@@ -5680,6 +5783,7 @@ public class XFLConverter {
             });
 
             if (documentScriptPack != null) {
+                exportLog.progress("Reading document accessibility: " + documentClass);
                 Map<String, String> accessibility = getRootAccessibilityFromPack(swf.getAbcIndex(), documentScriptPack);
                 if (!accessibility.isEmpty()) {
                     domDocument.writeAttribute("hasAccessibleData", "true");
@@ -5699,7 +5803,7 @@ public class XFLConverter {
 
             Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol = new HashMap<>();
 
-            StatusStack statusStack = new StatusStack(progressListener);
+            StatusStack statusStack = new StatusStack(progressListener, exportLog);
 
             Reference<Integer> lastImportedId = new Reference<>(0);
             Map<CharacterTag, String> characterNameMap = new IdentityHashMap<>();
@@ -5709,6 +5813,7 @@ public class XFLConverter {
             Set<CharacterTag> charactersExportedInFirstFrame = new LinkedIdentityHashSet<>();
             Map<CharacterTag, String> characterImportLinkageURL = new IdentityHashMap<>();
             Reference<Integer> lastItemIdNumber = new Reference<>(0);
+            exportLog.progress("Resolving imports and first-frame exports");
             int frame = 1;
             for (Tag tag : swf.getTags()) {
                 checkInterrupted();
@@ -5749,6 +5854,7 @@ public class XFLConverter {
                 }
             }
 
+            exportLog.progress("Resolving class source URLs");
             for (CharacterTag ct : characters) {
                 checkInterrupted();
                 String cls = characterClasses.get(ct);
@@ -5782,14 +5888,19 @@ public class XFLConverter {
                 domDocument.writeEndElement(); //folders
             }
             
+            statusStack.pushStatus("fonts");
             convertFonts(lastItemIdNumber, lastImportedId, characterNameMap, swf, characters, domDocument, statusStack, characterVariables, characterClasses, charactersExportedInFirstFrame, characterImportLinkageURL);
+            statusStack.popStatus();
 
-            Set<ShapeTag> smallShapes = getSmallShapes(swf);
+            exportLog.progress("Finding small shapes");
+            Set<ShapeTag> smallShapes = getSmallShapes(swf, exportLog);
             
             Map<Integer, FontTag> normalizedFonts = new HashMap<>();
             Map<Integer, TextTag> normalizedTexts = new HashMap<>();
             FontNormalizer fontNormalizer = new FontNormalizer();
+            exportLog.progress("Normalizing fonts and texts");
             fontNormalizer.normalizeFonts(swf, normalizedFonts, normalizedTexts);
+            exportLog.progress("Font normalization completed; fonts=" + normalizedFonts.size() + ", texts=" + normalizedTexts.size());
 
             convertLibrary(normalizedFonts, normalizedTexts, lastItemIdNumber, charactersExportedInFirstFrame, characterImportLinkageURL, characters, lastImportedId, characterNameMap, swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, swf.getTags(), files, datfiles, flaVersion, domDocument, placeToMaskedSymbol, morphShapeSymbols, statusStack, smallShapes);
 
@@ -5817,12 +5928,14 @@ public class XFLConverter {
         }
         
         checkInterrupted();
+        exportLog.progress("Formatting DOMDocument.xml");
         String domDocumentStr = prettyFormatXML(domDocument.toString());
         if (componentConverter != null) {
             domDocumentStr = componentConverter.convert(domDocumentStr, files, datfiles);
         }
 
         if (settings.exportScript) {
+            exportLog.progress("Exporting ActionScript 1/2 classes");
             for (Tag t : swf.getTags()) {
                 checkInterrupted();
                 if (t instanceof DoInitActionTag) {
@@ -5833,6 +5946,7 @@ public class XFLConverter {
                             && (componentConverter == null || !componentConverter.isBundledAs2Character(chid))) {
                         DefineSpriteTag sprite = (DefineSpriteTag) character;
                         if (sprite.getTags().isEmpty()) {
+                            exportLog.progress("Decompiling ActionScript 1/2 class: sprite ID=" + chid + ", tag=" + dia);
                             String data = convertActionScript12(dia);
                             String expName = dia.getSwf().getExportName(dia.spriteId);
                             expName = expName != null ? expName : "_unk_";
@@ -5849,7 +5963,7 @@ public class XFLConverter {
                             expPath = expPath.replace(".", File.separator);
                             File cdir = new File(scriptsDir.getAbsolutePath() + File.separator + expDir);
                             Path.createDirectorySafe(cdir);
-                            writeFile(handler, Utf8Helper.getBytes(data), scriptsDir.getAbsolutePath() + File.separator + expPath + ".as");
+                            writeFile(handler, Utf8Helper.getBytes(data), scriptsDir.getAbsolutePath() + File.separator + expPath + ".as", exportLog);
                         }
                     }
                 }
@@ -5859,6 +5973,7 @@ public class XFLConverter {
         int flaSwfVersion = swf.version > flaVersion.maxSwfVersion() ? flaVersion.maxSwfVersion() : swf.version;
         boolean greaterThanCC = flaVersion.ordinal() >= FLAVersion.CC.ordinal();
         XFLXmlWriter publishSettings = new XFLXmlWriter();
+        exportLog.progress("Generating PublishSettings.xml");
         try {
             publishSettings.writeStartElement("flash_profiles");
             publishSettings.writeStartElement("flash_profile", new String[]{"version", "1.0", "name", "Default", "current", "true"});
@@ -6227,6 +6342,7 @@ public class XFLConverter {
         String publishSettingsStr = publishSettings.toString();
 
         checkInterrupted();
+        exportLog.progress("Writing output; library files=" + files.size() + ", binary data files=" + datfiles.size());
         String zipfile = outfile;
 
         try {
@@ -6242,10 +6358,13 @@ public class XFLConverter {
                 final boolean fHasImport = hasImport;
                 new RetryTask(() -> {
                     checkInterrupted();
+                    exportLog.progress("Writing FLA archive: " + outfileF);
                     try (FlaFileWriter output = new FlaFileWriter(new File(outfileF))) {
                         try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(output.getFile()))) {
+                            exportLog.progress("Writing archive entry: DOMDocument.xml");
                             out.putNextEntry(new ZipEntry("DOMDocument.xml"));
                             out.write(Utf8Helper.getBytes(domDocumentF));
+                            exportLog.progress("Writing archive entry: PublishSettings.xml");
                             out.putNextEntry(new ZipEntry("PublishSettings.xml"));
                             out.write(Utf8Helper.getBytes(publishSettingsF));
                             out.putNextEntry(new ZipEntry("LIBRARY/"));
@@ -6254,6 +6373,7 @@ public class XFLConverter {
                             }
                             for (String fileName : files.keySet()) {
                                 checkInterrupted();
+                                exportLog.progress("Writing archive entry: LIBRARY/" + fileName + " (" + files.get(fileName).length + " bytes)");
                                 out.putNextEntry(new ZipEntry("LIBRARY/" + fileName));
                                 out.write(files.get(fileName));
                             }
@@ -6263,18 +6383,22 @@ public class XFLConverter {
                                 if (data.length == 0) {
                                     continue;
                                 }
+                                exportLog.progress("Writing archive entry: bin/" + fileName + " (" + data.length + " bytes)");
                                 out.putNextEntry(new ZipEntry("bin/" + fileName));
                                 out.write(data);
                             }
+                            exportLog.progress("Closing FLA archive: " + outfileF);
                         }
+                        exportLog.progress("Committing FLA archive: " + outfileF);
                         output.commit();
+                        exportLog.progress("FLA archive committed: " + outfileF);
                     }
                 }, handler).run();
 
             } else {
                 Path.createDirectorySafe(xflDataDir);
-                writeFile(handler, Utf8Helper.getBytes(domDocumentStr), xflDataDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
-                writeFile(handler, Utf8Helper.getBytes(publishSettingsStr), xflDataDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
+                writeFile(handler, Utf8Helper.getBytes(domDocumentStr), xflDataDir.getAbsolutePath() + File.separator + "DOMDocument.xml", exportLog);
+                writeFile(handler, Utf8Helper.getBytes(publishSettingsStr), xflDataDir.getAbsolutePath() + File.separator + "PublishSettings.xml", exportLog);
                 File libraryDir = new File(xflDataDir.getAbsolutePath() + File.separator + "LIBRARY");
                 libraryDir.mkdir();
                 if (hasImport) {
@@ -6285,7 +6409,7 @@ public class XFLConverter {
                 binDir.mkdir();
                 for (String fileName : files.keySet()) {
                     checkInterrupted();
-                    writeFile(handler, files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName);
+                    writeFile(handler, files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName, exportLog);
                 }
                 for (String fileName : datfiles.keySet()) {
                     checkInterrupted();
@@ -6293,17 +6417,34 @@ public class XFLConverter {
                     if (data.length == 0) {
                         continue;
                     }
-                    writeFile(handler, data, binDir.getAbsolutePath() + File.separator + fileName);
+                    writeFile(handler, data, binDir.getAbsolutePath() + File.separator + fileName, exportLog);
                 }
-                writeFile(handler, Utf8Helper.getBytes("PROXY-CS5"), xflFile);
+                writeFile(handler, Utf8Helper.getBytes("PROXY-CS5"), xflFile, exportLog);
             }
             if (useAS3 && settings.exportScript) {
                 try {
+                    exportLog.progress("Exporting ActionScript 3 classes to " + scriptsDir);
                     ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, !Configuration.exportFlaAs3DisableScriptLayer.get(), false, true, "/_assets/", Configuration.linkAllClasses.get(), true);
                     if (componentConverter != null) {
                         scriptExportSettings.ignoredInstanceMethods = componentConverter.getIgnoredMethods();
                     }
-                    swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, null);
+                    swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, new EventListener() {
+                        @Override
+                        public void handleExportingEvent(String type, int index, int count, Object data) {
+                            exportLog.progress("AS3 START " + type + " " + index + "/" + count + ": " + data);
+                        }
+
+                        @Override
+                        public void handleExportedEvent(String type, int index, int count, Object data) {
+                            exportLog.progress("AS3 DONE " + type + " " + index + "/" + count + ": " + data);
+                        }
+
+                        @Override
+                        public void handleEvent(String event, Object data) {
+                            exportLog.progress("AS3 " + event + ": " + data);
+                        }
+                    });
+                    exportLog.progress("ActionScript 3 export completed");
                 } catch (Exception ex) {
                     checkInterrupted();
                     logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);
@@ -6312,10 +6453,11 @@ public class XFLConverter {
 
             checkInterrupted();
             if (cbfFlaVersion != null) {
+                exportLog.progress("Converting to binary FLA " + cbfFlaVersion + ": " + outfile);
                 if (progressListener != null) {
                     progressListener.status("Converting to " + cbfFlaVersion + " ...");
                 }
-                convertToBinaryFla(new File(zipfile), new File(outfile), cbfFlaVersion, swf.getCharset());
+                convertToBinaryFla(new File(zipfile), new File(outfile), cbfFlaVersion, swf.getCharset(), exportLog);
             }
 
         } finally {
@@ -6327,11 +6469,28 @@ public class XFLConverter {
     }
 
     static void convertToBinaryFla(File input, File output, FlaFormatVersion version, String charset) throws IOException, InterruptedException {
+        convertToBinaryFla(input, output, version, charset, null);
+    }
+
+    private static void convertToBinaryFla(File input, File output, FlaFormatVersion version, String charset, XFLExportLog exportLog) throws IOException, InterruptedException {
         checkInterrupted();
+        if (exportLog != null) {
+            exportLog.progress("Reading intermediate XFL for binary FLA: " + input);
+        }
+        BinaryFlaDocument document = new XflReader(Charset.forName(charset)).read(input);
+        if (exportLog != null) {
+            exportLog.progress("Converting XFL to binary FLA: " + version);
+        }
         BinaryFlaConversionResult result = new BinaryFlaConverter(version, charset).convert(
-                new XflReader(Charset.forName(charset)).read(input));
+                document);
         checkInterrupted();
+        if (exportLog != null) {
+            exportLog.progress("Writing binary FLA: " + output);
+        }
         result.writeToFile(output);
+        if (exportLog != null) {
+            exportLog.progress("Binary FLA written: " + output);
+        }
     }
 
     private static void convertAdjustColorFilter(COLORMATRIXFILTER filter, XFLXmlWriter writer) throws XMLStreamException {

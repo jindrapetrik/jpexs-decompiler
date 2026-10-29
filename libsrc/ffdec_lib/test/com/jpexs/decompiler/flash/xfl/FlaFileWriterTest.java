@@ -75,7 +75,8 @@ public class FlaFileWriterTest {
 
     private void assertFileCount(Path directory, long count) throws Exception {
         try (Stream<Path> files = Files.list(directory)) {
-            assertEquals(files.count(), count, "Temporary files must be cleaned up");
+            assertEquals(files.filter(path -> !path.getFileName().toString().equals("document.fla.export.log")).count(),
+                    count, "Temporary files must be cleaned up (the diagnostic log is retained)");
         }
     }
 
@@ -200,6 +201,7 @@ public class FlaFileWriterTest {
             assertFileCount(directory, 1);
         } finally {
             Files.deleteIfExists(output);
+            Files.deleteIfExists(directory.resolve("document.fla.export.log"));
             Files.delete(directory);
         }
     }
@@ -224,6 +226,7 @@ public class FlaFileWriterTest {
             }
         } finally {
             Files.deleteIfExists(output);
+            Files.deleteIfExists(directory.resolve("document.fla.export.log"));
             Files.delete(directory);
         }
     }
