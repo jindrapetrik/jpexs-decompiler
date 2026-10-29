@@ -21,6 +21,8 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
+import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -38,6 +40,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import static org.testng.Assert.*;
 
 public class XflVersionedExportTest {
@@ -141,6 +144,78 @@ public class XflVersionedExportTest {
             FlaRecord output = mainFrames(file).get(0).getChildren().get(0);
             assertEquals(((Number) output.get("autoExpand")).intValue(), autoSize ? 1 : 0);
             assertEquals(text.autoSize, autoSize, "Export must not modify the source flag");
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    private void tabIndex(SWF swf, int depth, int value) {
+        SetTabIndexTag tag = new SetTabIndexTag(swf);
+        tag.depth = depth;
+        tag.tabIndex = value;
+        swf.addTag(tag);
+    }
+
+    @DataProvider(name = "tabIndexInstances")
+    public Object[][] tabIndexInstances() {
+        return new Object[][]{{false, false}, {false, true}, {true, false}, {true, true}};
+    }
+
+    @Test(dataProvider = "tabIndexInstances")
+    public void tabOrderFollowsThePlacedInstance(boolean symbol, boolean named) throws Exception {
+        SWF swf = movie();
+        swf.frameCount = 5;
+        DefineEditTextTag text = text(swf);
+        int id = text.characterID;
+        if (symbol) {
+            DefineSpriteTag sprite = new DefineSpriteTag(swf);
+            sprite.frameCount = 1;
+            sprite.addTag(new PlaceObject2Tag(swf, false, 1, id, new MATRIX(), null, -1, null, -1, null));
+            sprite.addTag(new ShowFrameTag(swf));
+            swf.addTag(sprite);
+            id = sprite.spriteId;
+        }
+        swf.addTag(new PlaceObject2Tag(swf, false, 1, id, new MATRIX(), null, -1, named ? "first" : null, -1, null));
+        tabIndex(swf, 1, 17);
+        tabIndex(swf, 99, 99); // A different, empty depth must not change the instance.
+        swf.addTag(new ShowFrameTag(swf));
+        swf.addTag(new PlaceObject2Tag(swf, true, 1, -1, new MATRIX(), null, -1, null, -1, null));
+        tabIndex(swf, 1, 5);
+        swf.addTag(new ShowFrameTag(swf));
+        swf.addTag(new ShowFrameTag(swf)); // Retain the index across a held frame.
+        RemoveObject2Tag remove = new RemoveObject2Tag(swf);
+        remove.depth = 1;
+        swf.addTag(remove);
+        swf.addTag(new PlaceObject2Tag(swf, false, 1, id, new MATRIX(), null, -1, null, -1, null));
+        swf.addTag(new ShowFrameTag(swf));
+        tabIndex(swf, 1, 0); // Zero is an explicit tab index, not an absent value.
+        swf.addTag(new ShowFrameTag(swf));
+        String[] expected = {"17", "5", "5", "", "0"};
+        Path file = Files.createTempFile("tab-order-", ".fla");
+        try {
+            export(swf, file, FLAVersion.CS6);
+            NodeList frames = document(file, "DOMDocument.xml").getElementsByTagName("DOMFrame");
+            int count = 0;
+            for (int i = 0; i < frames.getLength(); i++) {
+                Element frame = (Element) frames.item(i);
+                Element instance = (Element) frame.getElementsByTagName(symbol ? "DOMSymbolInstance" : "DOMDynamicText").item(0);
+                assertNotNull(instance);
+                int duration = frame.hasAttribute("duration") ? Integer.parseInt(frame.getAttribute("duration")) : 1;
+                for (int j = 0; j < duration; j++) {
+                    assertEquals(instance.getAttribute("tabIndex"), expected[count++]);
+                }
+            }
+            assertEquals(count, expected.length);
+            export(swf, file, FLAVersion.MX2004);
+            count = 0;
+            for (FlaRecord frame : mainFrames(file)) {
+                FlaRecord accessibility = (FlaRecord) frame.getChildren().get(0).get("accessibility");
+                for (int i = 0; i < ((Number) frame.get("duration")).intValue(); i++) {
+                    Object value = accessibility == null ? null : accessibility.get("tabIndex");
+                    assertEquals(value == null ? "" : value, expected[count++]);
+                }
+            }
+            assertEquals(count, expected.length);
         } finally {
             Files.deleteIfExists(file);
         }

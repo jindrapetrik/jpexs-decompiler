@@ -92,6 +92,7 @@ import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.GenCommandTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.SetTabIndexTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
@@ -1499,7 +1500,7 @@ public class XFLConverter {
         return (DEBUG_EXPORT_LAYER_DEPTHS ? "MaskedSymbol " : "Symbol ") + symbolId;
     }
 
-    private void convertSymbolInstance(int frame, AccessibilityBag accessibility, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value metadata, CharacterTag tag, FLAVersion flaVersion, XFLXmlWriter writer, boolean small, Integer morphFrame) throws XMLStreamException, InterruptedException {
+    private void convertSymbolInstance(int frame, AccessibilityBag accessibility, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, String name, MATRIX matrix, ColorTransform colorTransform, boolean cacheAsBitmap, int blendMode, List<FILTER> filters, boolean isVisible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value metadata, CharacterTag tag, FLAVersion flaVersion, XFLXmlWriter writer, boolean small, Integer morphFrame, Integer tabIndex) throws XMLStreamException, InterruptedException {
         if (matrix == null) {
             matrix = new MATRIX();
         }
@@ -1517,14 +1518,8 @@ public class XFLConverter {
         writer.writeStartElement("DOMSymbolInstance", new String[]{"libraryItemName", getSymbolName(lastImportedId, characterNameMap, swf, tag)});
         if (name != null) {
             writer.writeAttribute("name", name);
-            Map<String, String> accessibilityMap = accessibility.getAttributes(name, frame + 1);
-            if (!accessibilityMap.isEmpty()) {
-                writer.writeAttribute("hasAccessibleData", "true");
-                for (String acKey : accessibilityMap.keySet()) {
-                    writer.writeAttribute(acKey, accessibilityMap.get(acKey));
-                }
-            }
         }
+        writeAccessibility(writer, accessibility, name, frame, tabIndex);
         String blendModeStr = null;
         if (blendMode < BLENDMODES.length) {
             blendModeStr = BLENDMODES[blendMode];
@@ -1929,7 +1924,7 @@ public class XFLConverter {
                                             if (normalizedTexts.containsKey(realCharacterId)) {
                                                 character = normalizedTexts.get(realCharacterId);
                                             }
-                                            convertText(normalizedFonts, frame, new AccessibilityBag() /*???*/, null, (TextTag) character, matrix, filters, recCharWriter, characterImportLinkageURL, lastImportedId, characterNameMap, characters);
+                                            convertText(normalizedFonts, frame, new AccessibilityBag() /*???*/, null, (TextTag) character, matrix, filters, recCharWriter, characterImportLinkageURL, lastImportedId, characterNameMap, characters, null);
                                             statusStack.popStatus();
                                         } else if (character instanceof DefineVideoStreamTag) {
                                             statusStack.pushStatus(character.toString());
@@ -1947,7 +1942,7 @@ public class XFLConverter {
                                                     small = true;
                                                 }
                                             }
-                                            convertSymbolInstance(-1, new AccessibilityBag() /*???*/, lastImportedId, characterNameMap, swf, null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, null, character.getSwf().getCharacter(rec.characterId), flaVersion, recCharWriter, small, null);
+                                            convertSymbolInstance(-1, new AccessibilityBag() /*???*/, lastImportedId, characterNameMap, swf, null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, null, character.getSwf().getCharacter(rec.characterId), flaVersion, recCharWriter, small, null, null);
                                         }
 
                                         int emptyDuration = frame - lastFrame - 1;
@@ -2739,6 +2734,7 @@ public class XFLConverter {
         RGBA backGroundColor = null;
         CLIPACTIONS clipActions = null;
         int ratio = -1;
+        Integer tabIndex = null;
         Set<Integer> classicTweenInstanceStarts = new HashSet<>();
         Map<String, double[]> motionRegistrationPoints = new HashMap<>();
         Map<Integer, MorphShapeTween.Sample> morphSamples = new HashMap<>();
@@ -2794,6 +2790,9 @@ public class XFLConverter {
                         newCharacter = character;
                     }
                     character = newCharacter;
+                    if (!po.flagMove() || newCharId != -1 || newCharCls != null) {
+                        tabIndex = null;
+                    }
                     if (componentConverter != null && componentConverter.isComponent(character)) {
                         componentLayer = true;
                     }
@@ -2862,6 +2861,10 @@ public class XFLConverter {
                 }
             }
 
+            if (t instanceof SetTabIndexTag && ((SetTabIndexTag) t).depth == depth && character != null) {
+                tabIndex = ((SetTabIndexTag) t).tabIndex;
+            }
+
             if (generatorTemplateConverter != null && t instanceof GenCommandTag) {
                 GenCommandTag command = (GenCommandTag) t;
                 if (command.depth == depth) {
@@ -2880,6 +2883,7 @@ public class XFLConverter {
                     generatorCommand = null;
                     classicTweenInstanceStarts.add(frame + 1);
                     character = null;
+                    tabIndex = null;
                     metadata = null;
                     matrix = null;
                     instanceName = null;
@@ -2929,7 +2933,7 @@ public class XFLConverter {
                         String marker = generatorTemplateConverter.attachedName(generatorCommand, instanceName);
                         convertSymbolInstance(frame, accessibility, lastImportedId, characterNameMap, swf, marker,
                                 matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor,
-                                clipActions, metadata, character, flaVersion, elementsWriter, false, null);
+                                clipActions, metadata, character, flaVersion, elementsWriter, false, null, tabIndex);
                     }
                 } else if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(character))) {
                     if (lastGeneratorCommand == null && lastCharacter == character && Objects.equals(matrix, lastMatrix)) {
@@ -2943,7 +2947,7 @@ public class XFLConverter {
                 } else if (character instanceof MorphShapeTag) {
                     MorphShapeTag morph = (MorphShapeTag) character;
                     if (morphShapeSymbols.contains(morph.getCharacterId())) {
-                        convertSymbolInstance(frame, accessibility, lastImportedId, characterNameMap, swf, instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, flaVersion, elementsWriter, false, morphShapeSymbols.frame(morph.getCharacterId(), ratio));
+                        convertSymbolInstance(frame, accessibility, lastImportedId, characterNameMap, swf, instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, flaVersion, elementsWriter, false, morphShapeSymbols.frame(morph.getCharacterId(), ratio), tabIndex);
                     } else {
                         // Preserve every actual pose first. Compatible spans are restored
                         // to editable tweens with explicit vertex hints below.
@@ -2959,7 +2963,7 @@ public class XFLConverter {
                         if (normalizedTexts.containsKey(realCharacterId)) {
                             character = normalizedTexts.get(realCharacterId);
                         }
-                        convertText(normalizedFonts, frame, accessibility, instanceName, (TextTag) character, matrix, filters, elementsWriter, characterImportLinkageURL, lastImportedId, characterNameMap, characters);
+                        convertText(normalizedFonts, frame, accessibility, instanceName, (TextTag) character, matrix, filters, elementsWriter, characterImportLinkageURL, lastImportedId, characterNameMap, characters, tabIndex);
                         statusStack.popStatus();
                     } else if (character instanceof DefineVideoStreamTag) {
                         convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, elementsWriter);
@@ -2973,7 +2977,7 @@ public class XFLConverter {
                                 small = true;
                             }
                         }
-                        convertSymbolInstance(frame, accessibility, lastImportedId, characterNameMap, swf, instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, flaVersion, elementsWriter, small, null);
+                        convertSymbolInstance(frame, accessibility, lastImportedId, characterNameMap, swf, instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, flaVersion, elementsWriter, small, null, tabIndex);
                     }
                 }
 
@@ -3254,6 +3258,23 @@ public class XFLConverter {
             }
         }
         return ret;
+    }
+
+    private static void writeAccessibility(XFLXmlWriter writer, AccessibilityBag accessibility, String name, int frame, Integer tabIndex) throws XMLStreamException {
+        Map<String, String> attributes = new LinkedHashMap<>();
+        if (tabIndex != null) {
+            attributes.put("tabIndex", Integer.toString(tabIndex));
+        }
+        if (name != null) {
+            // Frame scripts execute after timeline tags and may override tab order.
+            attributes.putAll(accessibility.getAttributes(name, frame + 1));
+        }
+        if (!attributes.isEmpty()) {
+            writer.writeAttribute("hasAccessibleData", true);
+            for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+                writer.writeAttribute(attribute.getKey(), attribute.getValue());
+            }
+        }
     }
 
     private static class AccessibilityBag {
@@ -5258,7 +5279,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private static void convertText(Map<Integer, FontTag> normalizedFonts, int frame, AccessibilityBag accessibility, String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, XFLXmlWriter writer, Map<CharacterTag, String> characterImportLinkageURL, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, Set<CharacterTag> characters) throws XMLStreamException {
+    private static void convertText(Map<Integer, FontTag> normalizedFonts, int frame, AccessibilityBag accessibility, String instanceName, TextTag tag, MATRIX m, List<FILTER> filters, XFLXmlWriter writer, Map<CharacterTag, String> characterImportLinkageURL, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, Set<CharacterTag> characters, Integer tabIndex) throws XMLStreamException {
         MATRIX matrix = new MATRIX(m);
         CSMSettingsTag csmts = null;
         XFLXmlWriter filterStr = new XFLXmlWriter();
@@ -5474,14 +5495,8 @@ public class XFLConverter {
             }
             if (instanceName != null) {
                 writer.writeAttribute("name", instanceName);
-                Map<String, String> accessibilityMap = accessibility.getAttributes(instanceName, frame + 1);
-                if (!accessibilityMap.isEmpty()) {
-                    writer.writeAttribute("hasAccessibleData", "true");
-                    for (String acKey : accessibilityMap.keySet()) {
-                        writer.writeAttribute(acKey, accessibilityMap.get(acKey));
-                    }
-                }
             }
+            writeAccessibility(writer, accessibility, instanceName, frame, tabIndex);
             if (antiAliasSharpness != null) {
                 writer.writeAttribute("antiAliasSharpness", antiAliasSharpness);
                 writer.writeAttribute("antiAliasThickness", antiAliasThickness);
