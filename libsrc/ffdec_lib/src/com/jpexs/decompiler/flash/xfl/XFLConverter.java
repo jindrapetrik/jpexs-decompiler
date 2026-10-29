@@ -118,6 +118,7 @@ import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.StartSoundBase;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
@@ -1233,6 +1234,17 @@ public class XFLConverter {
                 DefineSpriteTag sprite = (DefineSpriteTag) t;
                 walkNeededClasses(ret, sprite.getTags(), exportLog);
             }
+            if (t instanceof StartSound2Tag) {
+                StartSound2Tag ss2 = (StartSound2Tag) t;
+                String cls = ss2.soundClassName;
+                CharacterTag ct = ss2.getSwf().getCharacterByClass(cls);
+                if (ct != null) {
+                    if (!ret.contains(ct)) {
+                        ret.add(ct);
+                        walkNeededCharacters(ret, ct, exportLog);
+                    }
+                }
+            }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
                 String cls = pt.getClassName();
@@ -1844,7 +1856,7 @@ public class XFLConverter {
                                     logger.log(Level.WARNING, "Sound tag (ID={0}) was not found", soundChar);
                                 } else if (soundCharTag instanceof DefineSoundTag) {
                                     DefineSoundTag sound = (DefineSoundTag) soundCharTag;
-                                    convertSoundUsage(symbolStr, sound, soundInfo);
+                                    convertSoundUsage(lastImportedId, characterNameMap, defineButtonSound.getSwf(), symbolStr, sound, soundInfo);
                                 } else {
                                     logger.log(Level.WARNING, "Tag (ID={0}) expected to be DefineSound, {1} found. It is referenced from DefineButtonSound({2}).", new Object[]{soundChar, soundCharTag.getClass().getSimpleName(), defineButtonSound.buttonId});
                                 }
@@ -2057,7 +2069,7 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private void convertSoundMedia(Reference<Integer> lastItemIdNumber, Map<CharacterTag, String> characterImportLinkageURL, SWF swf, ReadOnlyTagList tags, SoundTag symbol, XFLXmlWriter writer, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles) throws XMLStreamException {
+    private void convertSoundMedia(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, Reference<Integer> lastItemIdNumber, Map<CharacterTag, String> characterImportLinkageURL, SWF swf, ReadOnlyTagList tags, SoundTag symbol, XFLXmlWriter writer, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles) throws XMLStreamException {
         int soundFormat = 0;
         int soundRate = 0;
         boolean soundType = false;
@@ -2230,7 +2242,7 @@ public class XFLConverter {
             datfiles.put(datFileName, decodedData);
         }
 
-        String symbolFile = symbol.getFlaExportName() + "." + exportFormat;
+        String symbolFile = ((symbol instanceof DefineSoundTag) ? getSymbolName(lastImportedId, characterNameMap, swf, (DefineSoundTag) symbol, "Sound") : symbol.getFlaExportName()) + "." + exportFormat;
         files.put(symbolFile, data);
         writer.writeStartElement("DOMSoundItem", new String[]{
             "name", symbolFile,
@@ -2384,7 +2396,7 @@ public class XFLConverter {
                     mediaStarted = true;
                 }
                 statusStack.pushStatus(symbol.toString());
-                convertSoundMedia(lastItemIdNumber, characterImportLinkageURL, swf, tags, (DefineSoundTag) symbol, writer, files, datfiles);
+                convertSoundMedia(lastImportedId, characterNameMap, lastItemIdNumber, characterImportLinkageURL, swf, tags, (DefineSoundTag) symbol, writer, files, datfiles);
 
                 writeLinkage(writer, symbol, characterVariables, characterClasses, charactersExportedInFirstFrame, characterImportLinkageURL);
 
@@ -2478,7 +2490,7 @@ public class XFLConverter {
                 SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) t;
                 for (SoundStreamFrameRange range : head.getRanges()) {
                     statusStack.pushStatus(range.toString());
-                    convertSoundMedia(lastItemIdNumber, characterImportLinkageURL, swf, tags, range, writer, files, datfiles);
+                    convertSoundMedia(lastImportedId, characterNameMap, lastItemIdNumber, characterImportLinkageURL, swf, tags, range, writer, files, datfiles);
                     writer.writeEndElement();
                     statusStack.popStatus();
                 }
@@ -2494,7 +2506,7 @@ public class XFLConverter {
                         SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) st;
                         for (SoundStreamFrameRange range : head.getRanges()) {
                             statusStack.pushStatus(range.toString());
-                            convertSoundMedia(lastItemIdNumber, characterImportLinkageURL, swf, sprite.getTags(), range, writer, files, datfiles);
+                            convertSoundMedia(lastImportedId, characterNameMap, lastItemIdNumber, characterImportLinkageURL, swf, sprite.getTags(), range, writer, files, datfiles);
                             writer.writeEndElement();
                             statusStack.popStatus();
                         }
@@ -2537,8 +2549,8 @@ public class XFLConverter {
         return new XmlPrettyFormat().prettyFormat(input, 5, false);
     }
 
-    private static void convertSoundUsage(XFLXmlWriter writer, DefineSoundTag sound, SOUNDINFO soundInfo) throws XMLStreamException {
-        String soundName = "sound" + sound.soundId + "." + sound.getExportFormat().toString().toLowerCase();
+    private static void convertSoundUsage(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, XFLXmlWriter writer, DefineSoundTag sound, SOUNDINFO soundInfo) throws XMLStreamException {
+        String soundName = getSymbolName(lastImportedId, characterNameMap, swf, sound, "Sound") + "." + sound.getExportFormat().toString().toLowerCase();
         writer.writeAttribute("soundName", soundName);
         if (soundInfo.hasInPoint) {
             writer.writeAttribute("inPoint44", soundInfo.inPoint);
@@ -2636,11 +2648,15 @@ public class XFLConverter {
         }
     }
 
-    private static void convertFrame(boolean shapeTween, SoundStreamFrameRange soundStreamRange, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, XFLXmlWriter writer, Integer acceleration) throws XMLStreamException {
+    private static void convertFrame(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, boolean shapeTween, SoundStreamFrameRange soundStreamRange, StartSoundBase startSound, int frame, int duration, String actionScript, String elements, XFLXmlWriter writer, Integer acceleration) throws XMLStreamException {
         DefineSoundTag sound = null;
         if (startSound != null) {
             SWF swf = startSound.getSwf();
-            sound = swf.getSound(startSound.soundId);
+            if (startSound.getSoundClassName() != null) {
+                sound = (DefineSoundTag) swf.getCharacterByClass(startSound.getSoundClassName());
+            } else {
+                sound = swf.getSound(startSound.getSoundId());
+            }
         }
         //System.err.println("-- writing frame " + frame);
         writer.writeStartElement("DOMFrame");
@@ -2667,7 +2683,7 @@ public class XFLConverter {
 
         }
         if (startSound != null && sound != null) {
-            convertSoundUsage(writer, sound, startSound.soundInfo);
+            convertSoundUsage(lastImportedId, characterNameMap, startSound.getSwf(), writer, sound, startSound.getSoundInfo());
         }
 
         if (!actionScript.isEmpty()) {
@@ -2910,7 +2926,7 @@ public class XFLConverter {
                     frameGeneratorCommands.clear();
                     if (lastIn) {
                         if (!lastElements.isEmpty()) {
-                            convertFrame(false, null, null, frame - duration, duration, "", lastElements, writer2, null);
+                            convertFrame(lastImportedId, characterNameMap, false, null, null, frame - duration, duration, "", lastElements, writer2, null);
                             duration = 1;
                         } else {
                             duration++;
@@ -3011,7 +3027,7 @@ public class XFLConverter {
                     }
                 }
                 if ((!elements.equals(lastElements) || classicTweenInstanceStarts.contains(frame)) && frame > 0) {
-                    convertFrame(false, null, null, frame - duration, duration, "", lastElements, writer2, null);
+                    convertFrame(lastImportedId, characterNameMap, false, null, null, frame - duration, duration, "", lastElements, writer2, null);
                     duration = 1;
                 } else if (frame == 0) {
                     duration = 1;
@@ -3028,7 +3044,7 @@ public class XFLConverter {
         if ((!lastElements.isEmpty() || writer2.length() > 0) && lastIn) {
             if (frame >= startFrame && frame <= endFrame && (onlyFrames == null || onlyFrames.get(frame))) {
                 frame++;
-                convertFrame(false, null, null, frame - duration, duration, "", lastElements, writer2, null);
+                convertFrame(lastImportedId, characterNameMap, false, null, null, frame - duration, duration, "", lastElements, writer2, null);
             }
         }
         afterStr = "</frames>" + afterStr;
@@ -4099,37 +4115,33 @@ public class XFLConverter {
         return layerCount;
     }
 
-    private void convertSoundLayer(Scene scene, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+    private void convertSoundLayer(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, Scene scene, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         int soundLayerIndex = 0;
-        List<StartSoundTag> startSounds = new ArrayList<>();
+        List<StartSoundBase> startSounds = new ArrayList<>();
         List<Integer> startSoundFrameNumbers = new ArrayList<>();
         List<SoundStreamFrameRange> soundStreamRanges = new ArrayList<>();
         int frame = 0;
         for (Tag t : timeLineTags) {
-            if (t instanceof StartSoundTag || t instanceof StartSound2Tag) {
+            if (t instanceof StartSoundBase) {
                 SWF swf = t.getSwf();
-                StartSoundTag startSound;
-                if (t instanceof StartSound2Tag) {
-                    StartSound2Tag startSound2 = (StartSound2Tag) t;
-                    CharacterTag sound = swf.getCharacterByClass(startSound2.soundClassName);
+                StartSoundBase startSound = (StartSoundBase) t;
+                DefineSoundTag s;
+                if (startSound.getSoundClassName() != null) {
+                    CharacterTag sound = swf.getCharacterByClass(startSound.getSoundClassName());
                     if (!(sound instanceof DefineSoundTag)) {
-                        logger.log(Level.WARNING, "Sound class {0} does not resolve to a DefineSound tag", startSound2.soundClassName);
+                        logger.log(Level.WARNING, "Sound class {0} does not resolve to a DefineSound tag", startSound.getSoundClassName());
+                        continue;
+                    }           
+                    s = (DefineSoundTag) sound;
+                } else {
+                    s = swf.getSound(startSound.getSoundId());   
+                    if (s == null) {
+                        logger.log(Level.WARNING, "Sound tag (ID={0}) was not found", startSound.getSoundId());
                         continue;
                     }
-                    // Normalize the class-based event without changing the source tag.
-                    startSound = new StartSoundTag(swf);
-                    startSound.soundId = sound.getCharacterId();
-                    startSound.soundInfo = startSound2.soundInfo;
-                } else {
-                    startSound = (StartSoundTag) t;
-                }
-                DefineSoundTag s = swf.getSound(startSound.soundId);
-                if (s == null) {
-                    logger.log(Level.WARNING, "Sound tag (ID={0}) was not found", startSound.soundId);
-                    continue;
-                }
-
-                if (!files.containsKey("sound" + s.soundId + "." + s.getExportFormat().toString().toLowerCase())) { //Sound was not exported
+                }                
+                
+                if (!files.containsKey(getSymbolName(lastImportedId, characterNameMap, swf, s, "Sound") + "." + s.getExportFormat().toString().toLowerCase())) { //Sound was not exported
                     startSound = null; // ignore
                 }
 
@@ -4166,10 +4178,10 @@ public class XFLConverter {
 
             if (startFrame != 0) {
                 // empty frames should be added
-                convertFrame(false, null, null, 0, startFrame, "", "", writer, null);
+                convertFrame(lastImportedId, characterNameMap, false, null, null, 0, startFrame, "", "", writer, null);
             }
 
-            convertFrame(false, soundStreamRanges.get(i), null, startFrame, duration, "", "", writer, null);
+            convertFrame(lastImportedId, characterNameMap, false, soundStreamRanges.get(i), null, startFrame, duration, "", "", writer, null);
 
             writer.writeEndElement();
             writer.writeEndElement();
@@ -4184,10 +4196,10 @@ public class XFLConverter {
 
             if (startFrame != 0) {
                 // empty frames should be added
-                convertFrame(false, null, null, 0, startFrame, "", "", writer, null);
+                convertFrame(lastImportedId, characterNameMap, false, null, null, 0, startFrame, "", "", writer, null);
             }
 
-            convertFrame(false, null, startSounds.get(i), startFrame, duration, "", "", writer, null);
+            convertFrame(lastImportedId, characterNameMap, false, null, startSounds.get(i), startFrame, duration, "", "", writer, null);
 
             writer.writeEndElement();
             writer.writeEndElement();
@@ -5170,7 +5182,7 @@ public class XFLConverter {
             }
 
             statusStack.log("Converting sound layers");
-            convertSoundLayer(scene, sceneTimelineTags, files, writer);
+            convertSoundLayer(lastImportedId, characterNameMap, scene, sceneTimelineTags, files, writer);
             writer.writeEndElement(); //layers
             writer.writeEndElement(); //DOMTimeline
             statusStack.popStatus();

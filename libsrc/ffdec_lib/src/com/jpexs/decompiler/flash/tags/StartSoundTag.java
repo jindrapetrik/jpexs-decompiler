@@ -28,6 +28,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+import com.jpexs.decompiler.flash.tags.base.StartSoundBase;
 
 /**
  * StartSound tag - starts a sound playing.
@@ -35,7 +36,7 @@ import java.util.Set;
  * @author JPEXS
  */
 @SWFVersion(from = 1)
-public class StartSoundTag extends Tag implements CharacterIdTag {
+public class StartSoundTag extends Tag implements CharacterIdTag, StartSoundBase {
 
     public static final int ID = 15;
 
@@ -107,4 +108,24 @@ public class StartSoundTag extends Tag implements CharacterIdTag {
     public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         needed.add(soundId);
     }        
+
+    @Override
+    public SOUNDINFO getSoundInfo() {
+       return soundInfo;
+    }
+
+    @Override
+    public void setSoundInfo(SOUNDINFO soundInfo) {
+        this.soundInfo = soundInfo;
+    }
+    
+    @Override
+    public int getSoundId() {
+        return soundId;
+    }
+
+    @Override
+    public String getSoundClassName() {
+        return null;
+    }
 }
