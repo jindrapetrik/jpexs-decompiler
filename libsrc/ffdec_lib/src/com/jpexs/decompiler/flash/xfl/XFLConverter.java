@@ -3026,8 +3026,11 @@ public class XFLConverter {
             statusStack.log("Detecting shape tweens; depth=" + depth + ", frames=" + (frame + 1));
             String shapeFrames = MorphShapeTween.detect(writer2.toString(), morphSamples, classicTweenInstanceStarts);
             statusStack.log("Detecting classic/motion tweens; depth=" + depth + ", quality=" + tweenDetectionQuality);
+            // Earlier FLA formats cannot store motion objects. Keep their sampled
+            // frames when the animation cannot be represented by a classic tween.
+            double motionFrameRate = flaVersion.ordinal() >= FLAVersion.CS4.ordinal() ? swf.frameRate : 0;
             String framesXml = ClassicTweenDetector.detect(shapeFrames, classicTweenInstanceStarts,
-                    swf.frameRate, motionRegistrationPoints, componentLayer || generatorLayer ? 0 : tweenDetectionQuality);
+                    motionFrameRate, motionRegistrationPoints, componentLayer || generatorLayer ? 0 : tweenDetectionQuality);
             statusStack.log("Tween detection completed; depth=" + depth);
             if (framesXml.contains("tweenType=\"motion object\"")) {
                 if (prevStr.contains("<DOMLayer")) {
