@@ -32,8 +32,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipFile;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import static org.testng.Assert.*;
 
 public class XflVersionedExportTest {
@@ -104,6 +108,42 @@ public class XflVersionedExportTest {
             frames.addAll(layer.getChildren());
         }
         return frames;
+    }
+
+    private Document document(Path file, String entry) throws Exception {
+        try (ZipFile zip = new ZipFile(file.toFile())) {
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                    .parse(zip.getInputStream(zip.getEntry(entry)));
+        }
+    }
+
+    @DataProvider(name = "textOptions")
+    public Object[][] textOptions() {
+        return new Object[][]{{true, true}, {true, false}, {false, true}, {false, false}};
+    }
+
+    @Test(dataProvider = "textOptions")
+    public void keepsDynamicAndInputTextAutoSize(boolean readOnly, boolean autoSize) throws Exception {
+        SWF swf = movie();
+        DefineEditTextTag text = text(swf);
+        text.readOnly = readOnly;
+        text.autoSize = autoSize;
+        swf.addTag(new PlaceObject2Tag(swf, false, 1, text.characterID, new MATRIX(), null, -1, null, -1, null));
+        swf.addTag(new ShowFrameTag(swf));
+        Path file = Files.createTempFile("text-auto-size-", ".fla");
+        try {
+            export(swf, file, FLAVersion.CS6);
+            Element element = (Element) document(file, "DOMDocument.xml")
+                    .getElementsByTagName(readOnly ? "DOMDynamicText" : "DOMInputText").item(0);
+            assertNotNull(element);
+            assertEquals("true".equals(element.getAttribute("autoExpand")), autoSize);
+            export(swf, file, FLAVersion.MX);
+            FlaRecord output = mainFrames(file).get(0).getChildren().get(0);
+            assertEquals(((Number) output.get("autoExpand")).intValue(), autoSize ? 1 : 0);
+            assertEquals(text.autoSize, autoSize, "Export must not modify the source flag");
+        } finally {
+            Files.deleteIfExists(file);
+        }
     }
 
     @DataProvider(name = "legacyTargets")

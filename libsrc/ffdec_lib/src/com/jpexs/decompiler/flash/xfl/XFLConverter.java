@@ -5466,6 +5466,9 @@ public class XFLConverter {
                 tagName = "DOMInputText";
             }
             writer.writeStartElement(tagName);
+            if (det.autoSize) {
+                writer.writeAttribute("autoExpand", true);
+            }
             if (fontRenderingMode != null) {
                 writer.writeAttribute("fontRenderingMode", fontRenderingMode);
             }
