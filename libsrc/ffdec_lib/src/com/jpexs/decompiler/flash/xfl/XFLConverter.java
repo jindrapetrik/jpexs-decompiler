@@ -89,6 +89,7 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
+import com.jpexs.decompiler.flash.tags.GenCommandTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -260,6 +261,8 @@ public class XFLConverter {
     private int tweenDetectionQuality = 100;
 
     private ComponentConverter componentConverter;
+
+    private GeneratorTemplateConverter generatorTemplateConverter;
 
     /**
      * Adds "(depth xxx)" to layer name
@@ -1725,9 +1728,27 @@ public class XFLConverter {
         statusStack.popStatus();
     }
 
+    private static void collectPlacedCharacters(ReadOnlyTagList tags, Set<CharacterTag> characters) {
+        for (Tag tag : tags) {
+            if (tag instanceof DefineSpriteTag) {
+                collectPlacedCharacters(((DefineSpriteTag) tag).getTags(), characters);
+            } else if (tag instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag placement = (PlaceObjectTypeTag) tag;
+                CharacterTag character = placement.getCharacterId() >= 0
+                        ? tag.getSwf().getCharacter(placement.getCharacterId())
+                        : tag.getSwf().getCharacterByClass(placement.getClassName());
+                if (character != null) {
+                    characters.add(character);
+                }
+            }
+        }
+    }
+
     private void convertSymbols(Map<Integer, FontTag> normalizedFonts, Map<Integer, TextTag> normalizedTexts, Reference<Integer> lastItemIdNumber, Set<CharacterTag> charactersExportedInFirstFrame, Map<CharacterTag, String> characterImportLinkageURL, Set<CharacterTag> characters, Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap, SWF swf, Map<CharacterTag, String> characterVariables, Map<CharacterTag, String> characterClasses, Map<CharacterTag, ScriptPack> characterScriptPacks, List<CharacterTag> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<String, byte[]> files, FLAVersion flaVersion, XFLXmlWriter writer, Map<PlaceObjectTypeTag, MultiLevelClip> placeToMaskedSymbol, MorphShapeSymbols morphShapeSymbols, StatusStack statusStack, Set<ShapeTag> smallShapes) throws XMLStreamException, InterruptedException {
         //boolean hasSymbol = false;
         Reference<Integer> nextClipId = new Reference<>(-1);
+        Set<CharacterTag> placedCharacters = new LinkedIdentityHashSet<>();
+        collectPlacedCharacters(swf.getTags(), placedCharacters);
         writer.writeStartElement("symbols");
 
         for (CharacterTag symbol : characters) {
@@ -1970,7 +1991,7 @@ public class XFLConverter {
                     symbolStr.writeEndElement(); // timeline
                 } else if (symbol instanceof DefineSpriteTag) {
                     DefineSpriteTag sprite = (DefineSpriteTag) symbol;
-                    if (sprite.getTags().isEmpty()) { //probably AS2 class
+                    if (sprite.getTags().isEmpty() && !placedCharacters.contains(sprite)) { // Unplaced AS2 class
                         statusStack.popStatus();
                         continue;
                     }
@@ -2025,6 +2046,9 @@ public class XFLConverter {
         statusStack.pushStatus("converting multiusage morphshapes");
         extractMorphShapeSymbols(normalizedFonts, normalizedTexts, characterScriptPacks, lastItemIdNumber, lastImportedId, characterNameMap, writer, swf, nonLibraryShapes, flaVersion, files, morphShapeSymbols, statusStack, characterImportLinkageURL, characters, smallShapes);
         statusStack.popStatus();
+        if (generatorTemplateConverter != null) {
+            generatorTemplateConverter.library(writer, files);
+        }
         /*if (hasSymbol) {
             
         }*/
@@ -2719,6 +2743,10 @@ public class XFLConverter {
         Map<String, double[]> motionRegistrationPoints = new HashMap<>();
         Map<Integer, MorphShapeTween.Sample> morphSamples = new HashMap<>();
         boolean componentLayer = false;
+        GenCommandTag generatorCommand = null;
+        GenCommandTag lastGeneratorCommand = null;
+        List<GenCommandTag> frameGeneratorCommands = new ArrayList<>();
+        boolean generatorLayer = false;
 
         //Add ShowFrameTag to the end when there is one last missing
         List<Tag> timTags = timelineTags.toArrayList();
@@ -2749,6 +2777,9 @@ public class XFLConverter {
                         classicTweenInstanceStarts.remove(frame + 1);
                     } else if (!po.flagMove()) {
                         classicTweenInstanceStarts.add(frame + 1);
+                    }
+                    if (!po.flagMove() || po.getCharacterId() != -1 || po.getClassName() != null) {
+                        generatorCommand = null;
                     }
                     int newCharId = po.getCharacterId();
                     String newCharCls = po.getClassName();
@@ -2831,9 +2862,22 @@ public class XFLConverter {
                 }
             }
 
+            if (generatorTemplateConverter != null && t instanceof GenCommandTag) {
+                GenCommandTag command = (GenCommandTag) t;
+                if (command.depth == depth) {
+                    if (!command.typeGlobal) {
+                        generatorCommand = command;
+                    } else if (!GeneratorTemplateConverter.isMovieSettings(command)) {
+                        frameGeneratorCommands.add(command);
+                    }
+                    generatorLayer = true;
+                }
+            }
+
             if (t instanceof RemoveTag) {
                 RemoveTag rt = (RemoveTag) t;
                 if (rt.getDepth() == depth) {
+                    generatorCommand = null;
                     classicTweenInstanceStarts.add(frame + 1);
                     character = null;
                     metadata = null;
@@ -2852,6 +2896,7 @@ public class XFLConverter {
             if (t instanceof ShowFrameTag) {
                 frame++;
                 if (frame < startFrame || frame > endFrame || (onlyFrames != null && !onlyFrames.get(frame))) {
+                    frameGeneratorCommands.clear();
                     if (lastIn) {
                         if (!lastElements.isEmpty()) {
                             convertFrame(false, null, null, frame - duration, duration, "", lastElements, writer2, null);
@@ -2876,8 +2921,18 @@ public class XFLConverter {
 
                 XFLXmlWriter elementsWriter = new XFLXmlWriter();
 
-                if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(character))) {
-                    if (lastCharacter == character && Objects.equals(matrix, lastMatrix)) {
+                if (generatorCommand != null) {
+                    if (generatorTemplateConverter.isObjectCommand(character)) {
+                        generatorTemplateConverter.objectInstance(generatorCommand, character,
+                                getSymbolName(lastImportedId, characterNameMap, swf, character), matrix, elementsWriter);
+                    } else {
+                        String marker = generatorTemplateConverter.attachedName(generatorCommand, instanceName);
+                        convertSymbolInstance(frame, accessibility, lastImportedId, characterNameMap, swf, marker,
+                                matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor,
+                                clipActions, metadata, character, flaVersion, elementsWriter, false, null);
+                    }
+                } else if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(character))) {
+                    if (lastGeneratorCommand == null && lastCharacter == character && Objects.equals(matrix, lastMatrix)) {
                         elementsWriter.writeCharactersRaw(lastElements);
                     } else {
                         ShapeTag shape = (ShapeTag) character;
@@ -2922,8 +2977,12 @@ public class XFLConverter {
                     }
                 }
 
+                for (GenCommandTag command : frameGeneratorCommands) {
+                    generatorTemplateConverter.frameCommand(command, elementsWriter);
+                }
+                frameGeneratorCommands.clear();
                 String elements = elementsWriter.toString();
-                if (character instanceof MorphShapeTag
+                if (generatorCommand == null && character instanceof MorphShapeTag
                         && !morphShapeSymbols.contains(character.getCharacterId())) {
                     MorphShapeTween.Sample sample = MorphShapeTween.sample((MorphShapeTag) character,
                             ratio == -1 ? 0 : ratio, matrix, elements);
@@ -2951,6 +3010,7 @@ public class XFLConverter {
                 lastElements = elements;
                 lastCharacter = character;
                 lastMatrix = matrix;
+                lastGeneratorCommand = generatorCommand;
             }
         }
 
@@ -2967,7 +3027,7 @@ public class XFLConverter {
             String shapeFrames = MorphShapeTween.detect(writer2.toString(), morphSamples, classicTweenInstanceStarts);
             statusStack.log("Detecting classic/motion tweens; depth=" + depth + ", quality=" + tweenDetectionQuality);
             String framesXml = ClassicTweenDetector.detect(shapeFrames, classicTweenInstanceStarts,
-                    swf.frameRate, motionRegistrationPoints, componentLayer ? 0 : tweenDetectionQuality);
+                    swf.frameRate, motionRegistrationPoints, componentLayer || generatorLayer ? 0 : tweenDetectionQuality);
             statusStack.log("Tween detection completed; depth=" + depth);
             if (framesXml.contains("tweenType=\"motion object\"")) {
                 if (prevStr.contains("<DOMLayer")) {
@@ -5085,7 +5145,7 @@ public class XFLConverter {
 
         writer.writeStartElement("DOMFrame");
         writer.writeAttribute("index", 0);
-        writer.writeAttribute("duration", frameCount);
+        writer.writeAttribute("duration", Math.max(1, frameCount));
         writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
         writer.writeStartElement("elements");
         writer.writeEndElement(); //elements
@@ -5688,6 +5748,13 @@ public class XFLConverter {
             xflVersion = FLAVersion.CS5.xflVersion();
         }
 
+        generatorTemplateConverter = new GeneratorTemplateConverter(swf.getTags());
+        if (generatorTemplateConverter.isEmpty()) {
+            generatorTemplateConverter = null;
+        } else if (cbfFlaVersion == null || cbfFlaVersion.ordinal() < FlaFormatVersion.F3.ordinal()) {
+            logger.log(Level.WARNING, "Generator commands cannot be preserved in FLA {0}; choose a binary FLA target from Flash 3 through CS4.", flaVersion);
+            generatorTemplateConverter = null;
+        }
         FileAttributesTag fa = swf.getFileAttributes();
 
         boolean useAS3 = false;
@@ -5724,6 +5791,9 @@ public class XFLConverter {
         MorphShapeSymbols morphShapeSymbols = MorphShapeSymbols.collect(swf.getTags(), getMultiUsageMorphShapes(swf.getTags()));
         exportLog.progress("Finding shapes outside the library");
         List<CharacterTag> nonLibraryShapes = getNonLibraryShapes(swf.getTags(), exportLog);
+        if (generatorTemplateConverter != null) {
+            generatorTemplateConverter.keepAttachedCharactersInLibrary(nonLibraryShapes);
+        }
 
         exportLog.progress("Collecting characters and dependencies");
         Set<CharacterTag> characters = getCharactersAndAllDependent(swf, exportLog);
@@ -5807,8 +5877,11 @@ public class XFLConverter {
 
             Reference<Integer> lastImportedId = new Reference<>(0);
             Map<CharacterTag, String> characterNameMap = new IdentityHashMap<>();
-            Set<String> componentFolders = componentConverter == null ? Collections.emptySet()
-                    : componentConverter.initializeLibraryNames(characters, characterNameMap);
+            Set<String> componentFolders = new LinkedHashSet<>();
+            if (componentConverter != null) {
+                componentFolders.addAll(componentConverter.initializeLibraryNames(characters, characterNameMap));
+            }
+            componentFolders.addAll(CharacterLibraryNames.initialize(swf.getTags(), characters, characterNameMap, nonLibraryShapes));
 
             Set<CharacterTag> charactersExportedInFirstFrame = new LinkedIdentityHashSet<>();
             Map<CharacterTag, String> characterImportLinkageURL = new IdentityHashMap<>();
@@ -6457,7 +6530,7 @@ public class XFLConverter {
                 if (progressListener != null) {
                     progressListener.status("Converting to " + cbfFlaVersion + " ...");
                 }
-                convertToBinaryFla(new File(zipfile), new File(outfile), cbfFlaVersion, swf.getCharset(), exportLog);
+                convertToBinaryFla(new File(zipfile), new File(outfile), cbfFlaVersion, swf.getCharset(), exportLog, generatorTemplateConverter);
             }
 
         } finally {
@@ -6469,15 +6542,18 @@ public class XFLConverter {
     }
 
     static void convertToBinaryFla(File input, File output, FlaFormatVersion version, String charset) throws IOException, InterruptedException {
-        convertToBinaryFla(input, output, version, charset, null);
+        convertToBinaryFla(input, output, version, charset, null, null);
     }
 
-    private static void convertToBinaryFla(File input, File output, FlaFormatVersion version, String charset, XFLExportLog exportLog) throws IOException, InterruptedException {
+    private static void convertToBinaryFla(File input, File output, FlaFormatVersion version, String charset, XFLExportLog exportLog, GeneratorTemplateConverter generator) throws IOException, InterruptedException {
         checkInterrupted();
         if (exportLog != null) {
             exportLog.progress("Reading intermediate XFL for binary FLA: " + input);
         }
         BinaryFlaDocument document = new XflReader(Charset.forName(charset)).read(input);
+        if (generator != null) {
+            document = generator.restore(document);
+        }
         if (exportLog != null) {
             exportLog.progress("Converting XFL to binary FLA: " + version);
         }
