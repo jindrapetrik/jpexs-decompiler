@@ -72,8 +72,27 @@ public class XFLExportLogTest {
         XFLExportSettings settings = new XFLExportSettings();
         settings.compressed = compressed;
         settings.exportScript = false;
-        swf.exportXfl(handler, dir.resolve(compressed ? "movie.fla" : "movie.xfl").toString(),
-                "příliš žluťoučký.swf", "Test", "Test", "1", false, version, settings, listener);
+        new XFLConverter(true).convertSWF(handler, swf, "příliš žluťoučký.swf",
+                dir.resolve(compressed ? "movie.fla" : "movie.xfl").toString(), settings,
+                "Test", "Test", "1", false, version, listener);
+    }
+
+    @Test(dataProvider = "formats")
+    public void defaultConverterUsesConfiguredLogging(boolean compressed, FLAVersion version) throws Exception {
+        Path dir = Files.createTempDirectory("ffdec-export-log-default-");
+        try {
+            SWF swf = new SWF();
+            swf.frameCount = 1;
+            swf.addTag(new ShowFrameTag(swf));
+            XFLExportSettings settings = new XFLExportSettings();
+            settings.compressed = compressed;
+            settings.exportScript = false;
+            swf.exportXfl(null, dir.resolve(compressed ? "movie.fla" : "movie.xfl").toString(),
+                    "movie.swf", "Test", "Test", "1", false, version, settings, null);
+            assertEquals(Files.exists(logPath(dir, compressed)), XFLConverter.EXPORT_LOG_ENABLED);
+        } finally {
+            cleanup(dir);
+        }
     }
 
     @Test(dataProvider = "formats")

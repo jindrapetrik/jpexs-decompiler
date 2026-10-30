@@ -62,7 +62,7 @@ public class XflSoundExportTest {
                     }
                     sound.soundData = new ByteArrayRange(data);
                     swf.addTag(sound);
-                    expected.put(sound.getFlaExportName() + ".wav", sound.getSoundFormat().decode(null, sound.getRawSoundData(), 0));
+                    expected.put("Sound " + sound.soundId + ".wav", sound.getSoundFormat().decode(null, sound.getRawSoundData(), 0));
                 }
             }
         }

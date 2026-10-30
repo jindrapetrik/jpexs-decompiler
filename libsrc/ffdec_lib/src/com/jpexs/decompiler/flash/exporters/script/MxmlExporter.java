@@ -2224,6 +2224,13 @@ public class MxmlExporter {
                 int equals = assignment.lastIndexOf(" = ");
                 if (equals >= 0) {
                     target = assignment.substring(0, equals).replaceFirst("^this\\.", "");
+                    GraphTargetItem property = propertyName(item);
+                    if (property instanceof FullMultinameAVM2Item
+                            && ((FullMultinameAVM2Item) property).namespace != null
+                            && abc.constants.getMultiname(((FullMultinameAVM2Item) property).multinameIndex).isAttribute()) {
+                        // Render the namespace directly instead of a runtime QName containing a local variable.
+                        target = (render(propertyObject(item), method) + "." + render(property, method)).replaceFirst("^this\\.", "");
+                    }
                 }
             }
         }

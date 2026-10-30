@@ -251,6 +251,19 @@ public class XFLConverter {
      */
     public static final boolean EXPORT_LOG_ENABLED = false;
 
+    private final boolean exportLogEnabled;
+
+    /**
+     * Creates a converter with the default diagnostic logging setting.
+     */
+    public XFLConverter() {
+        this(EXPORT_LOG_ENABLED);
+    }
+
+    XFLConverter(boolean exportLogEnabled) {
+        this.exportLogEnabled = exportLogEnabled;
+    }
+
     public static final int KEY_MODE_NORMAL = 9728;
 
     public static final int KEY_MODE_CLASSIC_TWEEN = 22017;
@@ -5748,7 +5761,7 @@ public class XFLConverter {
      */
     public void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion, ProgressListener progressListener) throws IOException, InterruptedException {
         File output = new File(outfile).getAbsoluteFile();
-        if (!EXPORT_LOG_ENABLED) {
+        if (!exportLogEnabled) {
             convertSWF(handler, swf, swfFileName, output.getAbsolutePath(), settings,
                     generator, generatorVerName, generatorVersion, parallel, flaVersion, progressListener, XFLExportLog.DISABLED);
             return;
