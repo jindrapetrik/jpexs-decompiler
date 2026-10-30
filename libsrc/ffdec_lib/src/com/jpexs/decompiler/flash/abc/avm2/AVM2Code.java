@@ -256,6 +256,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
@@ -309,6 +311,7 @@ import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -1944,6 +1947,37 @@ public class AVM2Code implements Cloneable {
 
             if (ins.definition instanceof KillIns) {
                 int killedReg = ins.operands[0];
+                //i++ of a slot (a script variable) through a temporary register:
+                //getglobalscope, getslot N, increment, setlocal R, getlocal R,
+                //getglobalscope, swap, setslot N, kill R
+                if (output.size() >= 2
+                        && (output.get(output.size() - 1) instanceof SetSlotAVM2Item)
+                        && (output.get(output.size() - 2) instanceof SetLocalAVM2Item)) {
+                    SetSlotAVM2Item setSlot = (SetSlotAVM2Item) output.get(output.size() - 1);
+                    SetLocalAVM2Item setLoc = (SetLocalAVM2Item) output.get(output.size() - 2);
+                    if (setLoc.regIndex == killedReg
+                            && (setSlot.value instanceof LocalRegAVM2Item)
+                            && ((LocalRegAVM2Item) setSlot.value).regIndex == killedReg) {
+                        GraphTargetItem value = setLoc.value;
+                        GraphTargetItem notCoerced = value.getNotCoerced();
+                        boolean increment = notCoerced instanceof IncrementAVM2Item;
+                        boolean decrement = notCoerced instanceof DecrementAVM2Item;
+                        GraphTargetItem inside = (increment || decrement) ? notCoerced.value.getNotCoerced() : null;
+                        if ((inside instanceof GetSlotAVM2Item)
+                                && ((GetSlotAVM2Item) inside).slotIndex == setSlot.slotIndex
+                                && !setSlot.scope.hasSideEffect()
+                                && Objects.equals(((GetSlotAVM2Item) inside).scope.getThroughRegister(), setSlot.scope.getThroughRegister())) {
+                            GraphTargetItem type = InstructionDefinition.getNumberType(value);
+                            output.remove(output.size() - 1);
+                            output.remove(output.size() - 1);
+                            output.add(increment
+                                    ? new PostIncrementAVM2Item(setSlot.getSrc(), setSlot.getLineStartItem(), inside, type)
+                                    : new PostDecrementAVM2Item(setSlot.getSrc(), setSlot.getLineStartItem(), inside, type));
+                            ip++;
+                            continue;
+                        }
+                    }
+                }
                 if (output.size() >= 2 && !stack.isEmpty()) {
                     if ((stack.peek() instanceof LocalRegAVM2Item) && (((LocalRegAVM2Item) stack.peek()).regIndex == killedReg)) {
                         if (output.get(output.size() - 1) instanceof SetPropertyAVM2Item) {
@@ -2434,6 +2468,11 @@ public class AVM2Code implements Cloneable {
         }
         for (int i = 0; i < items.size(); i++) {
             GraphTargetItem currentItem = items.get(i);
+            if (currentItem instanceof ForItem) {
+                //The first commands run before the loop expression, declare their registers first,
+                //otherwise a register used in the expression (i--) is marked as declared without declaration
+                injectDeclarations(usedDeobfuscations, level + 1, paramNames, ((ForItem) currentItem).firstCommands, minreg, declaredRegisters, declaredSlots, declaredSlotsDec, declaredProperties, declaredPropsDec, abc, body);
+            }
             List<GraphTargetItem> itemsOnLine = new ArrayList<>();
             itemsOnLine.add(currentItem);
             currentItem.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {

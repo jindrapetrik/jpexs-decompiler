@@ -4629,8 +4629,12 @@ public class Graph {
                         }
                         //List<GraphTargetItem> out2 = new ArrayList<>();
                         //makeAllCommands(out2, stack);
-                        makeAllCommands(onTrue, trueStack);
-                        makeAllCommands(onFalse, falseStack);
+                        //When both branches leave the same number of values on stack, it is a ternar
+                        //operator candidate and these values must not be filtered out
+                        int bsrCount = topBsr != null ? 1 : 0;
+                        boolean branchesLeaveValues = trueStack.size() > bsrCount && trueStack.size() == falseStack.size();
+                        makeAllBranchCommands(onTrue, trueStack, branchesLeaveValues);
+                        makeAllBranchCommands(onFalse, falseStack, branchesLeaveValues);
                         GraphTargetItem addAfterIf = null;
                         if (!onTrue.isEmpty() && !onFalse.isEmpty()
                                 && (onTrue.get(onTrue.size() - 1) instanceof ContinueItem)
@@ -5504,6 +5508,18 @@ public class Graph {
      */
     public void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
         stack.finishBlock(commands, true);
+    }
+
+    /**
+     * Moves all stack items of if branch to commands.
+     *
+     * @param commands Commands
+     * @param stack Stack
+     * @param branchesLeaveValues Both branches leave the same number of values
+     * on stack (ternar operator candidate)
+     */
+    protected void makeAllBranchCommands(List<GraphTargetItem> commands, TranslateStack stack, boolean branchesLeaveValues) {
+        makeAllCommands(commands, stack);
     }
 
     /**

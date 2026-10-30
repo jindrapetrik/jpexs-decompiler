@@ -2732,13 +2732,24 @@ public class AVM2Graph extends Graph {
                         if (thisSwitch.additionalDefaultPosition != defaultIndex) {
                             int previousBodyIndex = thisSwitch.valuesMapping.get(thisSwitch.additionalDefaultPosition);
                             List<GraphTargetItem> defaultBody = thisSwitch.caseCommands.remove(defaultBodyIndex);
-                            thisSwitch.caseCommands.add(previousBodyIndex, defaultBody);
+                            //previousBodyIndex is an index before the removal
+                            int newDefaultBodyIndex = previousBodyIndex > defaultBodyIndex ? previousBodyIndex - 1 : previousBodyIndex;
+                            thisSwitch.caseCommands.add(newDefaultBodyIndex, defaultBody);
                             for (int p = 0; p < thisSwitch.valuesMapping.size(); p++) {
-                                if (thisSwitch.valuesMapping.get(p) >= previousBodyIndex) {
-                                    thisSwitch.valuesMapping.set(p, thisSwitch.valuesMapping.get(p) + 1);
+                                int bodyIndex = thisSwitch.valuesMapping.get(p);
+                                if (bodyIndex == defaultBodyIndex) {
+                                    bodyIndex = newDefaultBodyIndex;
+                                } else {
+                                    if (bodyIndex > defaultBodyIndex) {
+                                        bodyIndex--;
+                                    }
+                                    if (bodyIndex >= newDefaultBodyIndex) {
+                                        bodyIndex++;
+                                    }
                                 }
+                                thisSwitch.valuesMapping.set(p, bodyIndex);
                             }
-                            defaultBodyIndex = previousBodyIndex;
+                            defaultBodyIndex = newDefaultBodyIndex;
                             GraphTargetItem lastCmd = defaultBody.isEmpty() ? null : defaultBody.get(defaultBody.size() - 1);
                             if (lastCmd != null && !(lastCmd instanceof ExitItem) && !(lastCmd instanceof BreakItem) && !(lastCmd instanceof ContinueItem)) {
                                 defaultBody.add(new BreakItem(thisSwitch.dialect, null, null, thisSwitch.loop.id));
@@ -3582,6 +3593,25 @@ public class AVM2Graph extends Graph {
             }
         }
         super.makeAllCommands(commands, stack);
+    }
+
+    /**
+     * Moves all stack items of if branch to commands. When both branches leave
+     * values on stack (ternar operator candidate), anonymous functions are kept,
+     * for example in: cond ? function():void {...} : null
+     *
+     * @param commands Commands
+     * @param stack Stack
+     * @param branchesLeaveValues Both branches leave the same number of values
+     * on stack (ternar operator candidate)
+     */
+    @Override
+    protected void makeAllBranchCommands(List<GraphTargetItem> commands, TranslateStack stack, boolean branchesLeaveValues) {
+        if (branchesLeaveValues) {
+            super.makeAllCommands(commands, stack);
+            return;
+        }
+        makeAllCommands(commands, stack);
     }
 
     @Override

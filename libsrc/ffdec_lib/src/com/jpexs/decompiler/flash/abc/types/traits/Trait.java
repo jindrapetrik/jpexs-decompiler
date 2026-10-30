@@ -433,16 +433,20 @@ public abstract class Trait implements Cloneable, Serializable {
                 depsFromNewFunctions.add(d.getId());
             }
             Set<DottedChain> typesDefinedInThisScript = new LinkedHashSet<>();
+            //a name in fullyQualifiedNames gives an id with the full name as its last part
+            Set<String> rawTypesDefinedInThisScript = new LinkedHashSet<>();
             for (Trait st : abc.script_info.get(scriptIndex).traits.traits) {
                 Multiname stName = st.getName(abc);
                 int stNsKind = stName.getSimpleNamespaceKind(abc.constants);
                 if ((stNsKind == Namespace.KIND_PACKAGE) || (stNsKind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                    typesDefinedInThisScript.add(stName.getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true));
+                    DottedChain stId = stName.getNameWithNamespace(usedDeobfuscations, abc, abc.constants, true);
+                    typesDefinedInThisScript.add(stId);
+                    rawTypesDefinedInThisScript.add(stId.toRawString());
                 }
             }
             for (int i = 0; i < dependencies.size(); i++) {
                 DottedChain id = dependencies.get(i).getId();
-                if (typesDefinedInThisScript.contains(id)
+                if ((typesDefinedInThisScript.contains(id) || rawTypesDefinedInThisScript.contains(id.getLast()))
                         && !depsFromTraits.contains(id)
                         && !depsFromNewFunctions.contains(id)) {
                     dependencies.remove(i);
