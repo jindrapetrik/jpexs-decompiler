@@ -614,7 +614,9 @@ final class ComponentConverter {
             Set<String> written = new HashSet<>();
             // Flash CS6 requires identifying attributes before dependent ones,
             // notably libraryItemName before component-instance properties.
-            String[] attributeOrder = "DOMCompiledClipItem".equals(node.getNodeName())
+            String[] attributeOrder = "DOMTLFText".equals(node.getNodeName())
+                    ? new String[]{"name", "left", "top", "right", "bottom"}
+                    : "DOMCompiledClipItem".equals(node.getNodeName())
                     ? new String[]{"name", "itemID", "linkageExportForAS", "linkageIdentifier", "linkageClassName",
                         "sourceLastImported", "tooltip", "customIconID", "actionscriptClass", "swfScmHRef",
                         "swfScmSourceFilename", "persistLivePreview11", "editFrameIndex", "requiredMinimumPlayerVersion",

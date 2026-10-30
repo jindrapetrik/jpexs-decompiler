@@ -271,6 +271,8 @@ public class XFLConverter {
 
     private ComponentConverter componentConverter;
 
+    private TlfTextConverter tlfTextConverter;
+
     private GeneratorTemplateConverter generatorTemplateConverter;
 
     /**
@@ -5787,6 +5789,9 @@ public class XFLConverter {
     }
 
     private void convertSWF(AbortRetryIgnoreHandler handler, SWF swf, String swfFileName, String outfile, XFLExportSettings settings, String generator, String generatorVerName, String generatorVersion, boolean parallel, FLAVersion flaVersion, ProgressListener progressListener, XFLExportLog exportLog) throws IOException, InterruptedException {
+        if (flaVersion.getCfbFlaVersion() == null && flaVersion != FLAVersion.CC) {
+            swf = TlfTextConverter.unwrap(swf);
+        }
         exportLog.progress("Validating export settings");
         if (settings.tweenDetectionQuality < 0 || settings.tweenDetectionQuality > 100) {
             throw new IllegalArgumentException("Tween detection quality must be between 0 and 100");
@@ -5882,6 +5887,9 @@ public class XFLConverter {
                 ? new ComponentConverter(swf, cbfFlaVersion != null
                         && cbfFlaVersion.ordinal() < FlaFormatVersion.MX2004.ordinal(),
                         cbfFlaVersion != null && cbfFlaVersion.ordinal() < FlaFormatVersion.MX.ordinal()) : null;
+
+        tlfTextConverter = cbfFlaVersion == null && flaVersion != FLAVersion.CC
+                ? new TlfTextConverter(swf) : null;
 
         String backgroundColor = "#ffffff";
         SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
@@ -6075,6 +6083,9 @@ public class XFLConverter {
         String domDocumentStr = prettyFormatXML(domDocument.toString());
         if (componentConverter != null) {
             domDocumentStr = componentConverter.convert(domDocumentStr, files, datfiles);
+        }
+        if (tlfTextConverter != null) {
+            domDocumentStr = tlfTextConverter.convert(domDocumentStr, files);
         }
 
         if (settings.exportScript) {
@@ -6582,7 +6593,20 @@ public class XFLConverter {
                     if (componentConverter != null) {
                         scriptExportSettings.ignoredInstanceMethods = componentConverter.getIgnoredMethods();
                     }
-                    swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, new EventListener() {
+                    if (tlfTextConverter != null) {
+                        scriptExportSettings.ignoredInstanceTraits = tlfTextConverter.getIgnoredTraits();
+                        scriptExportSettings.restoredStatementFilter = tlfTextConverter::filterStatements;
+                    }
+                    boolean protectedSources = false;
+                    if (tlfTextConverter != null && !Configuration.overwriteExistingFiles.get()) {
+                        for (ScriptPack pack : swf.getAS3Packs()) {
+                            if (pack.getExportFile(scriptsDir.getAbsolutePath(), scriptExportSettings).exists()) {
+                                protectedSources = true;
+                                break;
+                            }
+                        }
+                    }
+                    List<File> scriptFiles = swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, new EventListener() {
                         @Override
                         public void handleExportingEvent(String type, int index, int count, Object data) {
                             exportLog.progress("AS3 START " + type + " " + index + "/" + count + ": " + data);
@@ -6598,6 +6622,9 @@ public class XFLConverter {
                             exportLog.progress("AS3 " + event + ": " + data);
                         }
                     });
+                    if (tlfTextConverter != null && !protectedSources) {
+                        tlfTextConverter.cleanupScripts(scriptFiles, scriptsDir);
+                    }
                     exportLog.progress("ActionScript 3 export completed");
                 } catch (Exception ex) {
                     checkInterrupted();

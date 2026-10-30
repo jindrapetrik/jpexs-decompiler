@@ -17,10 +17,14 @@
 package com.jpexs.decompiler.flash.exporters.settings;
 
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 /**
  * Script export settings.
@@ -63,6 +67,12 @@ public class ScriptExportSettings implements Cloneable {
      * Initializers restored as native FLA component parameters.
      */
     public Set<MethodBody> ignoredInstanceMethods = Collections.emptySet();
+
+    /** Generated traits restored as editable FLA objects. */
+    public Set<Trait> ignoredInstanceTraits = Collections.emptySet();
+
+    /** Optional FLA-only removal of statements restored as authoring objects. */
+    public BiConsumer<MethodBody, List<GraphTargetItem>> restoredStatementFilter;
 
     /**
      * Export embed

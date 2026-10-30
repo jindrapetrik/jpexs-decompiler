@@ -279,6 +279,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //instance variables
+        for (Trait t : instanceInfo.instance_traits.traits) {
+            if (convertData.ignoredInstanceTraits.contains(t)) {
+                ignoredInstanceVariableNames.add(t.getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), false, false));
+            }
+        }
         instanceInfo.instance_traits.toString(usedDeobfuscations, swfVersion, packageName, first, abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path + "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, ignoredInstanceVariableNames, isInterface);
 
         //instance initializer - constructor
@@ -318,7 +323,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         List<String> ignoredInstanceTraitNames = new ArrayList<>();
         for (Trait t : instanceInfo.instance_traits.traits) {
-            if (t instanceof TraitMethodGetterSetter && convertData.ignoredInstanceMethods.contains(
+            if (convertData.ignoredInstanceTraits.contains(t) || t instanceof TraitMethodGetterSetter && convertData.ignoredInstanceMethods.contains(
                     abc.findBody(((TraitMethodGetterSetter) t).method_info))) {
                 ignoredInstanceTraitNames.add(t.getName(abc).getName(usedDeobfuscations, abc, abc.constants, new ArrayList<>(), false, false));
             }

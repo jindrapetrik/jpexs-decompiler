@@ -93,7 +93,10 @@ public final class SwzExtractor {
 
     private static final class Element {
 
-        final int tag, start, end, next;
+        final int tag;
+        final int start;
+        final int end;
+        final int next;
 
         Element(int tag, int start, int end, int next) {
             this.tag = tag;

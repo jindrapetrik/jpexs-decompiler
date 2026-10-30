@@ -478,6 +478,9 @@ public final class MethodBody implements Cloneable {
                                 convertedItems1 = converted.getCode().toGraphTargetItems(usedDeobfuscations, swfVersion, callStack, abcIndex, convertData.thisHasDefaultToPrimitive, convertData, path, methodIndex, isStatic, scriptIndex, classIndex, abc, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, 0, new HashMap<>(), initTraitClasses); //converted.getCode().visitCode(converted)
                             }
                             convertData.removeIgnoredMethodCalls(abc, classIndex, convertedItems1);
+                            if (convertData.restoredStatementFilter != null) {
+                                convertData.restoredStatementFilter.accept(MethodBody.this, convertedItems1);
+                            }
                             try (Statistics s = new Statistics("Graph.graphToString")) {
                                 Graph.graphToString(convertedItems1, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames, seenMethods, exportMode, swfVersion, usedDeobfuscations, classIndex));
                             }

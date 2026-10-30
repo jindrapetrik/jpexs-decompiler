@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.StartSoundBase;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -28,7 +29,6 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-import com.jpexs.decompiler.flash.tags.base.StartSoundBase;
 
 /**
  * StartSound tag - starts a sound playing.

@@ -31,6 +31,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 /**
  * Data for conversion.
@@ -54,6 +55,12 @@ public class ConvertData {
      * Only the FLA exporter supplies this set; ordinary script export keeps them.
      */
     public Set<MethodBody> ignoredInstanceMethods = Collections.emptySet();
+
+    /** Generated traits restored as editable FLA objects. */
+    public Set<Trait> ignoredInstanceTraits = Collections.emptySet();
+
+    /** Optional FLA-only statement filter; normal decompilation leaves it unset. */
+    public BiConsumer<MethodBody, List<GraphTargetItem>> restoredStatementFilter;
 
     public boolean exportEmbed;
 
