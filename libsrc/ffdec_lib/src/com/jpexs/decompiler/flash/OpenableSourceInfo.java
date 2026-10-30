@@ -238,6 +238,8 @@ public class OpenableSourceInfo {
                     return new ZippedBundle(new File(file));
                 case ".iggy":
                     return new IggySwfBundle(new File(file));
+                case ".swz":
+                    return new SwzBundle(new File(file));
             }
         }
 

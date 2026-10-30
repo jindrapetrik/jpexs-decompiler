@@ -101,6 +101,10 @@ alias /?
     External textures remain IggyExternalImage references in the SWF.
     Use -swfProfile iggy when reading that SWF with FFDec CLI.
 
+-swz2swf <infile> <outfile>
+    Extract SWF from a SWZ file.
+    Extract the embedded SWF from <infile> SWZ and save it to <outfile>.
+
 -swf2xml [-external <formats>] <infile> <outfile>
     Convert SWF to XML.
     Convert the <infile> SWF to <outfile> XML file.

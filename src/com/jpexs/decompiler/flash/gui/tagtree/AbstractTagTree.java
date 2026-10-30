@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.SWC;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SwzBundle;
 import com.jpexs.decompiler.flash.ZippedBundle;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -555,7 +556,9 @@ public abstract class AbstractTagTree extends JTree {
                     return TreeNodeType.BUNDLE_SWC;
                 } else if (slist.bundle.getClass() == IggySwfBundle.class) {
                     return TreeNodeType.BUNDLE_IGGY;
-                } else {
+                } else if (slist.bundle.getClass() == SwzBundle.class) {
+                    return TreeNodeType.BUNDLE_SWZ;
+                }else {
                     return TreeNodeType.BUNDLE_BINARY;
                 }
             }

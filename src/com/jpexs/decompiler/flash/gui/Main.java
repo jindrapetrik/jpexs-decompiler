@@ -2887,7 +2887,7 @@ public class Main {
         }
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
-            private final String[] supportedExtensions = new String[]{".swf", ".spl", ".swt", ".gfx", ".swc", ".zip", ".iggy", ".abc"};
+            private final String[] supportedExtensions = new String[]{".swf", ".spl", ".swt", ".gfx", ".swc", ".swz", ".zip", ".iggy", ".abc"};
 
             @Override
             public boolean accept(File f) {
@@ -2949,6 +2949,19 @@ public class Main {
             }
         };
         fc.addChoosableFileFilter(swcFilter);
+        
+        FileFilter swzFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swz")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.swz");
+            }
+        };
+        fc.addChoosableFileFilter(swzFilter);
 
         FileFilter gfxFilter = new FileFilter() {
             @Override
@@ -2974,7 +2987,7 @@ public class Main {
                 return AppStrings.translate("filter.iggy");
             }
         };
-        fc.addChoosableFileFilter(iggyFilter);
+        fc.addChoosableFileFilter(iggyFilter);                
 
         FileFilter abcFilter = new FileFilter() {
             @Override

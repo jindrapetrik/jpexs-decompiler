@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
+import com.jpexs.decompiler.flash.SwzExtractor;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
@@ -477,6 +478,11 @@ public class CommandLineArgumentParser {
             exampleFound = true;
         }
 
+        if (filter == null || filter.equals("swz2swf")) {
+            out.println(PREFIX + "-swz2swf myfile.swz result.swf");
+            exampleFound = true;
+        }
+
         if (filter == null || filter.equals("header")) {
             out.println(PREFIX + "-header myfile.swf");
             out.println(PREFIX + "-header -set version 10 -set width 800px -set framerate 23.5 myfile.swf outfile.swf");
@@ -744,6 +750,9 @@ public class CommandLineArgumentParser {
             System.exit(0);
         } else if (command.equals("iggy2swf")) {
             parseIggy2Swf(args);
+            System.exit(0);
+        } else if (command.equals("swz2swf")) {
+            parseSwz2Swf(args);
             System.exit(0);
         } else if (command.equals("swf2xml")) {
             parseSwf2Xml(args, charset, swfProfile, handler);
@@ -2917,6 +2926,27 @@ public class CommandLineArgumentParser {
             System.out.println("OK");
         } catch (IOException | IllegalArgumentException ex) {
             logger.log(Level.SEVERE, "Error converting Iggy to SWF", ex);
+            System.exit(1);
+        }
+    }
+
+    private static void parseSwz2Swf(Stack<String> args) {
+        if (args.size() != 2) {
+            badArguments("swz2swf");
+        }
+        String input = args.pop();
+        File output = new File(args.pop());
+        try {
+            byte[] swf;
+            try (InputStream stream = new BufferedInputStream(new StdInAwareFileInputStream(input))) {
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                Helper.copyStreamEx(stream, bytes);
+                swf = SwzExtractor.extract(bytes.toByteArray());
+            }
+            Files.write(output.toPath(), swf);
+            System.out.println("OK");
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "Error extracting SWZ to SWF", ex);
             System.exit(1);
         }
     }
