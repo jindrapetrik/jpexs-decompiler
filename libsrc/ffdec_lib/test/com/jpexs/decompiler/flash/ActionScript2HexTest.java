@@ -45,14 +45,22 @@ public class ActionScript2HexTest {
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         Action.actionsToSource(new HashMap<>(), tag, tag.getActions(), "", writer, swf.getCharset());
         writer.finishHilights();
-        return writer.toString().replace("\r\n", "\n");
+        return writer.toString().replace("\r\n", "\n").trim();
     }
 
     @Test
     public void testPushReadOusideBounds() throws InterruptedException {
-        assertEquals(decompileHex("96 02 00 00 41 26 07 00").trim(), 
+        assertEquals(decompileHex("96 02 00 00 41 26 07 00"), 
                 "trace(\"A&\\x07\");\n" +
                 "stop();"
         );
+    }
+    
+    @Test
+    public void testConstantPoolInvalidCount() throws InterruptedException {
+        //The constantpool has length 08 00, but count = 2
+        //In FP 32, player is stopped on this,
+        //In FP 7, data is read out of bounds, but the script continues (after actionLength)
+        assertEquals(decompileHex("88 08 00 02 00 48 45 4c 4c 4f 00 96 02 00 08 00 26 00"), "trace(\"HELLO\");");       
     }
 }
