@@ -1993,7 +1993,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES
                     && !isFolder
                     && !(firstItem instanceof AS3Package)
-                    && !(firstItem instanceof PackedBinaryData)) {
+                    && !(firstItem instanceof PackedBinaryData)
+                    && !(firstItem instanceof FrameScript && ((FrameScript) firstItem).getSingleDoActionTag() == null)
+                    ) {
                 showInTagListViewTagMenuItem.setVisible(true);
             }
 
@@ -2002,7 +2004,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if (((firstItem instanceof DrawableTag)
                     || (firstItem instanceof Frame)
-                    || (firstItem instanceof TagScript)
+                    //|| (firstItem instanceof TagScript)
                     || (firstItem instanceof SoundStreamHeadTypeTag)
                     || (firstItem instanceof DefineSoundTag)
                     || (firstItem instanceof DefineExternalSound)
@@ -2019,7 +2021,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                     || (firstItem instanceof CLIPACTIONRECORD)
                     || (firstItem instanceof BUTTONRECORD)
                     || (firstItem instanceof BUTTONCONDACTION)
-                    || (firstItem instanceof TagScript)) {
+                    || (firstItem instanceof TagScript)
+                    || (firstItem instanceof FrameScript && ((FrameScript) firstItem).getSingleDoActionTag() != null)) {
                 showInHexDumpViewTagMenuItem.setVisible(true);
             }
 
@@ -5491,6 +5494,9 @@ public class TagTreeContextMenu extends JPopupMenu {
         TreeItem item = getCurrentItem();
         if (item instanceof TagScript) {
             item = ((TagScript) item).getTag();
+        }
+        if (item instanceof FrameScript) {
+            item = ((FrameScript) item).getSingleDoActionTag();
         }
         mainPanel.showView(MainPanel.VIEW_DUMP);
         mainPanel.dumpTree.setSelectedItem(item);
