@@ -282,13 +282,13 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem saveExeMenuItem;
 
     private JMenu exportFileMenu;
-    
+
     private JMenuItem exportXamlMenuItem;
 
     private JMenuItem importSwfXmlMenuItem;
 
-    private JMenu bulkImportMenu;            
-    
+    private JMenu bulkImportMenu;
+
     private JMenuItem importScriptsMenuItem;
 
     private JMenuItem importTextsMenuItem;
@@ -424,7 +424,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem createTweenMenuItem;
 
     private JMenuItem convertTextTypeMenuItem;
-    
+
     private JMenuItem normalizeFontsMenuItem;
 
     private JMenuItem prepareDebugInject;
@@ -627,8 +627,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         exportFlaMenuItem.addActionListener(this::exportFlaActionPerformed);
         exportFlaMenuItem.setIcon(View.getIcon("exportfla16"));
         add(exportFlaMenuItem);
-        
-        
+
         exportFileMenu = new JMenu(mainPanel.translate("menu.export.file"));
         exportFileMenu.setIcon(View.getIcon("export16"));
 
@@ -783,7 +782,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         createTweenMenuItem.addActionListener(this::createTweenActionPerformed);
         createTweenMenuItem.setIcon(View.getIcon("tween16"));
         add(createTweenMenuItem);
-        
+
         convertTextTypeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.convertTextType"));
         convertTextTypeMenuItem.addActionListener(this::convertTextTypeActionPerformed);
         convertTextTypeMenuItem.setIcon(View.getIcon("text16"));
@@ -888,10 +887,9 @@ public class TagTreeContextMenu extends JPopupMenu {
         importSwfXmlMenuItem.setIcon(View.getIcon("importxml16"));
         add(importSwfXmlMenuItem);
 
-        
         bulkImportMenu = new JMenu(mainPanel.translate("menu.file.import.bulkImport"));
         bulkImportMenu.setIcon(View.getIcon("bulkimport16"));
-        
+
         importScriptsMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.script"));
         importScriptsMenuItem.addActionListener(this::importScriptsActionPerformed);
         importScriptsMenuItem.setIcon(View.getIcon("importscript16"));
@@ -1385,7 +1383,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (!(item instanceof FontTag)) {
                 allSelectedIsFont = false;
             }
-            
+
             if (!(item instanceof TextTag)) {
                 allSelectedIsText = false;
             }
@@ -1994,8 +1992,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     && !isFolder
                     && !(firstItem instanceof AS3Package)
                     && !(firstItem instanceof PackedBinaryData)
-                    && !(firstItem instanceof FrameScript && ((FrameScript) firstItem).getSingleDoActionTag() == null)
-                    ) {
+                    && !(firstItem instanceof FrameScript && ((FrameScript) firstItem).getSingleDoActionTag() == null)) {
                 showInTagListViewTagMenuItem.setVisible(true);
             }
 
@@ -2120,7 +2117,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (items.size() == 1 && items.get(0) instanceof PlaceObjectTypeTag) {
             createTweenMenuItem.setVisible(findTweenTarget((PlaceObjectTypeTag) items.get(0)) != null);
         }
-        
+
         if (allSelectedIsText) {
             convertTextTypeMenuItem.setVisible(true);
         }
@@ -2286,12 +2283,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
         }
-        
+
         //These will be hidden when they do not contain any visible item
         exportFileMenu.setVisible(true);
         bulkImportMenu.setVisible(true);
-        
-        
+
         updateSeparators();
     }
 
@@ -2315,7 +2311,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
         }
-        
+
         final int ITEM_COUNT_LIMIT = 6;
         int totalVisible = 0;
         for (Component comp : getComponents()) {
@@ -2861,7 +2857,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             logger.log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
             logger.log(Level.SEVERE, null, ex.getCause());
-        }        
+        }
     }
 
     private void addTagAfterActionPerformed(ActionEvent evt, TreeItem item, Class<?> cl, TreeNodeType createNodeType) {
@@ -2913,7 +2909,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             logger.log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
             logger.log(Level.SEVERE, null, ex.getCause());
-        }  
+        }
     }
 
     private int checkUniqueCharacterId(Tag tag) {
@@ -3473,14 +3469,14 @@ public class TagTreeContextMenu extends JPopupMenu {
             this.tweenRatio = tweenRatio;
         }
     }
-    
+
     private void convertTextTypeActionPerformed(ActionEvent evt) {
         List<TreeItem> itemr = getSelectedItems();
         if (itemr.isEmpty()) {
             return;
         }
         int currentTextType = 0;
-        
+
         TextTypeConverter converter = new TextTypeConverter();
 
         if (itemr.size() == 1) {
@@ -3503,7 +3499,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         for (TreeItem item : itemr) {
-            TextTag t = (TextTag) item;            
+            TextTag t = (TextTag) item;
             converter.convertCharacter(t.getSwf(), t.getCharacterId(), newTextType);
         }
 
@@ -7103,5 +7099,4 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
-    
 }
