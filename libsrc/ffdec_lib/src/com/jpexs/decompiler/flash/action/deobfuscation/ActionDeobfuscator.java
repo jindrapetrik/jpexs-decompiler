@@ -69,6 +69,8 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineLocal;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf5.ActionIncrement;
+import com.jpexs.decompiler.flash.action.swf5.ActionInitArray;
+import com.jpexs.decompiler.flash.action.swf5.ActionInitObject;
 import com.jpexs.decompiler.flash.action.swf5.ActionLess2;
 import com.jpexs.decompiler.flash.action.swf5.ActionModulo;
 import com.jpexs.decompiler.flash.action.swf5.ActionPushDuplicate;
@@ -710,7 +712,10 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                     || action instanceof ActionConstantPool
                     || action instanceof ActionCallFunction
                     || action instanceof ActionReturn
-                    || action instanceof ActionEnd)) {
+                    || action instanceof ActionInitArray
+                    || action instanceof ActionInitObject
+                    || action instanceof ActionEnd
+                    )) {
                 break;
             }
 
