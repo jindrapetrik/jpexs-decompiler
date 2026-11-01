@@ -623,6 +623,11 @@ public class ShapeSelection {
         return result;
     }
 
+    public BatchEdit deleteAll(List<Selection> selected) {
+        BatchEdit deleted = changeAll(selected, item -> null, item -> null);
+        return new BatchEdit(deleted.model, new ArrayList<>(), deleted.changed);
+    }
+
     public BatchEdit changeAll(List<Selection> selected, Function<Selection, FILLSTYLE> fillChange,
             Function<Selection, ILINESTYLE> lineChange) {
         Map<Selection, FILLSTYLE> fills = new IdentityHashMap<>();

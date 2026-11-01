@@ -739,6 +739,19 @@ public class EasySwfPanel extends JPanel {
         }
     }
 
+    private void deleteShapeSelection() {
+        if (editingShape == null || selectedShapeParts.isEmpty()) {
+            return;
+        }
+        stagePanel.setShapePreview(null);
+        ShapeSelection.BatchEdit edit = shapeSelection.deleteAll(selectedShapeParts);
+        if (edit.changed) {
+            applyShapeEdit(edit, EasyStrings.translate("action.deleteShapeSelection"));
+        } else {
+            showShapeSelections(edit.selected);
+        }
+    }
+
     private void changeShapeStyle(boolean stroke, String property) {
         if (editingShape == null || selectedShapeParts.stream().noneMatch(item -> item.stroke == stroke)) {
             return;
@@ -831,6 +844,7 @@ public class EasySwfPanel extends JPanel {
         stagePanel.setSelectionMoveListeners(editingShape == null ? null
                 : point -> shapeSelection.selectionContains(selectedShapeParts, point, 3, stagePanel.getTimelinedToPanelTransform()),
                 editingShape == null ? null : this::moveShapeSelection);
+        stagePanel.setSelectionDeleteListener(editingShape == null ? null : this::deleteShapeSelection);
         stagePanel.setTransformSelectionMode(transformEnabled());
         timelinePanel.setVisible(editingShape == null);
         rightTabbedPane.setEnabledAt(2, editingShape == null);

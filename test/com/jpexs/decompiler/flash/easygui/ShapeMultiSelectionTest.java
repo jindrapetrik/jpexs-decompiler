@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.Helper;
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
@@ -355,5 +356,58 @@ public class ShapeMultiSelectionTest {
         assertEquals(at(restored.model, 1000, 0).line.getWidth(), 200);
         assertEquals(at(restored.model, 0, 1000).line.getWidth(), 200);
         assertEquals(ShapeSelection.updateSelection(restored.selected, at(restored.model, 0, 1000), true).size(), 1);
+    }
+
+    @Test
+    public void deletingARectangularSelectionClearsItAndUndoRestoresTheExactShape() throws Exception {
+        DefineShape4Tag shape = shape();
+        rectangle(shape, 0, 0, 2000, 2000, 1, 1);
+        rectangle(shape, 3000, 0, 1000, 1000, 1, 1);
+        ShapeSelection model = selection(shape);
+        addClean(shape);
+        byte[] before = shape.getData();
+        ShapeSelection.RectangleSelection box = model.selectRectangle(new Rectangle2D.Double(500, -200, 1000, 1000),
+                Collections.emptyList(), false);
+        assertEquals(box.selected.size(), 2);
+        ShapeSelection.BatchEdit deleted = box.model.deleteAll(box.selected);
+        assertTrue(deleted.changed);
+        assertTrue(deleted.selected.isEmpty());
+        UndoManager history = new UndoManager();
+        history.doOperation(new ShapeStyleChangeOperation(shape, deleted.model, "Delete", null), shape.getSwf());
+        ShapeSelection restored = roundTrip(current(shape));
+        assertNull(at(restored, 1000, 400));
+        assertNull(at(restored, 1000, 0));
+        assertEquals(at(restored, 250, 400).fill.color.toColor(), Color.red);
+        assertEquals(at(restored, 250, 0).line.getWidth(), 200);
+        assertEquals(at(restored, 3500, 500).fill.color.toColor(), Color.red);
+        assertFalse(deleted.model.deleteAll(deleted.selected).changed);
+        history.undo(shape.getSwf());
+        assertEquals(current(shape).getData(), before);
+        assertFalse(shape.getSwf().isModified());
+        assertFalse(history.canUndo(shape.getSwf()));
+        history.redo(shape.getSwf());
+        assertNull(at(new ShapeSelection(current(shape)), 1000, 400));
+    }
+
+    @Test
+    public void deletingAllContentsSavesAnEmptyShapeAndDeletingOneEdgePreservesItsFill() throws Exception {
+        DefineShape4Tag shape = shape();
+        rectangle(shape, 0, 0, 2000, 2000, 1, 1);
+        ShapeSelection model = selection(shape);
+        addClean(shape);
+        ShapeSelection.BatchEdit edgeDeleted = model.deleteAll(Collections.singletonList(at(model, 1000, 0)));
+        assertTrue(edgeDeleted.selected.isEmpty());
+        assertFalse(at(edgeDeleted.model, 1000, 0).stroke);
+        assertEquals(at(edgeDeleted.model, 1000, 500).fill.color.toColor(), Color.red);
+        assertEquals(at(edgeDeleted.model, 0, 1000).line.getWidth(), 200);
+        ShapeSelection.RectangleSelection all = model.selectRectangle(new Rectangle2D.Double(-500, -500, 3000, 3000),
+                Collections.emptyList(), false);
+        ShapeSelection.BatchEdit deleted = all.model.deleteAll(all.selected);
+        assertTrue(deleted.selected.isEmpty());
+        new ShapeStyleChangeOperation(shape, deleted.model, "Delete", null).doOperation();
+        ShapeSelection restored = roundTrip(current(shape));
+        assertNull(at(restored, 1000, 500));
+        assertNull(at(restored, 1000, 0));
+        assertTrue(restored.getParts().isEmpty());
     }
 }

@@ -450,6 +450,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private BiConsumer<Point2D, Boolean> selectionMoveListener;
 
+    private Runnable selectionDeleteListener;
+
     private Timelined shapePreview;
 
     private ShapeTag editedShape;
@@ -624,6 +626,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         selectionMoveHitTest = hitTest;
         selectionMoveListener = listener;
         shapePreview = null;
+    }
+
+    public void setSelectionDeleteListener(Runnable listener) {
+        selectionDeleteListener = listener;
     }
 
     public void setShapePreview(ShapeTag shape) {
@@ -2305,6 +2311,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_DELETE && rectangleSelectionListener != null && selectionDeleteListener != null) {
+                        e.consume();
+                        selectionDeleteListener.run();
+                        return;
+                    }
                     if (textSelectionText != null) {
                         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                             changeTextSelection(+1);
