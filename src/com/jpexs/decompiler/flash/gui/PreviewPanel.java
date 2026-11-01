@@ -3614,15 +3614,25 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return false;
     }
 
+    static void applyPlaceObjectTransform(PlaceObjectTypeTag placeTag, int frame, Matrix matrix) {
+        MATRIX originalMatrix = placeTag.getMatrix();
+        if (originalMatrix == null) {
+            // Move tags can inherit their matrix from an earlier placement at the same depth.
+            DepthState depthState = placeTag.getTimelined().getTimeline().getDepthState(frame, placeTag.getDepth());
+            if (depthState != null) {
+                originalMatrix = depthState.matrix;
+            }
+        }
+        placeTag.setMatrix(matrix.concatenate(new Matrix(originalMatrix)).toMATRIX());
+        placeTag.setPlaceFlagHasMatrix(true);
+    }
+
     private void saveDisplayEditTag(boolean refreshTree) {
         boolean operationMode = displayEditMode == EDIT_TRANSFORM || displayEditMode == EDIT_POINTS;
         if (displayEditMode == EDIT_TRANSFORM) {
             Matrix matrix = displayEditImagePanel.getNewMatrix();
             if (displayEditTag instanceof PlaceObjectTypeTag) {
-                PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) displayEditTag;
-                Matrix origMatrix = new Matrix(placeTag.getMatrix());
-                placeTag.setMatrix(matrix.concatenate(origMatrix).toMATRIX());
-                placeTag.setPlaceFlagHasMatrix(true);
+                applyPlaceObjectTransform((PlaceObjectTypeTag) displayEditTag, displayEditFrame, matrix);
             }
             if (displayEditTag instanceof ShapeTag) {
                 ShapeTag shape = (ShapeTag) displayEditTag;
