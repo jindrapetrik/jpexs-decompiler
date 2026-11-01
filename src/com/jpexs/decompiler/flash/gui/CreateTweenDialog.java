@@ -13,8 +13,11 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RECT;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -40,6 +43,7 @@ public class CreateTweenDialog extends AppDialog {
     private final int frameCount;
     private final MATRIX startMatrix;
     private final MATRIX endMatrix;
+    private final RECT characterBounds;
     private final CXFORMWITHALPHA startColorTransform;
     private final CXFORMWITHALPHA endColorTransform;
     private final boolean tweenColorTransform;
@@ -50,6 +54,8 @@ public class CreateTweenDialog extends AppDialog {
     private final JSpinner easingSpinner = new JSpinner(new SpinnerNumberModel(0, -100, 100, 1));
     private final JLabel easingDirectionLabel = new JLabel();
     private final JTabbedPane easingTabs = new JTabbedPane();
+    private final TransformPanel.RegistrationPointPanel transformationPointPanel
+            = new TransformPanel.RegistrationPointPanel(e -> schedulePreviewUpdate());
     private final CustomEasePanel customEasePanel;
     private final Timer previewUpdateTimer = new Timer(75, e -> updatePreview());
     private int previewEasingValue;
@@ -65,6 +71,8 @@ public class CreateTweenDialog extends AppDialog {
         this.frameCount = frameCount;
         this.startMatrix = new MATRIX(startMatrix);
         this.endMatrix = new MATRIX(endMatrix);
+        CharacterTag character = swf.getCharacter(characterId);
+        this.characterBounds = character instanceof BoundedTag ? ((BoundedTag) character).getRect() : null;
         this.startColorTransform = startColorTransform == null ? null : startColorTransform.clone();
         this.endColorTransform = endColorTransform == null ? null : endColorTransform.clone();
         this.tweenColorTransform = tweenColorTransform;
@@ -79,6 +87,10 @@ public class CreateTweenDialog extends AppDialog {
         add(previewPanel, BorderLayout.CENTER);
 
         JPanel options = new JPanel(new BorderLayout(8, 8));
+        JPanel transformationPointOptions = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        transformationPointOptions.add(new JLabel(AppStrings.translate("transform.transformPoint")));
+        transformationPointOptions.add(transformationPointPanel);
+        options.add(transformationPointOptions, BorderLayout.NORTH);
         JPanel standardPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         standardPanel.add(new JLabel(translate("easing.value")));
         standardPanel.add(easingSpinner);
@@ -188,7 +200,7 @@ public class CreateTweenDialog extends AppDialog {
                     : tweenRatio ? TweenEasing.interpolate(startRatio, endRatio, eased) : -1;
             PlaceObject2Tag place = new PlaceObject2Tag(swf, frame > 0, 1,
                     frame == 0 ? characterId : -1,
-                    TweenEasing.interpolate(startMatrix, endMatrix, eased), colorTransform,
+                    getInterpolatedMatrix(eased), colorTransform,
                     ratio, null, -1, null);
             place.setTimelined(preview);
             preview.addTag(place);
@@ -201,6 +213,18 @@ public class CreateTweenDialog extends AppDialog {
         // Frame -1 selects timeline playback. A non-negative frame would make
         // ImagePanel render a still frame even when autoPlay is enabled.
         previewPanel.setTimelined(preview, swf, -1, false, true, false, true, true, false, true, true, false);
+    }
+
+    /**
+     * Gets the same transform around the selected point for the preview and
+     * the created tween.
+     *
+     * @param easedProgress Progress after applying the selected easing
+     * @return Interpolated transform
+     */
+    public MATRIX getInterpolatedMatrix(double easedProgress) {
+        return TweenEasing.interpolate(startMatrix, endMatrix, easedProgress, characterBounds,
+                transformationPointPanel.getSelectedPosition());
     }
 
     public double getEasedProgress(double progress) {

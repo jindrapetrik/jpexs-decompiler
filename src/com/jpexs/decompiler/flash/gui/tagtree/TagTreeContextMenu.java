@@ -3413,7 +3413,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             double progress = (double) (frameIndex - target.sourceFrame)
                     / (target.targetFrame - target.sourceFrame);
             double eased = dialog.getEasedProgress(progress);
-            MATRIX matrix = TweenEasing.interpolate(target.startMatrix, target.endMatrix, eased);
+            MATRIX matrix = dialog.getInterpolatedMatrix(eased);
             CXFORMWITHALPHA colorTransform = target.tweenColorTransform
                     ? TweenEasing.interpolate(target.startColorTransform, target.endColorTransform, eased) : null;
             int ratio = target.tweenRatio
