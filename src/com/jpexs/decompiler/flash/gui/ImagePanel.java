@@ -134,6 +134,7 @@ import java.util.TimerTask;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -445,6 +446,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private BiConsumer<Shape, Boolean> rectangleSelectionListener;
 
+    private Predicate<Point2D> selectionMoveHitTest;
+
+    private BiConsumer<Point2D, Boolean> selectionMoveListener;
+
+    private Timelined shapePreview;
+
     private ShapeTag editedShape;
 
     private boolean inMoving = false;
@@ -600,6 +607,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public void setRectangleSelectionListener(BiConsumer<Shape, Boolean> listener) {
         rectangleSelectionListener = listener;
         iconPanel.rectangleSelectionGesture = false;
+        iconPanel.selectionMoveGesture = false;
         iconPanel.suppressRectangleClick = false;
         iconPanel.dragStart = null;
         iconPanel.selectionEnd = null;
@@ -610,6 +618,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             iconPanel.setCursor(defaultCursor);
         }
         iconPanel.repaint();
+    }
+
+    public void setSelectionMoveListeners(Predicate<Point2D> hitTest, BiConsumer<Point2D, Boolean> listener) {
+        selectionMoveHitTest = hitTest;
+        selectionMoveListener = listener;
+        shapePreview = null;
+    }
+
+    public void setShapePreview(ShapeTag shape) {
+        shapePreview = shape == null ? null : TimelinedMaker.makeTimelined(shape);
+        displayObjectCache.clear();
+        redraw();
     }
 
     public void setSelectionMode(boolean selectionMode) {
@@ -1788,7 +1808,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private boolean rectangleSelectionGesture;
 
+        private boolean selectionMoveGesture;
+
         private boolean suppressRectangleClick;
+
+        private Point2D selectionMoveDelta(Point2D end) {
+            Point2D from = toTimelinedPoint(dragStart);
+            Point2D to = toTimelinedPoint(end);
+            return new Point2D.Double(to.getX() - from.getX(), to.getY() - from.getY());
+        }
 
         private boolean canInvert = true;
 
@@ -2068,7 +2096,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         Rectangle2D selectionRect = getSelectionRect();
-                        if (selectionRect != null) {
+                        if (selectionRect != null && !selectionMoveGesture) {
                             g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_ROUND, 0, new float[]{2, 2}, 0f));
                             if (canInvert) {
                                 g2.setComposite(BlendComposite.Invert);
@@ -2537,6 +2565,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 public void mousePressed(MouseEvent e) {
                     if (rectangleSelectionListener != null && SwingUtilities.isLeftMouseButton(e) && !e.isAltDown()) {
                         rectangleSelectionGesture = true;
+                        selectionMoveGesture = !e.isControlDown() && selectionMoveHitTest != null
+                                && selectionMoveHitTest.test(toTimelinedPoint(e.getPoint()));
                         suppressRectangleClick = false;
                         setDragStart(e.getPoint());
                         selectionEnd = null;
@@ -2754,12 +2784,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             selectionEnd = e.getPoint();
                         }
                         Rectangle2D rectangle = getSelectionRect();
+                        boolean moving = selectionMoveGesture;
+                        Point2D delta = moving && rectangle != null ? selectionMoveDelta(e.getPoint()) : null;
                         rectangleSelectionGesture = false;
+                        selectionMoveGesture = false;
                         suppressRectangleClick = rectangle != null;
                         dragStart = null;
                         selectionEnd = null;
                         repaint();
-                        if (rectangle != null && rectangleSelectionListener != null) {
+                        if (delta != null && selectionMoveListener != null) {
+                            selectionMoveListener.accept(delta, true);
+                            suppressRectangleClick = true;
+                        } else if (!moving && rectangle != null && rectangleSelectionListener != null) {
                             rectangleSelectionListener.accept(toTimelinedArea(rectangle), e.isControlDown());
                         }
                         return;
@@ -2918,7 +2954,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (rectangleSelectionGesture) {
                         if (dragStart != null && dragStart.distance(e.getPoint()) >= 3) {
                             selectionEnd = e.getPoint();
-                            repaint();
+                            if (selectionMoveGesture && selectionMoveListener != null) {
+                                selectionMoveListener.accept(selectionMoveDelta(e.getPoint()), false);
+                            } else {
+                                repaint();
+                            }
                         }
                         return;
                     }
@@ -5576,6 +5616,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             displayObjectCache.clear();
             this.timelined = drawable;
             this.editedShape = null;
+            this.shapePreview = null;
             this.isolatedDepth = null;
             this.parentTimelineds.clear();
             this.parentFrames.clear();
@@ -5842,6 +5883,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         timelined = null;
         editedShape = null;
+        shapePreview = null;
         loaded = true;
         stillFrame = true;
         zoomAvailable = false;
@@ -5876,6 +5918,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         lda = null;
         timelined = null;
         editedShape = null;
+        shapePreview = null;
         loaded = true;
         stillFrame = true;
         zoomAvailable = true;
@@ -6599,7 +6642,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 } else if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
                     img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
                 } else {
-                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepths, isolatedDepth, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelineds, parentDepths, parentFrames, getParentMatrix());
+                    Timelined rendered = shapePreview == null ? timelined : shapePreview;
+                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, rendered, renderContext, selectedDepths, isolatedDepth, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelineds, parentDepths, parentFrames, getParentMatrix());
                 }
 
                 synchronized (ImagePanel.this) {
@@ -6915,6 +6959,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         clearImagePanel();
         timelined = null;
         editedShape = null;
+        shapePreview = null;
         swf = null;
         guidesSwf = null;
         lda = null;
@@ -7545,6 +7590,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             timelined = TimelinedMaker.makeTimelined(shape);
             swf = shape.getSwf();
             editedShape = shape;
+            shapePreview = null;
             frame = 0;
             prevFrame = -1;
             parentTimelineds.clear();

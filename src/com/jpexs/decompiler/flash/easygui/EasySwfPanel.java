@@ -691,11 +691,16 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void showShapeSelections(List<ShapeSelection.Selection> selected) {
+        selectedShapeParts = highlightShapeSelections(shapeSelection, selected);
+        shapePropertiesPanel.setSelections(selectedShapeParts);
+    }
+
+    private List<ShapeSelection.Selection> highlightShapeSelections(ShapeSelection model, List<ShapeSelection.Selection> selected) {
         List<ShapeSelection.Selection> displayed = new ArrayList<>();
         List<java.awt.Shape> fills = new ArrayList<>();
         List<ImagePanel.LineHilight> lines = new ArrayList<>();
         for (ShapeSelection.Selection item : selected) {
-            ShapeSelection.Selection current = shapeSelection.displaySelection(item);
+            ShapeSelection.Selection current = model.displaySelection(item);
             displayed.add(current);
             if (current.stroke && current.line != null) {
                 lines.add(new ImagePanel.LineHilight(current.area, current.linePath, current.line.getWidth()));
@@ -703,9 +708,35 @@ public class EasySwfPanel extends JPanel {
                 fills.add(current.area);
             }
         }
-        selectedShapeParts = displayed;
         stagePanel.setHilightedShapes(fills, lines);
-        shapePropertiesPanel.setSelections(displayed);
+        return displayed;
+    }
+
+    private void moveShapeSelection(Point2D delta, boolean commit) {
+        if (editingShape == null || selectedShapeParts.isEmpty()) {
+            return;
+        }
+        ShapeSelection.BatchEdit edit = shapeSelection.moveAll(selectedShapeParts, delta.getX(), delta.getY());
+        if (commit || !edit.changed) {
+            stagePanel.setShapePreview(null);
+        }
+        if (!edit.changed) {
+            showShapeSelections(selectedShapeParts);
+        } else if (commit) {
+            applyShapeEdit(edit, EasyStrings.translate("action.move"));
+        } else {
+            try {
+                stagePanel.setShapePreview(ShapeStyleChangeOperation.createShape(editingShape, edit.model));
+                highlightShapeSelections(edit.model, edit.selected);
+            } catch (IOException | InterruptedException ex) {
+                Logger.getLogger(EasySwfPanel.class.getName()).log(Level.SEVERE, "Cannot preview shape move", ex);
+                if (ex instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+                stagePanel.setShapePreview(null);
+                showShapeSelections(selectedShapeParts);
+            }
+        }
     }
 
     private void changeShapeStyle(boolean stroke, String property) {
@@ -717,7 +748,6 @@ public class EasySwfPanel extends JPanel {
             showShapeSelections(previous);
             return;
         }
-        ShapeSelection beforeModel = shapeSelection;
         ShapeSelection.BatchEdit edit = shapeSelection.changeAll(previous,
                 stroke ? null : item -> shapePropertiesPanel.applyFillChange(item.fill, item.geometry.getBounds2D(), property),
                 stroke ? item -> shapePropertiesPanel.applyStrokeChange(item.line, item.area.getBounds2D(), property) : null);
@@ -727,6 +757,12 @@ public class EasySwfPanel extends JPanel {
         }
         String description = EasyStrings.translate("action.change").replace("%item%",
                 EasyStrings.translate("properties.shape.header." + (stroke ? "stroke" : "fill")));
+        applyShapeEdit(edit, description);
+    }
+
+    private void applyShapeEdit(ShapeSelection.BatchEdit edit, String description) {
+        List<ShapeSelection.Selection> previous = new ArrayList<>(selectedShapeParts);
+        ShapeSelection beforeModel = shapeSelection;
         ImagePanel.ShapeEditContext context = stagePanel.getShapeEditContext();
         try {
             undoManager.doOperation(new ShapeStyleChangeOperation(editingShape, edit.model, description, (tag, forward) -> {
@@ -745,7 +781,7 @@ public class EasySwfPanel extends JPanel {
                 libraryTreeTable.setSwf(tag.getSwf());
             }), editingShape.getSwf());
         } catch (IOException | InterruptedException ex) {
-            Logger.getLogger(EasySwfPanel.class.getName()).log(Level.SEVERE, "Cannot change shape style", ex);
+            Logger.getLogger(EasySwfPanel.class.getName()).log(Level.SEVERE, "Cannot edit shape", ex);
             if (ex instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
@@ -792,6 +828,9 @@ public class EasySwfPanel extends JPanel {
             rightTabbedPane.setSelectedIndex(0);
             updatePropertiesPanel();
         });
+        stagePanel.setSelectionMoveListeners(editingShape == null ? null
+                : point -> shapeSelection.selectionContains(selectedShapeParts, point, 3, stagePanel.getTimelinedToPanelTransform()),
+                editingShape == null ? null : this::moveShapeSelection);
         stagePanel.setTransformSelectionMode(transformEnabled());
         timelinePanel.setVisible(editingShape == null);
         rightTabbedPane.setEnabledAt(2, editingShape == null);

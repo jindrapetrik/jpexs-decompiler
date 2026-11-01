@@ -18,6 +18,7 @@ import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
@@ -201,6 +202,10 @@ public class ShapeSelection {
      * Selects a polygonal area in local coordinates, including transformed screen rectangles.
      */
     public RectangleSelection selectArea(Shape selectionArea, List<Selection> current, boolean additive) {
+        return selectArea(selectionArea, current, additive, true);
+    }
+
+    private RectangleSelection selectArea(Shape selectionArea, List<Selection> current, boolean additive, boolean visibleOnly) {
         Area region = new Area(selectionArea);
         if (region.isEmpty()) {
             return new RectangleSelection(this, additive ? new ArrayList<>(current) : new ArrayList<>());
@@ -222,7 +227,7 @@ public class ShapeSelection {
                 clipped.intersect(region);
                 if (part.fill == null) {
                     clipped.reset();
-                } else {
+                } else if (visibleOnly) {
                     // Filled areas hidden by later fills are not editable here.
                     for (int i = part.index + 1; i < parts.size(); i++) {
                         if (parts.get(i).fill != null) {
@@ -251,7 +256,7 @@ public class ShapeSelection {
                 boolean first = true;
                 for (Path2D.Double edge : strokeEdges(path)) {
                     double[][] points = edgePoints(edge);
-                    List<Double> cuts = areaCuts(points, region, boundaries);
+                    List<Double> cuts = areaCuts(points, boundaries);
                     for (int i = 1; i < cuts.size(); i++) {
                         double from = cuts.get(i - 1);
                         double to = cuts.get(i);
@@ -287,7 +292,10 @@ public class ShapeSelection {
 
     private static List<Line2D.Double> areaBoundaries(Shape area) {
         List<Line2D.Double> boundaries = new ArrayList<>();
-        for (Path2D.Double edge : strokeEdges(area)) {
+        Path2D.Double flattened = new Path2D.Double();
+        // Only intersection testing is flattened; the edited edges retain their curves.
+        flattened.append(area.getPathIterator(null, 0.25), false);
+        for (Path2D.Double edge : strokeEdges(flattened)) {
             boundaries.add(new Line2D.Double(firstPoint(edge), edge.getCurrentPoint()));
         }
         return boundaries;
@@ -298,20 +306,24 @@ public class ShapeSelection {
             return true;
         }
         for (Line2D.Double boundary : boundaries) {
-            double dx = boundary.x2 - boundary.x1;
-            double dy = boundary.y2 - boundary.y1;
-            double length = Math.hypot(dx, dy);
-            double px = point[0] - boundary.x1;
-            double py = point[1] - boundary.y1;
-            double along = length == 0 ? -1 : (px * dx + py * dy) / length;
-            if (length > 0 && along >= -1e-7 && along <= length + 1e-7 && Math.abs(px * dy - py * dx) / length <= 1e-7) {
+            if (onBoundary(boundary, point)) {
                 return true;
             }
         }
         return false;
     }
 
-    private static List<Double> areaCuts(double[][] points, Area area, List<Line2D.Double> boundaries) {
+    private static boolean onBoundary(Line2D.Double boundary, double[] point) {
+        double dx = boundary.x2 - boundary.x1;
+        double dy = boundary.y2 - boundary.y1;
+        double length = Math.hypot(dx, dy);
+        double px = point[0] - boundary.x1;
+        double py = point[1] - boundary.y1;
+        double along = length == 0 ? -1 : (px * dx + py * dy) / length;
+        return length > 0 && along >= -1e-7 && along <= length + 1e-7 && Math.abs(px * dy - py * dx) / length <= 1e-7;
+    }
+
+    private static List<Double> areaCuts(double[][] points, List<Line2D.Double> boundaries) {
         List<Double> cuts = new ArrayList<>(Arrays.asList(0.0, 1.0));
         for (Line2D.Double boundary : boundaries) {
             double dx = boundary.x2 - boundary.x1;
@@ -338,7 +350,7 @@ public class ShapeSelection {
                     : QuadCurve2D.solveQuadratic(Arrays.copyOf(equation, 3), roots);
             for (int i = 0; i < count; i++) {
                 double t = roots[i];
-                if (t > 1e-9 && t < 1 - 1e-9 && containsInclusive(area, boundaries, curvePoint(points, t))) {
+                if (t > 1e-9 && t < 1 - 1e-9 && onBoundary(boundary, curvePoint(points, t))) {
                     cuts.add(t);
                 }
             }
@@ -513,6 +525,102 @@ public class ShapeSelection {
             b.fillType = normalizedFill(b.fillType);
         }
         return a.equals(b);
+    }
+
+    public boolean selectionContains(List<Selection> selected, Point2D point, double tolerance, AffineTransform localToDisplay) {
+        Point2D displayed = localToDisplay.transform(point, null);
+        for (Selection item : selected) {
+            Shape area = localToDisplay.createTransformedShape(displaySelection(item).area);
+            if (area.contains(displayed) || item.stroke && item.line != null && tolerance > 0
+                    && new BasicStroke((float) (2 * tolerance)).createStrokedShape(area).contains(displayed)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Cuts the selection from its source and places it over the destination.
+     * Covered geometry is removed so it cannot reappear after another move.
+     */
+    public BatchEdit moveAll(List<Selection> selected, double x, double y) {
+        double dx = Math.rint(x);
+        double dy = Math.rint(y);
+        if (selected.isEmpty() || dx == 0 && dy == 0) {
+            return new BatchEdit(this, new ArrayList<>(selected), false);
+        }
+        BatchEdit cut = changeAll(selected, item -> null, item -> null);
+        Map<Integer, List<Integer>> byPart = new LinkedHashMap<>();
+        for (int i = 0; i < selected.size(); i++) {
+            byPart.computeIfAbsent(cut.selected.get(i).index, key -> new ArrayList<>()).add(i);
+        }
+        AffineTransform translation = AffineTransform.getTranslateInstance(dx, dy);
+        ShapeSelection moved = new ShapeSelection();
+        Map<Integer, Selection> replacements = new LinkedHashMap<>();
+        Area coverage = new Area();
+        for (Selection part : cut.model.parts) {
+            List<Integer> items = byPart.get(part.index);
+            if (items == null) {
+                continue;
+            }
+            Selection original = selected.get(items.get(0));
+            Shape geometry = part.geometry;
+            if (!part.stroke) {
+                Area fill = new Area();
+                for (int item : items) {
+                    fill.add(new Area(cut.selected.get(item).geometry));
+                }
+                geometry = fill;
+            }
+            Selection placed = moved.addPart(translateFill(original.fill, dx, dy), translateLine(original.line, dx, dy),
+                    translation.createTransformedShape(geometry), part.stroke);
+            if (placed.fill != null || placed.line != null) {
+                coverage.add(new Area(placed.area));
+            }
+            for (int item : items) {
+                Selection source = cut.selected.get(item);
+                replacements.put(item, rebase(source, placed, translation.createTransformedShape(source.geometry), source.edgeIndex));
+            }
+        }
+        RectangleSelection covered = cut.model.selectArea(coverage, Collections.emptyList(), false, false);
+        BatchEdit erased = covered.model.changeAll(covered.selected, item -> null, item -> null);
+        ShapeSelection result = new ShapeSelection();
+        for (Selection part : erased.model.parts) {
+            if (part.fill != null || part.line != null) {
+                result.addPart(part.fill, part.line, part.geometry, part.stroke);
+            }
+        }
+        Map<Integer, Selection> placedParts = new LinkedHashMap<>();
+        for (Selection part : moved.parts) {
+            placedParts.put(part.index, result.addPart(part.fill, part.line, part.geometry, part.stroke));
+        }
+        List<Selection> next = new ArrayList<>();
+        for (int i = 0; i < selected.size(); i++) {
+            Selection item = replacements.get(i);
+            next.add(rebase(item, placedParts.get(item.index), item.geometry, item.edgeIndex));
+        }
+        return new BatchEdit(result, next, true);
+    }
+
+    private static FILLSTYLE translateFill(FILLSTYLE fill, double dx, double dy) {
+        if (fill == null) {
+            return null;
+        }
+        FILLSTYLE result = Helper.deepCopy(fill);
+        MATRIX matrix = result.hasGradient() ? result.gradientMatrix : result.hasBitmap() ? result.bitmapMatrix : null;
+        if (matrix != null) {
+            matrix.translateX += (int) dx;
+            matrix.translateY += (int) dy;
+        }
+        return result;
+    }
+
+    private static ILINESTYLE translateLine(ILINESTYLE line, double dx, double dy) {
+        ILINESTYLE result = Helper.deepCopy(line);
+        if (result instanceof LINESTYLE2 && ((LINESTYLE2) result).hasFillFlag) {
+            ((LINESTYLE2) result).fillType = translateFill(((LINESTYLE2) result).fillType, dx, dy);
+        }
+        return result;
     }
 
     public BatchEdit changeAll(List<Selection> selected, Function<Selection, FILLSTYLE> fillChange,

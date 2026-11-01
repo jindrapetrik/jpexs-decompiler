@@ -92,7 +92,7 @@ public class ShapeStyleChangeOperation implements DoableOperation {
         return description;
     }
 
-    private static ShapeTag createShape(ShapeTag original, ShapeSelection model) throws IOException, InterruptedException {
+    public static ShapeTag createShape(ShapeTag original, ShapeSelection model) throws IOException, InterruptedException {
         SHAPEWITHSTYLE data = SHAPEWITHSTYLE.createEmpty(4);
         data.shapeRecords.clear();
         List<FILLSTYLE> fills = new ArrayList<>();
