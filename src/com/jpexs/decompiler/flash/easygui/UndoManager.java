@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ public class UndoManager {
 
     private final Map<SWF, Integer> historyPosMap = new WeakHashMap<>();
     private final Map<SWF, List<DoableOperation>> historyMap = new WeakHashMap<>();
+    private final Map<SWF, Integer> savedPosMap = new WeakHashMap<>();
 
     private final List<Runnable> changeListeners = new ArrayList<>();
 
@@ -56,6 +59,11 @@ public class UndoManager {
         }
 
         int historyPos = historyPosMap.get(swf);
+        rememberSavedPosition(swf);
+        if (savedPosMap.get(swf) > historyPos) {
+            // The saved state belongs to the redo branch which is being dropped.
+            savedPosMap.put(swf, -1);
+        }
 
         List<DoableOperation> history = historyMap.get(swf);
 
@@ -67,7 +75,35 @@ public class UndoManager {
         historyMap.get(swf).add(doableOperation);
         historyPosMap.put(swf, historyPosMap.get(swf) + 1);
         doableOperation.doOperation();
+        updateModifiedState(swf);
         fireChange();
+    }
+
+    private void rememberSavedPosition(SWF swf) {
+        if (!swf.isModified()) {
+            savedPosMap.put(swf, historyPosMap.get(swf));
+        } else if (!savedPosMap.containsKey(swf)) {
+            savedPosMap.put(swf, -1);
+        }
+    }
+
+    private void updateModifiedState(SWF swf) {
+        if (historyPosMap.get(swf).equals(savedPosMap.get(swf))) {
+            clearModifiedFlags(swf);
+            swf.setHeaderModified(false);
+        } else {
+            swf.setModified(true);
+        }
+    }
+
+    private void clearModifiedFlags(Timelined timelined) {
+        for (Tag tag : timelined.getTags()) {
+            if (tag instanceof Timelined) {
+                clearModifiedFlags((Timelined) tag);
+            }
+            tag.setModified(false);
+        }
+        timelined.setModified(false);
     }
 
     public boolean canUndo(SWF swf) {
@@ -88,8 +124,10 @@ public class UndoManager {
         if (!canUndo(swf)) {
             return;
         }
+        rememberSavedPosition(swf);
         historyPosMap.put(swf, historyPosMap.get(swf) - 1);
         historyMap.get(swf).get(historyPosMap.get(swf)).undoOperation();
+        updateModifiedState(swf);
         fireChange();
     }
 
@@ -97,8 +135,10 @@ public class UndoManager {
         if (!canRedo(swf)) {
             return;
         }
+        rememberSavedPosition(swf);
         historyMap.get(swf).get(historyPosMap.get(swf)).doOperation();
         historyPosMap.put(swf, historyPosMap.get(swf) + 1);
+        updateModifiedState(swf);
         fireChange();
     }
 
@@ -119,6 +159,7 @@ public class UndoManager {
     public void clear() {
         historyMap.clear();
         historyPosMap.clear();
+        savedPosMap.clear();
         fireChange();
     }
 
@@ -128,6 +169,7 @@ public class UndoManager {
         }
         historyMap.get(swf).clear();
         historyPosMap.put(swf, 0);
+        savedPosMap.remove(swf);
         fireChange();
     }
 }

@@ -110,6 +110,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -128,6 +129,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.logging.Level;
@@ -321,6 +323,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private Shape hilightedLineCenter = null;
 
     private double hilightedLineWidth = 0;
+    private List<LineHilight> hilightedLines = new ArrayList<>();
 
     private IntFunction<Shape> hilightedFillProvider = null;
 
@@ -437,6 +440,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean transformSelectionMode = false;
 
     private boolean multiSelect = false;
+
+    private BiConsumer<Rectangle2D, Boolean> rectangleSelectionListener;
 
     private boolean inMoving = false;
 
@@ -582,6 +587,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public void setMultiSelect(boolean multiSelect) {
         this.multiSelect = multiSelect;
+    }
+
+    /**
+     * Replaces object selection by a custom rectangle selection in timeline twips.
+     * A null listener restores the regular preview mouse behavior.
+     */
+    public void setRectangleSelectionListener(BiConsumer<Rectangle2D, Boolean> listener) {
+        rectangleSelectionListener = listener;
+        iconPanel.rectangleSelectionGesture = false;
+        iconPanel.suppressRectangleClick = false;
+        iconPanel.dragStart = null;
+        iconPanel.selectionEnd = null;
+        iconPanel.repaint();
     }
 
     public void setSelectionMode(boolean selectionMode) {
@@ -803,6 +821,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void setHilightedLineDataInternal(LineHilight hilight) {
+        hilightedLines = new ArrayList<>();
         this.hilightedLineProvider = null;
         this.hilightedLine = hilight == null ? null : hilight.area;
         this.hilightedLineCenter = hilight == null ? null : hilight.center;
@@ -810,7 +829,24 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         updateHilightedShapeTimer();
     }
 
+    public void setHilightedShapes(List<Shape> fills, List<LineHilight> lines) {
+        hilightedEdge = null;
+        hilightedPoints = null;
+        pointEditPanel.setVisible(false);
+        Area combined = new Area();
+        for (Shape fill : fills) {
+            combined.add(new Area(fill));
+        }
+        setHilightedFillInternal(combined.isEmpty() ? null : combined);
+        setHilightedLineInternal(null);
+        hilightedLines = new ArrayList<>(lines);
+        hilightEdgeColor = 255;
+        updateHilightedShapeTimer();
+        redraw();
+    }
+
     public void setHilightedLineProvider(IntFunction<LineHilight> hilightedLineProvider) {
+        hilightedLines = new ArrayList<>();
         this.hilightedEdge = null;
         this.hilightedPoints = null;
         setHilightedFillInternal(null);
@@ -1262,7 +1298,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void updateHilightedShapeTimer() {
-        if (hilightedFill == null && hilightedLine == null && hilightedFillProvider == null && hilightedLineProvider == null) {
+        if (hilightedFill == null && hilightedLine == null && hilightedLines.isEmpty() && hilightedFillProvider == null && hilightedLineProvider == null) {
             if (hilightedShapeTimer != null) {
                 hilightedShapeTimer.stop();
             }
@@ -1739,6 +1775,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         private Point2D dragStart = null;
 
         private Point2D selectionEnd = null;
+
+        private boolean rectangleSelectionGesture;
+
+        private boolean suppressRectangleClick;
 
         private boolean canInvert = true;
 
@@ -2291,6 +2331,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mouseClicked(MouseEvent e) {
 
+                    if (rectangleSelectionListener != null && !e.isAltDown()) {
+                        if (suppressRectangleClick) {
+                            e.consume();
+                        }
+                        return;
+                    }
+
                     if (SwingUtilities.isRightMouseButton(e) && !selectionMode && !doFreeTransform) {
                         TextTag text = mouseOverText;
                         if (text != null) {
@@ -2478,6 +2525,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mousePressed(MouseEvent e) {
+                    if (rectangleSelectionListener != null && SwingUtilities.isLeftMouseButton(e) && !e.isAltDown()) {
+                        rectangleSelectionGesture = true;
+                        suppressRectangleClick = false;
+                        setDragStart(e.getPoint());
+                        selectionEnd = null;
+                        requestFocusInWindow();
+                        return;
+                    }
                     if (startGradientTransformDrag(e)) {
                         requestFocusInWindow();
                         return;
@@ -2684,6 +2739,25 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
+                    if (rectangleSelectionGesture && SwingUtilities.isLeftMouseButton(e)) {
+                        if (dragStart != null && dragStart.distance(e.getPoint()) >= 3) {
+                            selectionEnd = e.getPoint();
+                        }
+                        Rectangle2D rectangle = getSelectionRect();
+                        rectangleSelectionGesture = false;
+                        suppressRectangleClick = rectangle != null;
+                        dragStart = null;
+                        selectionEnd = null;
+                        repaint();
+                        if (rectangle != null && rectangleSelectionListener != null) {
+                            Point2D from = toTransformPoint(new Point2D.Double(rectangle.getMinX(), rectangle.getMinY()));
+                            Point2D to = toTransformPoint(new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY()));
+                            rectangleSelectionListener.accept(new Rectangle2D.Double(Math.min(from.getX(), to.getX()),
+                                    Math.min(from.getY(), to.getY()), Math.abs(to.getX() - from.getX()),
+                                    Math.abs(to.getY() - from.getY())), e.isControlDown());
+                        }
+                        return;
+                    }
                     if (finishGradientTransformDrag()) {
                         return;
                     }
@@ -2835,6 +2909,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
+                    if (rectangleSelectionGesture) {
+                        if (dragStart != null && dragStart.distance(e.getPoint()) >= 3) {
+                            selectionEnd = e.getPoint();
+                            repaint();
+                        }
+                        return;
+                    }
                     if (dragGradientTransform(e)) {
                         return;
                     }
@@ -4299,7 +4380,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
-            if ((hilightedFill != null || hilightedLine != null) && timelined != null) {
+            if ((hilightedFill != null || hilightedLine != null || !hilightedLines.isEmpty()) && timelined != null) {
                 int currentHilightEdgeColor = nextHilightEdgeColor();
                 double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                 AffineTransform hilightTransform = new AffineTransform();
@@ -4334,16 +4415,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     fillGraphics.dispose();
                 }
 
+                List<LineHilight> selectedLines = hilightedLines;
                 if (hilightedLine != null) {
-                    Shape displayedLineArea = hilightTransform.createTransformedShape(hilightedLine);
+                    selectedLines = java.util.Collections.singletonList(new LineHilight(hilightedLine, hilightedLineCenter, hilightedLineWidth));
+                }
+                for (LineHilight line : selectedLines) {
+                    Shape displayedLineArea = hilightTransform.createTransformedShape(line.area);
                     Graphics2D lineGraphics = (Graphics2D) g2d.create();
                     lineGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     lineGraphics.setPaint(dotColor);
                     int dotSpacing = 9;
                     double dotSize = 2;
-                    double displayedLineWidth = hilightedLineWidth * zoomDouble / SWF.unitDivisor;
-                    if (hilightedLineCenter != null && displayedLineWidth < dotSpacing + dotSize) {
-                        Shape displayedLineCenter = hilightTransform.createTransformedShape(hilightedLineCenter);
+                    double displayedLineWidth = line.width * zoomDouble / SWF.unitDivisor;
+                    if (line.center != null && displayedLineWidth < dotSpacing + dotSize) {
+                        Shape displayedLineCenter = hilightTransform.createTransformedShape(line.center);
                         lineGraphics.setStroke(new BasicStroke((float) dotSize, BasicStroke.CAP_ROUND,
                                 BasicStroke.JOIN_ROUND, 10f, new float[]{0.1f, dotSpacing}, 0));
                         lineGraphics.draw(displayedLineCenter);
@@ -4576,8 +4661,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 if (c != iconPanel) {
                     return;
                 }
+                MouseEvent converted = convertMouseEvent(e, iconPanel);
                 for (MouseListener l : iconPanel.mouseListeners) {
-                    l.mouseClicked(convertMouseEvent(e, iconPanel));
+                    l.mouseClicked(converted);
                 }
             }
 
@@ -4595,7 +4681,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                 }
 
-                if (c != iconPanel) {
+                if (c != iconPanel && !iconPanel.rectangleSelectionGesture) {
                     return;
                 }
                 for (MouseMotionListener l : iconPanel.mouseMotionListeners) {
@@ -4684,7 +4770,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 topRuler.setCursor(defaultCursor);
                 leftRuler.setCursor(defaultCursor);
 
-                if (c != iconPanel) {
+                if (c != iconPanel && !iconPanel.rectangleSelectionGesture) {
                     finishGradientTransformDrag();
                     return;
                 }
@@ -7210,6 +7296,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
      */
     public Point2D toTimelinedPoint(Point2D point) {
         return toTransformPoint(point);
+    }
+
+    /**
+     * Restores the top-left point of the viewport after replacing its timeline.
+     * @param point Viewport origin in timeline coordinates (twips)
+     */
+    public void setViewPosition(Point2D point) {
+        double scale = getRealZoom() / SWF.unitDivisor;
+        offsetPoint.setLocation(-point.getX() * scale, -point.getY() * scale);
+        updateScrollBars();
+        redraw();
     }
 
     private Matrix toImageMatrix(Matrix transform) {

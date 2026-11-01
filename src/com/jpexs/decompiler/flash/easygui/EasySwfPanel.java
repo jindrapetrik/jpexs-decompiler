@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.easygui.properties.panels.DocumentPropertiesPanel;
 import com.jpexs.decompiler.flash.easygui.properties.panels.InstancePropertiesPanel;
+import com.jpexs.decompiler.flash.easygui.properties.panels.ShapePropertiesPanel;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.ImagePanel;
@@ -64,10 +65,14 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -75,6 +80,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -101,6 +107,10 @@ public class EasySwfPanel extends JPanel {
     private JTabbedPane rightTabbedPane;
     private TransformPanel transformPanel;
     private Timelined timelined;
+    private ShapeTag editingShape;
+    private ShapeSelection shapeSelection;
+    private List<ShapeSelection.Selection> selectedShapeParts = new ArrayList<>();
+    private boolean updatingTimelined;
     private JLabel timelineLabel;
     private JButton closeTimelineButton;
     private JPanel propertiesPanel;
@@ -108,9 +118,11 @@ public class EasySwfPanel extends JPanel {
     private static final String PROPERTIES_DOCUMENT = "Document";
     private static final String PROPERTIES_INSTANCE = "Instance";
     private static final String PROPERTIES_TEXT = "Text";
+    private static final String PROPERTIES_SHAPE = "Shape";
     private DocumentPropertiesPanel documentPropertiesPanel;
     private InstancePropertiesPanel instancePropertiesPanel;
     private InstancePropertiesPanel textInstancePropertiesPanel;
+    private ShapePropertiesPanel shapePropertiesPanel;
     private final MainPanel mainPanel;
 
     /**
@@ -127,9 +139,27 @@ public class EasySwfPanel extends JPanel {
         stagePanel.setSelectionMode(true);
         stagePanel.setMultiSelect(true);
 
+        stagePanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (shapeSelection == null || e.isConsumed() || !SwingUtilities.isLeftMouseButton(e) || e.isAltDown()) {
+                    return;
+                }
+                Point2D point = stagePanel.toTimelinedPoint(e.getPoint());
+                Point2D nearby = stagePanel.toTimelinedPoint(new Point2D.Double(e.getX() + 3, e.getY()));
+                ShapeSelection.Selection selected = shapeSelection.select(point, point.distance(nearby));
+                showShapeSelections(ShapeSelection.updateSelection(selectedShapeParts, selected, e.isControlDown()));
+                rightTabbedPane.setSelectedIndex(0);
+                updatePropertiesPanel();
+            }
+        });
+
         stagePanel.addEventListener(new MediaDisplayListener() {
             @Override
             public void mediaDisplayStateChanged(MediaDisplay source) {
+                if (updatingTimelined) {
+                    return;
+                }
                 if (stagePanel.getTimelined() != timelined) {
                     View.execInEventDispatchLater(new Runnable() {
                         @Override
@@ -267,7 +297,7 @@ public class EasySwfPanel extends JPanel {
         stagePanel.setTransferHandler(new TransferHandler() {
             @Override
             public boolean canImport(TransferHandler.TransferSupport support) {
-                return support.isDataFlavorSupported(CharacterTagTransferable.CHARACTERTAG_FLAVOR);
+                return editingShape == null && timelined != null && support.isDataFlavorSupported(CharacterTagTransferable.CHARACTERTAG_FLAVOR);
             }
 
             @Override
@@ -498,9 +528,12 @@ public class EasySwfPanel extends JPanel {
 
         instancePropertiesPanel = new InstancePropertiesPanel(this, undoManager, false);
         textInstancePropertiesPanel = new InstancePropertiesPanel(this, undoManager, true);
+        shapePropertiesPanel = new ShapePropertiesPanel();
+        shapePropertiesPanel.setPropertyChangeListener((stroke, property) -> changeShapeStyle(stroke, property));
         propertiesPanel.add(documentPropertiesPanel, PROPERTIES_DOCUMENT);
         propertiesPanel.add(instancePropertiesPanel, PROPERTIES_INSTANCE);
         propertiesPanel.add(textInstancePropertiesPanel, PROPERTIES_TEXT);
+        propertiesPanel.add(shapePropertiesPanel, PROPERTIES_SHAPE);
 
         rightTabbedPane.addTab(EasyStrings.translate("properties"), propertiesPanel);
 
@@ -514,6 +547,10 @@ public class EasySwfPanel extends JPanel {
         rightTabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
+                if (editingShape != null) {
+                    transformPanel.setVisible(false);
+                    return;
+                }
                 if (stagePanel.getTimelined() == null) {
                     return;
                 }
@@ -583,6 +620,10 @@ public class EasySwfPanel extends JPanel {
     
     private void updatePropertiesPanel() {
         CardLayout cl = (CardLayout) propertiesPanel.getLayout();
+        if (editingShape != null) {
+            cl.show(propertiesPanel, PROPERTIES_SHAPE);
+            return;
+        }
         List<PlaceObjectTypeTag> places = getSelectedPlaceTags();
         if (places == null || places.isEmpty()) {
             cl.show(propertiesPanel, PROPERTIES_DOCUMENT);
@@ -603,10 +644,13 @@ public class EasySwfPanel extends JPanel {
     }
 
     private boolean transformEnabled() {
-        return rightTabbedPane.getSelectedIndex() == 2;
+        return editingShape == null && rightTabbedPane.getSelectedIndex() == 2;
     }
 
     public void setSwf(SWF swf) {
+        if (editingShape != null && editingShape.getSwf() == swf) {
+            return;
+        }
         Timelined tim = swf;
         if (swf != null) {
             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf);
@@ -623,18 +667,115 @@ public class EasySwfPanel extends JPanel {
         setTimelined(tim);
     }
     
+    public void editShape(ShapeTag shape) {
+        setTimelined(TimelinedMaker.makeTimelined(shape), true, shape);
+        rightTabbedPane.setSelectedIndex(0);
+    }
+
+    private void showShapeSelections(List<ShapeSelection.Selection> selected) {
+        List<ShapeSelection.Selection> displayed = new ArrayList<>();
+        List<java.awt.Shape> fills = new ArrayList<>();
+        List<ImagePanel.LineHilight> lines = new ArrayList<>();
+        for (ShapeSelection.Selection item : selected) {
+            ShapeSelection.Selection current = shapeSelection.displaySelection(item);
+            displayed.add(current);
+            if (current.stroke && current.line != null) {
+                lines.add(new ImagePanel.LineHilight(current.area, current.linePath, current.line.getWidth()));
+            } else if (!current.stroke) {
+                fills.add(current.area);
+            }
+        }
+        selectedShapeParts = displayed;
+        stagePanel.setHilightedShapes(fills, lines);
+        shapePropertiesPanel.setSelections(displayed);
+    }
+
+    private void changeShapeStyle(boolean stroke, String property) {
+        if (editingShape == null || selectedShapeParts.stream().noneMatch(item -> item.stroke == stroke)) {
+            return;
+        }
+        List<ShapeSelection.Selection> previous = new ArrayList<>(selectedShapeParts);
+        if (!shapePropertiesPanel.isPropertyChangeValid(stroke, property)) {
+            showShapeSelections(previous);
+            return;
+        }
+        ShapeSelection beforeModel = shapeSelection;
+        ShapeSelection.BatchEdit edit = shapeSelection.changeAll(previous,
+                stroke ? null : item -> shapePropertiesPanel.applyFillChange(item.fill, item.geometry.getBounds2D(), property),
+                stroke ? item -> shapePropertiesPanel.applyStrokeChange(item.line, item.area.getBounds2D(), property) : null);
+        if (!edit.changed) {
+            showShapeSelections(previous);
+            return;
+        }
+        String description = EasyStrings.translate("action.change").replace("%item%",
+                EasyStrings.translate("properties.shape.header." + (stroke ? "stroke" : "fill")));
+        try {
+            undoManager.doOperation(new ShapeStyleChangeOperation(editingShape, edit.model, description, (tag, forward) -> {
+                Point2D origin = stagePanel.toTimelinedPoint(new Point(0, 0));
+                boolean preserveView = editingShape != null && editingShape.getSwf() == tag.getSwf()
+                        && editingShape.getCharacterId() == tag.getCharacterId() && !stagePanel.getZoom().fit;
+                editShape(tag);
+                shapeSelection = forward ? edit.model : beforeModel;
+                if (preserveView) {
+                    stagePanel.setViewPosition(origin);
+                }
+                showShapeSelections(forward ? edit.selected : previous);
+                libraryTreeTable.setSwf(null);
+                libraryTreeTable.setSwf(tag.getSwf());
+            }), editingShape.getSwf());
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(EasySwfPanel.class.getName()).log(Level.SEVERE, "Cannot change shape style", ex);
+            if (ex instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            showShapeSelections(previous);
+        }
+    }
+
     public void setTimelined(Timelined timelined) {
         setTimelined(timelined, true);
     }
 
     private void setTimelined(Timelined timelined, boolean updateStage) {
+        setTimelined(timelined, updateStage, null);
+    }
+
+    private void setTimelined(Timelined timelined, boolean updateStage, ShapeTag shape) {
         if (this.timelined == timelined) {
             return;
         }
         if (mainPanel.getCurrentView() != MainPanel.VIEW_EASY) {
             timelined = null;
+            shape = null;
         }
+        updatingTimelined = true;
+        try {
+            updateTimelined(timelined, updateStage, shape);
+        } finally {
+            updatingTimelined = false;
+        }
+    }
+
+    private void updateTimelined(Timelined timelined, boolean updateStage, ShapeTag shape) {
+        editingShape = shape;
+        shapeSelection = shape == null ? null : new ShapeSelection(shape);
+        selectedShapeParts = new ArrayList<>();
         this.timelined = timelined;
+        stagePanel.setSelectionMode(editingShape == null);
+        stagePanel.setMultiSelect(editingShape == null);
+        stagePanel.setAltSelectionEnabled(editingShape == null);
+        stagePanel.setRectangleSelectionListener(editingShape == null ? null : (rectangle, additive) -> {
+            ShapeSelection.RectangleSelection selection = shapeSelection.selectRectangle(rectangle, selectedShapeParts, additive);
+            shapeSelection = selection.model;
+            showShapeSelections(selection.selected);
+            rightTabbedPane.setSelectedIndex(0);
+            updatePropertiesPanel();
+        });
+        stagePanel.setTransformSelectionMode(transformEnabled());
+        timelinePanel.setVisible(editingShape == null);
+        rightTabbedPane.setEnabledAt(2, editingShape == null);
+        transformPanel.setVisible(false);
+        shapePropertiesPanel.setShape(editingShape);
         if (timelined == null) {
             stagePanel.clearAll();
             timelinePanel.setTimelined(null);
@@ -655,15 +796,17 @@ public class EasySwfPanel extends JPanel {
                 closeTimelineButton.setVisible(false);
             } else {
                 EasyTagNameResolver nameResolver = new EasyTagNameResolver();
-                timelineLabel.setText(EasyStrings.translate("timeline.item").replace("%item%", nameResolver.getTagName((Tag) timelined)));
+                timelineLabel.setText(EasyStrings.translate("timeline.item").replace("%item%", nameResolver.getTagName(editingShape == null ? (Tag) timelined : editingShape)));
                 closeTimelineButton.setVisible(true);
             }
-            timelinePanel.setTimelined(timelined);
+            timelinePanel.setTimelined(editingShape == null ? timelined : null);
             
             if (updateStage) {
                 stagePanel.setTimelined(timelined, swf, 0, true, true, true, true, true, false, true, true, true);
                 if (timelined instanceof CharacterTag) {
                     stagePanel.setGuidesCharacter(swf, ((CharacterTag) timelined).getCharacterId());
+                } else if (editingShape != null) {
+                    stagePanel.setGuidesCharacter(swf, editingShape.getCharacterId());
                 } else {
                     stagePanel.setGuidesCharacter(swf, -1);
                 }
@@ -678,6 +821,7 @@ public class EasySwfPanel extends JPanel {
             instancePropertiesPanel.update();
             textInstancePropertiesPanel.update();
         }
+        updatePropertiesPanel();
         updateUndos();
     }
 
@@ -741,6 +885,9 @@ public class EasySwfPanel extends JPanel {
         int frame = stagePanel.getFrame();
         List<Integer> depths = stagePanel.getSelectedDepths();
         List<DepthState> ret = new ArrayList<>();
+        if (editingShape != null) {
+            return ret;
+        }
         for (int i = 0; i < depths.size(); i++) {
             ret.add(timelined.getTimeline().getDepthState(frame, depths.get(i)));
         }
