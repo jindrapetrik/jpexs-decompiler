@@ -26,6 +26,7 @@ import com.jpexs.helpers.Helper;
 import java.awt.BasicStroke;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.GeneralPath;
@@ -193,9 +194,18 @@ public class ShapeSelection {
      * Stroke fragments stay in one continuous path until their styles change.
      */
     public RectangleSelection selectRectangle(Rectangle2D rectangle, List<Selection> current, boolean additive) {
-        if (rectangle.isEmpty()) {
+        return selectArea(rectangle, current, additive);
+    }
+
+    /**
+     * Selects a polygonal area in local coordinates, including transformed screen rectangles.
+     */
+    public RectangleSelection selectArea(Shape selectionArea, List<Selection> current, boolean additive) {
+        Area region = new Area(selectionArea);
+        if (region.isEmpty()) {
             return new RectangleSelection(this, additive ? new ArrayList<>(current) : new ArrayList<>());
         }
+        List<Line2D.Double> boundaries = areaBoundaries(selectionArea);
         ShapeSelection result = new ShapeSelection();
         List<Selection> selected = new ArrayList<>();
         Map<Integer, List<Selection>> previous = new LinkedHashMap<>();
@@ -209,7 +219,7 @@ public class ShapeSelection {
             if (!part.stroke) {
                 Selection copy = result.addPart(part.fill, part.line, part.geometry, false);
                 Area clipped = new Area(part.geometry);
-                clipped.intersect(new Area(rectangle));
+                clipped.intersect(region);
                 if (part.fill == null) {
                     clipped.reset();
                 } else {
@@ -241,7 +251,7 @@ public class ShapeSelection {
                 boolean first = true;
                 for (Path2D.Double edge : strokeEdges(path)) {
                     double[][] points = edgePoints(edge);
-                    List<Double> cuts = rectangleCuts(points, rectangle);
+                    List<Double> cuts = areaCuts(points, region, boundaries);
                     for (int i = 1; i < cuts.size(); i++) {
                         double from = cuts.get(i - 1);
                         double to = cuts.get(i);
@@ -249,7 +259,7 @@ public class ShapeSelection {
                         geometry.append(fragment, !first);
                         first = false;
                         double[] middle = curvePoint(points, (from + to) / 2);
-                        fragments.add(new EdgeFragment(fragment, edgeIndex, containsInclusive(rectangle, middle)));
+                        fragments.add(new EdgeFragment(fragment, edgeIndex, containsInclusive(region, boundaries, middle)));
                     }
                     edgeIndex++;
                 }
@@ -275,39 +285,61 @@ public class ShapeSelection {
         return new RectangleSelection(result, selected);
     }
 
-    private static boolean containsInclusive(Rectangle2D rectangle, double[] point) {
-        double epsilon = 1e-7;
-        return point[0] >= rectangle.getMinX() - epsilon && point[0] <= rectangle.getMaxX() + epsilon
-                && point[1] >= rectangle.getMinY() - epsilon && point[1] <= rectangle.getMaxY() + epsilon;
+    private static List<Line2D.Double> areaBoundaries(Shape area) {
+        List<Line2D.Double> boundaries = new ArrayList<>();
+        for (Path2D.Double edge : strokeEdges(area)) {
+            boundaries.add(new Line2D.Double(firstPoint(edge), edge.getCurrentPoint()));
+        }
+        return boundaries;
     }
 
-    private static List<Double> rectangleCuts(double[][] points, Rectangle2D rectangle) {
+    private static boolean containsInclusive(Area area, List<Line2D.Double> boundaries, double[] point) {
+        if (area.contains(point[0], point[1])) {
+            return true;
+        }
+        for (Line2D.Double boundary : boundaries) {
+            double dx = boundary.x2 - boundary.x1;
+            double dy = boundary.y2 - boundary.y1;
+            double length = Math.hypot(dx, dy);
+            double px = point[0] - boundary.x1;
+            double py = point[1] - boundary.y1;
+            double along = length == 0 ? -1 : (px * dx + py * dy) / length;
+            if (length > 0 && along >= -1e-7 && along <= length + 1e-7 && Math.abs(px * dy - py * dx) / length <= 1e-7) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<Double> areaCuts(double[][] points, Area area, List<Line2D.Double> boundaries) {
         List<Double> cuts = new ArrayList<>(Arrays.asList(0.0, 1.0));
-        for (int axis = 0; axis < 2; axis++) {
-            double[] bounds = axis == 0 ? new double[]{rectangle.getMinX(), rectangle.getMaxX()}
-                    : new double[]{rectangle.getMinY(), rectangle.getMaxY()};
-            for (double bound : bounds) {
-                double a = points[0][axis];
-                double b = points[1][axis];
-                double[] equation;
-                if (points.length == 2) {
-                    equation = new double[]{a - bound, b - a};
-                } else if (points.length == 3) {
-                    double c = points[2][axis];
-                    equation = new double[]{a - bound, 2 * (b - a), a - 2 * b + c};
-                } else {
-                    double c = points[2][axis];
-                    double d = points[3][axis];
-                    equation = new double[]{a - bound, 3 * (b - a), 3 * (a - 2 * b + c), -a + 3 * b - 3 * c + d};
-                }
-                double[] roots = new double[3];
-                int count = equation.length == 4 ? CubicCurve2D.solveCubic(equation, roots)
-                        : QuadCurve2D.solveQuadratic(Arrays.copyOf(equation, 3), roots);
-                for (int i = 0; i < count; i++) {
-                    double t = roots[i];
-                    if (t > 1e-9 && t < 1 - 1e-9 && containsInclusive(rectangle, curvePoint(points, t))) {
-                        cuts.add(t);
-                    }
+        for (Line2D.Double boundary : boundaries) {
+            double dx = boundary.x2 - boundary.x1;
+            double dy = boundary.y2 - boundary.y1;
+            double[] distances = new double[points.length];
+            for (int i = 0; i < points.length; i++) {
+                distances[i] = (points[i][0] - boundary.x1) * dy - (points[i][1] - boundary.y1) * dx;
+            }
+            double a = distances[0];
+            double b = distances[1];
+            double[] equation;
+            if (points.length == 2) {
+                equation = new double[]{a, b - a};
+            } else if (points.length == 3) {
+                double c = distances[2];
+                equation = new double[]{a, 2 * (b - a), a - 2 * b + c};
+            } else {
+                double c = distances[2];
+                double d = distances[3];
+                equation = new double[]{a, 3 * (b - a), 3 * (a - 2 * b + c), -a + 3 * b - 3 * c + d};
+            }
+            double[] roots = new double[3];
+            int count = equation.length == 4 ? CubicCurve2D.solveCubic(equation, roots)
+                    : QuadCurve2D.solveQuadratic(Arrays.copyOf(equation, 3), roots);
+            for (int i = 0; i < count; i++) {
+                double t = roots[i];
+                if (t > 1e-9 && t < 1 - 1e-9 && containsInclusive(area, boundaries, curvePoint(points, t))) {
+                    cuts.add(t);
                 }
             }
         }
@@ -720,17 +752,26 @@ public class ShapeSelection {
     }
 
     public Selection select(Point2D point, double tolerance) {
+        return select(point, tolerance, new AffineTransform());
+    }
+
+    /**
+     * Uses display coordinates for stroke tolerance and the nearest edge.
+     */
+    public Selection select(Point2D point, double tolerance, AffineTransform localToDisplay) {
+        Point2D displayPoint = localToDisplay.transform(point, null);
         for (int i = parts.size() - 1; i >= 0; i--) {
             Selection part = parts.get(i);
             if (part.line != null) {
                 Shape lineArea = part.stroke ? part.area : createStroke(part.line).createStrokedShape(part.geometry);
-                if (lineArea.contains(point) || (tolerance > 0 && new BasicStroke((float) (2 * tolerance))
-                        .createStrokedShape(lineArea).contains(point))) {
+                Shape displayedLine = localToDisplay.createTransformedShape(lineArea);
+                if (displayedLine.contains(displayPoint) || (tolerance > 0 && new BasicStroke((float) (2 * tolerance))
+                        .createStrokedShape(displayedLine).contains(displayPoint))) {
                     List<Path2D.Double> edges = strokeEdges(part.geometry);
                     int nearest = -1;
                     double nearestDistance = Double.POSITIVE_INFINITY;
                     for (int edge = 0; edge < edges.size(); edge++) {
-                        double distance = distanceToPath(edges.get(edge), point);
+                        double distance = distanceToPath(localToDisplay.createTransformedShape(edges.get(edge)), displayPoint);
                         if (distance < nearestDistance) {
                             nearest = edge;
                             nearestDistance = distance;

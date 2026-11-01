@@ -28,6 +28,8 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.helpers.Helper;
 import java.awt.Color;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
@@ -218,5 +220,38 @@ public class ShapeRectangleSelectionTest {
         assertTrue(box.model.selectRectangle(new Rectangle2D.Double(4000, 4000, 100, 100), box.selected, false).selected.isEmpty());
         assertEquals(box.model.selectRectangle(new Rectangle2D.Double(4000, 4000, 100, 100), box.selected, true).selected.size(), 1);
         assertTrue(select(model, 2000, 0, 100, 100).selected.isEmpty());
+    }
+
+    @Test
+    public void rotatedAndSkewedMarqueesKeepTheirActualAreaAndSplitStrokeAtTheScreenBorder() throws Exception {
+        DefineShape4Tag shape = shape();
+        rectangle(shape, 0, 0, 4000, 2000, 1, 1);
+        ShapeSelection model = selection(shape);
+        addClean(shape);
+        AffineTransform placement = new AffineTransform(1, 0.5, 0.4, 1.2, 1000, 2000);
+        Rectangle2D screenBox = new Rectangle2D.Double(1500, 2000, 1500, 2000);
+        Shape localBox = placement.createInverse().createTransformedShape(screenBox);
+        ShapeSelection.RectangleSelection box = model.selectArea(localBox, Collections.emptyList(), false);
+        ShapeSelection.BatchEdit edit = box.model.changeAll(box.selected, item -> fill(Color.green), ShapeRectangleSelectionTest::blue);
+        new ShapeStyleChangeOperation(shape, edit.model, "Transformed rectangle", null).doOperation();
+        ShapeSelection saved = roundTrip(current(shape));
+        assertEquals(at(saved, 1000, 500).fill.color.toColor(), Color.green);
+        // This point is inside the local bounding box but outside the screen rectangle.
+        assertEquals(at(saved, 1700, 1200).fill.color.toColor(), Color.red);
+        assertEquals(at(saved, 1000, 0).line.getColor().toColor(), Color.blue);
+        assertEquals(at(saved, 2500, 0).line.getColor().toColor(), Color.black);
+        assertEquals(at(saved, 250, 0).line.getColor().toColor(), Color.black);
+    }
+
+    @Test
+    public void strokeHitToleranceUsesScreenPixelsWithAnisotropicScaling() {
+        DefineShape4Tag shape = shape();
+        move(shape.shapes.shapeRecords, 0, 0, 0, 1);
+        edge(shape.shapes.shapeRecords, 2000, 0);
+        shape.shapes.lineStyles.lineStyles2[0].width = 20;
+        ShapeSelection model = selection(shape);
+        AffineTransform placement = new AffineTransform(0.2, 0.1, 0, 0.01, 100, 200);
+        assertTrue(model.select(new Point2D.Double(1000, 50), 3, placement).stroke);
+        assertNull(model.select(new Point2D.Double(1000, 1000), 3, placement));
     }
 }

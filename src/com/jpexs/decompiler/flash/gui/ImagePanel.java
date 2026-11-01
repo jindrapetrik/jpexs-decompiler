@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -113,6 +114,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -441,7 +443,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private boolean multiSelect = false;
 
-    private BiConsumer<Rectangle2D, Boolean> rectangleSelectionListener;
+    private BiConsumer<Shape, Boolean> rectangleSelectionListener;
+
+    private ShapeTag editedShape;
 
     private boolean inMoving = false;
 
@@ -593,12 +597,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
      * Replaces object selection by a custom rectangle selection in timeline twips.
      * A null listener restores the regular preview mouse behavior.
      */
-    public void setRectangleSelectionListener(BiConsumer<Rectangle2D, Boolean> listener) {
+    public void setRectangleSelectionListener(BiConsumer<Shape, Boolean> listener) {
         rectangleSelectionListener = listener;
         iconPanel.rectangleSelectionGesture = false;
         iconPanel.suppressRectangleClick = false;
         iconPanel.dragStart = null;
         iconPanel.selectionEnd = null;
+        if (listener != null) {
+            doFreeTransform = false;
+            inMoving = false;
+            mode = Cursor.DEFAULT_CURSOR;
+            iconPanel.setCursor(defaultCursor);
+        }
         iconPanel.repaint();
     }
 
@@ -2750,11 +2760,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         selectionEnd = null;
                         repaint();
                         if (rectangle != null && rectangleSelectionListener != null) {
-                            Point2D from = toTransformPoint(new Point2D.Double(rectangle.getMinX(), rectangle.getMinY()));
-                            Point2D to = toTransformPoint(new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY()));
-                            rectangleSelectionListener.accept(new Rectangle2D.Double(Math.min(from.getX(), to.getX()),
-                                    Math.min(from.getY(), to.getY()), Math.abs(to.getX() - from.getX()),
-                                    Math.abs(to.getY() - from.getY())), e.isControlDown());
+                            rectangleSelectionListener.accept(toTimelinedArea(rectangle), e.isControlDown());
                         }
                         return;
                     }
@@ -3958,6 +3964,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
+                    if (rectangleSelectionListener != null || editedShape != null) {
+                        mode = Cursor.DEFAULT_CURSOR;
+                        if (getCursor() != defaultCursor) {
+                            setCursor(defaultCursor);
+                        }
+                        return;
+                    }
                     if (updateGradientTransformCursor(e)) {
                         return;
                     }
@@ -4341,6 +4354,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         //updateScrollBars();
                     } else if (doFreeTransform) {
                         setAllowMove(true);
+                    } else if (editedShape != null) {
+                        // Expanding the editor must not move an instance opened in place.
+                        setAllowMove(true);
                     } else if (selectionMode) {
                         setAllowMove(false);
                         if (h < h2 && w < w2) {
@@ -4382,10 +4398,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             if ((hilightedFill != null || hilightedLine != null || !hilightedLines.isEmpty()) && timelined != null) {
                 int currentHilightEdgeColor = nextHilightEdgeColor();
-                double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                AffineTransform hilightTransform = new AffineTransform();
-                hilightTransform.translate(offsetPoint.getX(), offsetPoint.getY());
-                hilightTransform.scale(zoomDouble / SWF.unitDivisor, zoomDouble / SWF.unitDivisor);
+                AffineTransform hilightTransform = getTimelinedToPanelTransform();
                 double colorRatio = (currentHilightEdgeColor - 100) / 155.0;
                 Color dotColor = new Color(
                         (int) Math.round(0 + colorRatio * 255),
@@ -4426,7 +4439,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     lineGraphics.setPaint(dotColor);
                     int dotSpacing = 9;
                     double dotSize = 2;
-                    double displayedLineWidth = line.width * zoomDouble / SWF.unitDivisor;
+                    double displayedLineWidth = line.width * Math.max(Math.hypot(hilightTransform.getScaleX(), hilightTransform.getShearY()),
+                            Math.hypot(hilightTransform.getShearX(), hilightTransform.getScaleY()));
                     if (line.center != null && displayedLineWidth < dotSpacing + dotSize) {
                         Shape displayedLineCenter = hilightTransform.createTransformedShape(line.center);
                         lineGraphics.setStroke(new BasicStroke((float) dotSize, BasicStroke.CAP_ROUND,
@@ -5561,6 +5575,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             bounds = null;
             displayObjectCache.clear();
             this.timelined = drawable;
+            this.editedShape = null;
             this.isolatedDepth = null;
             this.parentTimelineds.clear();
             this.parentFrames.clear();
@@ -5826,6 +5841,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         clear();
 
         timelined = null;
+        editedShape = null;
         loaded = true;
         stillFrame = true;
         zoomAvailable = false;
@@ -5859,6 +5875,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         lda = null;
         timelined = null;
+        editedShape = null;
         loaded = true;
         stillFrame = true;
         zoomAvailable = true;
@@ -6724,6 +6741,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             } else {
                                 debugLabel.setText(ret.toString());
                             }
+                            if (rectangleSelectionListener != null || editedShape != null) {
+                                mode = Cursor.DEFAULT_CURSOR;
+                                if (iconPanel.getCursor() != defaultCursor) {
+                                    iconPanel.setCursor(defaultCursor);
+                                }
+                                return;
+                            }
                             MouseEvent mouseEvent = ImagePanel.this.lastMouseEvent;
                             Cursor gradientCursor = getGradientTransformCursor(mouseEvent == null ? null : mouseEvent.getPoint());
                             if (gradientCursor != null) {
@@ -6890,6 +6914,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         stopInternal();
         clearImagePanel();
         timelined = null;
+        editedShape = null;
         swf = null;
         guidesSwf = null;
         lda = null;
@@ -7298,12 +7323,44 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return toTransformPoint(point);
     }
 
+    public AffineTransform getTimelinedToPanelTransform() {
+        AffineTransform transform = new AffineTransform();
+        transform.translate(offsetPoint.getX(), offsetPoint.getY());
+        double scale = getRealZoom() / SWF.unitDivisor;
+        if (lowQuality) {
+            scale /= LQ_FACTOR;
+        }
+        transform.scale(scale, scale);
+        transform.concatenate(getParentMatrix().toTransform());
+        return transform;
+    }
+
+    public Shape toTimelinedArea(Rectangle2D rectangle) {
+        Path2D.Double area = new Path2D.Double();
+        double[][] corners = {{rectangle.getMinX(), rectangle.getMinY()}, {rectangle.getMaxX(), rectangle.getMinY()},
+            {rectangle.getMaxX(), rectangle.getMaxY()}, {rectangle.getMinX(), rectangle.getMaxY()}};
+        for (int i = 0; i < corners.length; i++) {
+            Point2D point = toTimelinedPoint(new Point2D.Double(corners[i][0], corners[i][1]));
+            if (i == 0) {
+                area.moveTo(point.getX(), point.getY());
+            } else {
+                area.lineTo(point.getX(), point.getY());
+            }
+        }
+        area.closePath();
+        return area;
+    }
+
     /**
      * Restores the top-left point of the viewport after replacing its timeline.
      * @param point Viewport origin in timeline coordinates (twips)
      */
     public void setViewPosition(Point2D point) {
+        point = getParentMatrix().transform(point);
         double scale = getRealZoom() / SWF.unitDivisor;
+        if (lowQuality) {
+            scale /= LQ_FACTOR;
+        }
         offsetPoint.setLocation(-point.getX() * scale, -point.getY() * scale);
         updateScrollBars();
         redraw();
@@ -7446,6 +7503,100 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
+    /**
+     * The instance path and viewport used to edit a shape in its scene.
+     */
+    public static class ShapeEditContext {
+
+        private final List<Timelined> timelines;
+        private final List<Integer> depths;
+        private final List<Integer> frames;
+        private final Point2D offset;
+        private final double zoomValue;
+        private final boolean zoomFit;
+
+        private ShapeEditContext(ImagePanel panel) {
+            timelines = new ArrayList<>(panel.parentTimelineds);
+            depths = new ArrayList<>(panel.parentDepths);
+            frames = new ArrayList<>(panel.parentFrames);
+            offset = new Point2D.Double(panel.offsetPoint.getX(), panel.offsetPoint.getY());
+            zoomValue = panel.zoom.value;
+            zoomFit = panel.zoom.fit;
+        }
+
+        public boolean sameLocation(ShapeEditContext other) {
+            return other != null && timelines.equals(other.timelines) && depths.equals(other.depths) && frames.equals(other.frames);
+        }
+    }
+
+    public ShapeTag getEditedShape() {
+        return editedShape;
+    }
+
+    public ShapeEditContext getShapeEditContext() {
+        synchronized (lock) {
+            return editedShape == null ? null : new ShapeEditContext(this);
+        }
+    }
+
+    public void restoreShapeEditContext(ShapeTag shape, ShapeEditContext context) {
+        pause();
+        synchronized (lock) {
+            timelined = TimelinedMaker.makeTimelined(shape);
+            swf = shape.getSwf();
+            editedShape = shape;
+            frame = 0;
+            prevFrame = -1;
+            parentTimelineds.clear();
+            parentTimelineds.addAll(context.timelines);
+            parentDepths.clear();
+            parentDepths.addAll(context.depths);
+            parentFrames.clear();
+            parentFrames.addAll(context.frames);
+            offsetPoint.setLocation(context.offset);
+            zoom = new Zoom();
+            zoom.value = context.zoomValue;
+            zoom.fit = context.zoomFit;
+            selectedDepths.clear();
+            isolatedDepth = null;
+            bounds = null;
+            doFreeTransform = false;
+            transform = null;
+            transformUpdated = null;
+            registrationPointUpdated = null;
+            depthStateUnderCursor = null;
+            displayObjectCache.clear();
+        }
+        setSelectionMode(false);
+        setTransformSelectionMode(false);
+        setHilightedShapes(new ArrayList<>(), new ArrayList<>());
+        updateScrollBars();
+        gotoFrame(1);
+    }
+
+    public boolean closeShapeEdit() {
+        int parentFrame;
+        synchronized (lock) {
+            if (editedShape == null || parentTimelineds.isEmpty()) {
+                return false;
+            }
+            int last = parentTimelineds.size() - 1;
+            timelined = parentTimelineds.remove(last);
+            parentFrame = parentFrames.remove(last);
+            int depth = parentDepths.remove(last);
+            editedShape = null;
+            selectedDepths.clear();
+            selectedDepths.add(depth);
+            depthStateUnderCursor = null;
+            displayObjectCache.clear();
+        }
+        setRectangleSelectionListener(null);
+        setHilightedShapes(new ArrayList<>(), new ArrayList<>());
+        setSelectionMode(true);
+        gotoFrame(parentFrame + 1);
+        return true;
+    }
+
     public void loadOpenedDepths() {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf);
         if (conf != null) {
@@ -7496,14 +7647,22 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         DepthState ds = tim.getTimeline().getFrame(frame).layers.get(depth);
         if (ds != null) {
             CharacterTag cht = ds.getCharacter();
-            if (cht instanceof Timelined) {
+            if (cht instanceof Timelined || cht instanceof ShapeTag) {
+                double previousZoom = getRealZoom();
                 int newFrame = 0;
                 synchronized (lock) {
                     parentTimelineds.add(timelined);
                     parentDepths.add(ds.depth);
                     parentFrames.add(ds.frame.frame);
-                    timelined = (Timelined) cht;
+                    editedShape = cht instanceof ShapeTag ? (ShapeTag) cht : null;
+                    timelined = editedShape == null ? (Timelined) cht : TimelinedMaker.makeTimelined(cht);
                     selectedDepths.clear();
+
+                    if (editedShape != null) {
+                        zoom = new Zoom();
+                        zoom.value = previousZoom;
+                        setSelectionMode(false);
+                    }
 
                     int time = ds.time;
                     newFrame = time % timelined.getFrameCount();
@@ -7514,17 +7673,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                     SWF swf = parentTimelineds.get(0).getSwf();
                     SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf);
-                    if (parentTimelineds.size() == 1) {
+                    if (editedShape == null && parentTimelineds.size() == 1) {
                         conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FIRST_PARENT_FRAME, "" + (ds.frame.frame + 1));
                     }
 
-                    List<String> parentDepths = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS);
-                    parentDepths.add("" + ds.depth);
-                    conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, parentDepths);
+                    if (editedShape == null) {
+                        List<String> parentDepths = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS);
+                        parentDepths.add("" + ds.depth);
+                        conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, parentDepths);
 
-                    List<String> parentFrames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES);
-                    parentFrames.add("" + ds.frame.frame);
-                    conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, parentFrames);
+                        List<String> parentFrames = conf.getCustomDataAsList(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES);
+                        parentFrames.add("" + ds.frame.frame);
+                        conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, parentFrames);
+                    }
                 }
                 gotoFrame(newFrame + 1);
                 fireMediaDisplayStateChanged();

@@ -142,12 +142,12 @@ public class EasySwfPanel extends JPanel {
         stagePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (shapeSelection == null || e.isConsumed() || !SwingUtilities.isLeftMouseButton(e) || e.isAltDown()) {
+                if (shapeSelection == null || e.isConsumed() || e.getClickCount() != 1
+                        || !SwingUtilities.isLeftMouseButton(e) || e.isAltDown()) {
                     return;
                 }
                 Point2D point = stagePanel.toTimelinedPoint(e.getPoint());
-                Point2D nearby = stagePanel.toTimelinedPoint(new Point2D.Double(e.getX() + 3, e.getY()));
-                ShapeSelection.Selection selected = shapeSelection.select(point, point.distance(nearby));
+                ShapeSelection.Selection selected = shapeSelection.select(point, 3, stagePanel.getTimelinedToPanelTransform());
                 showShapeSelections(ShapeSelection.updateSelection(selectedShapeParts, selected, e.isControlDown()));
                 rightTabbedPane.setSelectedIndex(0);
                 updatePropertiesPanel();
@@ -164,7 +164,7 @@ public class EasySwfPanel extends JPanel {
                     View.execInEventDispatchLater(new Runnable() {
                         @Override
                         public void run() {
-                            setTimelined(stagePanel.getTimelined(), false);
+                            setTimelined(stagePanel.getTimelined(), false, stagePanel.getEditedShape());
                         }
                     });
                     timelinePanel.setFrame(stagePanel.getFrame(), stagePanel.getSelectedDepths());
@@ -461,6 +461,9 @@ public class EasySwfPanel extends JPanel {
         closeTimelineButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (editingShape != null && stagePanel.closeShapeEdit()) {
+                    return;
+                }
                 SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(timelined.getSwf());
                 conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, new ArrayList<>());
                 conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, new ArrayList<>());
@@ -672,6 +675,21 @@ public class EasySwfPanel extends JPanel {
         rightTabbedPane.setSelectedIndex(0);
     }
 
+    private void editShape(ShapeTag shape, ImagePanel.ShapeEditContext context) {
+        if (context == null) {
+            editShape(shape);
+            return;
+        }
+        updatingTimelined = true;
+        try {
+            stagePanel.restoreShapeEditContext(shape, context);
+            updateTimelined(stagePanel.getTimelined(), false, shape);
+        } finally {
+            updatingTimelined = false;
+        }
+        rightTabbedPane.setSelectedIndex(0);
+    }
+
     private void showShapeSelections(List<ShapeSelection.Selection> selected) {
         List<ShapeSelection.Selection> displayed = new ArrayList<>();
         List<java.awt.Shape> fills = new ArrayList<>();
@@ -709,12 +727,15 @@ public class EasySwfPanel extends JPanel {
         }
         String description = EasyStrings.translate("action.change").replace("%item%",
                 EasyStrings.translate("properties.shape.header." + (stroke ? "stroke" : "fill")));
+        ImagePanel.ShapeEditContext context = stagePanel.getShapeEditContext();
         try {
             undoManager.doOperation(new ShapeStyleChangeOperation(editingShape, edit.model, description, (tag, forward) -> {
                 Point2D origin = stagePanel.toTimelinedPoint(new Point(0, 0));
-                boolean preserveView = editingShape != null && editingShape.getSwf() == tag.getSwf()
-                        && editingShape.getCharacterId() == tag.getCharacterId() && !stagePanel.getZoom().fit;
-                editShape(tag);
+                boolean sameShape = editingShape != null && editingShape.getSwf() == tag.getSwf()
+                        && editingShape.getCharacterId() == tag.getCharacterId();
+                ImagePanel.ShapeEditContext activeContext = stagePanel.getShapeEditContext();
+                boolean preserveView = sameShape && context == null && activeContext == null && !stagePanel.getZoom().fit;
+                editShape(tag, sameShape && context != null && context.sameLocation(activeContext) ? activeContext : context);
                 shapeSelection = forward ? edit.model : beforeModel;
                 if (preserveView) {
                     stagePanel.setViewPosition(origin);
@@ -765,7 +786,7 @@ public class EasySwfPanel extends JPanel {
         stagePanel.setMultiSelect(editingShape == null);
         stagePanel.setAltSelectionEnabled(editingShape == null);
         stagePanel.setRectangleSelectionListener(editingShape == null ? null : (rectangle, additive) -> {
-            ShapeSelection.RectangleSelection selection = shapeSelection.selectRectangle(rectangle, selectedShapeParts, additive);
+            ShapeSelection.RectangleSelection selection = shapeSelection.selectArea(rectangle, selectedShapeParts, additive);
             shapeSelection = selection.model;
             showShapeSelections(selection.selected);
             rightTabbedPane.setSelectedIndex(0);
@@ -796,7 +817,8 @@ public class EasySwfPanel extends JPanel {
                 closeTimelineButton.setVisible(false);
             } else {
                 EasyTagNameResolver nameResolver = new EasyTagNameResolver();
-                timelineLabel.setText(EasyStrings.translate("timeline.item").replace("%item%", nameResolver.getTagName(editingShape == null ? (Tag) timelined : editingShape)));
+                timelineLabel.setText(EasyStrings.translate(editingShape == null ? "timeline.item" : "shape.edit")
+                        .replace("%item%", nameResolver.getTagName(editingShape == null ? (Tag) timelined : editingShape)));
                 closeTimelineButton.setVisible(true);
             }
             timelinePanel.setTimelined(editingShape == null ? timelined : null);
