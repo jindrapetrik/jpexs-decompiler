@@ -104,8 +104,7 @@ public class ShapePropertiesPanelTest {
                     for (int i = 0; i < type.getItemCount(); i++) {
                         type.setSelectedIndex(i);
                     }
-                    JPanel gradientPanel = (JPanel) field(fillEditor, "gradientPanel");
-                    GradientEditor editor = (GradientEditor) gradientPanel.getComponent(0);
+                    GradientEditor editor = (GradientEditor) field(fillEditor, "gradientEditor");
                     @SuppressWarnings("unchecked")
                     List<Color> colors = (List<Color>) field(editor, "colors");
                     colors.set(0, Color.green);

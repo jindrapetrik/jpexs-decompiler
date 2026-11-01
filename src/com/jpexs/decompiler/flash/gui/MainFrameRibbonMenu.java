@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.easygui.EasyPanel;
+import com.jpexs.decompiler.flash.easygui.ShapeTool;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.awt.BorderLayout;
@@ -73,6 +75,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
     private final JRibbon ribbon;
 
+    private final MainFrameRibbon mainFrame;
+
+    private ShapeToolsRibbon shapeTools;
+
     private final Map<String, Object> menuItems = new HashMap<>();
 
     private final Map<String, String> menuTitles = new HashMap<>();
@@ -106,6 +112,27 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     public MainFrameRibbonMenu(MainFrameRibbon mainFrame, JRibbon ribbon) {
         super(mainFrame);
         this.ribbon = ribbon;
+        this.mainFrame = mainFrame;
+    }
+
+    @Override
+    public void createMenuBar() {
+        super.createMenuBar();
+        shapeTools = new ShapeToolsRibbon(ribbon, this::translate,
+                tool -> mainFrame.getPanel().getEasyPanel().setShapeTool(tool));
+    }
+
+    @Override
+    public void updateComponents(Openable openable) {
+        super.updateComponents(openable);
+        if (shapeTools == null) {
+            return;
+        }
+        MainPanel panel = mainFrame.getPanel();
+        EasyPanel editor = panel == null ? null : panel.getEasyPanel();
+        boolean editing = panel != null && panel.getCurrentView() == MainPanel.VIEW_EASY
+                && editor != null && editor.isShapeEditing();
+        shapeTools.update(editing, editor == null ? ShapeTool.SELECT : editor.getShapeTool());
     }
 
     private String fixCommandTitle(String title) {

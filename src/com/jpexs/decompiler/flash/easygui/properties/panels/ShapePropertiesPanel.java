@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.easygui.EasyTagNameResolver;
 import com.jpexs.decompiler.flash.easygui.ShapeSelection;
 import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.GradientEditor;
+import com.jpexs.decompiler.flash.easygui.properties.JTriStateCheckBox;
 import com.jpexs.decompiler.flash.easygui.properties.PropertyEditor;
 import com.jpexs.decompiler.flash.gui.ComboBoxItem;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
@@ -44,6 +45,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -94,11 +96,24 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
     private Rectangle2D selectedBounds = new Rectangle2D.Double(0, 0, 2000, 2000);
 
     public ShapePropertiesPanel() {
+        this(false);
+    }
+
+    /**
+     * Creates either the selection editor or persistent Pencil stroke settings.
+     */
+    public ShapePropertiesPanel(boolean strokeOnly) {
+        this(strokeOnly, false, strokeOnly);
+    }
+
+    private ShapePropertiesPanel(boolean strokeOnly, boolean fillOnly, boolean drawing) {
         super("shape");
         setLayout(new BorderLayout());
-        JLabel title = new JLabel(EasyStrings.translate("properties.shape"));
-        title.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        add(title, BorderLayout.NORTH);
+        if (!drawing) {
+            JLabel title = new JLabel(EasyStrings.translate("properties.shape"));
+            title.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+            add(title, BorderLayout.NORTH);
+        }
 
         addRow(strokePanel, "type", strokeEditor, 0);
         widthEditor.setColumns(3);
@@ -116,14 +131,22 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = -1;
         addRow(fillPanel, "type", fillEditor, 0);
-        addCard(cards, "fill", null, fillPanel, gbc, false);
+        if (!strokeOnly) {
+            addCard(cards, "fill", null, fillPanel, gbc, false);
+        }
         // Keep the final card at its preferred height, with free space below it.
-        addCard(cards, "stroke", null, strokePanel, gbc, false);
+        if (!fillOnly) {
+            addCard(cards, "stroke", null, strokePanel, gbc, false);
+        }
         gbc.gridy++;
         gbc.weighty = 1;
         cards.add(new JPanel(), gbc);
-        setCardOpened("fill", true);
-        setCardOpened("stroke", true);
+        if (!strokeOnly) {
+            setCardOpened("fill", true);
+        }
+        if (!fillOnly) {
+            setCardOpened("stroke", true);
+        }
         add(new FasterScrollPane(cards), BorderLayout.CENTER);
         fillEditor.changeListener = property -> fireChange(false, property);
         strokeEditor.changeListener = property -> fireChange(true, property);
@@ -132,6 +155,32 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         scaleComboBox.addActionListener(e -> fireChange(true, "scale"));
         capComboBox.addActionListener(e -> fireChange(true, "cap"));
         joinComboBox.addActionListener(e -> fireChange(true, "join"));
+        if (drawing) {
+            LINESTYLE2 line = new LINESTYLE2();
+            line.color = new RGBA(Color.black);
+            line.width = (int) SWF.unitDivisor;
+            line.miterLimitFactor = 3;
+            line.noClose = strokeOnly;
+            if (strokeOnly) {
+                setSelectedStroke(line);
+            } else if (fillOnly) {
+                FILLSTYLE fill = new FILLSTYLE();
+                fill.color = new RGBA(Color.black);
+                setSelectedFill(fill);
+            } else {
+                FILLSTYLE fill = new FILLSTYLE();
+                fill.color = new RGBA(Color.white);
+                setSelectedStyles(fill, line, null, (Boolean) null);
+            }
+        }
+    }
+
+    public static ShapePropertiesPanel createDrawingStyles() {
+        return new ShapePropertiesPanel(false, false, true);
+    }
+
+    public static ShapePropertiesPanel createFillSettings() {
+        return new ShapePropertiesPanel(false, true, true);
     }
 
     public void setChangeListener(Consumer<Boolean> listener) {
@@ -164,7 +213,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
 
     public LINESTYLE2 applyStrokeChange(ILINESTYLE original, Rectangle2D bounds, String property) {
         LINESTYLE2 line = original == null ? null : lineStyle2(original);
-        if (Arrays.asList("type", "color", "gradient", "bitmap").contains(property)) {
+        if (Arrays.asList("type", "color", "gradient", "flow", "linearRGB", "bitmap").contains(property)) {
             FILLSTYLE paint = strokeEditor.applyChange(lineFill(original), bounds, property);
             if (paint == null) {
                 return null;
@@ -203,15 +252,27 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
     }
 
     public FILLSTYLE getFillStyle() {
-        return Boolean.TRUE.equals(selectedStroke) ? null : fillEditor.getFillStyle(selectedBounds);
+        return getFillStyle(selectedBounds);
+    }
+
+    public FILLSTYLE getFillStyle(Rectangle2D bounds) {
+        return Boolean.TRUE.equals(selectedStroke) ? null : fillEditor.getFillStyle(bounds);
     }
 
     public LINESTYLE2 getStrokeStyle() {
-        if (Boolean.FALSE.equals(selectedStroke)) {
+        return getStrokeStyle(selectedBounds);
+    }
+
+    public LINESTYLE2 getStrokeStyle(Rectangle2D bounds) {
+        return getStrokeStyle(bounds, false);
+    }
+
+    private LINESTYLE2 getStrokeStyle(Rectangle2D bounds, boolean allowNone) {
+        if (Boolean.FALSE.equals(selectedStroke) && !allowNone) {
             return null;
         }
-        FILLSTYLE fill = strokeEditor.getFillStyle(selectedBounds);
-        if (fill == null) {
+        FILLSTYLE fill = strokeEditor.getFillStyle(bounds);
+        if (fill == null && !allowNone) {
             return null;
         }
         LINESTYLE2 line = originalLine == null ? new LINESTYLE2() : Helper.deepCopy(originalLine);
@@ -234,10 +295,43 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         if (miterEditor.getValue() != null && (originalLine == null || line.joinStyle == LINESTYLE2.MITER_JOIN)) {
             line.miterLimitFactor = miterEditor.getValue();
         }
-        line.hasFillFlag = fill.fillStyleType != FILLSTYLE.SOLID;
-        line.color = line.hasFillFlag ? null : new RGBA(fill.color);
+        line.hasFillFlag = fill != null && fill.fillStyleType != FILLSTYLE.SOLID;
+        line.color = fill == null || line.hasFillFlag ? null : new RGBA(fill.color);
         line.fillType = line.hasFillFlag ? fill : null;
         return line;
+    }
+
+    /**
+     * Captures drawing settings without generating a geometry-dependent matrix.
+     * A stroke with no paint still retains its width, caps and other settings.
+     */
+    public LINESTYLE2 getDrawingStrokeStyle() {
+        LINESTYLE2 line = getStrokeStyle(null, true);
+        if (miterEditor.getValue() != null) {
+            line.miterLimitFactor = miterEditor.getValue();
+        }
+        return line;
+    }
+
+    public void setDrawingFillStyle(FILLSTYLE fill) {
+        boolean wasUpdating = updating;
+        updating = true;
+        try {
+            fillEditor.setFillStyle(fill);
+        } finally {
+            updating = wasUpdating;
+        }
+    }
+
+    public void setDrawingStrokeStyle(LINESTYLE2 line) {
+        boolean wasUpdating = updating;
+        updating = true;
+        try {
+            setLineStyle(line);
+            miterEditor.setValue(line.miterLimitFactor);
+        } finally {
+            updating = wasUpdating;
+        }
     }
 
     private static JComboBox<String> createComboBox(String property, String... values) {
@@ -334,6 +428,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 capComboBox.setSelectedIndex(cap == null ? -1 : cap);
                 joinComboBox.setSelectedIndex(join == null ? -1 : join);
             }
+            updateStyleEnabled();
         } finally {
             updating = wasUpdating;
         }
@@ -341,7 +436,13 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
 
     private void addRow(JPanel panel, String property, Component editor, int row) {
         GridBagLayout layout = (GridBagLayout) panel.getLayout();
-        addToGrid(layout, panel, new JLabel(formatPropertyName(property)), 0, row);
+        JLabel label = new JLabel(formatPropertyName(property));
+        addToGrid(layout, panel, label, 0, row);
+        if (editor instanceof FillEditor) {
+            GridBagConstraints constraints = layout.getConstraints(label);
+            constraints.anchor = GridBagConstraints.NORTHEAST;
+            layout.setConstraints(label, constraints);
+        }
         addToGrid(layout, panel, editor, 1, row);
     }
 
@@ -354,6 +455,26 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             setSelectedFill(null);
         } finally {
             updating = false;
+        }
+    }
+
+    /**
+     * Refreshes available bitmaps without resetting drawing style settings.
+     */
+    public void setDrawingSwf(SWF swf) {
+        boolean wasUpdating = updating;
+        updating = true;
+        try {
+            fillEditor.setSwf(swf);
+            if (!fillEditor.isFillValid()) {
+                fillEditor.setSolidColor(Color.white);
+            }
+            strokeEditor.setSwf(swf);
+            if (!strokeEditor.isFillValid()) {
+                strokeEditor.setSolidColor(Color.black);
+            }
+        } finally {
+            updating = wasUpdating;
         }
     }
 
@@ -383,15 +504,19 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             }
             fillEditor.setFillStyle(Boolean.TRUE.equals(stroke) ? null : fill);
             setLineStyle(Boolean.FALSE.equals(stroke) ? null : line);
-            boolean fillEnabled = !Boolean.TRUE.equals(stroke);
-            boolean strokeEnabled = !Boolean.FALSE.equals(stroke);
-            setEnabledRecursively(fillPanel, fillEnabled);
-            setEnabledRecursively(strokePanel, strokeEnabled);
-            fillEditor.bitmapComboBox.setEnabled(fillEnabled && fillEditor.bitmapComboBox.getItemCount() > 0);
-            strokeEditor.bitmapComboBox.setEnabled(strokeEnabled && strokeEditor.bitmapComboBox.getItemCount() > 0);
+            updateStyleEnabled();
         } finally {
             updating = wasUpdating;
         }
+    }
+
+    private void updateStyleEnabled() {
+        boolean fillEnabled = !Boolean.TRUE.equals(selectedStroke);
+        boolean strokeEnabled = !Boolean.FALSE.equals(selectedStroke);
+        setEnabledRecursively(fillPanel, fillEnabled);
+        setEnabledRecursively(strokePanel, strokeEnabled);
+        fillEditor.bitmapComboBox.setEnabled(fillEnabled && fillEditor.bitmapComboBox.getItemCount() > 0);
+        strokeEditor.bitmapComboBox.setEnabled(strokeEnabled && strokeEditor.bitmapComboBox.getItemCount() > 0);
     }
 
     private static void setEnabledRecursively(Component component, boolean enabled) {
@@ -419,14 +544,27 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         miterEditor.setValue(line2 == null || line2.joinStyle != LINESTYLE2.MITER_JOIN ? 3f : line2.miterLimitFactor);
     }
 
-    private static class FillEditor extends JPanel {
+    static class FillEditor extends JPanel {
 
         private final JComboBox<String> typeComboBox = createComboBox("fill", "none", "solid", "linearGradient", "radialGradient", "bitmap");
-        private final JPanel valuePanel = new JPanel(new CardLayout());
+        private final JPanel valuePanel = new JPanel(new CardLayout()) {
+            @Override
+            public Dimension getPreferredSize() {
+                for (Component card : getComponents()) {
+                    if (card.isVisible()) {
+                        return card.getPreferredSize();
+                    }
+                }
+                return super.getPreferredSize();
+            }
+        };
         private final JButton colorButton = new JButton();
         private final JPanel gradientPanel = new JPanel(new BorderLayout());
+        private final JComboBox<String> flowComboBox = createComboBox("flow", "pad", "reflect", "repeat");
+        private final JTriStateCheckBox linearRGBCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.linearRGB"));
         private final JComboBox<ComboBoxItem<Integer>> bitmapComboBox = new JComboBox<>();
         private final Color defaultColor;
+        private final boolean allowNone;
         private Color color;
         private FILLSTYLE originalStyle;
         private GRADIENT gradient;
@@ -434,7 +572,15 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         private Consumer<String> changeListener = property -> { };
 
         public FillEditor(Color defaultColor) {
+            this(defaultColor, true);
+        }
+
+        FillEditor(Color defaultColor, boolean allowNone) {
             this.defaultColor = defaultColor;
+            this.allowNone = allowNone;
+            if (!allowNone) {
+                typeComboBox.removeItemAt(0);
+            }
             setLayout(new BorderLayout(0, 5));
             add(typeComboBox, BorderLayout.NORTH);
             valuePanel.add(new JPanel(), "none");
@@ -443,10 +589,25 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             valuePanel.add(bitmapComboBox, "bitmap");
             valuePanel.add(new JLabel("-"), "indeterminate");
             add(valuePanel, BorderLayout.CENTER);
+            JPanel gradientOptions = new JPanel(new GridBagLayout());
+            GridBagConstraints optionConstraints = new GridBagConstraints();
+            optionConstraints.gridx = 0;
+            optionConstraints.gridy = 0;
+            optionConstraints.anchor = GridBagConstraints.WEST;
+            gradientOptions.add(new JLabel(EasyStrings.translate("property.shape.flow") + ": "), optionConstraints);
+            optionConstraints.gridx = 1;
+            gradientOptions.add(flowComboBox, optionConstraints);
+            optionConstraints.gridx = 0;
+            optionConstraints.gridy = 1;
+            optionConstraints.gridwidth = 2;
+            gradientOptions.add(linearRGBCheckBox, optionConstraints);
+            gradientPanel.add(gradientOptions, BorderLayout.SOUTH);
+            flowComboBox.addActionListener(e -> changeListener.accept("flow"));
+            linearRGBCheckBox.addActionListener(e -> changeListener.accept("linearRGB"));
             bitmapComboBox.setPrototypeDisplayValue(new ComboBoxItem<>("Bitmap (65535)", -1));
             bitmapComboBox.setRenderer(indeterminateRenderer());
             typeComboBox.addActionListener(e -> {
-                int index = typeComboBox.getSelectedIndex();
+                int index = getType();
                 String card = index < 0 ? "indeterminate" : index == 0 ? "none" : index == 1 ? "solid" : index == 4 ? "bitmap" : "gradient";
                 ((CardLayout) valuePanel.getLayout()).show(valuePanel, card);
                 valuePanel.setVisible(index != 0);
@@ -465,9 +626,22 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             setFillStyle(null);
         }
 
+        private int getType() {
+            int index = typeComboBox.getSelectedIndex();
+            return index < 0 ? -1 : index + (allowNone ? 0 : 1);
+        }
+
+        private void setType(int type) {
+            typeComboBox.setSelectedIndex(type < 0 ? -1 : allowNone ? type : Math.max(1, type) - 1);
+        }
+
         private void updateColor(Color color) {
             this.color = color;
             colorButton.setText(String.format("#%02x%02x%02x (%d%%)", color.getRed(), color.getGreen(), color.getBlue(), Math.round(color.getAlpha() * 100f / 255)));
+            colorButton.setIcon(colorIcon(color));
+        }
+
+        static ImageIcon colorIcon(Color color) {
             // Paint the swatch independently of the look and feel's button colors.
             BufferedImage swatch = new BufferedImage(18, 18, BufferedImage.TYPE_INT_ARGB);
             Graphics2D graphics = swatch.createGraphics();
@@ -485,12 +659,20 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             } finally {
                 graphics.dispose();
             }
-            colorButton.setIcon(new ImageIcon(swatch));
+            return new ImageIcon(swatch);
+        }
+
+        void setChangeListener(Consumer<String> listener) {
+            changeListener = listener;
+        }
+
+        boolean isFillValid() {
+            return getType() != 4 || bitmapComboBox.getSelectedIndex() >= 0;
         }
 
         public void setSolidColor(Color color) {
             updateColor(color);
-            typeComboBox.setSelectedIndex(1);
+            setType(1);
         }
 
         public void setFillStyle(FILLSTYLE style) {
@@ -510,8 +692,13 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 public void linkChanged(boolean newValue) {
                 }
             });
-            gradientPanel.removeAll();
+            Component previous = ((BorderLayout) gradientPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+            if (previous != null) {
+                gradientPanel.remove(previous);
+            }
             gradientPanel.add(gradientEditor, BorderLayout.CENTER);
+            flowComboBox.setSelectedIndex(gradient.spreadMode >= 0 && gradient.spreadMode <= 2 ? gradient.spreadMode : -1);
+            linearRGBCheckBox.setSelected(gradient.interpolationMode == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE);
             int type = 0;
             if (style != null) {
                 switch (style.fillStyleType) {
@@ -538,11 +725,11 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                         break;
                 }
             }
-            typeComboBox.setSelectedIndex(type);
+            setType(type);
         }
 
         public FILLSTYLE getFillStyle(Rectangle2D bounds) {
-            int type = typeComboBox.getSelectedIndex();
+            int type = getType();
             if (type < 0) {
                 return Helper.deepCopy(originalStyle);
             }
@@ -563,7 +750,14 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                                 ? FILLSTYLE.FOCAL_RADIAL_GRADIENT : FILLSTYLE.RADIAL_GRADIENT;
                 gradientEditor.save();
                 style.gradient = Helper.deepCopy(gradient);
-                if (style.gradientMatrix == null) {
+                if (flowComboBox.getSelectedIndex() >= 0) {
+                    style.gradient.spreadMode = flowComboBox.getSelectedIndex();
+                }
+                if (linearRGBCheckBox.getSelectionState() != 1) {
+                    style.gradient.interpolationMode = linearRGBCheckBox.isSelected()
+                            ? GRADIENT.INTERPOLATION_LINEAR_RGB_MODE : GRADIENT.INTERPOLATION_RGB_MODE;
+                }
+                if (style.gradientMatrix == null && bounds != null) {
                     MATRIX matrix = new MATRIX();
                     matrix.hasScale = true;
                     matrix.scaleX = (float) (Math.max(20, bounds.getWidth()) / 32768);
@@ -613,13 +807,19 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 return;
             }
             Integer type = common(styles, FillEditor::styleType);
-            typeComboBox.setSelectedIndex(type == null ? -1 : type);
+            setType(type == null ? -1 : type);
             if (type != null && type == 1 && common(styles, style -> style.color.toColor()) == null) {
                 colorButton.setText("-");
                 colorButton.setIcon(null);
             }
-            if (type != null && (type == 2 || type == 3)) {
+            if (styles.stream().allMatch(style -> style != null && style.hasGradient())) {
+                ((CardLayout) valuePanel.getLayout()).show(valuePanel, "gradient");
                 gradientEditor.setIndeterminate(common(styles, FillEditor::gradientStops) == null);
+                Integer flow = common(styles, style -> style.gradient.spreadMode);
+                flowComboBox.setSelectedIndex(flow == null || flow < 0 || flow > 2 ? -1 : flow);
+                Integer interpolation = common(styles, style -> style.gradient.interpolationMode);
+                linearRGBCheckBox.setSelectionState(interpolation == null ? 1
+                        : interpolation == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE ? 2 : 0);
             }
             if (type != null && type == 4) {
                 Integer bitmap = common(styles, style -> style.bitmapId);
@@ -646,6 +846,15 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                     gradientEditor.save();
                     base.gradient.gradientRecords = Helper.deepCopy(gradient.gradientRecords);
                 }
+            } else if (property.equals("flow")) {
+                if (base != null && base.hasGradient() && flowComboBox.getSelectedIndex() >= 0) {
+                    base.gradient.spreadMode = flowComboBox.getSelectedIndex();
+                }
+            } else if (property.equals("linearRGB")) {
+                if (base != null && base.hasGradient() && linearRGBCheckBox.getSelectionState() != 1) {
+                    base.gradient.interpolationMode = linearRGBCheckBox.isSelected()
+                            ? GRADIENT.INTERPOLATION_LINEAR_RGB_MODE : GRADIENT.INTERPOLATION_RGB_MODE;
+                }
             } else if (property.equals("bitmap")) {
                 if (base != null && base.hasBitmap() && bitmapComboBox.getSelectedIndex() >= 0) {
                     base.bitmapId = bitmapComboBox.getItemAt(bitmapComboBox.getSelectedIndex()).getValue();
@@ -657,7 +866,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 }
                 FILLSTYLE result = base == null ? new FILLSTYLE() : base;
                 result.inShape3 = true;
-                int type = typeComboBox.getSelectedIndex();
+                int type = getType();
                 if (type == 1) {
                     result.color = original != null && original.fillStyleType == FILLSTYLE.SOLID
                             ? new RGBA(original.color) : new RGBA(template.color);
@@ -679,6 +888,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         }
 
         public void setSwf(SWF swf) {
+            Integer selectedId = bitmapComboBox.getSelectedIndex() < 0 ? null
+                    : bitmapComboBox.getItemAt(bitmapComboBox.getSelectedIndex()).getValue();
             bitmapComboBox.removeAllItems();
             if (swf != null) {
                 List<CharacterTag> images = new ArrayList<>();
@@ -691,6 +902,14 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 EasyTagNameResolver resolver = new EasyTagNameResolver();
                 for (CharacterTag image : images) {
                     bitmapComboBox.addItem(new ComboBoxItem<>(resolver.getTagName(image), image.getCharacterId()));
+                }
+            }
+            if (selectedId != null) {
+                for (int i = 0; i < bitmapComboBox.getItemCount(); i++) {
+                    if (selectedId.equals(bitmapComboBox.getItemAt(i).getValue())) {
+                        bitmapComboBox.setSelectedIndex(i);
+                        break;
+                    }
                 }
             }
             bitmapComboBox.setEnabled(bitmapComboBox.getItemCount() > 0);

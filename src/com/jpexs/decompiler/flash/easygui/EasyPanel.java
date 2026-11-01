@@ -88,6 +88,18 @@ public class EasyPanel extends JPanel {
     public SWF getSwf() {
         return tabSwitcher.getSelectedValue();
     }
+
+    public boolean isShapeEditing() {
+        return easySwfPanel.isShapeEditing();
+    }
+
+    public ShapeTool getShapeTool() {
+        return easySwfPanel.getShapeTool();
+    }
+
+    public void setShapeTool(ShapeTool tool) {
+        easySwfPanel.setShapeTool(tool);
+    }
     
     public void setTimelined(Timelined tim) {
         setSwf(tim.getSwf());

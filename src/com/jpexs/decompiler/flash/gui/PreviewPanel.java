@@ -3994,6 +3994,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         int y = 0;
 
         List<DisplayPoint> points = new ArrayList<>();
+        List<Integer> pathStarts = new ArrayList<>();
         boolean wasMoveTo = false;
         StyleChangeRecord lastStyleChangeRecord = null;
         for (SHAPERECORD rec : selectedRecords) {
@@ -4023,6 +4024,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 lastStyleChangeRecord = scr;
                 if (scr.stateMoveTo) {
                     DisplayPoint point = new DisplayPoint(scr.moveDeltaX, scr.moveDeltaY);
+                    pathStarts.add(points.size());
                     points.add(point);
                     wasMoveTo = true;
                 }
@@ -4031,7 +4033,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             x = rec.changeX(x);
             y = rec.changeY(y);
         }
-        displayEditImagePanel.setHilightedPoints(points);
+        displayEditImagePanel.setHilightedPoints(points, pathStarts);
     }
 
     private void transformDisplayEditTagButtonActionPerformed(ActionEvent evt) {

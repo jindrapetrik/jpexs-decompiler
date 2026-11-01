@@ -28,4 +28,10 @@ public interface PointUpdateListener {
     public boolean edgeSplit(int position, double splitPoint);
 
     public boolean pointRemoved(int position);
+
+    default void pointsRemoved(List<Integer> positions) {
+        for (int position : positions) {
+            pointRemoved(position);
+        }
+    }
 }

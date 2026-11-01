@@ -78,6 +78,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -114,6 +115,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -127,12 +129,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -284,6 +289,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static Cursor shearYCursor;
     private static Cursor movePointCursor;
     private static Cursor defaultCursor;
+    private static Cursor shapeDrawingCursor;
+    private static Cursor paintCursor;
+    private static Cursor inkCursor;
+    private static Cursor eyedropperCursor;
+    private static Cursor lassoCursor;
     private static Cursor addPointCursor;
     private static Cursor guideXCursor;
     private static Cursor guideYCursor;
@@ -367,6 +377,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean gradientTransformEditable = false;
     private Consumer<MATRIX> gradientTransformListener = null;
     private Consumer<Float> focalGradientPointListener = null;
+    private Runnable gradientGestureStarted;
+    private Consumer<Boolean> gradientGestureFinished;
+    private float focalGradientDragStart;
     private int activeGradientHandle = GRADIENT_HANDLE_NONE;
     private Matrix gradientTransformDragStart = null;
     private Point2D gradientHandleDragOffset = null;
@@ -374,6 +387,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private javax.swing.Timer hilightedShapeTimer;
 
     private List<DisplayPoint> hilightedPoints = null;
+    private Set<Integer> hilightedPointPathStarts;
 
     private DisplayPoint touchPointOffset = null;
 
@@ -445,6 +459,55 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean multiSelect = false;
 
     private BiConsumer<Shape, Boolean> rectangleSelectionListener;
+    private boolean lassoSelection;
+    private Path2D.Double lassoSelectionPath;
+
+    private Function<Point2D, Shape> shapeDrawingTip;
+    private Cursor activeShapeDrawingCursor;
+    private ShapeDrawListener shapeDrawListener;
+    private boolean shapeDrawingGesture;
+    private Point shapeDrawingPosition;
+    private Shape shapeDrawingGuide;
+    private boolean shapeDrawingGuideSolid;
+    private boolean shapeOriginVisible;
+
+    /**
+     * Drawing gestures in shape-local twips, independent of scene placement.
+     */
+    public interface ShapeDrawListener {
+
+        void begin(Point2D point);
+
+        default void begin(Point2D point, int modifiers, int clickCount) {
+            begin(point);
+        }
+
+        void update(Point2D point, boolean finished);
+
+        default void update(Point2D point, boolean finished, int modifiers) {
+            update(point, finished);
+        }
+
+        void cancel();
+
+        default void move(Point2D point) {
+        }
+
+        default void move(Point2D point, int modifiers) {
+            move(point);
+        }
+
+        default void exit() {
+        }
+
+        default boolean keyPressed(int keyCode, int modifiers) {
+            return false;
+        }
+
+        default boolean isPending() {
+            return false;
+        }
+    }
 
     private Predicate<Point2D> selectionMoveHitTest;
 
@@ -607,7 +670,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
      * A null listener restores the regular preview mouse behavior.
      */
     public void setRectangleSelectionListener(BiConsumer<Shape, Boolean> listener) {
+        setAreaSelectionListener(listener, false);
+    }
+
+    /**
+     * Selects an area using a rectangle or a freehand lasso in panel coordinates.
+     * The listener receives the closed area in local timeline coordinates.
+     */
+    public void setAreaSelectionListener(BiConsumer<Shape, Boolean> listener, boolean lasso) {
         rectangleSelectionListener = listener;
+        lassoSelection = listener != null && lasso;
+        lassoSelectionPath = null;
         iconPanel.rectangleSelectionGesture = false;
         iconPanel.selectionMoveGesture = false;
         iconPanel.suppressRectangleClick = false;
@@ -617,8 +690,60 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             doFreeTransform = false;
             inMoving = false;
             mode = Cursor.DEFAULT_CURSOR;
-            iconPanel.setCursor(defaultCursor);
+            iconPanel.setCursor(lassoSelection ? lassoCursor : defaultCursor);
         }
+        iconPanel.repaint();
+    }
+
+    private void appendLassoPoint(Point2D point) {
+        if (lassoSelectionPath != null && lassoSelectionPath.getCurrentPoint().distance(point) >= 1) {
+            lassoSelectionPath.lineTo(point.getX(), point.getY());
+        }
+    }
+
+    /**
+     * Installs a drawing tool and its local outline. Painting the outline on the
+     * canvas supports any brush size, zoom and scene transform without native
+     * cursor size limits. A null listener restores the usual input handling.
+     */
+    public void setShapeDrawingTool(Function<Point2D, Shape> tip, ShapeDrawListener listener) {
+        setShapeDrawingTool(tip, listener, ShapeDrawingPointer.DEFAULT);
+    }
+
+    public enum ShapeDrawingPointer {
+        DEFAULT, PAINT, INK, EYEDROPPER, MOVE, PEN
+    }
+
+    public void setShapeDrawingTool(Function<Point2D, Shape> tip, ShapeDrawListener listener, ShapeDrawingPointer pointer) {
+        if (shapeDrawListener != null && (shapeDrawingGesture || shapeDrawListener.isPending())) {
+            shapeDrawingGesture = false;
+            shapeDrawListener.cancel();
+        }
+        shapeDrawingTip = tip;
+        shapeDrawListener = listener;
+        shapeDrawingGuide = null;
+        shapeDrawingPosition = listener == null ? null : iconPanel.getMousePosition();
+        activeShapeDrawingCursor = listener == null ? defaultCursor : pointer == ShapeDrawingPointer.MOVE ? moveCanvasCursor
+                : pointer == ShapeDrawingPointer.PEN ? Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR)
+                : pointer == ShapeDrawingPointer.PAINT ? paintCursor
+                : pointer == ShapeDrawingPointer.INK ? inkCursor : pointer == ShapeDrawingPointer.EYEDROPPER ? eyedropperCursor
+                        : tip == null ? defaultCursor : shapeDrawingCursor;
+        iconPanel.setCursor(listener == null && lassoSelection ? lassoCursor : activeShapeDrawingCursor);
+        iconPanel.repaint();
+    }
+
+    public void setShapeDrawingGuide(Shape guide) {
+        setShapeDrawingGuide(guide, false);
+    }
+
+    public void setShapeDrawingGuide(Shape guide, boolean solid) {
+        shapeDrawingGuide = guide;
+        shapeDrawingGuideSolid = solid;
+        iconPanel.repaint();
+    }
+
+    public void setShapeOriginVisible(boolean visible) {
+        shapeOriginVisible = visible;
         iconPanel.repaint();
     }
 
@@ -626,6 +751,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         selectionMoveHitTest = hitTest;
         selectionMoveListener = listener;
         shapePreview = null;
+    }
+
+    private Cursor getAreaSelectionCursor(Point2D point, boolean additive) {
+        if (rectangleSelectionListener != null && (iconPanel.selectionMoveGesture
+                || !iconPanel.rectangleSelectionGesture && !additive && point != null && selectionMoveHitTest != null
+                && selectionMoveHitTest.test(toTimelinedPoint(point)))) {
+            return moveCursor;
+        }
+        return lassoSelection ? lassoCursor : defaultCursor;
     }
 
     public void setSelectionDeleteListener(Runnable listener) {
@@ -680,7 +814,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static Cursor loadCursor(String name, int x, int y) throws IOException {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Image image = ImageIO.read(MainPanel.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/cursors/" + name + ".png"));
-        return toolkit.createCustomCursor(image, new Point(x, y), name);
+        Dimension size = toolkit.getBestCursorSize(image.getWidth(null), image.getHeight(null));
+        Point hotSpot = scaleCursorHotSpot(new Point(x, y), image.getWidth(null), image.getHeight(null), size);
+        return toolkit.createCustomCursor(image, hotSpot, name);
+    }
+
+    static Point scaleCursorHotSpot(Point hotSpot, int width, int height, Dimension nativeSize) {
+        // AWT resizes the bitmap to the native cursor size, but passes the
+        // hotspot through unchanged. Scale it too, e.g. for Windows at 200% DPI.
+        if (nativeSize.width <= 0 || nativeSize.height <= 0) {
+            return new Point(hotSpot);
+        }
+        int x = (int) Math.round(hotSpot.x * (double) nativeSize.width / width);
+        int y = (int) Math.round(hotSpot.y * (double) nativeSize.height / height);
+        return new Point(Math.min(nativeSize.width - 1, x), Math.min(nativeSize.height - 1, y));
     }
 
     private SerializableImage imgPlay = null;
@@ -688,6 +835,110 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private List<BoundsChangeListener> boundsChangeListeners = new ArrayList<>();
 
     private List<PointUpdateListener> pointUpdateListeners = new ArrayList<>();
+
+    private Runnable pointEditStarted;
+    private Consumer<Boolean> pointEditFinished;
+    private List<DisplayPoint> pointEditOriginalPoints;
+    private boolean suppressPointClick;
+    private boolean updatingPointCoordinates;
+    private boolean pointCoordinatesPending;
+    private boolean pointEditToolbarVisible = true;
+    private final List<Runnable> pointSelectionListeners = new ArrayList<>();
+
+    public void setPointEditGestureListeners(Runnable started, Consumer<Boolean> finished) {
+        if (started == null) {
+            finishPointEditGesture(true);
+        }
+        pointEditStarted = started;
+        pointEditFinished = finished;
+    }
+
+    private void startPointEditGesture() {
+        if (pointEditStarted == null || pointEditOriginalPoints != null) {
+            return;
+        }
+        pointEditOriginalPoints = new ArrayList<>();
+        for (DisplayPoint point : hilightedPoints) {
+            pointEditOriginalPoints.add(new DisplayPoint(point));
+        }
+        pointEditStarted.run();
+    }
+
+    private boolean finishPointEditGesture(boolean canceled) {
+        if (pointEditOriginalPoints == null) {
+            return false;
+        }
+        if (canceled) {
+            hilightedPoints = pointEditOriginalPoints;
+        }
+        pointEditOriginalPoints = null;
+        suppressPointClick = true;
+        iconPanel.dragStart = null;
+        iconPanel.selectionEnd = null;
+        snapOffset = new Point2D.Double(0, 0);
+        if (pointEditFinished != null) {
+            pointEditFinished.accept(canceled);
+        }
+        calculatePointsXY();
+        redraw();
+        return true;
+    }
+
+    public List<Integer> getSelectedPointIndices() {
+        return new ArrayList<>(selectedPoints);
+    }
+
+    public void setPointEditToolbarVisible(boolean visible) {
+        pointEditToolbarVisible = visible;
+        pointEditPanel.setVisible(visible && hilightedPoints != null);
+    }
+
+    public void addPointSelectionListener(Runnable listener) {
+        pointSelectionListeners.add(listener);
+    }
+
+    public void removePointSelectionListener(Runnable listener) {
+        pointSelectionListeners.remove(listener);
+    }
+
+    /**
+     * Returns the top-left position of the selected points in local twips.
+     */
+    public Point2D getSelectedPointsPosition() {
+        return getMinSelectedPoint();
+    }
+
+    /**
+     * Moves selected points together to a position in local twips, using the
+     * regular point-update notification and the editor's undo integration.
+     */
+    public void setSelectedPointsPosition(Point2D position) {
+        Point min = getMinSelectedPoint();
+        if (min == null || position == null || !Double.isFinite(position.getX()) || !Double.isFinite(position.getY())
+                || position.getX() < Integer.MIN_VALUE || position.getX() > Integer.MAX_VALUE
+                || position.getY() < Integer.MIN_VALUE || position.getY() > Integer.MAX_VALUE) {
+            return;
+        }
+        long dx = Math.round(position.getX()) - min.x;
+        long dy = Math.round(position.getY()) - min.y;
+        if (dx == 0 && dy == 0) {
+            return;
+        }
+        for (int index : selectedPoints) {
+            DisplayPoint point = hilightedPoints.get(index);
+            if (point.x + dx < Integer.MIN_VALUE || point.x + dx > Integer.MAX_VALUE
+                    || point.y + dy < Integer.MIN_VALUE || point.y + dy > Integer.MAX_VALUE) {
+                return;
+            }
+        }
+        for (int index : selectedPoints) {
+            DisplayPoint point = hilightedPoints.get(index);
+            point.x = (int) (point.x + dx);
+            point.y = (int) (point.y + dy);
+        }
+        firePointsUpdated(hilightedPoints);
+        calculatePointsXY();
+    }
 
     private List<Runnable> transformChangeListeners = new ArrayList<>();
 
@@ -733,15 +984,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return result;
     }
 
-    private boolean firePointRemoved(int position) {
-        boolean result = true;
-        for (PointUpdateListener listener : pointUpdateListeners) {
-            result = result && listener.pointRemoved(position);
-        }
-        return result;
-    }
-
     private void applyPointsXY() {
+        if (updatingPointCoordinates || hilightedPoints == null) {
+            return;
+        }
         try {
             int x = (int) Math.round(parseDouble(pointXTextField.getText()) * SWF.unitDivisor);
             int y = (int) Math.round(parseDouble(pointYTextField.getText()) * SWF.unitDivisor);
@@ -763,7 +1009,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private java.awt.Point getMinSelectedPoint() {
-        if (selectedPoints.isEmpty()) {
+        if (hilightedPoints == null || selectedPoints.isEmpty()) {
             return null;
         }
         int minX = Integer.MAX_VALUE;
@@ -781,26 +1027,69 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void calculatePointsXY() {
-        Point2D minPoint = getMinSelectedPoint();
-        if (minPoint == null) {
-            pointXTextField.setText("");
-            pointYTextField.setText("");
-            return;
+        updatingPointCoordinates = true;
+        try {
+            Point2D minPoint = getMinSelectedPoint();
+            pointXTextField.setText(minPoint == null ? "" : formatDouble(minPoint.getX() / SWF.unitDivisor));
+            pointYTextField.setText(minPoint == null ? "" : formatDouble(minPoint.getY() / SWF.unitDivisor));
+        } finally {
+            updatingPointCoordinates = false;
         }
-
-        pointXTextField.setText(formatDouble(minPoint.getX() / SWF.unitDivisor));
-        pointYTextField.setText(formatDouble(minPoint.getY() / SWF.unitDivisor));
+        for (Runnable listener : pointSelectionListeners) {
+            listener.run();
+        }
     }
 
     public void setHilightedPoints(List<DisplayPoint> hilightedPoints) {
+        setHilightedPoints(hilightedPoints, null);
+    }
+
+    public void setHilightedPoints(List<DisplayPoint> hilightedPoints, List<Integer> pathStarts) {
         hilightedEdge = null;
         setHilightedFillInternal(null);
         setHilightedLineInternal(null);
         selectedPoints = new ArrayList<>();
-        calculatePointsXY();
+        pointsUnderCursor = new ArrayList<>();
+        pathPointsUnderCursor = new ArrayList<>();
         this.hilightedPoints = hilightedPoints;
-        pointEditPanel.setVisible(hilightedPoints != null);
+        hilightedPointPathStarts = pathStarts == null ? null : new HashSet<>(pathStarts);
+        calculatePointsXY();
+        pointEditPanel.setVisible(pointEditToolbarVisible && hilightedPoints != null);
         redraw();
+    }
+
+    private Shape[] getPointEditGuides(List<DisplayPoint> points) {
+        Path2D.Double path = new Path2D.Double();
+        Path2D.Double handles = new Path2D.Double();
+        for (int i = 0; i < points.size(); i++) {
+            DisplayPoint point = points.get(i);
+            if (i == 0 || hilightedPointPathStarts.contains(i)) {
+                path.moveTo(point.x, point.y);
+            } else if (!point.onPath && i + 1 < points.size() && !hilightedPointPathStarts.contains(i + 1)) {
+                DisplayPoint end = points.get(++i);
+                Point2D start = path.getCurrentPoint();
+                handles.moveTo(start.getX(), start.getY());
+                handles.lineTo(point.x, point.y);
+                handles.lineTo(end.x, end.y);
+                path.quadTo(point.x, point.y, end.x, end.y);
+            } else {
+                path.lineTo(point.x, point.y);
+            }
+        }
+        return new Shape[]{path, handles};
+    }
+
+    public void setSelectedPointIndices(List<Integer> indices) {
+        selectedPoints = new ArrayList<>();
+        if (hilightedPoints != null) {
+            for (int index : indices) {
+                if (index >= 0 && index < hilightedPoints.size()) {
+                    selectedPoints.add(index);
+                }
+            }
+        }
+        calculatePointsXY();
+        repaint();
     }
 
     public void setHilightedEdge(Point[] hilightedEdge) {
@@ -935,12 +1224,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void clearGradientTransform() {
+        finishGradientTransformDrag(true);
         setGradientTransform(null, false, null);
         iconPanel.setCursor(defaultCursor);
     }
 
+    public void setGradientTransformGestureListeners(Runnable started, Consumer<Boolean> finished) {
+        gradientGestureStarted = started;
+        gradientGestureFinished = finished;
+    }
+
     private Point2D gradientPointToPanel(double x, double y) {
-        Point2D shapePoint = gradientTransform.transform(new Point2D.Double(x, y));
+        Point2D shapePoint = getParentMatrix().transform(gradientTransform.transform(new Point2D.Double(x, y)));
         double zoomDouble = getRealZoom();
         return new Point2D.Double(
                 offsetPoint.getX() + shapePoint.getX() * zoomDouble / SWF.unitDivisor,
@@ -949,11 +1244,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private Point2D panelPointToShape(Point2D panelPoint) {
-        double zoomDouble = getRealZoom();
-        return new Point2D.Double(
-                (panelPoint.getX() - offsetPoint.getX()) * SWF.unitDivisor / zoomDouble,
-                (panelPoint.getY() - offsetPoint.getY()) * SWF.unitDivisor / zoomDouble
-        );
+        return toTimelinedPoint(panelPoint);
     }
 
     private Point2D getGradientHandleShapePoint(int handle) {
@@ -997,10 +1288,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 : new int[]{GRADIENT_HANDLE_CENTER, GRADIENT_HANDLE_END, GRADIENT_HANDLE_Y_AXIS};
         for (int handle : handles) {
             Point2D shapePoint = getGradientHandleShapePoint(handle);
-            Point2D panelPoint = new Point2D.Double(
-                    offsetPoint.getX() + shapePoint.getX() * getRealZoom() / SWF.unitDivisor,
-                    offsetPoint.getY() + shapePoint.getY() * getRealZoom() / SWF.unitDivisor
-            );
+            Point2D panelPoint = getTimelinedToPanelTransform().transform(shapePoint, null);
             if (panelPoint.distance(point) <= GRADIENT_HANDLE_HIT_RADIUS) {
                 return handle;
             }
@@ -1051,6 +1339,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         activeGradientHandle = handle;
         gradientTransformDragStart = gradientTransform.clone();
+        focalGradientDragStart = focalGradientPoint;
         Point2D mouseShapePoint = panelPointToShape(e.getPoint());
         Point2D handleShapePoint = getGradientHandleShapePoint(handle);
         gradientHandleDragOffset = new Point2D.Double(
@@ -1060,6 +1349,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         iconPanel.setCursor(handle == GRADIENT_HANDLE_CENTER
                 ? Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR)
                 : Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        if (gradientGestureStarted != null) {
+            gradientGestureStarted.run();
+        }
         return true;
     }
 
@@ -1151,12 +1443,31 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private boolean finishGradientTransformDrag() {
+        return finishGradientTransformDrag(false);
+    }
+
+    private boolean finishGradientTransformDrag(boolean canceled) {
         if (activeGradientHandle == GRADIENT_HANDLE_NONE) {
             return false;
         }
+        Matrix original = gradientTransformDragStart;
         activeGradientHandle = GRADIENT_HANDLE_NONE;
         gradientTransformDragStart = null;
         gradientHandleDragOffset = null;
+        if (canceled) {
+            gradientTransform = original;
+            focalGradientPoint = focalGradientDragStart;
+            if (gradientTransformListener != null) {
+                gradientTransformListener.accept(original.toMATRIX());
+            }
+            if (focalGradientPointListener != null) {
+                focalGradientPointListener.accept(focalGradientPoint);
+            }
+        }
+        if (gradientGestureFinished != null) {
+            gradientGestureFinished.accept(canceled);
+        }
+        iconPanel.repaint();
         return true;
     }
 
@@ -1211,10 +1522,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Color secondaryColor = gradientTransformEditable ? new Color(255, 145, 0) : new Color(165, 165, 165);
 
         if (!linearGradientTransform && !bitmapTransform) {
-            AffineTransform gradientToPanel = new AffineTransform();
-            gradientToPanel.translate(offsetPoint.getX(), offsetPoint.getY());
-            double displayScale = getRealZoom() / SWF.unitDivisor;
-            gradientToPanel.scale(displayScale, displayScale);
+            AffineTransform gradientToPanel = getTimelinedToPanelTransform();
             gradientToPanel.concatenate(gradientTransform.toTransform());
             Shape radialOutline = gradientToPanel.createTransformedShape(
                     new Ellipse2D.Double(-GRADIENT_UNIT, -GRADIENT_UNIT, 2 * GRADIENT_UNIT, 2 * GRADIENT_UNIT)
@@ -1445,6 +1753,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             shearYCursor = loadCursor("shear_y", 5, 9);
             movePointCursor = loadCursor("move_point", 0, 0);
             defaultCursor = loadCursor("default", 0, 0);
+            shapeDrawingCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                    new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "shapeDrawing");
+            paintCursor = loadCursor("paint", 4, 27);
+            inkCursor = loadCursor("ink", 4, 27);
+            eyedropperCursor = loadCursor("eyedropper", 4, 27);
+            lassoCursor = loadCursor("lasso", 4, 27);
             addPointCursor = loadCursor("add_point", 0, 0);
             guideXCursor = loadCursor("guide_x", 0, 0);
             guideYCursor = loadCursor("guide_y", 0, 0);
@@ -2022,14 +2336,30 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                                 g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 1 / zoomDouble)));
                                 double pointSize = SWF.unitDivisor * 4 / zoomDouble;
+                                if (hilightedPointPathStarts != null) {
+                                    Shape[] guides = getPointEditGuides(points);
+                                    float pixel = (float) (SWF.unitDivisor / zoomDouble);
+                                    for (int i = 0; i < guides.length; i++) {
+                                        Shape guide = getParentMatrix().toTransform().createTransformedShape(guides[i]);
+                                        float[] dash = i == 0 ? null : new float[]{4 * pixel, 4 * pixel};
+                                        g2.setPaint(Color.white);
+                                        g2.setStroke(new BasicStroke(3 * pixel, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10, dash, 0));
+                                        g2.draw(guide);
+                                        g2.setPaint(Color.black);
+                                        g2.setStroke(new BasicStroke(pixel, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10, dash, 0));
+                                        g2.draw(guide);
+                                    }
+                                    g2.setStroke(new BasicStroke(pixel));
+                                }
                                 //selectedPoints
                                 for (int i = 0; i < points.size(); i++) {
                                     DisplayPoint p = points.get(i);
+                                    Point2D placed = getParentMatrix().transform(p.toPoint2D());
                                     Shape pointShape;
                                     if (p.onPath) {
-                                        pointShape = new Rectangle2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                                        pointShape = new Rectangle2D.Double(placed.getX() - pointSize, placed.getY() - pointSize, pointSize * 2, pointSize * 2);
                                     } else {
-                                        pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                                        pointShape = new Ellipse2D.Double(placed.getX() - pointSize, placed.getY() - pointSize, pointSize * 2, pointSize * 2);
                                     }
                                     if (selectedPoints.contains(i)) {
                                         g2.setPaint(Color.black);
@@ -2102,7 +2432,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         Rectangle2D selectionRect = getSelectionRect();
-                        if (selectionRect != null && !selectionMoveGesture) {
+                        if (selectionRect != null && !selectionMoveGesture && !lassoSelection) {
                             g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_ROUND, 0, new float[]{2, 2}, 0f));
                             if (canInvert) {
                                 g2.setComposite(BlendComposite.Invert);
@@ -2257,8 +2587,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (hilightedPoints != null) {
                         java.awt.Point minPoint = getMinSelectedPoint();
                         if (minPoint != null) {
-                            pointXTextField.setText(formatDouble(minPoint.x / SWF.unitDivisor + x));
-                            pointYTextField.setText(formatDouble(minPoint.y / SWF.unitDivisor + y));
+                            updatingPointCoordinates = true;
+                            try {
+                                pointXTextField.setText(formatDouble(minPoint.x / SWF.unitDivisor + x));
+                                pointYTextField.setText(formatDouble(minPoint.y / SWF.unitDivisor + y));
+                            } finally {
+                                updatingPointCoordinates = false;
+                            }
                             applyPointsXY();
                         }
                     } else {
@@ -2311,6 +2646,38 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void keyPressed(KeyEvent e) {
+                    if (shapeDrawListener != null && shapeDrawListener.keyPressed(e.getKeyCode(), e.getModifiersEx())) {
+                        shapeDrawingGesture = false;
+                        e.consume();
+                        repaint();
+                        return;
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE && lassoSelectionPath != null) {
+                        lassoSelectionPath = null;
+                        rectangleSelectionGesture = false;
+                        dragStart = null;
+                        selectionEnd = null;
+                        suppressRectangleClick = true;
+                        e.consume();
+                        repaint();
+                        return;
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE && finishPointEditGesture(true)) {
+                        e.consume();
+                        return;
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE && finishGradientTransformDrag(true)) {
+                        e.consume();
+                        return;
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE && shapeDrawListener != null
+                            && (shapeDrawingGesture || shapeDrawListener.isPending())) {
+                        shapeDrawingGesture = false;
+                        shapeDrawListener.cancel();
+                        shapeDrawingGuide = null;
+                        e.consume();
+                        return;
+                    }
                     if (e.getKeyCode() == KeyEvent.VK_DELETE && rectangleSelectionListener != null && selectionDeleteListener != null) {
                         e.consume();
                         selectionDeleteListener.run();
@@ -2334,10 +2701,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     return o2 - o1;
                                 }
                             });
-                            for (int i : selectedPointsDesc) {
-                                firePointRemoved(i);
+                            for (PointUpdateListener listener : pointUpdateListeners) {
+                                listener.pointsRemoved(selectedPointsDesc);
                             }
                             selectedPoints.clear();
+                            calculatePointsXY();
                             repaint();
                         }
                     }
@@ -2379,7 +2747,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             MouseInputAdapter mouseInputAdapter = new MouseInputAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-
+                    if (suppressPointClick) {
+                        suppressPointClick = false;
+                        e.consume();
+                        return;
+                    }
+                    if (shapeDrawListener != null) {
+                        e.consume();
+                        return;
+                    }
                     if (rectangleSelectionListener != null && !e.isAltDown()) {
                         if (suppressRectangleClick) {
                             e.consume();
@@ -2574,6 +2950,27 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mousePressed(MouseEvent e) {
+                    suppressPointClick = false;
+                    if (startGradientTransformDrag(e)) {
+                        requestFocusInWindow();
+                        return;
+                    }
+                    if (shapeDrawListener != null && SwingUtilities.isRightMouseButton(e)
+                            && shapeDrawListener.keyPressed(KeyEvent.VK_ENTER, e.getModifiersEx())) {
+                        shapeDrawingGesture = false;
+                        e.consume();
+                        repaint();
+                        return;
+                    }
+                    if (shapeDrawListener != null && SwingUtilities.isLeftMouseButton(e) && !e.isAltDown()) {
+                        shapeDrawingGesture = true;
+                        shapeDrawingPosition = e.getPoint();
+                        requestFocusInWindow();
+                        shapeDrawListener.begin(toTimelinedPoint(e.getPoint()), e.getModifiersEx(), e.getClickCount());
+                        e.consume();
+                        repaint();
+                        return;
+                    }
                     if (rectangleSelectionListener != null && SwingUtilities.isLeftMouseButton(e) && !e.isAltDown()) {
                         rectangleSelectionGesture = true;
                         selectionMoveGesture = !e.isControlDown() && selectionMoveHitTest != null
@@ -2581,10 +2978,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         suppressRectangleClick = false;
                         setDragStart(e.getPoint());
                         selectionEnd = null;
-                        requestFocusInWindow();
-                        return;
-                    }
-                    if (startGradientTransformDrag(e)) {
+                        if (lassoSelection && !selectionMoveGesture) {
+                            lassoSelectionPath = new Path2D.Double(Path2D.WIND_EVEN_ODD);
+                            lassoSelectionPath.moveTo(e.getX(), e.getY());
+                        }
+                        setCursor(getAreaSelectionCursor(e.getPoint(), e.isControlDown()));
                         requestFocusInWindow();
                         return;
                     }
@@ -2651,6 +3049,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         selectedPointsOriginalValues = newPointsUnderCursorValues;
+                        if (hilightedPoints != null && !selectedPoints.isEmpty() && !pointsUnderCursor.isEmpty() && !ctrlDown) {
+                            startPointEditGesture();
+                        }
 
                         if ((selectionMode && depthStateUnderCursor != null && selectedDepths.contains(depthStateUnderCursor.depth))
                                 || (!selectionMode && doFreeTransform && depthStateUnderCursor != null)) {
@@ -2790,7 +3191,27 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
+                    if (SwingUtilities.isLeftMouseButton(e) && finishPointEditGesture(false)) {
+                        return;
+                    }
+                    if (finishGradientTransformDrag()) {
+                        return;
+                    }
+                    if (shapeDrawingGesture && SwingUtilities.isLeftMouseButton(e)) {
+                        shapeDrawingGesture = false;
+                        shapeDrawingPosition = e.getPoint();
+                        shapeDrawListener.update(toTimelinedPoint(e.getPoint()), true, e.getModifiersEx());
+                        e.consume();
+                        repaint();
+                        return;
+                    }
                     if (rectangleSelectionGesture && SwingUtilities.isLeftMouseButton(e)) {
+                        appendLassoPoint(e.getPoint());
+                        Path2D.Double lasso = lassoSelectionPath;
+                        lassoSelectionPath = null;
+                        if (lasso != null) {
+                            lasso.closePath();
+                        }
                         if (dragStart != null && dragStart.distance(e.getPoint()) >= 3) {
                             selectionEnd = e.getPoint();
                         }
@@ -2799,19 +3220,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         Point2D delta = moving && rectangle != null ? selectionMoveDelta(e.getPoint()) : null;
                         rectangleSelectionGesture = false;
                         selectionMoveGesture = false;
-                        suppressRectangleClick = rectangle != null;
+                        suppressRectangleClick = lasso != null || rectangle != null;
                         dragStart = null;
                         selectionEnd = null;
                         repaint();
                         if (delta != null && selectionMoveListener != null) {
                             selectionMoveListener.accept(delta, true);
                             suppressRectangleClick = true;
+                        } else if (lasso != null && rectangleSelectionListener != null) {
+                            rectangleSelectionListener.accept(toTimelinedArea(lasso), e.isControlDown());
                         } else if (!moving && rectangle != null && rectangleSelectionListener != null) {
                             rectangleSelectionListener.accept(toTimelinedArea(rectangle), e.isControlDown());
                         }
-                        return;
-                    }
-                    if (finishGradientTransformDrag()) {
                         return;
                     }
                     if (SwingUtilities.isLeftMouseButton(e)) {
@@ -2850,11 +3270,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     fireEdgeSplit(di.pathPoint, di.pathPosition);
                                 }
                                 selectedPoints.clear();
+                                calculatePointsXY();
                                 pointsUnderCursor.clear();
                                 pathPointsUnderCursor.clear();
                                 repaint();
                             }
-                            updateScrollBarMinMax();
+                            // Updating the ranges alone fires adjustment events
+                            // which can pan the canvas after a shape replacement.
+                            updateScrollBars();
                         }
 
                         if (dragStart != null && !inMoving && multiSelect) {
@@ -2962,7 +3385,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
+                    if (dragGradientTransform(e)) {
+                        return;
+                    }
+                    if (shapeDrawListener != null && !e.isAltDown()) {
+                        shapeDrawingPosition = e.getPoint();
+                        if (shapeDrawingGesture) {
+                            shapeDrawListener.update(toTimelinedPoint(e.getPoint()), false, e.getModifiersEx());
+                        }
+                        e.consume();
+                        repaint();
+                        return;
+                    }
                     if (rectangleSelectionGesture) {
+                        appendLassoPoint(e.getPoint());
                         if (dragStart != null && dragStart.distance(e.getPoint()) >= 3) {
                             selectionEnd = e.getPoint();
                             if (selectionMoveGesture && selectionMoveListener != null) {
@@ -2971,9 +3407,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 repaint();
                             }
                         }
-                        return;
-                    }
-                    if (dragGradientTransform(e)) {
                         return;
                     }
                     List<DisplayPoint> points = hilightedPoints;
@@ -4015,14 +4448,22 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
-                    if (rectangleSelectionListener != null || editedShape != null) {
-                        mode = Cursor.DEFAULT_CURSOR;
-                        if (getCursor() != defaultCursor) {
-                            setCursor(defaultCursor);
-                        }
+                    if (updateGradientTransformCursor(e)) {
                         return;
                     }
-                    if (updateGradientTransformCursor(e)) {
+                    if (shapeDrawListener != null) {
+                        shapeDrawingPosition = e.getPoint();
+                        shapeDrawListener.move(toTimelinedPoint(e.getPoint()), e.getModifiersEx());
+                        setCursor(activeShapeDrawingCursor);
+                        repaint();
+                        return;
+                    }
+                    if (rectangleSelectionListener != null || editedShape != null && hilightedPoints == null) {
+                        mode = Cursor.DEFAULT_CURSOR;
+                        Cursor cursor = getAreaSelectionCursor(e.getPoint(), e.isControlDown());
+                        if (getCursor() != cursor) {
+                            setCursor(cursor);
+                        }
                         return;
                     }
                     List<DisplayPoint> points = hilightedPoints;
@@ -4447,6 +4888,75 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
+            if (lassoSelectionPath != null) {
+                Graphics2D lassoGraphics = (Graphics2D) g2d.create();
+                lassoGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                lassoGraphics.setColor(Color.white);
+                lassoGraphics.setStroke(new BasicStroke(3));
+                lassoGraphics.draw(lassoSelectionPath);
+                lassoGraphics.setColor(Color.black);
+                lassoGraphics.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10, new float[]{4, 4}, 0));
+                lassoGraphics.draw(lassoSelectionPath);
+                lassoGraphics.dispose();
+            }
+
+            if (shapeOriginVisible && timelined != null) {
+                Point2D origin = getTimelinedToPanelTransform().transform(new Point2D.Double(), null);
+                double x = origin.getX();
+                double y = origin.getY();
+                Path2D.Double marker = new Path2D.Double();
+                marker.moveTo(x - 12, y);
+                marker.lineTo(x + 12, y);
+                marker.moveTo(x, y - 12);
+                marker.lineTo(x, y + 12);
+                marker.append(new Ellipse2D.Double(x - 6, y - 6, 12, 12), false);
+                Graphics2D originGraphics = (Graphics2D) g2d.create();
+                originGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                originGraphics.setColor(Color.white);
+                originGraphics.setStroke(new BasicStroke(4));
+                originGraphics.draw(marker);
+                originGraphics.setColor(Color.black);
+                originGraphics.setStroke(new BasicStroke(2));
+                originGraphics.draw(marker);
+                originGraphics.setColor(Color.red);
+                originGraphics.fill(new Rectangle2D.Double(x - 2, y - 2, 4, 4));
+                String label = "(0, 0)";
+                FontMetrics metrics = originGraphics.getFontMetrics();
+                originGraphics.setColor(Color.white);
+                originGraphics.fillRect((int) x + 14, (int) y - metrics.getHeight(), metrics.stringWidth(label) + 4, metrics.getHeight());
+                originGraphics.setColor(Color.black);
+                originGraphics.drawString(label, (float) x + 16, (float) y - metrics.getDescent());
+                originGraphics.dispose();
+            }
+
+            if (shapeDrawingGuide != null && timelined != null) {
+                Shape guide = getTimelinedToPanelTransform().createTransformedShape(shapeDrawingGuide);
+                Graphics2D guideGraphics = (Graphics2D) g2d.create();
+                guideGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                guideGraphics.setColor(Color.white);
+                guideGraphics.setStroke(new BasicStroke(3));
+                guideGraphics.draw(guide);
+                guideGraphics.setColor(Color.black);
+                guideGraphics.setStroke(shapeDrawingGuideSolid ? new BasicStroke(1)
+                        : new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10, new float[]{4, 4}, 0));
+                guideGraphics.draw(guide);
+                guideGraphics.dispose();
+            }
+
+            if (shapeDrawingTip != null && shapeDrawingPosition != null && timelined != null) {
+                Shape tip = shapeDrawingTip.apply(toTimelinedPoint(shapeDrawingPosition));
+                Shape outline = getTimelinedToPanelTransform().createTransformedShape(tip);
+                Graphics2D cursorGraphics = (Graphics2D) g2d.create();
+                cursorGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                cursorGraphics.setColor(Color.white);
+                cursorGraphics.setStroke(new BasicStroke(3));
+                cursorGraphics.draw(outline);
+                cursorGraphics.setColor(Color.black);
+                cursorGraphics.setStroke(new BasicStroke(1));
+                cursorGraphics.draw(outline);
+                cursorGraphics.dispose();
+            }
+
             if ((hilightedFill != null || hilightedLine != null || !hilightedLines.isEmpty()) && timelined != null) {
                 int currentHilightEdgeColor = nextHilightEdgeColor();
                 AffineTransform hilightTransform = getTimelinedToPanelTransform();
@@ -4746,7 +5256,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                 }
 
-                if (c != iconPanel && !iconPanel.rectangleSelectionGesture) {
+                if (c != iconPanel && !iconPanel.rectangleSelectionGesture && !shapeDrawingGesture && pointEditOriginalPoints == null) {
                     return;
                 }
                 for (MouseMotionListener l : iconPanel.mouseMotionListeners) {
@@ -4767,6 +5277,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void mouseExited(MouseEvent e) {
+                if (shapeDrawListener != null) {
+                    shapeDrawingPosition = null;
+                    iconPanel.repaint();
+                }
                 Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
                 if (c != iconPanel) {
                     return;
@@ -4780,6 +5294,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             public void mouseMoved(MouseEvent e) {
                 Component c = SwingUtilities.getDeepestComponentAt(ImagePanel.this, e.getX(), e.getY());
                 if (c != iconPanel) {
+                    if (shapeDrawListener != null) {
+                        shapeDrawingPosition = null;
+                        iconPanel.repaint();
+                    }
                     return;
                 }
                 for (MouseMotionListener l : iconPanel.mouseMotionListeners) {
@@ -4835,7 +5353,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 topRuler.setCursor(defaultCursor);
                 leftRuler.setCursor(defaultCursor);
 
-                if (c != iconPanel && !iconPanel.rectangleSelectionGesture) {
+                if (c != iconPanel && !iconPanel.rectangleSelectionGesture && !shapeDrawingGesture && pointEditOriginalPoints == null) {
                     finishGradientTransformDrag();
                     return;
                 }
@@ -4872,19 +5390,30 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         topPanel.add(debugLabel);
 
         DocumentListener documentListener = new DocumentListener() {
+            private void update() {
+                if (updatingPointCoordinates || pointCoordinatesPending) {
+                    return;
+                }
+                pointCoordinatesPending = true;
+                SwingUtilities.invokeLater(() -> {
+                    pointCoordinatesPending = false;
+                    applyPointsXY();
+                });
+            }
+
             @Override
             public void insertUpdate(DocumentEvent e) {
-                applyPointsXY();
+                update();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                applyPointsXY();
+                update();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                applyPointsXY();
+                update();
             }
         };
 
@@ -5144,6 +5673,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             @Override
             public void mouseEntered(MouseEvent e) {
                 synchronized (ImagePanel.this) {
+                    if (shapeDrawListener != null) {
+                        shapeDrawingPosition = e.getPoint();
+                        shapeDrawListener.move(toTimelinedPoint(e.getPoint()), e.getModifiersEx());
+                    }
                     lastMouseEvent = e;
                     redraw();
                 }
@@ -5152,6 +5685,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             @Override
             public void mouseExited(MouseEvent e) {
                 synchronized (ImagePanel.this) {
+                    shapeDrawingPosition = null;
+                    if (shapeDrawListener != null) {
+                        shapeDrawListener.exit();
+                    }
                     lastMouseEvent = null;
                     hideMouseSelection();
                     redraw();
@@ -6534,7 +7071,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
 
             mouseButton = this.mouseButton;
-            selectedDepths = this.selectedDepths;
+            synchronized (lock) {
+                selectedDepths = new ArrayList<>(this.selectedDepths);
+            }
             isolatedDepth = this.isolatedDepth;
             zoom = this.zoom;
             swf = this.swf;
@@ -6653,8 +7192,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 } else if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
                     img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
                 } else {
-                    Timelined rendered = shapePreview == null ? timelined : shapePreview;
-                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, rendered, renderContext, selectedDepths, isolatedDepth, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelineds, parentDepths, parentFrames, getParentMatrix());
+                    Timelined rendered;
+                    List<Timelined> parentTimelinesSnapshot;
+                    List<Integer> parentDepthsSnapshot;
+                    List<Integer> parentFramesSnapshot;
+                    Matrix parentMatrixSnapshot;
+                    synchronized (lock) {
+                        rendered = shapePreview == null ? timelined : shapePreview;
+                        parentTimelinesSnapshot = new ArrayList<>(parentTimelineds);
+                        parentDepthsSnapshot = new ArrayList<>(parentDepths);
+                        parentFramesSnapshot = new ArrayList<>(parentFrames);
+                        parentMatrixSnapshot = getParentMatrix();
+                    }
+                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, rendered, renderContext, selectedDepths, isolatedDepth, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelinesSnapshot, parentDepthsSnapshot, parentFramesSnapshot, parentMatrixSnapshot);
                 }
 
                 synchronized (ImagePanel.this) {
@@ -6796,18 +7346,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             } else {
                                 debugLabel.setText(ret.toString());
                             }
-                            if (rectangleSelectionListener != null || editedShape != null) {
-                                mode = Cursor.DEFAULT_CURSOR;
-                                if (iconPanel.getCursor() != defaultCursor) {
-                                    iconPanel.setCursor(defaultCursor);
-                                }
-                                return;
-                            }
                             MouseEvent mouseEvent = ImagePanel.this.lastMouseEvent;
                             Cursor gradientCursor = getGradientTransformCursor(mouseEvent == null ? null : mouseEvent.getPoint());
                             if (gradientCursor != null) {
                                 if (iconPanel.getCursor() != gradientCursor) {
                                     iconPanel.setCursor(gradientCursor);
+                                }
+                                return;
+                            }
+                            if (shapeDrawListener != null) {
+                                iconPanel.setCursor(activeShapeDrawingCursor);
+                                return;
+                            }
+                            if (rectangleSelectionListener != null || editedShape != null && hilightedPoints == null) {
+                                mode = Cursor.DEFAULT_CURSOR;
+                                Cursor cursor = getAreaSelectionCursor(mouseEvent == null ? null : mouseEvent.getPoint(), iconPanel.isCtrlDown());
+                                if (iconPanel.getCursor() != cursor) {
+                                    iconPanel.setCursor(cursor);
                                 }
                                 return;
                             }
@@ -7389,6 +7944,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         transform.scale(scale, scale);
         transform.concatenate(getParentMatrix().toTransform());
         return transform;
+    }
+
+    public Shape toTimelinedArea(Shape area) {
+        try {
+            return getTimelinedToPanelTransform().createInverse().createTransformedShape(area);
+        } catch (NoninvertibleTransformException ex) {
+            return new Area();
+        }
     }
 
     public Shape toTimelinedArea(Rectangle2D rectangle) {

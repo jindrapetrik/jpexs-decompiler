@@ -50,8 +50,13 @@ public class ShapeStyleChangeOperation implements DoableOperation {
 
     public ShapeStyleChangeOperation(ShapeTag before, ShapeSelection edited, String description,
             BiConsumer<ShapeTag, Boolean> refresh) throws IOException, InterruptedException {
+        this(before, createShape(before, edited), description, refresh);
+    }
+
+    public ShapeStyleChangeOperation(ShapeTag before, ShapeTag edited, String description,
+            BiConsumer<ShapeTag, Boolean> refresh) throws IOException, InterruptedException {
         this.before = before;
-        this.after = createShape(before, edited);
+        this.after = (ShapeTag) edited.cloneTag();
         this.parent = before.getTimelined() == null ? before.getSwf() : before.getTimelined();
         this.parentModified = parent.isModified();
         this.swfModified = before.getSwf().isModified();
@@ -231,7 +236,7 @@ public class ShapeStyleChangeOperation implements DoableOperation {
                     y = (int) Math.round(coords[3]);
                     break;
                 case PathIterator.SEG_CUBICTO:
-                    double[][] quadratics = SHAPERECORD.approximateCubic(new double[]{x, y,
+                    double[][] quadratics = CubicToQuadratic.approximate(new double[]{x, y,
                         coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]});
                     for (double[] quadratic : quadratics) {
                         curve(records, x, y, quadratic[0], quadratic[1], quadratic[2], quadratic[3]);

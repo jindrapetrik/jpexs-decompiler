@@ -98,7 +98,15 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         this(null, gradient);
     }
 
+    public static JPanel createPreview(GRADIENT gradient) {
+        return new GradientEditor(null, gradient, false);
+    }
+
     private GradientEditor(FILTER filter, GRADIENT gradient) {
+        this(filter, gradient, true);
+    }
+
+    private GradientEditor(FILTER filter, GRADIENT gradient, boolean editable) {
         this.filter = filter;
         this.gradient = gradient;
         setLayout(new BorderLayout());
@@ -130,7 +138,7 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         miniGradientPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) {
+                if (editable && GradientEditor.this.isEnabled() && SwingUtilities.isLeftMouseButton(e)) {
                     List<Color> originalColors = new ArrayList<>(colors);
                     List<Float> originalRatios = new ArrayList<>(ratios);
                     JDialog dialog = new JDialog();

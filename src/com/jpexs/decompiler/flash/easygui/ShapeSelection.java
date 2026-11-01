@@ -19,6 +19,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
@@ -32,6 +33,7 @@ import java.awt.geom.Area;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
@@ -164,6 +166,15 @@ public class ShapeSelection {
             this.selected = selected;
             this.changed = changed;
         }
+
+        /**
+         * Uses the geometry actually stored in the SWF after committing an edit.
+         * Keep transient fragments only while they are needed by a selection;
+         * their indexes refer to this model rather than the exported paths.
+         */
+        public ShapeSelection committedModel(ShapeTag shape) {
+            return selected.isEmpty() ? new ShapeSelection(shape) : model;
+        }
     }
 
     public static class RectangleSelection {
@@ -283,7 +294,7 @@ public class ShapeSelection {
                     }
                 }
                 if (keep) {
-                    selected.add(rebase(copy, copy, fragment.geometry, i));
+                    selected.add(rebase(copy, copy, fragment.geometry, i, visibleOnly));
                 }
             }
         }
@@ -406,7 +417,7 @@ public class ShapeSelection {
         return splitCurve(points, t, true)[points.length - 1];
     }
 
-    private static double[][] subcurve(double[][] points, double from, double to) {
+    static double[][] subcurve(double[][] points, double from, double to) {
         double[][] end = to == 1 ? points : splitCurve(points, to, true);
         double[][] result = from == 0 ? end : splitCurve(end, from / to, false);
         result[0] = curvePoint(points, from);
@@ -623,6 +634,458 @@ public class ShapeSelection {
         return result;
     }
 
+    /**
+     * Paints a fill over the existing geometry, removing the covered content.
+     * The entire brush gesture is represented by one fill with no selection.
+     */
+    public BatchEdit paint(Shape geometry, FILLSTYLE fill) {
+        Objects.requireNonNull(fill);
+        Area area = new Area(geometry);
+        if (area.isEmpty()) {
+            return new BatchEdit(this, new ArrayList<>(), false);
+        }
+        RectangleSelection covered = selectArea(area, Collections.emptyList(), false, false);
+        BatchEdit erased = covered.model.changeAll(covered.selected, item -> null, item -> null);
+        ShapeSelection result = new ShapeSelection();
+        for (Selection part : erased.model.parts) {
+            if (part.fill != null || part.line != null) {
+                result.addPart(part.fill, part.line, part.geometry, part.stroke);
+            }
+        }
+        result.addPart(fill.toShapeNum(4), null, area, false);
+        return new BatchEdit(result, new ArrayList<>(), true);
+    }
+
+    /**
+     * Appends an editable stroke, subdividing both paths at their intersections.
+     */
+    public BatchEdit drawStroke(Shape path, ILINESTYLE line) {
+        if (line == null || line.getWidth() <= 0 || strokeEdges(path).stream().noneMatch(edge -> {
+            Rectangle2D bounds = edge.getBounds2D();
+            return bounds.getWidth() > 0 || bounds.getHeight() > 0;
+        })) {
+            return new BatchEdit(this, new ArrayList<>(), false);
+        }
+        ShapeEdgeSplitter drawn = new ShapeEdgeSplitter(path);
+        drawn.intersect(drawn);
+        List<ShapeEdgeSplitter> existing = new ArrayList<>();
+        for (Selection part : parts) {
+            ShapeEdgeSplitter splitter = new ShapeEdgeSplitter(part.geometry);
+            if (part.fill != null || part.line != null) {
+                drawn.intersect(splitter);
+            }
+            existing.add(splitter);
+        }
+        ShapeSelection result = new ShapeSelection();
+        for (int i = 0; i < parts.size(); i++) {
+            Selection part = parts.get(i);
+            result.addPart(part.fill, part.line, existing.get(i).geometry(), part.stroke);
+        }
+        result.addPart(null, line, drawn.geometry(), true);
+        return new BatchEdit(result, new ArrayList<>(), true);
+    }
+
+    /**
+     * Creates a primitive's fill and outline as one document edit.
+     */
+    public BatchEdit drawShape(Shape geometry, FILLSTYLE fill, ILINESTYLE line) {
+        BatchEdit filled = fill != null && !new Area(geometry).isEmpty()
+                ? paint(geometry, fill) : new BatchEdit(this, new ArrayList<>(), false);
+        BatchEdit outlined = filled.model.drawStroke(geometry, line);
+        return new BatchEdit(outlined.model, new ArrayList<>(), filled.changed || outlined.changed);
+    }
+
+    public BatchEdit erase(Shape geometry) {
+        return erase(geometry, new AffineTransform());
+    }
+
+    /**
+     * Subtracts the eraser footprint from every paint layer. Intersected strokes
+     * become clipped outlines so caps cannot regrow into the erased region and
+     * even a partial-width touch removes the actual ink. Other strokes retain
+     * their original editable line styles.
+     */
+    public BatchEdit erase(Shape geometry, AffineTransform placement) {
+        Area eraser = new Area(geometry);
+        ShapeSelection result = new ShapeSelection();
+        boolean changed = false;
+        for (Selection part : parts) {
+            if (part.fill == null && part.line == null) {
+                continue;
+            }
+            Area ink;
+            if (part.stroke) {
+                try {
+                    double width = strokeWidth(part.line, placement);
+                    ink = width <= 0 ? new Area() : new Area(placement.createInverse().createTransformedShape(
+                            createStroke(part.line, width).createStrokedShape(placement.createTransformedShape(part.geometry))));
+                } catch (NoninvertibleTransformException ex) {
+                    throw new IllegalArgumentException("Shape placement must be invertible", ex);
+                }
+            } else {
+                ink = new Area(part.geometry);
+            }
+            Area intersection = new Area(ink);
+            intersection.intersect(eraser);
+            if (intersection.isEmpty()) {
+                result.addPart(part.fill, part.line, part.geometry, part.stroke);
+                continue;
+            }
+            changed = true;
+            ink.subtract(eraser);
+            if (!ink.isEmpty()) {
+                FILLSTYLE fill = part.fill;
+                if (part.stroke) {
+                    if (part.line instanceof LINESTYLE2 && ((LINESTYLE2) part.line).hasFillFlag) {
+                        fill = ((LINESTYLE2) part.line).fillType;
+                    } else {
+                        fill = new FILLSTYLE();
+                        fill.color = new RGBA(part.line.getColor());
+                    }
+                }
+                result.addPart(fill, null, ink, false);
+            }
+        }
+        return new BatchEdit(changed ? result : this, new ArrayList<>(), changed);
+    }
+
+    /**
+     * Finds the visible fill region, including an empty face enclosed by strokes.
+     * Unbounded space is never a Paint target.
+     */
+    public Selection fillRegionAt(Point2D point) {
+        Selection selected = select(point, 0);
+        if (selected != null && !selected.stroke) {
+            return selected;
+        }
+        Area region = enclosedRegionAt(point);
+        if (region == null) {
+            return null;
+        }
+        for (int i = parts.size() - 1; i >= 0; i--) {
+            Selection part = parts.get(i);
+            if (part.fill != null && part.geometry.contains(point)) {
+                region.intersect(new Area(part.geometry));
+                return new Selection(part.fill, null, region, null, region, false, i);
+            }
+        }
+        return new Selection(null, null, region, null, region, false, -1);
+    }
+
+    /**
+     * Selects a fill, or matching stroke edges around the clicked bounded face.
+     * An open stroke without an adjacent bounded face keeps single-edge selection.
+     */
+    public RectangleSelection selectFillTransform(Point2D point, AffineTransform localToDisplay) {
+        Selection hit = select(point, 0, localToDisplay);
+        if (hit == null || !hit.stroke) {
+            return new RectangleSelection(this, hit == null ? new ArrayList<>() : new ArrayList<>(Collections.singletonList(hit)));
+        }
+        ShapeSelection divided = splitIntersections();
+        Selection selected = divided.select(point, 0, localToDisplay);
+        if (selected == null || !selected.stroke) {
+            return new RectangleSelection(this, new ArrayList<>(Collections.singletonList(hit)));
+        }
+        Area region = divided.strokeFaceAt(selected, point);
+        if (region == null) {
+            return new RectangleSelection(divided, new ArrayList<>(Collections.singletonList(selected)));
+        }
+        Shape boundary = new BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(region);
+        List<Selection> group = new ArrayList<>();
+        for (Selection part : divided.parts) {
+            if (!part.stroke || !sameLine(part.line, selected.line)) {
+                continue;
+            }
+            List<Path2D.Double> edges = strokeEdges(part.geometry);
+            for (int i = 0; i < edges.size(); i++) {
+                Path2D.Double edge = edges.get(i);
+                if (followsBoundary(edgePoints(edge), boundary)) {
+                    group.add(new Selection(null, part.line, createStroke(part.line).createStrokedShape(edge), edge, edge, true, part.index, i));
+                }
+            }
+        }
+        return new RectangleSelection(divided, group.isEmpty() ? new ArrayList<>(Collections.singletonList(selected)) : group);
+    }
+
+    private Area strokeFaceAt(Selection stroke, Point2D point) {
+        Area direct = enclosedRegionAt(point);
+        if (isEdgeOfFace(stroke.geometry, direct)) {
+            return direct;
+        }
+        // A click on the centerline or the outside half of a wide outline may
+        // lie outside the face. Probe both sides of its subdivided edge.
+        double[][] points = edgePoints(stroke.geometry);
+        Area best = null;
+        for (double t : new double[]{0.5, 0.25, 0.75}) {
+            double[] center = curvePoint(points, t);
+            double[] before = curvePoint(points, t - 0.001);
+            double[] after = curvePoint(points, t + 0.001);
+            double dx = after[0] - before[0];
+            double dy = after[1] - before[1];
+            double length = Math.hypot(dx, dy);
+            if (length == 0) {
+                continue;
+            }
+            for (int side : new int[]{-1, 1}) {
+                Area face = enclosedRegionAt(new Point2D.Double(center[0] - side * 0.1 * dy / length, center[1] + side * 0.1 * dx / length));
+                if (isEdgeOfFace(stroke.geometry, face)) {
+                    Rectangle2D bounds = face.getBounds2D();
+                    Rectangle2D oldBounds = best == null ? null : best.getBounds2D();
+                    if (best == null || bounds.getWidth() * bounds.getHeight() < oldBounds.getWidth() * oldBounds.getHeight()) {
+                        best = face;
+                    }
+                }
+            }
+            if (best != null) {
+                return best;
+            }
+        }
+        return null;
+    }
+
+    private static boolean isEdgeOfFace(Shape edge, Area face) {
+        return face != null && followsBoundary(edgePoints(edge),
+                new BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(face));
+    }
+
+    private Area enclosedRegionAt(Point2D point) {
+        Area barriers = new Area();
+        Area coveringFills = new Area();
+        Rectangle2D bounds = null;
+        BasicStroke boundaryStroke = new BasicStroke(0.01f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+        for (int i = parts.size() - 1; i >= 0; i--) {
+            Selection part = parts.get(i);
+            if (part.fill == null && (part.line == null || part.line.getWidth() <= 0)) {
+                continue;
+            }
+            Rectangle2D partBounds = part.geometry.getBounds2D();
+            if (bounds == null) {
+                bounds = new Rectangle2D.Double(partBounds.getX(), partBounds.getY(), partBounds.getWidth(), partBounds.getHeight());
+            } else {
+                bounds.add(partBounds);
+            }
+            Area boundary = new Area(boundaryStroke.createStrokedShape(part.geometry));
+            boundary.subtract(coveringFills);
+            barriers.add(boundary);
+            if (part.fill != null) {
+                coveringFills.add(new Area(part.geometry));
+            }
+        }
+        if (bounds == null) {
+            return null;
+        }
+        double margin = Math.max(20, Math.max(bounds.getWidth(), bounds.getHeight()) * 0.1);
+        Rectangle2D outside = new Rectangle2D.Double(bounds.getX() - margin, bounds.getY() - margin,
+                bounds.getWidth() + 2 * margin, bounds.getHeight() + 2 * margin);
+        Area faces = new Area(outside);
+        faces.subtract(barriers);
+        if (!faces.contains(point)) {
+            return null;
+        }
+        Area region = connectedFillAt(faces, point);
+        Rectangle2D faceBounds = region.getBounds2D();
+        if (faceBounds.getMinX() <= outside.getMinX() || faceBounds.getMaxX() >= outside.getMaxX()
+                || faceBounds.getMinY() <= outside.getMinY() || faceBounds.getMaxY() >= outside.getMaxY()) {
+            return null;
+        }
+        return region;
+    }
+
+    public BatchEdit setRegionFill(Selection region, FILLSTYLE fill) {
+        if (region == null || region.stroke || Objects.equals(normalizedFill(region.fill), normalizedFill(fill))) {
+            return new BatchEdit(this, new ArrayList<>(), false);
+        }
+        if (region.index >= 0) {
+            BatchEdit edit = changeAll(Collections.singletonList(region), item -> fill, null);
+            return new BatchEdit(edit.model.splitIntersections(), new ArrayList<>(), edit.changed);
+        }
+        ShapeSelection result = new ShapeSelection();
+        // Empty faces have no existing paint layer. Place the new fill beneath
+        // the original strokes so their widths, caps and joins stay visible.
+        result.addPart(fill, null, region.geometry, false);
+        for (Selection part : splitIntersections().parts) {
+            result.addPart(part.fill, part.line, part.geometry, part.stroke);
+        }
+        return new BatchEdit(result, new ArrayList<>(), true);
+    }
+
+    /**
+     * Gives existing stroke junctions shared vertices before a face and its
+     * outline are serialized. Otherwise the face can round to a different point
+     * than an unsplit stroke and leave a tiny opening after applying Ink.
+     */
+    private ShapeSelection splitIntersections() {
+        List<ShapeEdgeSplitter> splitters = new ArrayList<>();
+        for (Selection part : parts) {
+            ShapeEdgeSplitter splitter = new ShapeEdgeSplitter(part.geometry);
+            if (part.fill != null || part.line != null) {
+                if (part.stroke) {
+                    splitter.intersect(splitter);
+                }
+                for (int i = 0; i < splitters.size(); i++) {
+                    Selection previous = parts.get(i);
+                    if ((part.stroke || previous.stroke) && (previous.fill != null || previous.line != null)) {
+                        splitter.intersect(splitters.get(i));
+                    }
+                }
+            }
+            splitters.add(splitter);
+        }
+        ShapeSelection result = new ShapeSelection();
+        for (int i = 0; i < parts.size(); i++) {
+            Selection part = parts.get(i);
+            result.addPart(part.fill, part.line, splitters.get(i).geometry(), part.stroke);
+        }
+        return result;
+    }
+
+    /**
+     * Applies Ink to the complete boundary of a bounded face, including holes.
+     * Existing boundary edges retain their centerlines and shared vertices;
+     * only their styles change. Missing outline segments are added separately.
+     */
+    public BatchEdit outlineRegion(Selection region, ILINESTYLE line) {
+        if (region == null || region.stroke) {
+            return new BatchEdit(this, new ArrayList<>(), false);
+        }
+        ILINESTYLE target = line == null || line.getWidth() <= 0 ? null : line;
+        Shape boundary = new BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(region.geometry);
+        ShapeSelection divided = splitIntersections();
+        List<Selection> strokes = new ArrayList<>();
+        Path2D.Double coveredPaths = new Path2D.Double();
+        for (Selection part : divided.parts) {
+            if (!part.stroke || part.line == null) {
+                continue;
+            }
+            List<Path2D.Double> edges = strokeEdges(part.geometry);
+            for (int i = 0; i < edges.size(); i++) {
+                Path2D.Double edge = edges.get(i);
+                double[][] points = edgePoints(edge);
+                if (followsBoundary(points, boundary)) {
+                    strokes.add(new Selection(null, part.line, part.area, edge, edge, true, part.index, i));
+                    coveredPaths.append(edge, false);
+                }
+            }
+        }
+        if (target == null && strokes.isEmpty()) {
+            return new BatchEdit(this, new ArrayList<>(), false);
+        }
+        if (target == null) {
+            BatchEdit cleared = divided.changeAll(strokes, null, item -> null);
+            return new BatchEdit(cleared.changed ? cleared.model : this, new ArrayList<>(), cleared.changed);
+        }
+        Shape covered = new BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(coveredPaths);
+        Path2D.Double missing = boundaryOutside(region.geometry, covered, coveredPaths);
+        if (strokeEdges(missing).isEmpty() && strokes.stream().allMatch(item -> sameLine(item.line, target))) {
+            return new BatchEdit(this, new ArrayList<>(), false);
+        }
+        BatchEdit cleared = divided.changeAll(strokes, null, item -> null);
+        coveredPaths.append(missing, false);
+        // Join the original centerlines into complete contours so cap/join
+        // settings also apply at vertices shared by different original paths.
+        BatchEdit outlined = cleared.model.drawStroke(joinBoundaryEdges(coveredPaths), target);
+        return new BatchEdit(outlined.model, new ArrayList<>(), cleared.changed || outlined.changed);
+    }
+
+    private static Path2D.Double joinBoundaryEdges(Shape boundary) {
+        List<Path2D.Double> remaining = strokeEdges(boundary);
+        Path2D.Double result = new Path2D.Double();
+        while (!remaining.isEmpty()) {
+            Path2D.Double first = remaining.remove(0);
+            Point2D start = firstPoint(first);
+            result.append(first, false);
+            while (result.getCurrentPoint().distanceSq(start) > 1e-12) {
+                Point2D current = result.getCurrentPoint();
+                boolean found = false;
+                for (int i = 0; i < remaining.size(); i++) {
+                    Path2D.Double next = remaining.get(i);
+                    boolean reverse = next.getCurrentPoint().distanceSq(current) <= 1e-12;
+                    if (reverse || firstPoint(next).distanceSq(current) <= 1e-12) {
+                        double[][] points = edgePoints(next);
+                        if (reverse) {
+                            Collections.reverse(Arrays.asList(points));
+                        }
+                        result.append(edgePath(points), true);
+                        remaining.remove(i);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    break;
+                }
+            }
+            if (result.getCurrentPoint().distanceSq(start) <= 1e-12) {
+                result.closePath();
+            }
+        }
+        return result;
+    }
+
+    private static boolean followsBoundary(double[][] points, Shape boundary) {
+        for (double t : new double[]{0, 0.25, 0.5, 0.75, 1}) {
+            double[] point = curvePoint(points, t);
+            if (!boundary.contains(point[0], point[1])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static Path2D.Double boundaryOutside(Shape boundary, Shape covered, Shape originalEdges) {
+        Area area = new Area(covered);
+        List<Line2D.Double> limits = areaBoundaries(covered);
+        List<Point2D> vertices = new ArrayList<>();
+        for (Path2D.Double edge : strokeEdges(originalEdges)) {
+            vertices.add(firstPoint(edge));
+            vertices.add(edge.getCurrentPoint());
+        }
+        Path2D.Double result = new Path2D.Double();
+        for (Path2D.Double path : splitPaths(boundary)) {
+            boolean connected = false;
+            boolean complete = true;
+            for (Path2D.Double edge : strokeEdges(path)) {
+                double[][] points = edgePoints(edge);
+                List<Double> cuts = areaCuts(points, limits);
+                for (int i = 1; i < cuts.size(); i++) {
+                    double from = cuts.get(i - 1);
+                    double to = cuts.get(i);
+                    double[] middle = curvePoint(points, (from + to) / 2);
+                    if (containsInclusive(area, limits, middle)) {
+                        connected = false;
+                        complete = false;
+                    } else {
+                        double[][] segment = subcurve(points, from, to);
+                        snapBoundaryEndpoint(segment[0], vertices);
+                        snapBoundaryEndpoint(segment[segment.length - 1], vertices);
+                        result.append(edgePath(segment), connected);
+                        connected = true;
+                    }
+                }
+            }
+            if (complete && connected && isClosed(path)) {
+                result.closePath();
+            }
+        }
+        return result;
+    }
+
+    private static void snapBoundaryEndpoint(double[] point, List<Point2D> vertices) {
+        Point2D nearest = null;
+        double distance = 1;
+        for (Point2D vertex : vertices) {
+            double candidate = vertex.distanceSq(point[0], point[1]);
+            if (candidate < distance) {
+                nearest = vertex;
+                distance = candidate;
+            }
+        }
+        if (nearest != null) {
+            point[0] = nearest.getX();
+            point[1] = nearest.getY();
+        }
+    }
+
     public BatchEdit deleteAll(List<Selection> selected) {
         BatchEdit deleted = changeAll(selected, item -> null, item -> null);
         return new BatchEdit(deleted.model, new ArrayList<>(), deleted.changed);
@@ -689,8 +1152,14 @@ public class ShapeSelection {
     }
 
     private static Selection rebase(Selection old, Selection part, Shape geometry, int edgeIndex) {
+        return rebase(old, part, geometry, edgeIndex, true);
+    }
+
+    private static Selection rebase(Selection old, Selection part, Shape geometry, int edgeIndex, boolean clipHighlight) {
         Shape area = old.stroke ? (part.line == null ? new Area() : createStroke(part.line).createStrokedShape(geometry)) : new Area(geometry);
-        if (old.stroke) {
+        // Internal geometry edits do not display a selection. Intersecting the
+        // almost coincident curved outlines can be very expensive in Area.
+        if (old.stroke && clipHighlight) {
             Area clipped = new Area(area);
             clipped.intersect(new Area(part.area));
             area = clipped;
@@ -864,6 +1333,29 @@ public class ShapeSelection {
                 selected.geometry, false, selected.index);
     }
 
+    /**
+     * Samples the topmost visible style without creating a selection highlight.
+     * Stroke hit testing follows the placement scale flags and minimum display
+     * width. Returned styles are detached from the edited shape.
+     */
+    public Selection sampleStyle(Point2D point, AffineTransform placement, double minimumWidth) {
+        Point2D displayed = placement.transform(point, null);
+        for (int i = parts.size() - 1; i >= 0; i--) {
+            Selection part = parts.get(i);
+            if (part.line != null) {
+                double width = Math.max(minimumWidth, strokeWidth(part.line, placement));
+                Shape ink = createStroke(part.line, width).createStrokedShape(placement.createTransformedShape(part.geometry));
+                if (ink.contains(displayed)) {
+                    return new Selection(null, Helper.deepCopy(part.line), part.area, part.linePath, part.geometry, true, i);
+                }
+            }
+            if (part.fill != null && part.geometry.contains(point)) {
+                return new Selection(Helper.deepCopy(part.fill), null, part.area, null, part.geometry, false, i);
+            }
+        }
+        return null;
+    }
+
     public Selection select(Point2D point, double tolerance) {
         return select(point, tolerance, new AffineTransform());
     }
@@ -1021,7 +1513,26 @@ public class ShapeSelection {
         return paths;
     }
 
+    static double strokeWidth(ILINESTYLE line, AffineTransform placement) {
+        if (line == null) {
+            return 0;
+        }
+        LINESTYLE2 line2 = line instanceof LINESTYLE2 ? (LINESTYLE2) line : null;
+        double width = line.getWidth();
+        if (line2 == null || !(line2.noHScaleFlag && line2.noVScaleFlag)) {
+            double x = placement.getScaleX() + placement.getShearX();
+            double y = placement.getShearY() + placement.getScaleY();
+            width *= line2 != null && line2.noHScaleFlag ? Math.abs(y)
+                    : line2 != null && line2.noVScaleFlag ? Math.abs(x) : Math.hypot(x, y) / Math.sqrt(2);
+        }
+        return width;
+    }
+
     private static Stroke createStroke(ILINESTYLE line) {
+        return createStroke(line, line.getWidth());
+    }
+
+    private static Stroke createStroke(ILINESTYLE line, double thickness) {
         int cap = BasicStroke.CAP_ROUND;
         int join = BasicStroke.JOIN_ROUND;
         float miter = 3;
@@ -1033,7 +1544,7 @@ public class ShapeSelection {
                     : line2.joinStyle == LINESTYLE2.MITER_JOIN ? BasicStroke.JOIN_MITER : BasicStroke.JOIN_ROUND;
             miter = Math.max(1, line2.miterLimitFactor);
         }
-        float width = Math.max(1, line.getWidth());
+        float width = (float) Math.max(1, thickness);
         return join == BasicStroke.JOIN_MITER
                 ? new ExtendedBasicStroke(width, cap, ExtendedBasicStroke.JOIN_MITER_CLIP, miter)
                 : new BasicStroke(width, cap, join);
