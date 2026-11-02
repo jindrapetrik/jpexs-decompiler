@@ -58,6 +58,7 @@ import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
@@ -92,6 +93,7 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.SystemColor;
+import java.awt.TexturePaint;
 import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.datatransfer.Clipboard;
@@ -337,7 +339,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private Shape hilightedLineCenter = null;
 
     private double hilightedLineWidth = 0;
+    private ILINESTYLE hilightedLineStyle;
     private List<LineHilight> hilightedLines = new ArrayList<>();
+
+    private static final TexturePaint SHAPE_SELECTION_PAINT = createShapeSelectionPaint();
+    private ShapeSelectionCache shapeSelectionCache;
 
     private IntFunction<Shape> hilightedFillProvider = null;
 
@@ -348,11 +354,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         private final Shape area;
         private final Shape center;
         private final double width;
+        private final ILINESTYLE style;
 
         public LineHilight(Shape area, Shape center, double width) {
+            this(area, center, width, null);
+        }
+
+        public LineHilight(Shape area, Shape center, ILINESTYLE style) {
+            this(area, center, style.getWidth(), style);
+        }
+
+        private LineHilight(Shape area, Shape center, double width, ILINESTYLE style) {
             this.area = area;
             this.center = center;
             this.width = width;
+            this.style = style;
         }
     }
 
@@ -1116,6 +1132,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void setHilightedFillInternal(Shape hilightedFill) {
+        shapeSelectionCache = null;
         this.hilightedFillProvider = null;
         this.hilightedFill = hilightedFill;
         updateHilightedShapeTimer();
@@ -1135,11 +1152,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void setHilightedLine(Shape hilightedLine, Shape hilightedLineCenter, double hilightedLineWidth) {
+        setHilightedLine(new LineHilight(hilightedLine, hilightedLineCenter, hilightedLineWidth));
+    }
+
+    public void setHilightedLine(Shape area, Shape center, ILINESTYLE style) {
+        setHilightedLine(new LineHilight(area, center, style));
+    }
+
+    private void setHilightedLine(LineHilight line) {
         this.hilightedEdge = null;
         this.hilightedPoints = null;
         setHilightedFillInternal(null);
         pointEditPanel.setVisible(false);
-        setHilightedLineDataInternal(new LineHilight(hilightedLine, hilightedLineCenter, hilightedLineWidth));
+        setHilightedLineDataInternal(line);
         hilightEdgeColor = 255;
         redraw();
     }
@@ -1149,11 +1174,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void setHilightedLineDataInternal(LineHilight hilight) {
+        shapeSelectionCache = null;
         hilightedLines = new ArrayList<>();
         this.hilightedLineProvider = null;
         this.hilightedLine = hilight == null ? null : hilight.area;
         this.hilightedLineCenter = hilight == null ? null : hilight.center;
         this.hilightedLineWidth = hilight == null ? 0 : hilight.width;
+        this.hilightedLineStyle = hilight == null ? null : hilight.style;
         updateHilightedShapeTimer();
     }
 
@@ -1170,7 +1197,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         hilightedLines = new ArrayList<>(lines);
         hilightEdgeColor = 255;
         updateHilightedShapeTimer();
-        redraw();
+        iconPanel.repaint();
     }
 
     public void setHilightedLineProvider(IntFunction<LineHilight> hilightedLineProvider) {
@@ -1617,6 +1644,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
         lastHilightedShapeRatio = ratio;
+        shapeSelectionCache = null;
         if (hilightedFillProvider != null) {
             hilightedFill = hilightedFillProvider.apply(ratio);
         }
@@ -1625,6 +1653,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             hilightedLine = hilight == null ? null : hilight.area;
             hilightedLineCenter = hilight == null ? null : hilight.center;
             hilightedLineWidth = hilight == null ? 0 : hilight.width;
+            hilightedLineStyle = hilight == null ? null : hilight.style;
         }
     }
 
@@ -1645,7 +1674,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void updateHilightedShapeTimer() {
-        if (hilightedFill == null && hilightedLine == null && hilightedLines.isEmpty() && hilightedFillProvider == null && hilightedLineProvider == null) {
+        if (hilightedFillProvider == null && hilightedLineProvider == null) {
             if (hilightedShapeTimer != null) {
                 hilightedShapeTimer.stop();
             }
@@ -1656,6 +1685,131 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         if (!hilightedShapeTimer.isRunning()) {
             hilightedShapeTimer.start();
+        }
+    }
+
+    private static TexturePaint createShapeSelectionPaint() {
+        BufferedImage tile = new BufferedImage(4, 4, BufferedImage.TYPE_INT_RGB);
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 4; x++) {
+                tile.setRGB(x, y, Color.WHITE.getRGB());
+            }
+        }
+        tile.setRGB(0, 0, Color.BLACK.getRGB());
+        tile.setRGB(2, 2, Color.BLACK.getRGB());
+        return new TexturePaint(tile, new Rectangle(0, 0, 4, 4));
+    }
+
+    private void paintShapeSelection(Graphics2D graphics, AffineTransform transform) {
+        Rectangle viewport = iconPanel.getWidth() > 0 && iconPanel.getHeight() > 0
+                ? new Rectangle(0, 0, iconPanel.getWidth(), iconPanel.getHeight()) : graphics.getClipBounds();
+        if (viewport == null || viewport.isEmpty()) {
+            return;
+        }
+        AffineTransform device = graphics.getTransform();
+        double scaleX = Math.hypot(device.getScaleX(), device.getShearY());
+        double scaleY = Math.hypot(device.getShearX(), device.getScaleY());
+        if (shapeSelectionCache == null || !shapeSelectionCache.transform.equals(transform)
+                || !shapeSelectionCache.viewport.equals(viewport) || shapeSelectionCache.pixelScale != getSceneScale()
+                || shapeSelectionCache.scaleX != scaleX || shapeSelectionCache.scaleY != scaleY
+                || shapeSelectionCache.minimumStrokeWidth != Configuration.useMinimumStrokeWidth1Px.get()) {
+            shapeSelectionCache = new ShapeSelectionCache(transform, viewport, scaleX, scaleY);
+        }
+        ShapeSelectionCache cache = shapeSelectionCache;
+        if (cache.raster == null) {
+            return;
+        }
+        graphics.drawImage(cache.strokeImage, cache.imageToPanel, null);
+        Graphics2D g = (Graphics2D) graphics.create();
+        try {
+            g.setXORMode(Color.WHITE);
+            g.drawImage(cache.raster, cache.imageToPanel, null);
+        } finally {
+            g.dispose();
+        }
+    }
+
+    private class ShapeSelectionCache {
+
+        final AffineTransform transform;
+        final Rectangle viewport;
+        final double pixelScale = getSceneScale();
+        final boolean minimumStrokeWidth = Configuration.useMinimumStrokeWidth1Px.get();
+        final double scaleX;
+        final double scaleY;
+        BufferedImage strokeImage;
+        BufferedImage raster;
+        AffineTransform imageToPanel;
+
+        ShapeSelectionCache(AffineTransform transform, Rectangle viewport, double scaleX, double scaleY) {
+            this.transform = new AffineTransform(transform);
+            this.viewport = new Rectangle(viewport);
+            this.scaleX = scaleX;
+            this.scaleY = scaleY;
+            BufferedImage strokes = new BufferedImage(Math.max(1, (int) Math.ceil(viewport.width * scaleX)),
+                    Math.max(1, (int) Math.ceil(viewport.height * scaleY)), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D strokeGraphics = strokes.createGraphics();
+            List<Shape> selected = new ArrayList<>();
+            if (hilightedFill != null) {
+                selected.add(transform.createTransformedShape(hilightedFill));
+            }
+            try {
+                strokeGraphics.scale(scaleX, scaleY);
+                strokeGraphics.translate(-viewport.x, -viewport.y);
+                List<LineHilight> lines = hilightedLine == null ? hilightedLines
+                        : java.util.Collections.singletonList(new LineHilight(hilightedLine, hilightedLineCenter, hilightedLineWidth, hilightedLineStyle));
+                double scale = Math.hypot(transform.getScaleX() + transform.getShearX(), transform.getShearY() + transform.getScaleY()) / Math.sqrt(2);
+                for (LineHilight line : lines) {
+                    if (line.center != null && line.style != null) {
+                        selected.add(ShapeStrokeHighlight.paint(strokeGraphics, swf, line.center, line.style, transform, pixelScale));
+                    } else if (line.center != null && line.width * scale < 4) {
+                        selected.add(new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                                .createStrokedShape(transform.createTransformedShape(line.center)));
+                    } else {
+                        selected.add(transform.createTransformedShape(line.area));
+                    }
+                }
+            } finally {
+                strokeGraphics.dispose();
+            }
+            Rectangle bounds = new Rectangle();
+            for (Shape part : selected) {
+                if (bounds.isEmpty()) {
+                    bounds = part.getBounds();
+                } else {
+                    bounds.add(part.getBounds());
+                }
+            }
+            bounds.grow(1, 1);
+            bounds = bounds.intersection(viewport);
+            if (selected.isEmpty() || bounds.isEmpty()) {
+                return;
+            }
+            int x = Math.max(0, (int) Math.floor((bounds.x - viewport.x) * scaleX));
+            int y = Math.max(0, (int) Math.floor((bounds.y - viewport.y) * scaleY));
+            int width = Math.min(strokes.getWidth() - x, (int) Math.ceil((bounds.getMaxX() - viewport.x) * scaleX) - x);
+            int height = Math.min(strokes.getHeight() - y, (int) Math.ceil((bounds.getMaxY() - viewport.y) * scaleY) - y);
+            strokeImage = strokes.getSubimage(x, y, width, height);
+            imageToPanel = AffineTransform.getTranslateInstance(viewport.x + x / scaleX, viewport.y + y / scaleY);
+            imageToPanel.scale(1 / scaleX, 1 / scaleY);
+            raster = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D maskGraphics = raster.createGraphics();
+            try {
+                // Cache a background-independent XOR mask: white is unchanged, black is inverted.
+                maskGraphics.setColor(Color.WHITE);
+                maskGraphics.fillRect(0, 0, width, height);
+                maskGraphics.scale(scaleX, scaleY);
+                maskGraphics.translate(-viewport.x - x / scaleX, -viewport.y - y / scaleY);
+                maskGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                maskGraphics.setPaint(SHAPE_SELECTION_PAINT);
+                // Paint each part with the same canvas-aligned pattern. Overlap is
+                // idempotent, so a costly vector union of adjacent curves is unnecessary.
+                for (Shape part : selected) {
+                    maskGraphics.fill(part);
+                }
+            } finally {
+                maskGraphics.dispose();
+            }
         }
     }
 
@@ -2435,7 +2589,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         Rectangle2D selectionRect = getSelectionRect();
-                        if (selectionRect != null && !selectionMoveGesture && !lassoSelection) {
+                        if (selectionRect != null && !selectionMoveGesture && !lassoSelection && rectangleSelectionListener == null) {
                             g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_ROUND, 0, new float[]{2, 2}, 0f));
                             if (canInvert) {
                                 g2.setComposite(BlendComposite.Invert);
@@ -2742,6 +2896,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                     calcRect();
                     updateScrollBars();
+                    if (rectangleSelectionListener != null) {
+                        redraw();
+                    }
                     render();
                     repaint();
                 }
@@ -4907,6 +5064,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 lassoGraphics.dispose();
             }
 
+            if (rectangleSelectionListener != null && !selectionMoveGesture && !lassoSelection) {
+                Rectangle2D rectangle = getSelectionRect();
+                if (rectangle != null) {
+                    Graphics2D marquee = (Graphics2D) g2d.create();
+                    marquee.setXORMode(Color.WHITE);
+                    marquee.setColor(Color.BLACK);
+                    marquee.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_ROUND, 10, new float[]{2, 2}, 0));
+                    marquee.draw(rectangle);
+                    marquee.dispose();
+                }
+            }
+
             if (shapeOriginVisible && timelined != null) {
                 Point2D origin = getTimelinedToPanelTransform().transform(new Point2D.Double(), null);
                 double x = origin.getX();
@@ -4965,70 +5134,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
 
             if ((hilightedFill != null || hilightedLine != null || !hilightedLines.isEmpty()) && timelined != null) {
-                int currentHilightEdgeColor = nextHilightEdgeColor();
-                AffineTransform hilightTransform = getTimelinedToPanelTransform();
-                double colorRatio = (currentHilightEdgeColor - 100) / 155.0;
-                Color dotColor = new Color(
-                        (int) Math.round(0 + colorRatio * 255),
-                        (int) Math.round(190 + colorRatio * 6),
-                        (int) Math.round(255 - colorRatio * 255),
-                        220
-                );
-
-                if (hilightedFill != null) {
-                    Shape displayedFill = hilightTransform.createTransformedShape(hilightedFill);
-                    Rectangle fillBounds = displayedFill.getBounds().intersection(new Rectangle(0, 0, getWidth(), getHeight()));
-                    Graphics2D fillGraphics = (Graphics2D) g2d.create();
-                    fillGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    fillGraphics.clip(displayedFill);
-                    fillGraphics.setPaint(dotColor);
-                    int dotSpacing = 9;
-                    double dotSize = 2;
-                    int firstY = Math.floorDiv(fillBounds.y, dotSpacing) * dotSpacing;
-                    for (int y = firstY; y <= fillBounds.y + fillBounds.height; y += dotSpacing) {
-                        int row = Math.floorDiv(y, dotSpacing);
-                        int rowOffset = (Math.abs(row) % 2) * (dotSpacing / 2);
-                        int firstX = Math.floorDiv(fillBounds.x - rowOffset, dotSpacing) * dotSpacing + rowOffset;
-                        for (int x = firstX; x <= fillBounds.x + fillBounds.width; x += dotSpacing) {
-                            fillGraphics.fill(new Ellipse2D.Double(x - dotSize / 2.0, y - dotSize / 2.0, dotSize, dotSize));
-                        }
-                    }
-                    fillGraphics.dispose();
-                }
-
-                List<LineHilight> selectedLines = hilightedLines;
-                if (hilightedLine != null) {
-                    selectedLines = java.util.Collections.singletonList(new LineHilight(hilightedLine, hilightedLineCenter, hilightedLineWidth));
-                }
-                for (LineHilight line : selectedLines) {
-                    Shape displayedLineArea = hilightTransform.createTransformedShape(line.area);
-                    Graphics2D lineGraphics = (Graphics2D) g2d.create();
-                    lineGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    lineGraphics.setPaint(dotColor);
-                    int dotSpacing = 9;
-                    double dotSize = 2;
-                    double displayedLineWidth = line.width * Math.max(Math.hypot(hilightTransform.getScaleX(), hilightTransform.getShearY()),
-                            Math.hypot(hilightTransform.getShearX(), hilightTransform.getScaleY()));
-                    if (line.center != null && displayedLineWidth < dotSpacing + dotSize) {
-                        Shape displayedLineCenter = hilightTransform.createTransformedShape(line.center);
-                        lineGraphics.setStroke(new BasicStroke((float) dotSize, BasicStroke.CAP_ROUND,
-                                BasicStroke.JOIN_ROUND, 10f, new float[]{0.1f, dotSpacing}, 0));
-                        lineGraphics.draw(displayedLineCenter);
-                    } else {
-                        Rectangle lineBounds = displayedLineArea.getBounds().intersection(new Rectangle(0, 0, getWidth(), getHeight()));
-                        lineGraphics.clip(displayedLineArea);
-                        int firstY = Math.floorDiv(lineBounds.y, dotSpacing) * dotSpacing;
-                        for (int y = firstY; y <= lineBounds.y + lineBounds.height; y += dotSpacing) {
-                            int row = Math.floorDiv(y, dotSpacing);
-                            int rowOffset = (Math.abs(row) % 2) * (dotSpacing / 2);
-                            int firstX = Math.floorDiv(lineBounds.x - rowOffset, dotSpacing) * dotSpacing + rowOffset;
-                            for (int x = firstX; x <= lineBounds.x + lineBounds.width; x += dotSpacing) {
-                                lineGraphics.fill(new Ellipse2D.Double(x - dotSize / 2.0, y - dotSize / 2.0, dotSize, dotSize));
-                            }
-                        }
-                    }
-                    lineGraphics.dispose();
-                }
+                paintShapeSelection(g2d, getTimelinedToPanelTransform());
             }
 
             paintGradientTransform(g2d);
@@ -5705,6 +5811,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 synchronized (ImagePanel.this) {
                     mouseButton = e.getButton();
                     lastMouseEvent = e;
+                    if (rectangleSelectionListener != null) {
+                        iconPanel.repaint();
+                        return;
+                    }
                     redraw();
 
                     TextTag text = iconPanel.mouseOverText;
@@ -5773,6 +5883,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 synchronized (ImagePanel.this) {
                     mouseButton = 0;
                     lastMouseEvent = e;
+                    if (rectangleSelectionListener != null) {
+                        iconPanel.repaint();
+                        return;
+                    }
                     redraw();
 
                     TextTag text = iconPanel.mouseOverText;
@@ -5813,6 +5927,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             public void mouseDragged(MouseEvent e) {
                 synchronized (ImagePanel.this) {
                     lastMouseEvent = e;
+                    if (rectangleSelectionListener != null && !iconPanel.selectionMoveGesture) {
+                        iconPanel.repaint();
+                        return;
+                    }
                     redraw();
 
                     TextTag text = iconPanel.mouseOverText;
@@ -7652,9 +7770,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     int curFrame = frame;
                     long delay = getMsPerFrame();
                     if (isSingleFrame) {
-                        drawFrame(thisTimer, true);
-
-                        fireMediaDisplayStateChanged();
+                        // Shape selection is an overlay on a stopped scene. Pointer
+                        // changes and edits request their own redraw; a periodic full
+                        // render here only queues expensive copies on the Swing thread.
+                        if (first || playing || rectangleSelectionListener == null) {
+                            drawFrame(thisTimer, true);
+                            fireMediaDisplayStateChanged();
+                        }
                     } else {
                         //Time before drawing current frame
                         long frameTimeMsIs = System.currentTimeMillis();

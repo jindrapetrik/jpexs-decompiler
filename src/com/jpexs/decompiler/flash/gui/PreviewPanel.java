@@ -2439,7 +2439,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         );
         ILINESTYLE lineStyle = (ILINESTYLE) selectedLineStyle;
         Shape lineArea = linePath.getCurrentPoint() == null ? null : createLineStyleArea(linePath, lineStyle);
-        displayEditImagePanel.setHilightedLine(lineArea, linePath, lineStyle.getWidth());
+        displayEditImagePanel.setHilightedLine(lineArea, linePath, lineStyle);
         return true;
     }
 
@@ -2599,7 +2599,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             return new ImagePanel.LineHilight(
                     createLineStyleArea(linePath, currentLineStyle),
                     linePath,
-                    currentLineStyle.getWidth()
+                    currentLineStyle
             );
         }));
         return true;

@@ -65,6 +65,7 @@ import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -79,6 +80,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -141,6 +143,9 @@ public class EasySwfPanel extends JPanel {
     private boolean styleClickDragged;
     private ShapeSelection.Selection eyedropperSample;
     private List<ShapeSelection.Selection> selectedShapeParts = new ArrayList<>();
+    private List<ShapeSelection.Selection> hitTestSelection;
+    private AffineTransform hitTestTransform;
+    private final List<Shape> selectionHitAreas = new ArrayList<>();
     private boolean updatingTimelined;
     private JLabel timelineLabel;
     private JButton closeTimelineButton;
@@ -1008,7 +1013,7 @@ public class EasySwfPanel extends JPanel {
             updatePropertiesPanel();
         }, shapeTool == ShapeTool.LASSO);
         stagePanel.setSelectionMoveListeners(!selecting ? null
-                : point -> shapeSelection.selectionContains(selectedShapeParts, point, 3, stagePanel.getTimelinedToPanelTransform()),
+                : this::shapeSelectionContains,
                 !selecting ? null : this::moveShapeSelection);
         stagePanel.setSelectionDeleteListener(!selecting ? null : this::deleteShapeSelection);
         boolean drawing = editingShape != null && drawingToolSelected();
@@ -1340,13 +1345,39 @@ public class EasySwfPanel extends JPanel {
             ShapeSelection.Selection current = model.displaySelection(item);
             displayed.add(current);
             if (current.stroke && current.line != null) {
-                lines.add(new ImagePanel.LineHilight(current.area, current.linePath, current.line.getWidth()));
+                lines.add(new ImagePanel.LineHilight(current.area, current.linePath, current.line));
             } else if (!current.stroke) {
                 fills.add(current.area);
             }
         }
         stagePanel.setHilightedShapes(fills, lines);
         return displayed;
+    }
+
+    private boolean shapeSelectionContains(Point2D point) {
+        AffineTransform transform = stagePanel.getTimelinedToPanelTransform();
+        if (hitTestSelection != selectedShapeParts || !transform.equals(hitTestTransform)) {
+            hitTestSelection = selectedShapeParts;
+            hitTestTransform = new AffineTransform(transform);
+            selectionHitAreas.clear();
+            BasicStroke tolerance = new BasicStroke(6);
+            for (ShapeSelection.Selection part : selectedShapeParts) {
+                // These are already clipped by highlightShapeSelections; do not subtract
+                // all covering curves again on every pointer or cursor refresh.
+                Shape displayed = transform.createTransformedShape(part.area);
+                selectionHitAreas.add(displayed);
+                if (part.stroke && part.line != null) {
+                    selectionHitAreas.add(tolerance.createStrokedShape(displayed));
+                }
+            }
+        }
+        Point2D displayed = transform.transform(point, null);
+        for (Shape area : selectionHitAreas) {
+            if (area.contains(displayed)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void moveShapeSelection(Point2D delta, boolean commit) {
