@@ -2584,6 +2584,21 @@ public class AVM2Graph extends Graph {
      * @param path Path
      */
     @Override
+    protected List<GraphTargetItem> getPrintedChildren(GraphTargetItem item) {
+        if (item instanceof SetTypeAVM2Item) {
+            SetTypeAVM2Item setType = (SetTypeAVM2Item) item;
+            if (setType.getCompoundValue() != null) {
+                //A compound assign prints its target and compound value, not the folded value
+                List<GraphTargetItem> printed = new ArrayList<>();
+                printed.add(setType.getObject());
+                printed.add(setType.getCompoundValue());
+                return printed;
+            }
+        }
+        return null;
+    }
+
+    @Override
     protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
         super.finalProcessAfter(list, level, localData, path);
         for (int i = 0; i < list.size(); i++) {
