@@ -56,6 +56,12 @@ public class DeclarationAVM2Item extends AVM2Item {
     public boolean typeIsNull = false;
 
     /**
+     * Declared by an undefined assignment: the type comes from the next
+     * assignment, if it coerces.
+     */
+    public boolean typeIsUndefined = false;
+
+    /**
      * Show value
      */
     public boolean showValue = true;

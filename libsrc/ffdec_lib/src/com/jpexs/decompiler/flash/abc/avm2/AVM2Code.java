@@ -2293,16 +2293,32 @@ public class AVM2Code implements Cloneable {
             isNull = true;
         }
 
+        //ASC2 declares a typed local without initializer as pushundefined; setlocal (var chain:Vector.<T>;),
+        //and so is an untyped var x;. Only a coerce in the next assignment tells the type
+        boolean isUndefined = !(assignment instanceof LocalRegAVM2Item) && !(assignment instanceof GetSlotAVM2Item)
+                && assignment.value != null && (assignment.value instanceof UndefinedAVM2Item);
+        boolean isCoerced = (assignment instanceof LocalRegAVM2Item)
+                || (assignment.value instanceof ConvertAVM2Item) || (assignment.value instanceof CoerceAVM2Item);
+        if (isUndefined) {
+            vtype = TypeItem.UNBOUNDED;
+        }
+
         if (declaredRegisters[reg] == null) {
             declaredRegisters[reg] = new DeclarationAVM2Item(assignment, vtype);
             if (assignment instanceof SetTypeAVM2Item) {
                 ((SetTypeAVM2Item) assignment).setDeclaration(declaredRegisters[reg]);
             }
             declaredRegisters[reg].typeIsNull = isNull;
+            declaredRegisters[reg].typeIsUndefined = isUndefined;
             return declaredRegisters[reg];
         }
 
-        if (declaredRegisters[reg].typeIsNull) {
+        if (declaredRegisters[reg].typeIsUndefined) {
+            if (!isUndefined) {
+                declaredRegisters[reg].typeIsUndefined = false;
+                declaredRegisters[reg].type = isCoerced ? vtype : TypeItem.UNBOUNDED;
+            }
+        } else if (declaredRegisters[reg].typeIsNull) {
             declaredRegisters[reg].type = vtype;
             declaredRegisters[reg].typeIsNull = isNull;
         } else if (declaredRegisters[reg].type == TypeItem.UNBOUNDED) {
