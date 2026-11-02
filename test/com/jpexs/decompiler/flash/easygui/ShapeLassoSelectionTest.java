@@ -130,8 +130,8 @@ public class ShapeLassoSelectionTest {
         return field.get(object);
     }
 
-    private static MouseEvent mouse(Component canvas, int id, Point2D point, boolean ctrl) throws Exception {
-        int modifiers = ctrl ? InputEvent.CTRL_DOWN_MASK : 0;
+    private static MouseEvent mouse(Component canvas, int id, Point2D point, boolean shift) throws Exception {
+        int modifiers = shift ? InputEvent.SHIFT_DOWN_MASK : 0;
         if (id == MouseEvent.MOUSE_DRAGGED) {
             modifiers |= MouseEvent.BUTTON1_DOWN_MASK;
         }
@@ -163,16 +163,16 @@ public class ShapeLassoSelectionTest {
         return panel.getTimelinedToPanelTransform().transform(new Point2D.Double(x, y), null);
     }
 
-    private static void lasso(ImagePanel panel, Component canvas, boolean ctrl, double... coordinates) throws Exception {
-        mouse(canvas, MouseEvent.MOUSE_PRESSED, screen(panel, coordinates[0], coordinates[1]), ctrl);
+    private static void lasso(ImagePanel panel, Component canvas, boolean shift, double... coordinates) throws Exception {
+        mouse(canvas, MouseEvent.MOUSE_PRESSED, screen(panel, coordinates[0], coordinates[1]), shift);
         for (int i = 2; i < coordinates.length; i += 2) {
-            mouse(canvas, MouseEvent.MOUSE_DRAGGED, screen(panel, coordinates[i], coordinates[i + 1]), ctrl);
+            mouse(canvas, MouseEvent.MOUSE_DRAGGED, screen(panel, coordinates[i], coordinates[i + 1]), shift);
         }
-        mouse(canvas, MouseEvent.MOUSE_RELEASED, screen(panel, coordinates[coordinates.length - 2], coordinates[coordinates.length - 1]), ctrl);
+        mouse(canvas, MouseEvent.MOUSE_RELEASED, screen(panel, coordinates[coordinates.length - 2], coordinates[coordinates.length - 1]), shift);
     }
 
     @Test
-    public void placedFreehandGestureClosesOnReleaseAddsWithCtrlAndCancelsWithoutChangingSelection() throws Exception {
+    public void placedFreehandGestureClosesOnReleaseAddsWithShiftAndCancelsWithoutChangingSelection() throws Exception {
         if (GraphicsEnvironment.isHeadless()) {
             throw new SkipException("ImagePanel requires a desktop graphics environment");
         }
@@ -305,7 +305,7 @@ public class ShapeLassoSelectionTest {
                 assertEquals(delta.get().getY(), to.getY() - from.getY(), 1e-6);
                 assertEquals(selections.get(), 3);
                 assertSame(selected.get(), beforeMove);
-                // Ctrl must start another lasso even inside the selected fill.
+                // Shift must start another lasso even inside the selected fill.
                 lasso(panel, canvas, true, 1500, 300, 2800, 300, 2800, 1300, 1500, 1300);
                 assertEquals(selections.get(), 4);
                 assertTrue(additive.get());

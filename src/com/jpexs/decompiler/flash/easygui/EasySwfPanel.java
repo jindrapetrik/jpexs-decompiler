@@ -250,14 +250,14 @@ public class EasySwfPanel extends JPanel {
                     return;
                 }
                 Point2D point = stagePanel.toTimelinedPoint(e.getPoint());
-                if (!e.isControlDown()) {
+                if (!e.isShiftDown()) {
                     if (shapeSelection.hasFloatingSelection() && shapeSelectionContains(point)) {
                         return;
                     }
                     finishFloatingSelection();
                 }
                 ShapeSelection.Selection selected = shapeSelection.select(point, 3, stagePanel.getTimelinedToPanelTransform());
-                List<ShapeSelection.Selection> next = ShapeSelection.updateSelection(selectedShapeParts, selected, e.isControlDown());
+                List<ShapeSelection.Selection> next = ShapeSelection.updateSelection(selectedShapeParts, selected, e.isShiftDown());
                 if (next.isEmpty()) {
                     finishFloatingSelection();
                 }

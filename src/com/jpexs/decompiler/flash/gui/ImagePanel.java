@@ -3133,7 +3133,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                     if (rectangleSelectionListener != null && SwingUtilities.isLeftMouseButton(e) && !e.isAltDown()) {
                         rectangleSelectionGesture = true;
-                        selectionMoveGesture = !e.isControlDown() && selectionMoveHitTest != null
+                        selectionMoveGesture = !e.isShiftDown() && selectionMoveHitTest != null
                                 && selectionMoveHitTest.test(toTimelinedPoint(e.getPoint()));
                         suppressRectangleClick = false;
                         setDragStart(e.getPoint());
@@ -3142,7 +3142,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             lassoSelectionPath = new Path2D.Double(Path2D.WIND_EVEN_ODD);
                             lassoSelectionPath.moveTo(e.getX(), e.getY());
                         }
-                        setCursor(getAreaSelectionCursor(e.getPoint(), e.isControlDown()));
+                        setCursor(getAreaSelectionCursor(e.getPoint(), e.isShiftDown()));
                         requestFocusInWindow();
                         return;
                     }
@@ -3388,9 +3388,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             selectionMoveListener.accept(delta, true);
                             suppressRectangleClick = true;
                         } else if (lasso != null && rectangleSelectionListener != null) {
-                            rectangleSelectionListener.accept(toTimelinedArea(lasso), e.isControlDown());
+                            rectangleSelectionListener.accept(toTimelinedArea(lasso), e.isShiftDown());
                         } else if (!moving && rectangle != null && rectangleSelectionListener != null) {
-                            rectangleSelectionListener.accept(toTimelinedArea(rectangle), e.isControlDown());
+                            rectangleSelectionListener.accept(toTimelinedArea(rectangle), e.isShiftDown());
                         }
                         return;
                     }
@@ -4620,7 +4620,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                     if (rectangleSelectionListener != null || editedShape != null && hilightedPoints == null) {
                         mode = Cursor.DEFAULT_CURSOR;
-                        Cursor cursor = getAreaSelectionCursor(e.getPoint(), e.isControlDown());
+                        Cursor cursor = getAreaSelectionCursor(e.getPoint(), e.isShiftDown());
                         if (getCursor() != cursor) {
                             setCursor(cursor);
                         }
@@ -7508,7 +7508,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             if (rectangleSelectionListener != null || editedShape != null && hilightedPoints == null) {
                                 mode = Cursor.DEFAULT_CURSOR;
-                                Cursor cursor = getAreaSelectionCursor(mouseEvent == null ? null : mouseEvent.getPoint(), iconPanel.isCtrlDown());
+                                Cursor cursor = getAreaSelectionCursor(mouseEvent == null ? null : mouseEvent.getPoint(), iconPanel.shiftDown);
                                 if (iconPanel.getCursor() != cursor) {
                                     iconPanel.setCursor(cursor);
                                 }
