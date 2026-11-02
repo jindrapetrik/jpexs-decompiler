@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -50,14 +51,17 @@ import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -546,6 +550,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
 
     static class FillEditor extends JPanel {
 
+        private static final int BITMAP_PREVIEW_SIZE = 32;
+
         private final JComboBox<String> typeComboBox = createComboBox("fill", "none", "solid", "linearGradient", "radialGradient", "bitmap");
         private final JPanel valuePanel = new JPanel(new CardLayout()) {
             @Override
@@ -564,6 +570,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         private final JTriStateCheckBox linearRGBCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.linearRGB"));
         private final JTriStateCheckBox focalPointCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.focalPoint"));
         private final JComboBox<ComboBoxItem<Integer>> bitmapComboBox = new JComboBox<>();
+        private final Map<Integer, ImageIcon> bitmapIcons = new HashMap<>();
+        private SWF bitmapSwf;
         private final JTriStateCheckBox smoothedCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.smoothed"));
         private final JTriStateCheckBox repeatCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.repeat"));
         private final Color defaultColor;
@@ -619,7 +627,15 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             smoothedCheckBox.addActionListener(e -> changeListener.accept("smoothed"));
             repeatCheckBox.addActionListener(e -> changeListener.accept("repeat"));
             bitmapComboBox.setPrototypeDisplayValue(new ComboBoxItem<>("Bitmap (65535)", -1));
-            bitmapComboBox.setRenderer(indeterminateRenderer());
+            bitmapComboBox.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean selected, boolean focus) {
+                    JLabel label = (JLabel) super.getListCellRendererComponent(list, value == null ? "-" : value, index, selected, focus);
+                    label.setIcon(value instanceof ComboBoxItem ? bitmapIcon((Integer) ((ComboBoxItem<?>) value).getValue()) : null);
+                    label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(3, 2, 3, 2)));
+                    return label;
+                }
+            });
             typeComboBox.addActionListener(e -> {
                 int index = getType();
                 String card = index < 0 ? "indeterminate" : index == 0 ? "none" : index == 1 ? "solid" : index == 4 ? "bitmap" : "gradient";
@@ -961,9 +977,44 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             return base;
         }
 
+        private ImageIcon bitmapIcon(int id) {
+            return bitmapIcons.computeIfAbsent(id, key -> {
+                int iconSize = BITMAP_PREVIEW_SIZE + 2;
+                BufferedImage preview = new BufferedImage(iconSize, iconSize, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D graphics = preview.createGraphics();
+                try {
+                    for (int y = 1; y <= BITMAP_PREVIEW_SIZE; y += 4) {
+                        for (int x = 1; x <= BITMAP_PREVIEW_SIZE; x += 4) {
+                            graphics.setColor((x / 4 + y / 4) % 2 == 0 ? Color.white : Color.lightGray);
+                            graphics.fillRect(x, y, 4, 4);
+                        }
+                    }
+                    ImageTag image = bitmapSwf == null ? null : bitmapSwf.getImage(key);
+                    Dimension size = image == null ? null : image.getImageDimension();
+                    if (size != null && size.width > 0 && size.height > 0) {
+                        SerializableImage source = image.getImageCached();
+                        if (source != null) {
+                            double scale = Math.min((double) BITMAP_PREVIEW_SIZE / source.getWidth(), (double) BITMAP_PREVIEW_SIZE / source.getHeight());
+                            int width = Math.max(1, (int) Math.round(source.getWidth() * scale));
+                            int height = Math.max(1, (int) Math.round(source.getHeight() * scale));
+                            graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                            graphics.drawImage(source.getBufferedImage(), (iconSize - width) / 2, (iconSize - height) / 2, width, height, null);
+                        }
+                    }
+                    graphics.setColor(Color.gray);
+                    graphics.drawRect(0, 0, iconSize - 1, iconSize - 1);
+                } finally {
+                    graphics.dispose();
+                }
+                return new ImageIcon(preview);
+            });
+        }
+
         public void setSwf(SWF swf) {
             Integer selectedId = bitmapComboBox.getSelectedIndex() < 0 ? null
                     : bitmapComboBox.getItemAt(bitmapComboBox.getSelectedIndex()).getValue();
+            bitmapSwf = swf;
+            bitmapIcons.clear();
             bitmapComboBox.removeAllItems();
             if (swf != null) {
                 List<CharacterTag> images = new ArrayList<>();
