@@ -213,7 +213,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
 
     public LINESTYLE2 applyStrokeChange(ILINESTYLE original, Rectangle2D bounds, String property) {
         LINESTYLE2 line = original == null ? null : lineStyle2(original);
-        if (Arrays.asList("type", "color", "gradient", "flow", "linearRGB", "focalPoint", "bitmap").contains(property)) {
+        if (Arrays.asList("type", "color", "gradient", "flow", "linearRGB", "focalPoint", "bitmap", "smoothed", "repeat").contains(property)) {
             FILLSTYLE paint = strokeEditor.applyChange(lineFill(original), bounds, property);
             if (paint == null) {
                 return null;
@@ -564,6 +564,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         private final JTriStateCheckBox linearRGBCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.linearRGB"));
         private final JTriStateCheckBox focalPointCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.focalPoint"));
         private final JComboBox<ComboBoxItem<Integer>> bitmapComboBox = new JComboBox<>();
+        private final JTriStateCheckBox smoothedCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.smoothed"));
+        private final JTriStateCheckBox repeatCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.repeat"));
         private final Color defaultColor;
         private final boolean allowNone;
         private Color color;
@@ -587,7 +589,13 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             valuePanel.add(new JPanel(), "none");
             valuePanel.add(colorButton, "solid");
             valuePanel.add(gradientPanel, "gradient");
-            valuePanel.add(bitmapComboBox, "bitmap");
+            JPanel bitmapPanel = new JPanel(new BorderLayout(0, 5));
+            bitmapPanel.add(bitmapComboBox, BorderLayout.NORTH);
+            JPanel bitmapOptions = new JPanel(new BorderLayout());
+            bitmapOptions.add(smoothedCheckBox, BorderLayout.NORTH);
+            bitmapOptions.add(repeatCheckBox, BorderLayout.SOUTH);
+            bitmapPanel.add(bitmapOptions, BorderLayout.SOUTH);
+            valuePanel.add(bitmapPanel, "bitmap");
             valuePanel.add(new JLabel("-"), "indeterminate");
             add(valuePanel, BorderLayout.CENTER);
             JPanel gradientOptions = new JPanel(new GridBagLayout());
@@ -608,6 +616,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             flowComboBox.addActionListener(e -> changeListener.accept("flow"));
             linearRGBCheckBox.addActionListener(e -> changeListener.accept("linearRGB"));
             focalPointCheckBox.addActionListener(e -> changeListener.accept("focalPoint"));
+            smoothedCheckBox.addActionListener(e -> changeListener.accept("smoothed"));
+            repeatCheckBox.addActionListener(e -> changeListener.accept("repeat"));
             bitmapComboBox.setPrototypeDisplayValue(new ComboBoxItem<>("Bitmap (65535)", -1));
             bitmapComboBox.setRenderer(indeterminateRenderer());
             typeComboBox.addActionListener(e -> {
@@ -705,6 +715,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             flowComboBox.setSelectedIndex(gradient.spreadMode >= 0 && gradient.spreadMode <= 2 ? gradient.spreadMode : -1);
             linearRGBCheckBox.setSelected(gradient.interpolationMode == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE);
             focalPointCheckBox.setSelected(style != null && style.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT);
+            smoothedCheckBox.setSelected(style == null || isSmoothed(style));
+            repeatCheckBox.setSelected(style == null || isRepeating(style));
             int type = 0;
             if (style != null) {
                 switch (style.fillStyleType) {
@@ -772,6 +784,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 }
             } else {
                 style.fillStyleType = originalStyle != null && originalStyle.hasBitmap() ? originalStyle.fillStyleType : FILLSTYLE.REPEATING_BITMAP;
+                setBitmapSmoothing(style);
+                setBitmapRepeating(style);
                 style.bitmapId = bitmapComboBox.getItemAt(bitmapComboBox.getSelectedIndex()).getValue();
                 if (style.bitmapMatrix == null) {
                     MATRIX matrix = new MATRIX();
@@ -790,6 +804,36 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             style.fillStyleType = type == 2 ? FILLSTYLE.LINEAR_GRADIENT
                     : focal ? FILLSTYLE.FOCAL_RADIAL_GRADIENT : FILLSTYLE.RADIAL_GRADIENT;
             style.fieldChanged(null);
+        }
+
+        private static boolean isSmoothed(FILLSTYLE style) {
+            return style.fillStyleType != FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP
+                    && style.fillStyleType != FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP;
+        }
+
+        private void setBitmapSmoothing(FILLSTYLE style) {
+            if (smoothedCheckBox.getSelectionState() == 1) {
+                return;
+            }
+            boolean clipped = style.fillStyleType == FILLSTYLE.CLIPPED_BITMAP
+                    || style.fillStyleType == FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP;
+            style.fillStyleType = smoothedCheckBox.isSelected()
+                    ? clipped ? FILLSTYLE.CLIPPED_BITMAP : FILLSTYLE.REPEATING_BITMAP
+                    : clipped ? FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP : FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP;
+        }
+
+        private static boolean isRepeating(FILLSTYLE style) {
+            return style.fillStyleType != FILLSTYLE.CLIPPED_BITMAP
+                    && style.fillStyleType != FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP;
+        }
+
+        private void setBitmapRepeating(FILLSTYLE style) {
+            if (repeatCheckBox.getSelectionState() == 1) {
+                return;
+            }
+            style.fillStyleType = repeatCheckBox.isSelected()
+                    ? isSmoothed(style) ? FILLSTYLE.REPEATING_BITMAP : FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP
+                    : isSmoothed(style) ? FILLSTYLE.CLIPPED_BITMAP : FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP;
         }
 
         private static int styleType(FILLSTYLE style) {
@@ -836,6 +880,10 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 focalPointCheckBox.setSelectionState(focal == null ? 1 : focal ? 2 : 0);
             }
             if (type != null && type == 4) {
+                Boolean smoothed = common(styles, FillEditor::isSmoothed);
+                smoothedCheckBox.setSelectionState(smoothed == null ? 1 : smoothed ? 2 : 0);
+                Boolean repeating = common(styles, FillEditor::isRepeating);
+                repeatCheckBox.setSelectionState(repeating == null ? 1 : repeating ? 2 : 0);
                 Integer bitmap = common(styles, style -> style.bitmapId);
                 bitmapComboBox.setSelectedIndex(-1);
                 if (bitmap != null) {
@@ -873,6 +921,14 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 if (base != null && styleType(base) == 3 && focalPointCheckBox.getSelectionState() != 1) {
                     setGradientType(base, 3);
                 }
+            } else if (property.equals("smoothed")) {
+                if (base != null && base.hasBitmap()) {
+                    setBitmapSmoothing(base);
+                }
+            } else if (property.equals("repeat")) {
+                if (base != null && base.hasBitmap()) {
+                    setBitmapRepeating(base);
+                }
             } else if (property.equals("bitmap")) {
                 if (base != null && base.hasBitmap() && bitmapComboBox.getSelectedIndex() >= 0) {
                     base.bitmapId = bitmapComboBox.getItemAt(bitmapComboBox.getSelectedIndex()).getValue();
@@ -895,6 +951,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                     result.gradientMatrix = original != null && original.gradientMatrix != null ? Helper.deepCopy(original.gradientMatrix) : template.gradientMatrix;
                 } else if (type == 4) {
                     result.fillStyleType = original != null && original.hasBitmap() ? original.fillStyleType : template.fillStyleType;
+                    setBitmapSmoothing(result);
+                    setBitmapRepeating(result);
                     result.bitmapId = original != null && original.hasBitmap() ? original.bitmapId : template.bitmapId;
                     result.bitmapMatrix = original != null && original.bitmapMatrix != null ? Helper.deepCopy(original.bitmapMatrix) : template.bitmapMatrix;
                 }

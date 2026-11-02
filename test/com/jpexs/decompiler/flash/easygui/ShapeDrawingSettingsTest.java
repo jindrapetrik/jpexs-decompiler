@@ -209,6 +209,42 @@ public class ShapeDrawingSettingsTest {
                 assertTrue(settings.brush.getFillStyle(BOUNDS).hasBitmap());
                 assertEquals(settings.shapes.getFill(BOUNDS).bitmapId, bitmap.getCharacterId());
                 assertEquals(settings.paint.getFillStyle(BOUNDS).bitmapMatrix.translateX, 789);
+                ((JTriStateCheckBox) field(field(settings.brush, "fillEditor"), "smoothedCheckBox")).doClick();
+                for (FILLSTYLE paint : new FILLSTYLE[]{settings.brush.getFillStyle(BOUNDS), settings.paint.getFillStyle(BOUNDS),
+                    settings.shapes.getFill(BOUNDS), settings.pen.getFillStyle(BOUNDS)}) {
+                    assertEquals(paint.fillStyleType, FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP);
+                    assertEquals(paint.bitmapId, bitmap.getCharacterId());
+                    assertEquals(paint.bitmapMatrix, fill.bitmapMatrix);
+                }
+                stroke.fillType = fill;
+                settings.shared.setSampledStroke(stroke);
+                ((JTriStateCheckBox) field(field(settings.ink, "strokeEditor"), "smoothedCheckBox")).doClick();
+                for (LINESTYLE2 ink : new LINESTYLE2[]{settings.ink.getStrokeStyle(BOUNDS), settings.pencil.getStrokeStyle(BOUNDS),
+                    settings.shapes.getStroke(BOUNDS), settings.pen.getStrokeStyle(BOUNDS)}) {
+                    assertEquals(ink.fillType.fillStyleType, FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP);
+                    assertEquals(ink.fillType.bitmapId, bitmap.getCharacterId());
+                    assertEquals(ink.fillType.bitmapMatrix, fill.bitmapMatrix);
+                    assertEquals(ink.width, stroke.width);
+                }
+                assertEquals(settings.ink.applyStrokeChange(stroke, BOUNDS, "smoothed").fillType.fillStyleType,
+                        FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP);
+                ((JTriStateCheckBox) field(field(settings.paint, "fillEditor"), "repeatCheckBox")).doClick();
+                for (FILLSTYLE paint : new FILLSTYLE[]{settings.brush.getFillStyle(BOUNDS), settings.paint.getFillStyle(BOUNDS),
+                    settings.shapes.getFill(BOUNDS), settings.pen.getFillStyle(BOUNDS)}) {
+                    assertEquals(paint.fillStyleType, FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP);
+                    assertEquals(paint.bitmapId, bitmap.getCharacterId());
+                    assertEquals(paint.bitmapMatrix, fill.bitmapMatrix);
+                }
+                assertEquals(settings.ink.getStrokeStyle(BOUNDS).fillType.fillStyleType, FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP);
+                ((JTriStateCheckBox) field(field(settings.pencil, "strokeEditor"), "repeatCheckBox")).doClick();
+                for (LINESTYLE2 ink : new LINESTYLE2[]{settings.ink.getStrokeStyle(BOUNDS), settings.pencil.getStrokeStyle(BOUNDS),
+                    settings.shapes.getStroke(BOUNDS), settings.pen.getStrokeStyle(BOUNDS)}) {
+                    assertEquals(ink.fillType.fillStyleType, FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP);
+                    assertEquals(ink.fillType.bitmapId, bitmap.getCharacterId());
+                    assertEquals(ink.fillType.bitmapMatrix, fill.bitmapMatrix);
+                    assertEquals(ink.width, stroke.width);
+                }
+                assertEquals(settings.ink.applyStrokeChange(stroke, BOUNDS, "repeat").fillType.fillStyleType, FILLSTYLE.REPEATING_BITMAP);
                 settings.shared.setSwf(null);
                 assertFalse(settings.paint.getFillStyle(BOUNDS).hasBitmap());
                 settings.assertFill(Color.white);

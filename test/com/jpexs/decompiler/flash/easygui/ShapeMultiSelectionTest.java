@@ -19,6 +19,7 @@ import static org.testng.Assert.assertTrue;
 
 import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.GradientEditor;
+import com.jpexs.decompiler.flash.easygui.properties.JTriStateCheckBox;
 import com.jpexs.decompiler.flash.easygui.properties.panels.ShapePropertiesPanel;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
@@ -327,6 +328,111 @@ public class ShapeMultiSelectionTest {
                 assertEquals(b.bitmapMatrix.translateX, 900);
                 panel.setSelections(Arrays.asList(at(model, 500, 500), at(model, 4500, 500)));
                 assertEquals(((JComboBox<?>) field(editor, "typeComboBox")).getSelectedIndex(), -1);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+    }
+
+    @Test
+    public void bitmapSmoothingPreservesWrappingAndMatricesForMixedSelectionsWithUndo() throws Exception {
+        DefineShape4Tag shape = shape();
+        DefineBitsLossless2Tag image = new DefineBitsLossless2Tag(shape.getSwf());
+        image.setCharacterId(shape.shapeId + 1);
+        shape.getSwf().addTag(image);
+        int[] types = {FILLSTYLE.REPEATING_BITMAP, FILLSTYLE.CLIPPED_BITMAP,
+            FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP, FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP};
+        FILLSTYLE[] fills = new FILLSTYLE[types.length];
+        for (int i = 0; i < types.length; i++) {
+            FILLSTYLE paint = new FILLSTYLE();
+            paint.fillStyleType = types[i];
+            paint.bitmapId = image.getCharacterId();
+            paint.bitmapMatrix = new MATRIX();
+            paint.bitmapMatrix.translateX = i * 100;
+            fills[i] = paint;
+            rectangle(shape, i * 2000, 0, 1000, 1000, i + 1, 0);
+        }
+        shape.shapes.fillStyles.fillStyles = fills;
+        ShapeSelection model = selection(shape);
+        List<ShapeSelection.Selection> selected = new ArrayList<>();
+        for (int i = 0; i < types.length; i++) {
+            selected.add(at(model, i * 2000 + 500, 500));
+        }
+        addClean(shape);
+        byte[] before = shape.getData();
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                ShapePropertiesPanel panel = new ShapePropertiesPanel();
+                panel.setShape(shape);
+                panel.setSelections(selected);
+                JTriStateCheckBox smoothed = (JTriStateCheckBox) field(field(panel, "fillEditor"), "smoothedCheckBox");
+                JTriStateCheckBox repeat = (JTriStateCheckBox) field(field(panel, "fillEditor"), "repeatCheckBox");
+                assertEquals(smoothed.getSelectionState(), 1);
+                assertEquals(repeat.getSelectionState(), 1);
+                AtomicInteger edits = new AtomicInteger();
+                panel.setPropertyChangeListener((stroke, property) -> {
+                    assertFalse(stroke);
+                    assertTrue(property.equals("smoothed") || property.equals("repeat"));
+                    edits.incrementAndGet();
+                });
+                smoothed.doClick();
+                ShapeSelection.BatchEdit enabled = model.changeAll(selected,
+                        item -> panel.applyFillChange(item.fill, item.geometry.getBounds2D(), "smoothed"), null);
+                assertTrue(enabled.changed);
+                panel.setSelections(enabled.selected);
+                assertEquals(smoothed.getSelectionState(), 2);
+                smoothed.doClick();
+                ShapeSelection.BatchEdit disabled = enabled.model.changeAll(enabled.selected,
+                        item -> panel.applyFillChange(item.fill, item.geometry.getBounds2D(), "smoothed"), null);
+                assertTrue(disabled.changed);
+                UndoManager undo = new UndoManager();
+                undo.doOperation(new ShapeStyleChangeOperation(shape, disabled.model, "Smoothed", null), shape.getSwf());
+                ShapeSelection saved = roundTrip(current(shape));
+                for (int i = 0; i < types.length; i++) {
+                    FILLSTYLE smoothFill = at(enabled.model, i * 2000 + 500, 500).fill;
+                    assertEquals(smoothFill.fillStyleType, i % 2 == 0 ? FILLSTYLE.REPEATING_BITMAP : FILLSTYLE.CLIPPED_BITMAP);
+                    FILLSTYLE savedFill = at(saved, i * 2000 + 500, 500).fill;
+                    assertEquals(savedFill.fillStyleType, i % 2 == 0
+                            ? FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP : FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP);
+                    assertEquals(savedFill.bitmapId, fills[i].bitmapId);
+                    assertEquals(savedFill.bitmapMatrix, fills[i].bitmapMatrix);
+                    assertEquals(fills[i].fillStyleType, types[i]);
+                }
+                byte[] after = current(shape).getData();
+                undo.undo(shape.getSwf());
+                assertEquals(current(shape).getData(), before);
+                undo.redo(shape.getSwf());
+                assertEquals(current(shape).getData(), after);
+                assertEquals(edits.get(), 2);
+                panel.setSelections(selected);
+                assertEquals(repeat.getSelectionState(), 1);
+                repeat.doClick();
+                ShapeSelection.BatchEdit repeated = model.changeAll(selected,
+                        item -> panel.applyFillChange(item.fill, item.geometry.getBounds2D(), "repeat"), null);
+                assertTrue(repeated.changed);
+                panel.setSelections(repeated.selected);
+                assertEquals(repeat.getSelectionState(), 2);
+                assertEquals(smoothed.getSelectionState(), 1);
+                repeat.doClick();
+                ShapeSelection.BatchEdit clipped = repeated.model.changeAll(repeated.selected,
+                        item -> panel.applyFillChange(item.fill, item.geometry.getBounds2D(), "repeat"), null);
+                assertTrue(clipped.changed);
+                undo.doOperation(new ShapeStyleChangeOperation(current(shape), clipped.model, "Repeat", null), shape.getSwf());
+                saved = roundTrip(current(shape));
+                for (int i = 0; i < types.length; i++) {
+                    assertEquals(at(repeated.model, i * 2000 + 500, 500).fill.fillStyleType,
+                            i < 2 ? FILLSTYLE.REPEATING_BITMAP : FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP);
+                    FILLSTYLE savedFill = at(saved, i * 2000 + 500, 500).fill;
+                    assertEquals(savedFill.fillStyleType, i < 2 ? FILLSTYLE.CLIPPED_BITMAP : FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP);
+                    assertEquals(savedFill.bitmapId, fills[i].bitmapId);
+                    assertEquals(savedFill.bitmapMatrix, fills[i].bitmapMatrix);
+                }
+                byte[] clippedBytes = current(shape).getData();
+                undo.undo(shape.getSwf());
+                assertEquals(current(shape).getData(), after);
+                undo.redo(shape.getSwf());
+                assertEquals(current(shape).getData(), clippedBytes);
+                assertEquals(edits.get(), 4);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }

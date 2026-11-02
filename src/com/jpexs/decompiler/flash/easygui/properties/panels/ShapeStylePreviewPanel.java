@@ -164,6 +164,14 @@ public class ShapeStylePreviewPanel extends AbstractPropertiesPanel {
                     ImageTag image = swf == null ? null : swf.getImage(fill.bitmapId);
                     valueLabel.setText(image == null ? EasyStrings.translate("item.image") + " " + fill.bitmapId
                             : new EasyTagNameResolver().getTagName(image));
+                    JPanel options = new JPanel(new BorderLayout());
+                    options.add(new JLabel(formatPropertyName("smoothed") + " "
+                            + (fill.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fill.fillStyleType == FILLSTYLE.CLIPPED_BITMAP
+                                    ? "\u2713" : "\u2717")), BorderLayout.NORTH);
+                    options.add(new JLabel(formatPropertyName("repeat") + " "
+                            + (fill.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fill.fillStyleType == FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP
+                                    ? "\u2713" : "\u2717")), BorderLayout.SOUTH);
+                    details.add(options, BorderLayout.SOUTH);
                 } else {
                     typeLabel.setText(option("fill", "solid"));
                     Color color = fill.color.toColor();
