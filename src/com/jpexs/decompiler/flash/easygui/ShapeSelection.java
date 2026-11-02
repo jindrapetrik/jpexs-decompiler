@@ -8,6 +8,7 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.shape.CurvedEdge;
 import com.jpexs.decompiler.flash.exporters.shape.IEdge;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
@@ -569,6 +570,14 @@ public class ShapeSelection {
         return moveSelection(selected, x, y, false);
     }
 
+    /**
+     * Transforms selected geometry above the untouched destination.
+     * The matrix uses shape-local twips, including gradient and bitmap matrices.
+     */
+    public BatchEdit transformFloatingSelection(List<Selection> selected, AffineTransform matrix) {
+        return transformSelection(selected, matrix, false);
+    }
+
     public boolean hasFloatingSelection() {
         if (floatingStart < 0) {
             return false;
@@ -617,7 +626,13 @@ public class ShapeSelection {
     private BatchEdit moveSelection(List<Selection> selected, double x, double y, boolean overwrite) {
         double dx = Math.rint(x);
         double dy = Math.rint(y);
-        if (selected.isEmpty() || dx == 0 && dy == 0) {
+        return transformSelection(selected, AffineTransform.getTranslateInstance(dx, dy), overwrite);
+    }
+
+    private BatchEdit transformSelection(List<Selection> selected, AffineTransform matrix, boolean overwrite) {
+        double[] values = new double[6];
+        matrix.getMatrix(values);
+        if (selected.isEmpty() || matrix.isIdentity() || Arrays.stream(values).anyMatch(value -> !Double.isFinite(value))) {
             return new BatchEdit(this, new ArrayList<>(selected), false);
         }
         BatchEdit cut = changeAll(selected, item -> null, item -> null);
@@ -625,7 +640,6 @@ public class ShapeSelection {
         for (int i = 0; i < selected.size(); i++) {
             byPart.computeIfAbsent(cut.selected.get(i).index, key -> new ArrayList<>()).add(i);
         }
-        AffineTransform translation = AffineTransform.getTranslateInstance(dx, dy);
         ShapeSelection moved = new ShapeSelection();
         Map<Integer, Selection> replacements = new LinkedHashMap<>();
         Area coverage = new Area();
@@ -643,14 +657,14 @@ public class ShapeSelection {
                 }
                 geometry = fill;
             }
-            Selection placed = moved.addPart(translateFill(original.fill, dx, dy), translateLine(original.line, dx, dy),
-                    translation.createTransformedShape(geometry), part.stroke);
+            Selection placed = moved.addPart(transformFill(original.fill, matrix), transformLine(original.line, matrix),
+                    matrix.createTransformedShape(geometry), part.stroke);
             if (overwrite && (placed.fill != null || placed.line != null)) {
                 coverage.add(new Area(placed.area));
             }
             for (int item : items) {
                 Selection source = cut.selected.get(item);
-                replacements.put(item, rebase(source, placed, translation.createTransformedShape(source.geometry), source.edgeIndex));
+                replacements.put(item, rebase(source, placed, matrix.createTransformedShape(source.geometry), source.edgeIndex));
             }
         }
         ShapeSelection background = cut.model;
@@ -695,10 +709,36 @@ public class ShapeSelection {
         return result;
     }
 
-    private static ILINESTYLE translateLine(ILINESTYLE line, double dx, double dy) {
+    private static FILLSTYLE transformFill(FILLSTYLE fill, AffineTransform transform) {
+        if (fill == null) {
+            return null;
+        }
+        if (transform.getScaleX() == 1 && transform.getScaleY() == 1 && transform.getShearX() == 0 && transform.getShearY() == 0) {
+            return translateFill(fill, Math.rint(transform.getTranslateX()), Math.rint(transform.getTranslateY()));
+        }
+        FILLSTYLE result = Helper.deepCopy(fill);
+        if (result.hasGradient() && result.gradientMatrix != null) {
+            result.gradientMatrix = new Matrix(transform).concatenate(new Matrix(result.gradientMatrix)).toMATRIX();
+        } else if (result.hasBitmap() && result.bitmapMatrix != null) {
+            result.bitmapMatrix = new Matrix(transform).concatenate(new Matrix(result.bitmapMatrix)).toMATRIX();
+        }
+        return result;
+    }
+
+    private static ILINESTYLE transformLine(ILINESTYLE line, AffineTransform transform) {
         ILINESTYLE result = Helper.deepCopy(line);
+        if (result == null) {
+            return null;
+        }
+        double sx = Math.hypot(transform.getScaleX(), transform.getShearY());
+        double sy = Math.hypot(transform.getShearX(), transform.getScaleY());
+        LINESTYLE2 line2 = line instanceof LINESTYLE2 ? (LINESTYLE2) line : null;
+        double scale = line2 != null && line2.noHScaleFlag && line2.noVScaleFlag ? 1
+                : line2 != null && line2.noHScaleFlag ? sy : line2 != null && line2.noVScaleFlag ? sx
+                        : Math.hypot(sx, sy) / Math.sqrt(2);
+        result.setWidth((int) Math.max(0, Math.min(65535, Math.round(line.getWidth() * scale))));
         if (result instanceof LINESTYLE2 && ((LINESTYLE2) result).hasFillFlag) {
-            ((LINESTYLE2) result).fillType = translateFill(((LINESTYLE2) result).fillType, dx, dy);
+            ((LINESTYLE2) result).fillType = transformFill(((LINESTYLE2) result).fillType, transform);
         }
         return result;
     }

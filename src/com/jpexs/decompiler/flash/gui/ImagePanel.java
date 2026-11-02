@@ -344,6 +344,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private static final TexturePaint SHAPE_SELECTION_PAINT = createShapeSelectionPaint();
     private ShapeSelectionCache shapeSelectionCache;
+    private ShapeSelectionTransform shapeSelectionTransform;
 
     private IntFunction<Shape> hilightedFillProvider = null;
 
@@ -985,6 +986,66 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private void fireTransformChanged() {
         for (Runnable listener : transformChangeListeners) {
             listener.run();
+        }
+    }
+
+    /**
+     * Enables the Transform panel and axis-aligned scene handles for shape-local
+     * geometry. The listener receives deltas converted to local coordinates.
+     */
+    public void setShapeSelectionTransform(Shape geometry, BiConsumer<Matrix, Boolean> listener) {
+        shapeSelectionTransform = geometry == null || listener == null ? null : new ShapeSelectionTransform(geometry, getParentMatrix(), listener);
+        updateShapeTransformBounds();
+        iconPanel.repaint();
+    }
+
+    public ShapeSelectionTransform.State getShapeSelectionTransformState() {
+        return shapeSelectionTransform == null ? null : shapeSelectionTransform.getState();
+    }
+
+    public void restoreShapeSelectionTransformState(ShapeSelectionTransform.State state) {
+        if (shapeSelectionTransform != null && state != null) {
+            shapeSelectionTransform.setState(state);
+            updateShapeTransformBounds();
+            iconPanel.repaint();
+        }
+    }
+
+    private void updateShapeTransformBounds() {
+        if (shapeSelectionTransform != null) {
+            fireBoundsChange(shapeSelectionTransform.getBounds(), shapeSelectionTransform.getPivot(), shapeSelectionTransform.getPosition());
+        }
+    }
+
+    private Cursor getShapeTransformCursor(Point2D point, boolean additive) {
+        if (shapeSelectionTransform == null || additive) {
+            return null;
+        }
+        switch (shapeSelectionTransform.hitTest(point, getTimelinedToPanelTransform())) {
+            case Cursor.NW_RESIZE_CURSOR:
+            case Cursor.SE_RESIZE_CURSOR:
+                return resizeNWSECursor;
+            case Cursor.NE_RESIZE_CURSOR:
+            case Cursor.SW_RESIZE_CURSOR:
+                return resizeSWNECursor;
+            case Cursor.E_RESIZE_CURSOR:
+            case Cursor.W_RESIZE_CURSOR:
+                return resizeXCursor;
+            case Cursor.N_RESIZE_CURSOR:
+            case Cursor.S_RESIZE_CURSOR:
+                return resizeYCursor;
+            case Cursor.HAND_CURSOR:
+                return moveRegPointCursor;
+            case Cursor.MOVE_CURSOR:
+                return moveCursor;
+            case ShapeSelectionTransform.ROTATE:
+                return rotateCursor;
+            case ShapeSelectionTransform.SHEAR_X:
+                return shearXCursor;
+            case ShapeSelectionTransform.SHEAR_Y:
+                return shearYCursor;
+            default:
+                return null;
         }
     }
 
@@ -1941,6 +2002,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public Matrix getNewMatrix() {
+        if (shapeSelectionTransform != null) {
+            return shapeSelectionTransform.getMatrix();
+        }
         if (transform == null) {
             return new Matrix();
         }
@@ -1948,6 +2012,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public Matrix getOriginalMatrix() {
+        if (shapeSelectionTransform != null) {
+            return new Matrix();
+        }
         if (selectedDepths.size() == 1 && timelined != null) {
             int depth = selectedDepths.get(0);
             Frame fr = timelined.getTimeline().getFrame(frame);
@@ -2803,6 +2870,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE && shapeSelectionTransform != null && shapeSelectionTransform.cancel()) {
+                        updateShapeTransformBounds();
+                        e.consume();
+                        repaint();
+                        return;
+                    }
                     if (shapeDrawListener != null && shapeDrawListener.keyPressed(e.getKeyCode(), e.getModifiersEx())) {
                         shapeDrawingGesture = false;
                         e.consume();
@@ -3111,6 +3184,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     suppressPointClick = false;
+                    if (shapeSelectionTransform != null && SwingUtilities.isLeftMouseButton(e) && !e.isShiftDown() && !e.isAltDown()
+                            && shapeSelectionTransform.press(e.getPoint(), getTimelinedToPanelTransform())) {
+                        requestFocusInWindow();
+                        e.consume();
+                        return;
+                    }
                     if (startGradientTransformDrag(e)) {
                         requestFocusInWindow();
                         return;
@@ -3351,6 +3430,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
+                    if (shapeSelectionTransform != null && SwingUtilities.isLeftMouseButton(e) && shapeSelectionTransform.release()) {
+                        suppressPointClick = true;
+                        updateShapeTransformBounds();
+                        e.consume();
+                        repaint();
+                        return;
+                    }
                     if (SwingUtilities.isLeftMouseButton(e) && finishPointEditGesture(false)) {
                         return;
                     }
@@ -3545,6 +3631,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
+                    if (shapeSelectionTransform != null && shapeSelectionTransform.drag(e.getPoint(), getTimelinedToPanelTransform(), e.isShiftDown())) {
+                        updateShapeTransformBounds();
+                        repaint();
+                        return;
+                    }
                     if (dragGradientTransform(e)) {
                         return;
                     }
@@ -4611,6 +4702,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (updateGradientTransformCursor(e)) {
                         return;
                     }
+                    Cursor shapeTransformCursor = getShapeTransformCursor(e.getPoint(), e.isShiftDown());
+                    if (shapeTransformCursor != null) {
+                        setCursor(shapeTransformCursor);
+                        return;
+                    }
                     if (shapeDrawListener != null) {
                         shapeDrawingPosition = e.getPoint();
                         shapeDrawListener.move(toTimelinedPoint(e.getPoint()), e.getModifiersEx());
@@ -5137,6 +5233,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 paintShapeSelection(g2d, getTimelinedToPanelTransform());
             }
 
+            if (shapeSelectionTransform != null && timelined != null) {
+                shapeSelectionTransform.paint(g2d, getTimelinedToPanelTransform());
+            }
             paintGradientTransform(g2d);
 
             g2d.setColor(Configuration.guidesColor.get());
@@ -6998,7 +7097,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return img;
     }
 
-    private static void drawRegistrationPoint(Graphics2D g2, Point2D registrationPoint) {
+    static void drawRegistrationPoint(Graphics2D g2, Point2D registrationPoint) {
         Stroke stroke = new BasicStroke(1);
         g2.setStroke(stroke);
         g2.setColor(Color.white);
@@ -7022,7 +7121,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         drawHandle(g2, bounds.getCenterX(), bounds.getY() + bounds.getHeight());
     }
 
-    private static void drawHandle(Graphics2D g2, double x, double y) {
+    static void drawHandle(Graphics2D g2, double x, double y) {
         Shape handleTopCenter = new Rectangle2D.Double(
                 x - HANDLES_WIDTH / 2,
                 y - HANDLES_WIDTH / 2,
@@ -7502,6 +7601,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 }
                                 return;
                             }
+                            Cursor shapeTransformCursor = getShapeTransformCursor(mouseEvent == null ? null : mouseEvent.getPoint(), iconPanel.shiftDown);
+                            if (shapeTransformCursor != null) {
+                                iconPanel.setCursor(shapeTransformCursor);
+                                return;
+                            }
                             if (shapeDrawListener != null) {
                                 iconPanel.setCursor(activeShapeDrawingCursor);
                                 return;
@@ -7669,6 +7773,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public synchronized void clearAll() {
+        shapeSelectionTransform = null;
         stopInternal();
         clearImagePanel();
         timelined = null;
@@ -8006,14 +8111,26 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public Point2D getRegistrationPoint() {
+        if (shapeSelectionTransform != null) {
+            return shapeSelectionTransform.getPivot();
+        }
         return registrationPoint;
     }
 
     public RegistrationPointPosition getRegistrationPointPosition() {
+        if (shapeSelectionTransform != null) {
+            return shapeSelectionTransform.getPosition();
+        }
         return registrationPointPosition;
     }
 
     public void setRegistrationPoint(Point2D registrationPoint) {
+        if (shapeSelectionTransform != null) {
+            shapeSelectionTransform.setPivot(registrationPoint, null);
+            updateShapeTransformBounds();
+            iconPanel.repaint();
+            return;
+        }
         this.registrationPoint = registrationPoint;
         this.registrationPointPosition = null;
         redraw();
@@ -8021,6 +8138,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void setRegistrationPointPosition(RegistrationPointPosition position) {
+        if (shapeSelectionTransform != null) {
+            Rectangle2D bounds = shapeSelectionTransform.getBounds();
+            shapeSelectionTransform.setPivot(new Point2D.Double(bounds.getX() + bounds.getWidth() * position.getPositionX(),
+                    bounds.getY() + bounds.getHeight() * position.getPositionY()), position);
+            updateShapeTransformBounds();
+            iconPanel.repaint();
+            return;
+        }
         Rectangle2D transformBounds = getTransformBounds();
         Point2D newRegistrationPoint = new Point2D.Double(
                 transformBounds.getX() + transformBounds.getWidth() * position.getPositionX(),
@@ -8033,6 +8158,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void applyTransformMatrix(Matrix matrix) {
+        if (shapeSelectionTransform != null) {
+            shapeSelectionTransform.apply(matrix);
+            return;
+        }
         applyTransformMatrixInternal(matrix);
         redraw();
         fireBoundsChange(getTransformBounds(), registrationPoint, registrationPointPosition);
@@ -8049,6 +8178,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void setFullTransformMatrix(Matrix matrix) {
+        if (shapeSelectionTransform != null) {
+            Matrix current = shapeSelectionTransform.getMatrix();
+            if (Math.abs(current.toTransform().getDeterminant()) > 1e-12) {
+                shapeSelectionTransform.apply(matrix.concatenate(current.inverse()));
+            }
+            return;
+        }
         Matrix relativeMatrix = matrix.concatenate(getOriginalMatrix().inverse()).concatenate(transform.inverse());
         Matrix parentMatrix = getParentMatrix();
         transform = parentMatrix.concatenate(matrix).concatenate(getOriginalMatrix().inverse()).concatenate(parentMatrix.inverse());
@@ -8186,6 +8322,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private Rectangle2D getTransformBounds(Matrix newMatrix) {
+        if (shapeSelectionTransform != null) {
+            return shapeSelectionTransform.getBounds();
+        }
         if (timelined == null) {
             return null;
         }
