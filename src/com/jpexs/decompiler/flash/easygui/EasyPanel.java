@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -112,6 +113,11 @@ public class EasyPanel extends JPanel {
     public void setTimelined(Timelined tim) {
         setSwf(tim.getSwf());
         easySwfPanel.setTimelined(tim);
+    }
+    
+    public void editShape(ShapeTag shape) {
+        setSwf(shape.getSwf());
+        easySwfPanel.editShape(shape);
     }
 
     public void dispose() {
