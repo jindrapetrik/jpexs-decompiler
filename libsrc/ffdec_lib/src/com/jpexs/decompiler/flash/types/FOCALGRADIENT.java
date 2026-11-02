@@ -35,6 +35,19 @@ public class FOCALGRADIENT extends GRADIENT implements Serializable {
     public float focalPoint;
 
     @Override
+    public int hashCode() {
+        return 31 * super.hashCode() + Float.floatToIntBits(focalPoint);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        return Float.floatToIntBits(focalPoint) == Float.floatToIntBits(((FOCALGRADIENT) obj).focalPoint);
+    }
+
+    @Override
     public boolean isCompatibleGradient(GRADIENT otherGradient) {
         if (interpolationMode != otherGradient.interpolationMode) {
             return false;

@@ -46,6 +46,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -101,6 +102,58 @@ public class ShapeFillTransformTest {
         undo.redo(original.getSwf());
         assertEquals(((ShapeTag) original.getSwf().getCharacter(original.shapeId)).getData(), after);
         assertFalse(gesture.setMatrix(selected.fill.gradientMatrix).changed);
+    }
+
+    @Test
+    public void frame65FocalPointOnlyChangeIsDetectedAndSupportsUndoRedo() throws Exception {
+        SWF swf;
+        try (FileInputStream input = new FileInputStream("libsrc/ffdec_lib/testdata/graphics/graphics.swf")) {
+            swf = new SWF(input, false);
+        }
+        ShapeTag original = (ShapeTag) swf.getCharacter(175);
+        byte[] before = original.getData();
+        ShapeSelection model = new ShapeSelection(original);
+        ShapeSelection.Selection selected = at(model, 7440, 2380);
+        assertEquals(selected.fill.fillStyleType, FILLSTYLE.FOCAL_RADIAL_GRADIENT);
+        FOCALGRADIENT gradient = (FOCALGRADIENT) selected.fill.gradient;
+        float previous = gradient.focalPoint;
+        assertFalse(new ShapeFillTransform(model, selected).setFocalPoint(previous).changed);
+        ShapeSelection.BatchEdit focused = new ShapeFillTransform(model, selected).setFocalPoint(0.75f);
+        assertTrue(focused.changed, "Changing only the focal point must create an edit");
+        FILLSTYLE edited = at(focused.model, 7440, 2380).fill;
+        assertEquals(edited.gradientMatrix, selected.fill.gradientMatrix);
+        assertEquals(edited.gradient.gradientRecords, selected.fill.gradient.gradientRecords);
+        assertEquals(((FOCALGRADIENT) edited.gradient).focalPoint, 0.75f);
+        assertEquals(gradient.focalPoint, previous, "Preview must not mutate the source gradient");
+        assertFalse(gradient.equals(edited.gradient));
+        assertEquals(gradient, Helper.deepCopy(gradient));
+        assertEquals(gradient.hashCode(), Helper.deepCopy(gradient).hashCode());
+        UndoManager undo = new UndoManager();
+        undo.doOperation(new ShapeStyleChangeOperation(original, focused.model, "Focal point", null), swf);
+        ShapeTag changed = (ShapeTag) swf.getCharacter(original.shapeId);
+        assertEquals(((FOCALGRADIENT) at(new ShapeSelection(changed), 7440, 2380).fill.gradient).focalPoint, 0.75f);
+        byte[] after = changed.getData();
+        undo.undo(swf);
+        assertEquals(((ShapeTag) swf.getCharacter(original.shapeId)).getData(), before);
+        undo.redo(swf);
+        assertEquals(((ShapeTag) swf.getCharacter(original.shapeId)).getData(), after);
+    }
+
+    @Test
+    public void focalPointOnlyChangeIsDetectedForGradientStrokes() {
+        LINESTYLE2 line = new LINESTYLE2();
+        line.width = 200;
+        line.hasFillFlag = true;
+        line.fillType = gradient(FILLSTYLE.FOCAL_RADIAL_GRADIENT);
+        ShapeSelection model = selection(shape()).drawStroke(new Line2D.Double(0, 0, 1000, 0), line).model;
+        ShapeSelection.Selection selected = at(model, 500, 0);
+        ShapeSelection.BatchEdit focused = new ShapeFillTransform(model, selected).setFocalPoint(-0.5f);
+        assertTrue(focused.changed);
+        LINESTYLE2 edited = (LINESTYLE2) at(focused.model, 500, 0).line;
+        assertEquals(edited.width, line.width);
+        assertEquals(edited.fillType.gradientMatrix, line.fillType.gradientMatrix);
+        assertEquals(((FOCALGRADIENT) edited.fillType.gradient).focalPoint, -0.5f);
+        assertEquals(((FOCALGRADIENT) line.fillType.gradient).focalPoint, 0.375f);
     }
 
     @Test
