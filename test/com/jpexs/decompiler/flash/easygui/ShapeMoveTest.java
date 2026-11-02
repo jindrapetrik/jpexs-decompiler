@@ -66,6 +66,89 @@ public class ShapeMoveTest {
     }
 
     @Test
+    public void floatingFillRestoresTheDestinationUntilItIsDropped() throws Exception {
+        DefineShape4Tag shape = shape();
+        rectangle(shape, 0, 0, 1000, 1000, 1, 0);
+        rectangle(shape, 2000, 0, 2000, 1000, 2, 0);
+        ShapeSelection model = selection(shape);
+        addClean(shape);
+        ShapeSelection.BatchEdit moved = model.moveFloatingSelection(Collections.singletonList(at(model, 500, 500)), 2000, 0);
+        assertTrue(moved.model.hasFloatingSelection());
+        assertEquals(at(moved.model, 2500, 500).fill.color.toColor(), Color.red);
+        assertNull(at(moved.model, 500, 500));
+        ShapeSelection.BatchEdit away = moved.model.moveFloatingSelection(moved.selected, 5000, 0);
+        assertEquals(at(away.model, 2500, 500).fill.color.toColor(), Color.blue);
+        assertEquals(at(away.model, 7500, 500).fill.color.toColor(), Color.red);
+        ShapeSelection.BatchEdit back = away.model.moveFloatingSelection(away.selected, -5000, 0);
+        ShapeSelection.BatchEdit dropped = back.model.mergeFloatingSelection();
+        assertTrue(dropped.changed);
+        assertFalse(dropped.model.hasFloatingSelection());
+        assertTrue(dropped.selected.isEmpty());
+        assertFalse(dropped.model.mergeFloatingSelection().changed);
+        ShapeSelection.BatchEdit afterDrop = dropped.model.moveFloatingSelection(Collections.singletonList(at(dropped.model, 2500, 500)), 5000, 0);
+        assertNull(at(afterDrop.model, 2500, 500), "The covered background is erased only when the layer is dropped");
+        assertEquals(at(afterDrop.model, 3500, 500).fill.color.toColor(), Color.blue);
+        new ShapeStyleChangeOperation(shape, moved.model, "Move", null).doOperation();
+        assertEquals(at(saved(current(shape)), 2500, 500).fill.color.toColor(), Color.red);
+    }
+
+    @Test
+    public void floatingStrokeAndFillSurviveStyleChangesAndAdditiveRectangles() {
+        DefineShape4Tag shape = shape();
+        rectangle(shape, 0, 0, 1000, 1000, 1, 1);
+        rectangle(shape, 2000, 0, 2000, 1000, 2, 1);
+        ShapeSelection model = selection(shape);
+        ShapeSelection.RectangleSelection box = model.selectRectangle(new Rectangle2D.Double(-200, -200, 1400, 1400), Collections.emptyList(), false);
+        ShapeSelection.BatchEdit moved = box.model.moveFloatingSelection(box.selected, 2000, 0);
+        ShapeSelection.BatchEdit styled = moved.model.changeAll(moved.selected, item -> fill(Color.green), null);
+        assertTrue(styled.model.hasFloatingSelection());
+        ShapeSelection.RectangleSelection added = styled.model.selectRectangle(new Rectangle2D.Double(3500, 200, 400, 400), styled.selected, true);
+        assertTrue(added.model.hasFloatingSelection());
+        ShapeSelection.BatchEdit away = added.model.moveFloatingSelection(added.selected, 5000, 0);
+        assertEquals(at(away.model, 2500, 500).fill.color.toColor(), Color.blue);
+        assertEquals(at(away.model, 2500, 0).line.getWidth(), 200);
+        assertEquals(at(away.model, 7500, 500).fill.color.toColor(), Color.green);
+        assertEquals(at(away.model, 7500, 0).line.getWidth(), 200);
+        ShapeSelection.BatchEdit deleted = moved.model.deleteAll(moved.selected);
+        assertFalse(deleted.model.hasFloatingSelection());
+        assertEquals(at(deleted.model, 2500, 500).fill.color.toColor(), Color.blue);
+        assertEquals(at(deleted.model, 2500, 0).line.getWidth(), 200);
+    }
+
+    @Test
+    public void undoAndRedoRestoreFloatingLayerAndItsUnderlyingGeometry() throws Exception {
+        DefineShape4Tag shape = shape();
+        rectangle(shape, 0, 0, 1000, 1000, 1, 0);
+        rectangle(shape, 2000, 0, 2000, 1000, 2, 0);
+        ShapeSelection original = selection(shape);
+        addClean(shape);
+        byte[] before = shape.getData();
+        ShapeSelection[] active = {original};
+        ShapeSelection.BatchEdit moved = original.moveFloatingSelection(Collections.singletonList(at(original, 500, 500)), 2000, 0);
+        UndoManager undo = new UndoManager();
+        undo.doOperation(new ShapeStyleChangeOperation(shape, moved.model, "Move", (tag, forward) -> {
+            active[0] = forward ? moved.committedModel(tag) : original;
+        }), shape.getSwf());
+        ShapeSelection.BatchEdit dropped = active[0].mergeFloatingSelection();
+        undo.doOperation(new ShapeStyleChangeOperation(current(shape), dropped.model, "Drop", (tag, forward) -> {
+            active[0] = forward ? dropped.committedModel(tag) : moved.model;
+        }), shape.getSwf());
+        assertFalse(active[0].hasFloatingSelection());
+        undo.undo(shape.getSwf());
+        assertTrue(active[0].hasFloatingSelection());
+        ShapeSelection.BatchEdit away = active[0].moveFloatingSelection(moved.selected, 5000, 0);
+        assertEquals(at(away.model, 2500, 500).fill.color.toColor(), Color.blue);
+        undo.undo(shape.getSwf());
+        assertEquals(current(shape).getData(), before);
+        undo.redo(shape.getSwf());
+        assertTrue(active[0].hasFloatingSelection());
+        undo.redo(shape.getSwf());
+        assertFalse(active[0].hasFloatingSelection());
+        ShapeSelection.BatchEdit afterDrop = active[0].moveFloatingSelection(Collections.singletonList(at(active[0], 2500, 500)), 5000, 0);
+        assertNull(at(afterDrop.model, 2500, 500));
+    }
+
+    @Test
     public void moveCutsTheSourceOverwritesTheDestinationAndUndoRestoresOriginalBytes() throws Exception {
         DefineShape4Tag shape = shape();
         rectangle(shape, 0, 0, 1000, 1000, 1, 0);

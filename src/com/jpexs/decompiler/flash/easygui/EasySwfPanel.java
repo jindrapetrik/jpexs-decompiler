@@ -250,8 +250,18 @@ public class EasySwfPanel extends JPanel {
                     return;
                 }
                 Point2D point = stagePanel.toTimelinedPoint(e.getPoint());
+                if (!e.isControlDown()) {
+                    if (shapeSelection.hasFloatingSelection() && shapeSelectionContains(point)) {
+                        return;
+                    }
+                    finishFloatingSelection();
+                }
                 ShapeSelection.Selection selected = shapeSelection.select(point, 3, stagePanel.getTimelinedToPanelTransform());
-                showShapeSelections(ShapeSelection.updateSelection(selectedShapeParts, selected, e.isControlDown()));
+                List<ShapeSelection.Selection> next = ShapeSelection.updateSelection(selectedShapeParts, selected, e.isControlDown());
+                if (next.isEmpty()) {
+                    finishFloatingSelection();
+                }
+                showShapeSelections(next);
                 rightTabbedPane.setSelectedIndex(0);
                 updatePropertiesPanel();
             }
@@ -564,6 +574,7 @@ public class EasySwfPanel extends JPanel {
         closeTimelineButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                finishFloatingSelection();
                 if (editingShape != null && stagePanel.closeShapeEdit()) {
                     return;
                 }
@@ -821,6 +832,9 @@ public class EasySwfPanel extends JPanel {
     public void setShapeTool(ShapeTool tool) {
         Objects.requireNonNull(tool);
         if (shapeTool != tool) {
+            if (tool != ShapeTool.SELECT && tool != ShapeTool.LASSO) {
+                finishFloatingSelection();
+            }
             if (shapeTool == ShapeTool.PEN) {
                 penTool.finish(false);
             }
@@ -1006,6 +1020,9 @@ public class EasySwfPanel extends JPanel {
         }
         boolean selecting = editingShape != null && (shapeTool == ShapeTool.SELECT || shapeTool == ShapeTool.LASSO);
         stagePanel.setAreaSelectionListener(!selecting ? null : (area, additive) -> {
+            if (!additive) {
+                finishFloatingSelection();
+            }
             ShapeSelection.RectangleSelection selection = shapeSelection.selectArea(area, selectedShapeParts, additive);
             shapeSelection = selection.model;
             showShapeSelections(selection.selected);
@@ -1384,7 +1401,7 @@ public class EasySwfPanel extends JPanel {
         if (editingShape == null || selectedShapeParts.isEmpty()) {
             return;
         }
-        ShapeSelection.BatchEdit edit = shapeSelection.moveAll(selectedShapeParts, delta.getX(), delta.getY());
+        ShapeSelection.BatchEdit edit = shapeSelection.moveFloatingSelection(selectedShapeParts, delta.getX(), delta.getY());
         if (commit || !edit.changed) {
             stagePanel.setShapePreview(null);
         }
@@ -1404,6 +1421,12 @@ public class EasySwfPanel extends JPanel {
                 stagePanel.setShapePreview(null);
                 showShapeSelections(selectedShapeParts);
             }
+        }
+    }
+
+    private void finishFloatingSelection() {
+        if (editingShape != null && shapeSelection != null && shapeSelection.hasFloatingSelection()) {
+            applyShapeEdit(shapeSelection.mergeFloatingSelection(), EasyStrings.translate("action.move"));
         }
     }
 
@@ -1481,6 +1504,10 @@ public class EasySwfPanel extends JPanel {
     private void setTimelined(Timelined timelined, boolean updateStage, ShapeTag shape) {
         if (this.timelined == timelined) {
             return;
+        }
+        if (editingShape != null && (shape == null || shape.getSwf() != editingShape.getSwf()
+                || shape.getCharacterId() != editingShape.getCharacterId())) {
+            finishFloatingSelection();
         }
         if (mainPanel.getCurrentView() != MainPanel.VIEW_EASY) {
             timelined = null;

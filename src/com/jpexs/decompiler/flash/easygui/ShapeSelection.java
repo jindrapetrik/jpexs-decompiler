@@ -56,6 +56,7 @@ import java.util.function.Function;
  * @author JPEXS
  */
 public class ShapeSelection {
+    private int floatingStart = -1;
 
     private final List<Selection> parts = new ArrayList<>();
 
@@ -173,7 +174,7 @@ public class ShapeSelection {
          * their indexes refer to this model rather than the exported paths.
          */
         public ShapeSelection committedModel(ShapeTag shape) {
-            return selected.isEmpty() ? new ShapeSelection(shape) : model;
+            return selected.isEmpty() && !model.hasFloatingSelection() ? new ShapeSelection(shape) : model;
         }
     }
 
@@ -231,6 +232,9 @@ public class ShapeSelection {
             }
         }
         for (Selection part : parts) {
+            if (part.index == floatingStart) {
+                result.floatingStart = result.parts.size();
+            }
             List<Selection> old = previous.getOrDefault(part.index, Collections.emptyList());
             if (!part.stroke) {
                 Selection copy = result.addPart(part.fill, part.line, part.geometry, false);
@@ -555,6 +559,62 @@ public class ShapeSelection {
      * Covered geometry is removed so it cannot reappear after another move.
      */
     public BatchEdit moveAll(List<Selection> selected, double x, double y) {
+        return moveSelection(selected, x, y, true);
+    }
+
+    /**
+     * Keeps moved geometry above the untouched destination until the selection is dropped.
+     */
+    public BatchEdit moveFloatingSelection(List<Selection> selected, double x, double y) {
+        return moveSelection(selected, x, y, false);
+    }
+
+    public boolean hasFloatingSelection() {
+        if (floatingStart < 0) {
+            return false;
+        }
+        for (int i = floatingStart; i < parts.size(); i++) {
+            if (parts.get(i).fill != null || parts.get(i).line != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Stamps the floating layer into its destination when the selection is cleared.
+     */
+    public BatchEdit mergeFloatingSelection() {
+        if (!hasFloatingSelection()) {
+            return new BatchEdit(this, new ArrayList<>(), false);
+        }
+        ShapeSelection base = new ShapeSelection();
+        Area coverage = new Area();
+        for (Selection part : parts) {
+            if (part.index < floatingStart) {
+                base.addPart(part.fill, part.line, part.geometry, part.stroke);
+            } else if (part.fill != null || part.line != null) {
+                coverage.add(new Area(part.area));
+            }
+        }
+        RectangleSelection covered = base.selectArea(coverage, Collections.emptyList(), false, false);
+        ShapeSelection erased = covered.model.changeAll(covered.selected, item -> null, item -> null).model;
+        ShapeSelection result = new ShapeSelection();
+        for (Selection part : erased.parts) {
+            if (part.fill != null || part.line != null) {
+                result.addPart(part.fill, part.line, part.geometry, part.stroke);
+            }
+        }
+        for (int i = floatingStart; i < parts.size(); i++) {
+            Selection part = parts.get(i);
+            if (part.fill != null || part.line != null) {
+                result.addPart(part.fill, part.line, part.geometry, part.stroke);
+            }
+        }
+        return new BatchEdit(result, new ArrayList<>(), true);
+    }
+
+    private BatchEdit moveSelection(List<Selection> selected, double x, double y, boolean overwrite) {
         double dx = Math.rint(x);
         double dy = Math.rint(y);
         if (selected.isEmpty() || dx == 0 && dy == 0) {
@@ -585,7 +645,7 @@ public class ShapeSelection {
             }
             Selection placed = moved.addPart(translateFill(original.fill, dx, dy), translateLine(original.line, dx, dy),
                     translation.createTransformedShape(geometry), part.stroke);
-            if (placed.fill != null || placed.line != null) {
+            if (overwrite && (placed.fill != null || placed.line != null)) {
                 coverage.add(new Area(placed.area));
             }
             for (int item : items) {
@@ -593,13 +653,22 @@ public class ShapeSelection {
                 replacements.put(item, rebase(source, placed, translation.createTransformedShape(source.geometry), source.edgeIndex));
             }
         }
-        RectangleSelection covered = cut.model.selectArea(coverage, Collections.emptyList(), false, false);
-        BatchEdit erased = covered.model.changeAll(covered.selected, item -> null, item -> null);
+        ShapeSelection background = cut.model;
+        if (overwrite) {
+            RectangleSelection covered = background.selectArea(coverage, Collections.emptyList(), false, false);
+            background = covered.model.changeAll(covered.selected, item -> null, item -> null).model;
+        }
         ShapeSelection result = new ShapeSelection();
-        for (Selection part : erased.model.parts) {
+        for (Selection part : background.parts) {
             if (part.fill != null || part.line != null) {
+                if (!overwrite && background.floatingStart >= 0 && part.index >= background.floatingStart && result.floatingStart < 0) {
+                    result.floatingStart = result.parts.size();
+                }
                 result.addPart(part.fill, part.line, part.geometry, part.stroke);
             }
+        }
+        if (!overwrite && result.floatingStart < 0) {
+            result.floatingStart = result.parts.size();
         }
         Map<Integer, Selection> placedParts = new LinkedHashMap<>();
         for (Selection part : moved.parts) {
@@ -1117,6 +1186,9 @@ public class ShapeSelection {
         Map<Selection, Selection> replacements = new IdentityHashMap<>();
         for (int i = 0; i < parts.size(); i++) {
             Selection part = parts.get(i);
+            if (i == floatingStart) {
+                result.floatingStart = result.parts.size();
+            }
             List<Selection> items = byPart.getOrDefault(i, java.util.Collections.emptyList());
             boolean changedFill = items.stream().anyMatch(fills::containsKey);
             boolean changedLine = items.stream().anyMatch(lines::containsKey);
@@ -1395,7 +1467,7 @@ public class ShapeSelection {
                 Area editable = new Area(part.geometry);
                 for (int above = i + 1; above < parts.size(); above++) {
                     Selection covering = parts.get(above);
-                    if (visible.intersects(covering.area.getBounds2D())) {
+                    if ((covering.fill != null || covering.line != null) && visible.intersects(covering.area.getBounds2D())) {
                         visible.subtract(new Area(covering.area));
                     }
                     if (covering.stroke && covering.line != null) {
