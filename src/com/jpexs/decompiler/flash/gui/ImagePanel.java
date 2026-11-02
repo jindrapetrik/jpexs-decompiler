@@ -990,8 +990,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     /**
-     * Enables the Transform panel and axis-aligned scene handles for shape-local
-     * geometry. The listener receives deltas converted to local coordinates.
+     * Enables the Transform panel and a scene-aligned initial frame for local
+     * geometry. Restoring its state retains the transformed frame and its axes.
      */
     public void setShapeSelectionTransform(Shape geometry, BiConsumer<Matrix, Boolean> listener) {
         shapeSelectionTransform = geometry == null || listener == null ? null : new ShapeSelectionTransform(geometry, getParentMatrix(), listener);
@@ -1021,7 +1021,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (shapeSelectionTransform == null || additive) {
             return null;
         }
-        switch (shapeSelectionTransform.hitTest(point, getTimelinedToPanelTransform())) {
+        switch (shapeSelectionTransform.cursorMode(point, getTimelinedToPanelTransform())) {
             case Cursor.NW_RESIZE_CURSOR:
             case Cursor.SE_RESIZE_CURSOR:
                 return resizeNWSECursor;
@@ -8139,9 +8139,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public void setRegistrationPointPosition(RegistrationPointPosition position) {
         if (shapeSelectionTransform != null) {
-            Rectangle2D bounds = shapeSelectionTransform.getBounds();
-            shapeSelectionTransform.setPivot(new Point2D.Double(bounds.getX() + bounds.getWidth() * position.getPositionX(),
-                    bounds.getY() + bounds.getHeight() * position.getPositionY()), position);
+            shapeSelectionTransform.setPivotPosition(position);
             updateShapeTransformBounds();
             iconPanel.repaint();
             return;
