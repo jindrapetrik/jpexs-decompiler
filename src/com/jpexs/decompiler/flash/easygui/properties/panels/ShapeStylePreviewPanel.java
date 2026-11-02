@@ -153,6 +153,10 @@ public class ShapeStylePreviewPanel extends AbstractPropertiesPanel {
                         : option("flow", new String[]{"pad", "reflect", "repeat"}[spread])), 1, 0);
                 addToGrid(layout, options, new JLabel(formatPropertyName("linearRGB") + " "
                         + (fill.gradient.interpolationMode == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE ? "\u2713" : "\u2717")), 0, 1, 2, 1);
+                if (fill.fillStyleType != FILLSTYLE.LINEAR_GRADIENT) {
+                    addToGrid(layout, options, new JLabel(formatPropertyName("focalPoint") + " "
+                            + (fill.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT ? "\u2713" : "\u2717")), 0, 2, 2, 1);
+                }
                 details.add(options, BorderLayout.CENTER);
             } else {
                 if (fill.hasBitmap()) {

@@ -1404,6 +1404,9 @@ public class EasySwfPanel extends JPanel {
         for (ShapeSelection.Selection item : selected) {
             ShapeSelection.Selection current = model.displaySelection(item);
             displayed.add(current);
+            if (shapeTool == ShapeTool.GRADIENT_TRANSFORM) {
+                continue;
+            }
             if (current.stroke && current.line != null) {
                 lines.add(new ImagePanel.LineHilight(current.area, current.linePath, current.line));
             } else if (!current.stroke) {

@@ -213,7 +213,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
 
     public LINESTYLE2 applyStrokeChange(ILINESTYLE original, Rectangle2D bounds, String property) {
         LINESTYLE2 line = original == null ? null : lineStyle2(original);
-        if (Arrays.asList("type", "color", "gradient", "flow", "linearRGB", "bitmap").contains(property)) {
+        if (Arrays.asList("type", "color", "gradient", "flow", "linearRGB", "focalPoint", "bitmap").contains(property)) {
             FILLSTYLE paint = strokeEditor.applyChange(lineFill(original), bounds, property);
             if (paint == null) {
                 return null;
@@ -562,6 +562,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         private final JPanel gradientPanel = new JPanel(new BorderLayout());
         private final JComboBox<String> flowComboBox = createComboBox("flow", "pad", "reflect", "repeat");
         private final JTriStateCheckBox linearRGBCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.linearRGB"));
+        private final JTriStateCheckBox focalPointCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.focalPoint"));
         private final JComboBox<ComboBoxItem<Integer>> bitmapComboBox = new JComboBox<>();
         private final Color defaultColor;
         private final boolean allowNone;
@@ -601,9 +602,12 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             optionConstraints.gridy = 1;
             optionConstraints.gridwidth = 2;
             gradientOptions.add(linearRGBCheckBox, optionConstraints);
+            optionConstraints.gridy = 2;
+            gradientOptions.add(focalPointCheckBox, optionConstraints);
             gradientPanel.add(gradientOptions, BorderLayout.SOUTH);
             flowComboBox.addActionListener(e -> changeListener.accept("flow"));
             linearRGBCheckBox.addActionListener(e -> changeListener.accept("linearRGB"));
+            focalPointCheckBox.addActionListener(e -> changeListener.accept("focalPoint"));
             bitmapComboBox.setPrototypeDisplayValue(new ComboBoxItem<>("Bitmap (65535)", -1));
             bitmapComboBox.setRenderer(indeterminateRenderer());
             typeComboBox.addActionListener(e -> {
@@ -611,6 +615,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 String card = index < 0 ? "indeterminate" : index == 0 ? "none" : index == 1 ? "solid" : index == 4 ? "bitmap" : "gradient";
                 ((CardLayout) valuePanel.getLayout()).show(valuePanel, card);
                 valuePanel.setVisible(index != 0);
+                focalPointCheckBox.setVisible(index == 3);
                 revalidate();
                 repaint();
                 changeListener.accept("type");
@@ -699,6 +704,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             gradientPanel.add(gradientEditor, BorderLayout.CENTER);
             flowComboBox.setSelectedIndex(gradient.spreadMode >= 0 && gradient.spreadMode <= 2 ? gradient.spreadMode : -1);
             linearRGBCheckBox.setSelected(gradient.interpolationMode == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE);
+            focalPointCheckBox.setSelected(style != null && style.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT);
             int type = 0;
             if (style != null) {
                 switch (style.fillStyleType) {
@@ -745,11 +751,9 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 style.fillStyleType = FILLSTYLE.SOLID;
                 style.color = new RGBA(color);
             } else if (type == 2 || type == 3) {
-                style.fillStyleType = type == 2 ? FILLSTYLE.LINEAR_GRADIENT
-                        : originalStyle != null && originalStyle.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT
-                                ? FILLSTYLE.FOCAL_RADIAL_GRADIENT : FILLSTYLE.RADIAL_GRADIENT;
                 gradientEditor.save();
                 style.gradient = Helper.deepCopy(gradient);
+                setGradientType(style, type);
                 if (flowComboBox.getSelectedIndex() >= 0) {
                     style.gradient.spreadMode = flowComboBox.getSelectedIndex();
                 }
@@ -778,6 +782,14 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 }
             }
             return style;
+        }
+
+        private void setGradientType(FILLSTYLE style, int type) {
+            boolean focal = type == 3 && (focalPointCheckBox.getSelectionState() == 1
+                    ? style.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT : focalPointCheckBox.isSelected());
+            style.fillStyleType = type == 2 ? FILLSTYLE.LINEAR_GRADIENT
+                    : focal ? FILLSTYLE.FOCAL_RADIAL_GRADIENT : FILLSTYLE.RADIAL_GRADIENT;
+            style.fieldChanged(null);
         }
 
         private static int styleType(FILLSTYLE style) {
@@ -820,6 +832,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 Integer interpolation = common(styles, style -> style.gradient.interpolationMode);
                 linearRGBCheckBox.setSelectionState(interpolation == null ? 1
                         : interpolation == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE ? 2 : 0);
+                Boolean focal = common(styles, style -> style.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT);
+                focalPointCheckBox.setSelectionState(focal == null ? 1 : focal ? 2 : 0);
             }
             if (type != null && type == 4) {
                 Integer bitmap = common(styles, style -> style.bitmapId);
@@ -855,6 +869,10 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                     base.gradient.interpolationMode = linearRGBCheckBox.isSelected()
                             ? GRADIENT.INTERPOLATION_LINEAR_RGB_MODE : GRADIENT.INTERPOLATION_RGB_MODE;
                 }
+            } else if (property.equals("focalPoint")) {
+                if (base != null && styleType(base) == 3 && focalPointCheckBox.getSelectionState() != 1) {
+                    setGradientType(base, 3);
+                }
             } else if (property.equals("bitmap")) {
                 if (base != null && base.hasBitmap() && bitmapComboBox.getSelectedIndex() >= 0) {
                     base.bitmapId = bitmapComboBox.getItemAt(bitmapComboBox.getSelectedIndex()).getValue();
@@ -872,10 +890,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                             ? new RGBA(original.color) : new RGBA(template.color);
                     result.fillStyleType = FILLSTYLE.SOLID;
                 } else if (type == 2 || type == 3) {
-                    result.fillStyleType = type == 2 ? FILLSTYLE.LINEAR_GRADIENT
-                            : original != null && original.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT
-                                    ? FILLSTYLE.FOCAL_RADIAL_GRADIENT : FILLSTYLE.RADIAL_GRADIENT;
                     result.gradient = original != null && original.gradient != null ? Helper.deepCopy(original.gradient) : template.gradient;
+                    setGradientType(result, type);
                     result.gradientMatrix = original != null && original.gradientMatrix != null ? Helper.deepCopy(original.gradientMatrix) : template.gradientMatrix;
                 } else if (type == 4) {
                     result.fillStyleType = original != null && original.hasBitmap() ? original.fillStyleType : template.fillStyleType;

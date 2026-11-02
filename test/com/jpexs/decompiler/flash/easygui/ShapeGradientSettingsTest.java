@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -52,6 +53,119 @@ public class ShapeGradientSettingsTest {
 
     private static ShapeSelection.Selection at(ShapeSelection model, int x, int y) {
         return model.select(new Point2D.Double(x, y), 0);
+    }
+
+    @Test
+    public void mixedRadialFillsToggleFocalTypeWithoutChangingOtherSettingsAndSupportUndo() throws Exception {
+        DefineShape4Tag fixture = shape();
+        FILLSTYLE radial = gradient(FILLSTYLE.RADIAL_GRADIENT);
+        FILLSTYLE focal = gradient(FILLSTYLE.FOCAL_RADIAL_GRADIENT);
+        fixture.shapes.fillStyles.fillStyles = new FILLSTYLE[]{radial, focal};
+        rectangle(fixture, 0, 0, 1000, 1000, 1, 0);
+        rectangle(fixture, 2000, 0, 1000, 1000, 2, 0);
+        ShapeSelection model = selection(fixture);
+        List<ShapeSelection.Selection> selected = Arrays.asList(at(model, 500, 500), at(model, 2500, 500));
+        AtomicReference<ShapeSelection.BatchEdit> result = new AtomicReference<>();
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                ShapePropertiesPanel panel = new ShapePropertiesPanel();
+                panel.setShape(fixture);
+                panel.setSelections(selected);
+                Object editor = field(panel, "fillEditor");
+                JTriStateCheckBox checkbox = (JTriStateCheckBox) field(editor, "focalPointCheckBox");
+                assertTrue(checkbox.isVisible());
+                assertEquals(checkbox.getSelectionState(), 1);
+                checkbox.doClick();
+                assertEquals(checkbox.getSelectionState(), 2);
+                ShapeSelection.BatchEdit enabled = model.changeAll(selected,
+                        item -> panel.applyFillChange(item.fill, item.geometry.getBounds2D(), "focalPoint"), null);
+                assertTrue(enabled.changed);
+                for (int x : new int[]{500, 2500}) {
+                    FILLSTYLE original = x == 500 ? radial : focal;
+                    FILLSTYLE changed = at(enabled.model, x, 500).fill;
+                    assertEquals(changed.fillStyleType, FILLSTYLE.FOCAL_RADIAL_GRADIENT);
+                    assertEquals(changed.gradient.getClass(), FOCALGRADIENT.class);
+                    assertEquals(((FOCALGRADIENT) changed.gradient).focalPoint,
+                            x == 500 ? 0f : ((FOCALGRADIENT) focal.gradient).focalPoint);
+                    assertEquals(changed.gradientMatrix, original.gradientMatrix);
+                    assertEquals(changed.gradient.gradientRecords, original.gradient.gradientRecords);
+                    assertEquals(changed.gradient.spreadMode, original.gradient.spreadMode);
+                    assertEquals(changed.gradient.interpolationMode, original.gradient.interpolationMode);
+                }
+                panel.setSelections(enabled.selected);
+                checkbox.doClick();
+                ShapeSelection.BatchEdit disabled = enabled.model.changeAll(enabled.selected,
+                        item -> panel.applyFillChange(item.fill, item.geometry.getBounds2D(), "focalPoint"), null);
+                assertTrue(disabled.changed);
+                for (int x : new int[]{500, 2500}) {
+                    FILLSTYLE changed = at(disabled.model, x, 500).fill;
+                    assertEquals(changed.fillStyleType, FILLSTYLE.RADIAL_GRADIENT);
+                    assertEquals(changed.gradient.getClass(), GRADIENT.class);
+                }
+                assertEquals(radial.gradient.getClass(), GRADIENT.class);
+                assertEquals(((FOCALGRADIENT) focal.gradient).focalPoint, 0.375f);
+                result.set(enabled);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        fixture.getSwf().addTag(fixture);
+        byte[] before = fixture.getData();
+        UndoManager undo = new UndoManager();
+        undo.doOperation(new ShapeStyleChangeOperation(fixture, result.get().model, "Focal point", null), fixture.getSwf());
+        byte[] after = ((ShapeTag) fixture.getSwf().getCharacter(fixture.shapeId)).getData();
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        fixture.getSwf().saveTo(bytes);
+        SWF restored = new SWF(new ByteArrayInputStream(bytes.toByteArray()), false);
+        ShapeSelection saved = new ShapeSelection((ShapeTag) restored.getCharacter(fixture.shapeId));
+        assertEquals(((FOCALGRADIENT) at(saved, 500, 500).fill.gradient).focalPoint, 0f);
+        assertEquals(((FOCALGRADIENT) at(saved, 2500, 500).fill.gradient).focalPoint, 0.375f);
+        undo.undo(fixture.getSwf());
+        assertEquals(((ShapeTag) fixture.getSwf().getCharacter(fixture.shapeId)).getData(), before);
+        undo.redo(fixture.getSwf());
+        assertEquals(((ShapeTag) fixture.getSwf().getCharacter(fixture.shapeId)).getData(), after);
+    }
+
+    @Test
+    public void radialStrokeFocalCheckboxChangesOnlyTheGradientType() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                ShapePropertiesPanel panel = new ShapePropertiesPanel(true);
+                LINESTYLE2 line = new LINESTYLE2();
+                line.width = 120;
+                line.hasFillFlag = true;
+                line.fillType = gradient(FILLSTYLE.FOCAL_RADIAL_GRADIENT);
+                line.noHScaleFlag = true;
+                line.noClose = true;
+                panel.setSelectedStroke(line);
+                Object editor = field(panel, "strokeEditor");
+                JTriStateCheckBox checkbox = (JTriStateCheckBox) field(editor, "focalPointCheckBox");
+                assertTrue(checkbox.isVisible());
+                assertEquals(checkbox.getSelectionState(), 2);
+                AtomicInteger edits = new AtomicInteger();
+                panel.setPropertyChangeListener((stroke, property) -> {
+                    assertTrue(stroke);
+                    assertEquals(property, "focalPoint");
+                    edits.incrementAndGet();
+                });
+                checkbox.doClick();
+                LINESTYLE2 changed = panel.applyStrokeChange(line, new Rectangle2D.Double(), "focalPoint");
+                LINESTYLE2 expected = Helper.deepCopy(line);
+                expected.fillType.fillStyleType = FILLSTYLE.RADIAL_GRADIENT;
+                expected.fillType.fieldChanged(null);
+                assertEquals(changed, expected);
+                assertEquals(changed.fillType.gradient.getClass(), GRADIENT.class);
+                panel.setSelectedStroke(changed);
+                checkbox.doClick();
+                LINESTYLE2 enabled = panel.applyStrokeChange(changed, new Rectangle2D.Double(), "focalPoint");
+                assertEquals(enabled.fillType.fillStyleType, FILLSTYLE.FOCAL_RADIAL_GRADIENT);
+                assertEquals(((FOCALGRADIENT) enabled.fillType.gradient).focalPoint, 0f);
+                assertEquals(edits.get(), 2);
+                assertEquals(line.fillType.fillStyleType, FILLSTYLE.FOCAL_RADIAL_GRADIENT);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     @Test
@@ -199,6 +313,19 @@ public class ShapeGradientSettingsTest {
                             linear.doClick();
                             fill = brush ? brushPanel.getFillStyle(new Rectangle2D.Double(0, 0, 1000, 1000)) : styles.getFillStyle();
                             assertEquals(fill.gradient.interpolationMode, GRADIENT.INTERPOLATION_RGB_MODE);
+                        }
+                        JTriStateCheckBox focal = (JTriStateCheckBox) field(editor, "focalPointCheckBox");
+                        assertEquals(focal.isVisible(), gradientType == 3);
+                        if (gradientType == 3) {
+                            focal.doClick();
+                            FILLSTYLE fill = brush ? brushPanel.getFillStyle(null) : styles.getFillStyle();
+                            assertEquals(fill.fillStyleType, FILLSTYLE.FOCAL_RADIAL_GRADIENT);
+                            assertEquals(fill.gradient.getClass(), FOCALGRADIENT.class);
+                            type.setSelectedIndex(2 - (brush ? 1 : 0));
+                            assertFalse(focal.isVisible());
+                            fill = brush ? brushPanel.getFillStyle(null) : styles.getFillStyle();
+                            assertEquals(fill.fillStyleType, FILLSTYLE.LINEAR_GRADIENT);
+                            assertEquals(fill.gradient.getClass(), GRADIENT.class);
                         }
                     }
                 }
