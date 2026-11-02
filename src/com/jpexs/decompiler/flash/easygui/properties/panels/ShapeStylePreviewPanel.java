@@ -25,7 +25,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -41,6 +44,7 @@ public class ShapeStylePreviewPanel extends AbstractPropertiesPanel {
     private final JLabel capLabel = new JLabel();
     private final JLabel joinLabel = new JLabel();
     private final JLabel miterLabel = new JLabel();
+    private final Map<Integer, ImageIcon> bitmapIcons = new HashMap<>();
     private SWF swf;
 
     public ShapeStylePreviewPanel() {
@@ -84,6 +88,7 @@ public class ShapeStylePreviewPanel extends AbstractPropertiesPanel {
 
     public void setShape(ShapeTag shape) {
         swf = shape == null ? null : shape.getSwf();
+        bitmapIcons.clear();
         setSample(null);
     }
 
@@ -164,6 +169,7 @@ public class ShapeStylePreviewPanel extends AbstractPropertiesPanel {
                     ImageTag image = swf == null ? null : swf.getImage(fill.bitmapId);
                     valueLabel.setText(image == null ? EasyStrings.translate("item.image") + " " + fill.bitmapId
                             : new EasyTagNameResolver().getTagName(image));
+                    valueLabel.setIcon(bitmapIcons.computeIfAbsent(fill.bitmapId, id -> ShapePropertiesPanel.FillEditor.bitmapIcon(image)));
                     JPanel options = new JPanel(new BorderLayout());
                     options.add(new JLabel(formatPropertyName("smoothed") + " "
                             + (fill.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fill.fillStyleType == FILLSTYLE.CLIPPED_BITMAP

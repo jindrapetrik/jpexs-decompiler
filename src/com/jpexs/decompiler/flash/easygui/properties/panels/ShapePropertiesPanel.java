@@ -978,36 +978,37 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         }
 
         private ImageIcon bitmapIcon(int id) {
-            return bitmapIcons.computeIfAbsent(id, key -> {
-                int iconSize = BITMAP_PREVIEW_SIZE + 2;
-                BufferedImage preview = new BufferedImage(iconSize, iconSize, BufferedImage.TYPE_INT_ARGB);
-                Graphics2D graphics = preview.createGraphics();
-                try {
-                    for (int y = 1; y <= BITMAP_PREVIEW_SIZE; y += 4) {
-                        for (int x = 1; x <= BITMAP_PREVIEW_SIZE; x += 4) {
-                            graphics.setColor((x / 4 + y / 4) % 2 == 0 ? Color.white : Color.lightGray);
-                            graphics.fillRect(x, y, 4, 4);
-                        }
+            return bitmapIcons.computeIfAbsent(id, key -> bitmapIcon(bitmapSwf == null ? null : bitmapSwf.getImage(key)));
+        }
+
+        static ImageIcon bitmapIcon(ImageTag image) {
+            int iconSize = BITMAP_PREVIEW_SIZE + 2;
+            BufferedImage preview = new BufferedImage(iconSize, iconSize, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics = preview.createGraphics();
+            try {
+                for (int y = 1; y <= BITMAP_PREVIEW_SIZE; y += 4) {
+                    for (int x = 1; x <= BITMAP_PREVIEW_SIZE; x += 4) {
+                        graphics.setColor((x / 4 + y / 4) % 2 == 0 ? Color.white : Color.lightGray);
+                        graphics.fillRect(x, y, 4, 4);
                     }
-                    ImageTag image = bitmapSwf == null ? null : bitmapSwf.getImage(key);
-                    Dimension size = image == null ? null : image.getImageDimension();
-                    if (size != null && size.width > 0 && size.height > 0) {
-                        SerializableImage source = image.getImageCached();
-                        if (source != null) {
-                            double scale = Math.min((double) BITMAP_PREVIEW_SIZE / source.getWidth(), (double) BITMAP_PREVIEW_SIZE / source.getHeight());
-                            int width = Math.max(1, (int) Math.round(source.getWidth() * scale));
-                            int height = Math.max(1, (int) Math.round(source.getHeight() * scale));
-                            graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                            graphics.drawImage(source.getBufferedImage(), (iconSize - width) / 2, (iconSize - height) / 2, width, height, null);
-                        }
-                    }
-                    graphics.setColor(Color.gray);
-                    graphics.drawRect(0, 0, iconSize - 1, iconSize - 1);
-                } finally {
-                    graphics.dispose();
                 }
-                return new ImageIcon(preview);
-            });
+                Dimension size = image == null ? null : image.getImageDimension();
+                if (size != null && size.width > 0 && size.height > 0) {
+                    SerializableImage source = image.getImageCached();
+                    if (source != null) {
+                        double scale = Math.min((double) BITMAP_PREVIEW_SIZE / source.getWidth(), (double) BITMAP_PREVIEW_SIZE / source.getHeight());
+                        int width = Math.max(1, (int) Math.round(source.getWidth() * scale));
+                        int height = Math.max(1, (int) Math.round(source.getHeight() * scale));
+                        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                        graphics.drawImage(source.getBufferedImage(), (iconSize - width) / 2, (iconSize - height) / 2, width, height, null);
+                    }
+                }
+                graphics.setColor(Color.gray);
+                graphics.drawRect(0, 0, iconSize - 1, iconSize - 1);
+            } finally {
+                graphics.dispose();
+            }
+            return new ImageIcon(preview);
         }
 
         public void setSwf(SWF swf) {
