@@ -2486,9 +2486,9 @@ public class AVM2Code implements Cloneable {
                 ForEachInAVM2Item fei = (ForEachInAVM2Item) currentItem;
                 if (fei.expression.object instanceof LocalRegAVM2Item) {
                     int reg = ((LocalRegAVM2Item) fei.expression.object).regIndex;
-                    if (declaredRegisters[reg] == null) {
-                        fei.expression.object = handleDeclareReg(minreg, fei.expression.object, declaredRegisters, declaredSlots, reg);
-                    }
+                    //Also when declared before (var x:XML; ... for each (x in list)), so the
+                    //coerce after nextvalue types a declaration that only saw null so far
+                    fei.expression.object = handleDeclareReg(minreg, fei.expression.object, declaredRegisters, declaredSlots, reg);
                 }
             }
             if (currentItem instanceof ForInAVM2Item) {
