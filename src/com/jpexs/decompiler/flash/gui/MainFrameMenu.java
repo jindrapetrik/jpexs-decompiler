@@ -1895,9 +1895,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
         return true;
     }
 
-    public boolean pauseActionPerformed(ActionEvent evt) {
+    public boolean pauseActionPerformed(ActionEvent evt) {        
         try {
-            DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
+            DebuggerSession session = Main.getCurrentDebugSession();
+            if (session == null) {
+                return true;
+            }
+        
+            DebuggerCommands cmd = session.getCommands();
             //TODO
 
         } catch (IOException ex) {
@@ -1910,8 +1915,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
     public boolean stepOverActionPerformed(ActionEvent evt) {
 
         try {
-
-            DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
+            DebuggerSession session = Main.getCurrentDebugSession();
+            if (session == null) {
+                return true;
+            }
+            
+            DebuggerCommands cmd = session.getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
 
@@ -1925,7 +1934,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public boolean stepIntoActionPerformed(ActionEvent evt) {
         try {
-            DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
+            DebuggerSession session = Main.getCurrentDebugSession();
+            if (session == null) {
+                return true;
+            }
+            DebuggerCommands cmd = session.getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
 
@@ -1940,7 +1953,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public boolean stepOutActionPerformed(ActionEvent evt) {
         try {
-            DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
+            DebuggerSession session = Main.getCurrentDebugSession();
+            if (session == null) {
+                return true;
+            }
+            DebuggerCommands cmd = session.getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
             cmd.stepOut();
@@ -1954,7 +1971,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public boolean continueActionPerformed(ActionEvent evt) {
         try {
-            DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
+            DebuggerSession session = Main.getCurrentDebugSession();
+            if (session == null) {
+                return true;
+            }
+            DebuggerCommands cmd = session.getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
             cmd.sendContinue();

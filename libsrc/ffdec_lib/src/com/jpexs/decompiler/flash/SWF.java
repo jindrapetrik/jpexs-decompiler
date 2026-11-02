@@ -6450,7 +6450,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         Set<Integer> ct = new HashSet<>();
         Map<Integer, Set<Integer>> characterToNeeded = new HashMap<>();
-        getCyclicInTags(readOnlyTags, characterToNeeded);
+        getCyclicInTags(getTags(), characterToNeeded);
 
         for (int chid : characterToNeeded.keySet()) {
             for (int n : characterToNeeded.get(chid)) {

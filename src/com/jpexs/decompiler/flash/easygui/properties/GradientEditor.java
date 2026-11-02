@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.easygui.properties;
 
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
+import com.jpexs.decompiler.flash.types.GRADIENT;
+import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
@@ -55,6 +57,13 @@ public class GradientEditor extends JPanel implements PropertyEditor {
 
     private List<ChangeListener> listeners = new ArrayList<>();
     private final FILTER filter;
+    private final GRADIENT gradient;
+    private boolean indeterminate;
+
+    public void setIndeterminate(boolean indeterminate) {
+        this.indeterminate = indeterminate;
+        repaint();
+    }
 
     private static void drawCheckerboard(Graphics g, int tileSize, Rectangle rect) {
         drawCheckerboard(g, tileSize, rect.x, rect.y, rect.width, rect.height);
@@ -82,7 +91,24 @@ public class GradientEditor extends JPanel implements PropertyEditor {
     }
 
     public GradientEditor(FILTER filter) {
+        this(filter, null);
+    }
+
+    public GradientEditor(GRADIENT gradient) {
+        this(null, gradient);
+    }
+
+    public static JPanel createPreview(GRADIENT gradient) {
+        return new GradientEditor(null, gradient, false);
+    }
+
+    private GradientEditor(FILTER filter, GRADIENT gradient) {
+        this(filter, gradient, true);
+    }
+
+    private GradientEditor(FILTER filter, GRADIENT gradient, boolean editable) {
         this.filter = filter;
+        this.gradient = gradient;
         setLayout(new BorderLayout());
         JPanel miniGradientPanel = new JPanel() {
 
@@ -90,6 +116,11 @@ public class GradientEditor extends JPanel implements PropertyEditor {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
                 drawCheckerboard(g, 4, 0, 0, getWidth(), getHeight());
+                if (indeterminate) {
+                    g.setColor(Color.black);
+                    g.drawString("-", getWidth() / 2, getHeight() - 3);
+                    return;
+                }
 
                 float[] ratiosArr = new float[ratios.size()];
                 for (int i = 0; i < ratios.size(); i++) {
@@ -107,7 +138,9 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         miniGradientPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) {
+                if (editable && GradientEditor.this.isEnabled() && SwingUtilities.isLeftMouseButton(e)) {
+                    List<Color> originalColors = new ArrayList<>(colors);
+                    List<Float> originalRatios = new ArrayList<>(ratios);
                     JDialog dialog = new JDialog();
                     dialog.setUndecorated(true);
                     dialog.setResizable(false);
@@ -132,10 +165,13 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                         @Override
                         public void windowDeactivated(WindowEvent e) {
                             if (!colorDialogDisplayed) {
-                                dialog.setVisible(false);
-                                List<ChangeListener> listeners2 = new ArrayList<>(listeners);
-                                for (ChangeListener l : listeners2) {
-                                    l.change(GradientEditor.this);
+                                dialog.dispose();
+                                repaint();
+                                if (!originalColors.equals(colors) || !originalRatios.equals(ratios)) {
+                                    List<ChangeListener> listeners2 = new ArrayList<>(listeners);
+                                    for (ChangeListener l : listeners2) {
+                                        l.change(GradientEditor.this);
+                                    }
                                 }
                             }
                         }
@@ -172,7 +208,12 @@ public class GradientEditor extends JPanel implements PropertyEditor {
             }
         }
 
-        if (colors.size() == 1) {
+        if (colors.isEmpty()) {
+            colors.add(Color.black);
+            colors.add(Color.white);
+            ratios.add(0f);
+            ratios.add(1f);
+        } else if (colors.size() == 1) {
             colors.add(colors.get(0));
             ratios.set(0, 0f);
             ratios.add(1f);
@@ -198,6 +239,15 @@ public class GradientEditor extends JPanel implements PropertyEditor {
             GRADIENTGLOWFILTER glow = (GRADIENTGLOWFILTER) filter;
             glow.gradientColors = gradientColors;
             glow.gradientRatio = gradientRatio;
+        } else if (gradient != null) {
+            gradient.gradientRecords = new GRADRECORD[ratios.size()];
+            for (int i = 0; i < ratios.size(); i++) {
+                GRADRECORD record = new GRADRECORD();
+                record.inShape3 = true;
+                record.ratio = gradientRatio[i];
+                record.color = gradientColors[i];
+                gradient.gradientRecords[i] = record;
+            }
         }
         return true;
     }
@@ -210,6 +260,14 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         } else if (filter instanceof GRADIENTGLOWFILTER) {
             GRADIENTGLOWFILTER glow = (GRADIENTGLOWFILTER) filter;
             loadParams(glow.gradientColors, glow.gradientRatio);
+        } else if (gradient != null) {
+            RGBA[] gradientColors = new RGBA[gradient.gradientRecords.length];
+            int[] gradientRatios = new int[gradient.gradientRecords.length];
+            for (int i = 0; i < gradient.gradientRecords.length; i++) {
+                gradientColors[i] = new RGBA(gradient.gradientRecords[i].color);
+                gradientRatios[i] = gradient.gradientRecords[i].ratio;
+            }
+            loadParams(gradientColors, gradientRatios);
         } else {
             throw new RuntimeException("Invalid FILTER");
         }
@@ -283,6 +341,9 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                             }
                         }
 
+                        if (colors.size() >= (gradient == null ? 255 : 15)) {
+                            return;
+                        }
                         float newRatio = (e.getX() - COLOR_SIZE / 2) / (float) (getWidth() - COLOR_SIZE);
                         if (newRatio >= 0 && newRatio <= 1) {
                             synchronized (GradientEditorPanel.this) {
@@ -316,7 +377,11 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                                     ratio2 = 1f;
                                 }
                                 ratios.add(newIndex, newRatio);
-                                float ratioDelta = (newRatio - ratio1) / (ratio2 - ratio1);
+                                if (color1 == null) {
+                                    color1 = color2;
+                                    ratio1 = 0f;
+                                }
+                                float ratioDelta = ratio2.equals(ratio1) ? 0 : (newRatio - ratio1) / (ratio2 - ratio1);
                                 Color newColor = interpolate(color1, color2, ratioDelta);
 
                                 colors.add(newIndex, newColor);

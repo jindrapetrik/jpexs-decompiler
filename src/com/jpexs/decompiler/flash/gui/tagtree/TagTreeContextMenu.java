@@ -1996,7 +1996,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 showInTagListViewTagMenuItem.setVisible(true);
             }
 
-            if (firstItem instanceof Timelined) {
+            if ((firstItem instanceof Timelined) || (firstItem instanceof ShapeTag)) {
                 showInEasyViewTagMenuItem.setVisible(true);
             }
             if (((firstItem instanceof DrawableTag)
@@ -5504,11 +5504,15 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (item instanceof TagScript) {
             item = ((TagScript) item).getTag();
         }
-        if (!(item instanceof Timelined)) {
+        if (!(item instanceof Timelined) && !(item instanceof ShapeTag)) {
             return;
         }
         mainPanel.showView(MainPanel.VIEW_EASY);
-        mainPanel.easyPanel.setTimelined((Timelined) item);
+        if (item instanceof ShapeTag) {            
+            mainPanel.easyPanel.editShape((ShapeTag) item);
+        } else {
+            mainPanel.easyPanel.setTimelined((Timelined) item);        
+        }
         mainPanel.updateMenu();
     }
 

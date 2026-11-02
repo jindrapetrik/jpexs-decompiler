@@ -2439,7 +2439,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         );
         ILINESTYLE lineStyle = (ILINESTYLE) selectedLineStyle;
         Shape lineArea = linePath.getCurrentPoint() == null ? null : createLineStyleArea(linePath, lineStyle);
-        displayEditImagePanel.setHilightedLine(lineArea, linePath, lineStyle.getWidth());
+        displayEditImagePanel.setHilightedLine(lineArea, linePath, lineStyle);
         return true;
     }
 
@@ -2599,7 +2599,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             return new ImagePanel.LineHilight(
                     createLineStyleArea(linePath, currentLineStyle),
                     linePath,
-                    currentLineStyle.getWidth()
+                    currentLineStyle
             );
         }));
         return true;
@@ -2720,7 +2720,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         });
         replaceMorphShapeUpdateBoundsButton.setVisible(false);
 
-        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("importshape16"));
+        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("importshapeupdatebounds16"));
         replaceShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
         replaceShapeUpdateBoundsButton.addActionListener(new ActionListener() {
             @Override
@@ -3994,6 +3994,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         int y = 0;
 
         List<DisplayPoint> points = new ArrayList<>();
+        List<Integer> pathStarts = new ArrayList<>();
         boolean wasMoveTo = false;
         StyleChangeRecord lastStyleChangeRecord = null;
         for (SHAPERECORD rec : selectedRecords) {
@@ -4023,6 +4024,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 lastStyleChangeRecord = scr;
                 if (scr.stateMoveTo) {
                     DisplayPoint point = new DisplayPoint(scr.moveDeltaX, scr.moveDeltaY);
+                    pathStarts.add(points.size());
                     points.add(point);
                     wasMoveTo = true;
                 }
@@ -4031,7 +4033,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             x = rec.changeX(x);
             y = rec.changeY(y);
         }
-        displayEditImagePanel.setHilightedPoints(points);
+        displayEditImagePanel.setHilightedPoints(points, pathStarts);
     }
 
     private void transformDisplayEditTagButtonActionPerformed(ActionEvent evt) {

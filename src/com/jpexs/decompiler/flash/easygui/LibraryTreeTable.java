@@ -132,7 +132,9 @@ public class LibraryTreeTable extends JTreeTable {
                     }
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode) getValueAt(selectedRow, 0);
                     Object obj = node.getUserObject();
-                    if (obj instanceof Timelined) {
+                    if (obj instanceof ShapeTag) {
+                        easySwfPanel.editShape((ShapeTag) obj);
+                    } else if (obj instanceof Timelined) {
                         easySwfPanel.setTimelined((Timelined) obj);
                     }
                 }
