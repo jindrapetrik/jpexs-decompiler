@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.pushingpixels.flamingo.api.common.CommandToggleButtonGroup;
+import org.pushingpixels.flamingo.api.common.JCommandButton;
 import org.pushingpixels.flamingo.api.common.JCommandToggleButton;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.api.ribbon.JRibbonBand;
@@ -37,7 +38,8 @@ final class ShapeToolsRibbon {
     private final CommandToggleButtonGroup tools = new CommandToggleButtonGroup();
     private final Map<ShapeTool, JCommandToggleButton> buttons = new EnumMap<>(ShapeTool.class);
 
-    ShapeToolsRibbon(JRibbon ribbon, Function<String, String> translate, Consumer<ShapeTool> selectTool) {
+    ShapeToolsRibbon(JRibbon ribbon, Function<String, String> translate, Consumer<ShapeTool> selectTool,
+            Runnable replace, Runnable replaceUpdateBounds, Runnable export) {
         this.ribbon = ribbon;
         tools.setAllowsClearingSelection(false);
         JRibbonBand drawing = createBand("drawing", translate, selectTool,
@@ -46,10 +48,21 @@ final class ShapeToolsRibbon {
                 ShapeTool.PAINT, ShapeTool.INK, ShapeTool.GRADIENT_TRANSFORM, ShapeTool.EYEDROPPER);
         JRibbonBand modify = createBand("modify", translate, selectTool,
                 ShapeTool.SELECT, ShapeTool.LASSO, ShapeTool.EDIT_POINTS, ShapeTool.ANCHOR_POINT);
-        task = new RibbonTask(translate.apply("menu.shapes"), drawing, color, modify);
+        JRibbonBand transfer = new JRibbonBand(translate.apply("menu.shapes.transfer"), View.getResizableIcon("importshape32", 32));
+        addTransferButton(transfer, translate.apply("menu.shapes.transfer.replace"), "importshape32", replace);
+        addTransferButton(transfer, translate.apply("menu.shapes.transfer.replaceUpdateBounds"), "importshapeupdatebounds32", replaceUpdateBounds);
+        addTransferButton(transfer, translate.apply("menu.shapes.transfer.export"), "export32", export);
+        transfer.setResizePolicies(CoreRibbonResizePolicies.getCorePoliciesNone(transfer));
+        task = new RibbonTask(translate.apply("menu.shapes"), drawing, color, modify, transfer);
         context = new RibbonContextualTaskGroup("", new Color(0, 128, 0), task);
         ribbon.addContextualTaskGroup(context);
         tools.setSelected(buttons.get(ShapeTool.SELECT), true);
+    }
+
+    private static void addTransferButton(JRibbonBand band, String title, String icon, Runnable action) {
+        JCommandButton button = new JCommandButton(title, View.getResizableIcon(icon, 32));
+        button.addActionListener(event -> action.run());
+        band.addCommandButton(button, RibbonElementPriority.TOP);
     }
 
     private JRibbonBand createBand(String id, Function<String, String> translate, Consumer<ShapeTool> selectTool, ShapeTool... modes) {

@@ -2135,6 +2135,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return selection == null ? tagTree.getSelection(openable) : tagTree.getSelectionAndAllSubs(openable, selection);
         } else if (currentView == MainPanel.VIEW_TAGLIST) {
             return selection == null ? tagListTree.getSelection(openable) : tagListTree.getSelectionAndAllSubs(openable, selection);
+        } else if (currentView == MainPanel.VIEW_EASY && selection != null) {
+            // Simple editor actions supply complete character tags directly;
+            // their export does not depend on an initialized resource tree.
+            List<TreeItem> result = new ArrayList<>();
+            for (TreeItem item : selection) {
+                if (openable == null || item.getOpenable() == openable) {
+                    result.add(item);
+                }
+            }
+            return result;
         }
         return new ArrayList<>();
     }
@@ -4583,7 +4593,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         View.checkAccess();
 
         final SWF swf = getCurrentSwf();
-        List<TreeItem> sel = getCurrentTree().getAllSubsForItems(selected);
+        List<TreeItem> sel = currentView == VIEW_EASY ? getSelection(null, selected) : getCurrentTree().getAllSubsForItems(selected);
         if (!onlySel) {
             sel = null;
         } else if (sel.isEmpty()) {

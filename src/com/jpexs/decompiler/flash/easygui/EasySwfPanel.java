@@ -829,6 +829,49 @@ public class EasySwfPanel extends JPanel {
         return shapeTool;
     }
 
+    public void replaceShape(boolean updateBounds) {
+        if (editingShape == null || Main.isWorking()) {
+            return;
+        }
+        prepareShapeTransfer();
+        ImagePanel.ShapeEditContext context = stagePanel.getShapeEditContext();
+        Point2D origin = stagePanel.toTimelinedPoint(new Point(0, 0));
+        SWF swf = editingShape.getSwf();
+        try {
+            ShapeReplaceOperation operation = new ShapeReplaceOperation(editingShape,
+                    mainPanel.translate(updateBounds ? "button.replaceNoFill" : "button.replace"), (tag, forward) -> {
+                        mainPanel.refreshTree(tag.getSwf());
+                        editShape(tag, context);
+                        if (context == null && !stagePanel.getZoom().fit) {
+                            stagePanel.setViewPosition(origin);
+                        }
+                        libraryTreeTable.setSwf(null);
+                        libraryTreeTable.setSwf(tag.getSwf());
+                    });
+            if (mainPanel.replace(Collections.singletonList(editingShape), false, !updateBounds) && operation.finishImport()) {
+                undoManager.doOperation(operation, swf);
+            }
+        } catch (IOException | InterruptedException ex) {
+            logShapeEditFailure(ex);
+        }
+    }
+
+    public void exportShape() {
+        if (editingShape == null || Main.isWorking()) {
+            return;
+        }
+        prepareShapeTransfer();
+        mainPanel.exportSelectionActionPerformed(Collections.singletonList(editingShape));
+    }
+
+    private void prepareShapeTransfer() {
+        if (penTool.isPending()) {
+            penTool.finish(false);
+        }
+        finishPointEdit(false);
+        finishFloatingSelection();
+    }
+
     public void setShapeTool(ShapeTool tool) {
         Objects.requireNonNull(tool);
         if (shapeTool != tool) {

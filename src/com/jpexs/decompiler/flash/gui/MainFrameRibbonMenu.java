@@ -119,7 +119,10 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     public void createMenuBar() {
         super.createMenuBar();
         shapeTools = new ShapeToolsRibbon(ribbon, this::translate,
-                tool -> mainFrame.getPanel().getEasyPanel().setShapeTool(tool));
+                tool -> mainFrame.getPanel().getEasyPanel().setShapeTool(tool),
+                () -> mainFrame.getPanel().getEasyPanel().replaceShape(false),
+                () -> mainFrame.getPanel().getEasyPanel().replaceShape(true),
+                () -> mainFrame.getPanel().getEasyPanel().exportShape());
     }
 
     @Override

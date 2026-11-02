@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.SwingUtilities;
 import org.pushingpixels.flamingo.api.common.JCommandButton;
@@ -33,7 +34,7 @@ import org.testng.annotations.Test;
 public class ShapeToolsRibbonTest {
 
     @Test
-    public void sharesOneRequiredSelectionAcrossAllThreeBands() throws Exception {
+    public void sharesToolSelectionAndDispatchesWholeShapeTransferActions() throws Exception {
         if (GraphicsEnvironment.isHeadless()) {
             throw new SkipException("Ribbon frames require a graphics environment");
         }
@@ -48,13 +49,17 @@ public class ShapeToolsRibbonTest {
                 ribbon.addTask(file);
                 ResourceBundle translations = ResourceBundle.getBundle("com.jpexs.decompiler.flash.gui.locales.MainFrame", Locale.ENGLISH);
                 AtomicReference<ShapeTool> selected = new AtomicReference<>(ShapeTool.SELECT);
-                ShapeToolsRibbon tools = new ShapeToolsRibbon(ribbon, translations::getString, selected::set);
+                AtomicInteger replace = new AtomicInteger();
+                AtomicInteger updateBounds = new AtomicInteger();
+                AtomicInteger export = new AtomicInteger();
+                ShapeToolsRibbon tools = new ShapeToolsRibbon(ribbon, translations::getString, selected::set,
+                        replace::incrementAndGet, updateBounds::incrementAndGet, export::incrementAndGet);
                 RibbonContextualTaskGroup context = ribbon.getContextualTaskGroup(0);
                 RibbonTask task = context.getTask(0);
                 Assert.assertFalse(ribbon.isVisible(context));
-                Assert.assertEquals(task.getBandCount(), 3);
+                Assert.assertEquals(task.getBandCount(), 4);
                 List<JCommandToggleButton> buttons = new ArrayList<>();
-                int[] counts = {5, 4, 4};
+                int[] counts = {5, 4, 4, 0};
                 for (int i = 0; i < task.getBandCount(); i++) {
                     int before = buttons.size();
                     for (Component component : task.getBand(i).getControlPanel().getComponents()) {
@@ -64,6 +69,24 @@ public class ShapeToolsRibbonTest {
                     }
                     Assert.assertEquals(buttons.size() - before, counts[i]);
                 }
+                List<JCommandButton> transfer = new ArrayList<>();
+                for (Component component : task.getBand(3).getControlPanel().getComponents()) {
+                    if (component instanceof JCommandButton) {
+                        transfer.add((JCommandButton) component);
+                    }
+                }
+                Assert.assertEquals(transfer.size(), 3);
+                Assert.assertEquals(transfer.get(0).getText(), "Replace");
+                Assert.assertEquals(transfer.get(1).getText(), "Replace & Update bounds");
+                Assert.assertEquals(transfer.get(2).getText(), "Export");
+                for (JCommandButton button : transfer) {
+                    Assert.assertNotNull(button.getIcon());
+                    button.doActionClick();
+                }
+                Assert.assertEquals(replace.get(), 1);
+                Assert.assertEquals(updateBounds.get(), 1);
+                Assert.assertEquals(export.get(), 1);
+                Assert.assertSame(selected.get(), ShapeTool.SELECT);
                 assertSelected(buttons, "Select");
                 tools.update(true, selected.get());
                 Assert.assertTrue(ribbon.isVisible(context));

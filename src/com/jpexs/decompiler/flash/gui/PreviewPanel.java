@@ -2720,7 +2720,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         });
         replaceMorphShapeUpdateBoundsButton.setVisible(false);
 
-        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("importshape16"));
+        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("importshapeupdatebounds16"));
         replaceShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
         replaceShapeUpdateBoundsButton.addActionListener(new ActionListener() {
             @Override

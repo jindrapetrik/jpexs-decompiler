@@ -100,6 +100,14 @@ public class EasyPanel extends JPanel {
     public void setShapeTool(ShapeTool tool) {
         easySwfPanel.setShapeTool(tool);
     }
+
+    public void replaceShape(boolean updateBounds) {
+        easySwfPanel.replaceShape(updateBounds);
+    }
+
+    public void exportShape() {
+        easySwfPanel.exportShape();
+    }
     
     public void setTimelined(Timelined tim) {
         setSwf(tim.getSwf());
