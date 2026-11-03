@@ -241,7 +241,9 @@
             comment="${app.description.short}"
             exec="/usr/bin/${app.package}"
             icon="/usr/share/java/${app.package}/icon.png"
-            categories="Development;Network;Utility;WebDevelopment;Java"
+            categories="Development;Utility;WebDevelopment;Debugger;IDE;Java"
+            mimeType="application/x-shockwave-flash"
+            type="Application"
         />
         <deb 
             package="${app.package}"
