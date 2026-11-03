@@ -3293,6 +3293,31 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
+    protected Object backupWalkedLocalData(BaseLocalData localData) {
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        if (aLocalData.parsedExceptions == null || aLocalData.parsedExceptionIds == null) {
+            return null;
+        }
+        //checkTry marks the exceptions it walks as parsed
+        return new Object[]{new ArrayList<>(aLocalData.parsedExceptions), new ArrayList<>(aLocalData.parsedExceptionIds)};
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void restoreWalkedLocalData(BaseLocalData localData, Object backup) {
+        if (backup == null) {
+            return;
+        }
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        Object[] lists = (Object[]) backup;
+        //the lists are shared by the local data copies, so restore them in place
+        aLocalData.parsedExceptions.clear();
+        aLocalData.parsedExceptions.addAll((List<ABCException>) lists[0]);
+        aLocalData.parsedExceptionIds.clear();
+        aLocalData.parsedExceptionIds.addAll((List<Integer>) lists[1]);
+    }
+
+    @Override
     public AVM2LocalData prepareBranchLocalData(BaseLocalData localData) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         AVM2LocalData ret = new AVM2LocalData(aLocalData);
