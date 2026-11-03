@@ -22,8 +22,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * A local declared as undefined takes the type its assignments coerce to, and
- * stays untyped when they do not coerce.
+ * A local declared as undefined, or as a numeric default (0, NaN), takes the
+ * type its assignments coerce or convert to, and stays as it is when they do not.
  *
  * @see testdata/as3_undefined_local_coerce_type/README.md
  */
@@ -50,6 +50,26 @@ public class ActionScript3UndefinedLocalCoerceTypeDecompileTest extends ActionSc
                 + "}\r\n"
                 + "untyped = chain.length;\r\n"
                 + "return chain.length + untyped;\r\n",
+                false);
+    }
+
+    @Test
+    public void testNumericDefaultLocalCoerceType() {
+        decompileMethod("undefined_local_coerce_type", "testNumericDefaultLocalCoerceType",
+                "var cv:uint = 0;\r\n"
+                + "var k:int = 0;\r\n"
+                + "var result:uint = 0;\r\n"
+                + "for(k = 1; k < mask.length; )\r\n"
+                + "{\r\n"
+                + "cv = mask.charCodeAt(k) - \"x\".charCodeAt(0);\r\n"
+                + "if(cv > 2)\r\n"
+                + "{\r\n"
+                + "cv = 3;\r\n"
+                + "}\r\n"
+                + "result |= 1 << cv;\r\n"
+                + "k++;\r\n"
+                + "}\r\n"
+                + "return result;\r\n",
                 false);
     }
 }

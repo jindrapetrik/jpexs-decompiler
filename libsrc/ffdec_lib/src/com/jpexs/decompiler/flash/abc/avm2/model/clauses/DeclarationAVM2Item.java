@@ -62,6 +62,12 @@ public class DeclarationAVM2Item extends AVM2Item {
     public boolean typeIsUndefined = false;
 
     /**
+     * Declared by a numeric default (0, NaN): the next assignment that
+     * converts to int, uint or Number tells the type.
+     */
+    public boolean typeIsNumericDefault = false;
+
+    /**
      * Show value
      */
     public boolean showValue = true;
