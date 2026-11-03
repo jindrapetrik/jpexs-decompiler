@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
@@ -223,6 +224,33 @@ public class SwfToSwcExporter {
         return new SWF(new ByteArrayInputStream(swfOrigBaos.toByteArray()), Configuration.parallelSpeedUp.get(), false);
     }
 
+    /**
+     * Removes the scripts that define none of the classes.
+     *
+     * @param swf SWF
+     * @param classNames Classes to keep, in the -selectclass format
+     */
+    private static void keepScripts(SWF swf, List<String> classNames) {
+        Set<String> keptScripts = new HashSet<>();
+        for (ScriptPack pack : swf.getScriptPacksByClassNames(classNames)) {
+            keptScripts.add(System.identityHashCode(pack.abc) + ":" + pack.scriptIndex);
+        }
+        for (ABCContainerTag abcTag : swf.getAbcList()) {
+            ABC abc = abcTag.getABC();
+            boolean modified = false;
+            for (int i = 0; i < abc.script_info.size(); i++) {
+                if (!keptScripts.contains(System.identityHashCode(abc) + ":" + i)) {
+                    abc.script_info.get(i).delete(abc, true);
+                    modified = true;
+                }
+            }
+            if (modified) {
+                abc.pack();
+                ((Tag) abcTag).setModified(true);
+            }
+        }
+    }
+
     private static void printDelay(String title, long t1, long t2) {
         //System.out.println("time " + title + ": " + (t2 - t1));
     }
@@ -236,11 +264,29 @@ public class SwfToSwcExporter {
      * @throws InterruptedException On interrupt
      */
     public void exportSwf(SWF swf, File outSwcFile, boolean skipDependencies) throws IOException, InterruptedException {
+        exportSwf(swf, outSwcFile, skipDependencies, null);
+    }
+
+    /**
+     * Exports SWF to SWC.
+     * @param swf SWF to export
+     * @param outSwcFile Output SWC file
+     * @param skipDependencies Skip dependencies
+     * @param classNames Classes to keep, in the -selectclass format, the
+     * scripts of the other ones are removed. Null to keep all.
+     * @throws IOException On I/O error
+     * @throws InterruptedException On interrupt
+     */
+    public void exportSwf(SWF swf, File outSwcFile, boolean skipDependencies, List<String> classNames) throws IOException, InterruptedException {
         long t4 = 0;
         //Make local copy of SWF so we do not modify original
         try {
             long t1 = System.currentTimeMillis();
             swf = recompileSWF(swf);
+            if (classNames != null) {
+                keepScripts(swf, classNames);
+                swf = recompileSWF(swf);
+            }
             long t2 = System.currentTimeMillis();
             printDelay("swc.recompile", t1, t2);
 
