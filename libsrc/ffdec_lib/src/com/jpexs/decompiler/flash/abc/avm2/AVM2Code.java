@@ -248,6 +248,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXAttrIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXElemIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConstructSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
@@ -314,6 +315,7 @@ import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ForItem;
+import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -2675,6 +2677,40 @@ public class AVM2Code implements Cloneable {
     }
 
     /**
+     * Moves the code after an early return of a constructor into the negated
+     * condition when super() follows it, since AS3 does not allow super() after
+     * a return. Haxe starts its constructors with
+     * if (flash.Boot.skip_constructor) return;
+     *
+     * @param list Constructor commands
+     */
+    private static void moveSuperOutOfEarlyReturn(List<GraphTargetItem> list) {
+        int superPos = -1;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) instanceof ConstructSuperAVM2Item) {
+                superPos = i;
+                break;
+            }
+        }
+        for (int i = 0; i < superPos; i++) {
+            if (!(list.get(i) instanceof IfItem)) {
+                continue;
+            }
+            IfItem ifi = (IfItem) list.get(i);
+            if (ifi.onFalse.isEmpty() && ifi.onTrue.size() == 1 && (ifi.onTrue.get(0) instanceof ReturnVoidAVM2Item)) {
+                List<GraphTargetItem> rest = new ArrayList<>();
+                while (list.size() > i + 1) {
+                    rest.add(0, list.remove(list.size() - 1));
+                }
+                list.remove(i);
+                moveSuperOutOfEarlyReturn(rest);
+                list.add(new IfItem(ifi.dialect, ifi.getSrc(), ifi.getLineStartItem(), ifi.expression.invert(null), rest, new ArrayList<>()));
+                return;
+            }
+        }
+    }
+
+    /**
      * Converts code to source - list of GraphTargetItems.
      *
      * @param usedDeobfuscations Used deobfuscations
@@ -2916,6 +2952,9 @@ public class AVM2Code implements Cloneable {
         }
         if ((list.size() > lastPos) && (list.get(lastPos) instanceof ReturnVoidAVM2Item)) {
             list.remove(lastPos);
+        }
+        if (initializerType == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER) {
+            moveSuperOutOfEarlyReturn(list);
         }
         if (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
             if ((list.size() > lastPos) && (list.get(lastPos) instanceof ReturnValueAVM2Item)) {
