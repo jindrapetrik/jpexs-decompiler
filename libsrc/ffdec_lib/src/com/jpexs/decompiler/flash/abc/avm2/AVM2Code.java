@@ -258,7 +258,9 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
@@ -2293,16 +2295,44 @@ public class AVM2Code implements Cloneable {
             isNull = true;
         }
 
+        //ASC2 declares a typed local without initializer as pushundefined; setlocal (var chain:Vector.<T>;),
+        //and so is an untyped var x;. Only a coerce in the next assignment tells the type
+        boolean isUndefined = !(assignment instanceof LocalRegAVM2Item) && !(assignment instanceof GetSlotAVM2Item)
+                && assignment.value != null && (assignment.value instanceof UndefinedAVM2Item);
+        boolean isCoerced = (assignment instanceof LocalRegAVM2Item)
+                || (assignment.value instanceof ConvertAVM2Item) || (assignment.value instanceof CoerceAVM2Item);
+        if (isUndefined) {
+            vtype = TypeItem.UNBOUNDED;
+        }
+        //var cv:uint; is pushbyte 0; setlocal, typed int, then each assignment converts to uint
+        boolean isNumericDefault = !(assignment instanceof LocalRegAVM2Item) && !(assignment instanceof GetSlotAVM2Item)
+                && ((assignment.value instanceof IntegerValueAVM2Item && Integer.valueOf(0).equals(((IntegerValueAVM2Item) assignment.value).value))
+                || (assignment.value instanceof NanAVM2Item));
+
         if (declaredRegisters[reg] == null) {
             declaredRegisters[reg] = new DeclarationAVM2Item(assignment, vtype);
             if (assignment instanceof SetTypeAVM2Item) {
                 ((SetTypeAVM2Item) assignment).setDeclaration(declaredRegisters[reg]);
             }
             declaredRegisters[reg].typeIsNull = isNull;
+            declaredRegisters[reg].typeIsUndefined = isUndefined;
+            declaredRegisters[reg].typeIsNumericDefault = isNumericDefault;
             return declaredRegisters[reg];
         }
 
-        if (declaredRegisters[reg].typeIsNull) {
+        if (declaredRegisters[reg].typeIsNumericDefault && !isNumericDefault) {
+            declaredRegisters[reg].typeIsNumericDefault = false;
+            if (isCoerced && (vtype.equals(TypeItem.INT) || vtype.equals(TypeItem.UINT) || vtype.equals(TypeItem.NUMBER))) {
+                declaredRegisters[reg].type = vtype;
+            }
+        }
+
+        if (declaredRegisters[reg].typeIsUndefined) {
+            if (!isUndefined) {
+                declaredRegisters[reg].typeIsUndefined = false;
+                declaredRegisters[reg].type = isCoerced ? vtype : TypeItem.UNBOUNDED;
+            }
+        } else if (declaredRegisters[reg].typeIsNull) {
             declaredRegisters[reg].type = vtype;
             declaredRegisters[reg].typeIsNull = isNull;
         } else if (declaredRegisters[reg].type == TypeItem.UNBOUNDED) {
