@@ -36,6 +36,12 @@ public class ExceptionAVM2Item extends AVM2Item {
     public ABCException exception;
 
     /**
+     * Whether the exception, without type and name, is caught as any value
+     * rather than by a finally
+     */
+    public boolean catchAll = false;
+
+    /**
      * Constructor.
      *
      * @param exception Exception
