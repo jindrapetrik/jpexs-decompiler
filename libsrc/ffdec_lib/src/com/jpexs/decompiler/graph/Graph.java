@@ -1251,6 +1251,24 @@ public class Graph {
         removeUnreadSetTemporaries(list, read);
     }
 
+    private void removeUnreadSetTemporaries(List<GraphTargetItem> list, Set<Integer> read) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof SetTemporaryItem) {
+                SetTemporaryItem st = (SetTemporaryItem) item;
+                if (!read.contains(st.tempIndex) && st.value != null && !st.value.hasSideEffect()) {
+                    list.remove(i);
+                    continue;
+                }
+            }
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    removeUnreadSetTemporaries(sub, read);
+                }
+            }
+        }
+    }
+
     private void collectTempReads(GraphTargetItem item, Set<Integer> read, Set<GraphTargetItem> visited) {
         if (item == null || !visited.add(item)) {
             return;
@@ -1283,24 +1301,6 @@ public class Graph {
      */
     protected List<GraphTargetItem> getPrintedChildren(GraphTargetItem item) {
         return null;
-    }
-
-    private void removeUnreadSetTemporaries(List<GraphTargetItem> list, Set<Integer> read) {
-        for (int i = list.size() - 1; i >= 0; i--) {
-            GraphTargetItem item = list.get(i);
-            if (item instanceof SetTemporaryItem) {
-                SetTemporaryItem st = (SetTemporaryItem) item;
-                if (!read.contains(st.tempIndex) && st.value != null && !st.value.hasSideEffect()) {
-                    list.remove(i);
-                    continue;
-                }
-            }
-            if (item instanceof Block) {
-                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
-                    removeUnreadSetTemporaries(sub, read);
-                }
-            }
-        }
     }
 
     private boolean containsPopItems(List<GraphTargetItem> list) {
