@@ -1797,6 +1797,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         for (SWF swf : swfsToClose) {
+            easyPanel.swfClosed(swf);
             swf.clearTagSwfs();
             saveBreakpoints(swf);
             ABCExplorerDialog abcExportDialog = abcExplorerDialogs.get(swf);
@@ -1934,6 +1935,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         for (SWF swf : swfsToClose) {
+            easyPanel.swfClosed(swf);
             swf.clearTagSwfs();
         }
 

@@ -124,4 +124,8 @@ public class EasyPanel extends JPanel {
         setSwfs(new ArrayList<>());
         easySwfPanel.dispose();
     }
+
+    public void swfClosed(SWF swf) {
+        easySwfPanel.swfClosed(swf);
+    }
 }

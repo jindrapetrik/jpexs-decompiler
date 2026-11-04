@@ -108,7 +108,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     private final List<Runnable> changeListeners = new ArrayList<>();
 
-    public Set<Point> cursor = new LinkedHashSet<>();        
+    private final Set<Point> cursor = new LinkedHashSet<>();
     private final EasySwfPanel swfPanel;
 
     /*private int frame = 0;
@@ -509,13 +509,33 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         return cursor.iterator().next().y;
     }
 
+    private Set<Integer> getLockedDepths() {
+        return swfPanel.getLockedDepths(timeline == null ? null : timeline.timelined);
+    }
+
+    void removeLockedSelection() {
+        int frame = getFirstFrame();
+        Set<Integer> locked = getLockedDepths();
+        if (cursor.removeIf(cell -> locked.contains(cell.y))) {
+            if (cursor.isEmpty()) {
+                cursor.add(new Point(frame, 0));
+            }
+            repaint();
+            fireFrameSelected(getFirstFrame(), getDepthsAtFirstFrame());
+        }
+    }
+
     private void rectSelect(int frame, int depth, int endFrame, int endDepth) {
         int x1 = Math.min(frame, endFrame);
         int x2 = Math.max(frame, endFrame);
         int y1 = Math.min(depth, endDepth);
         int y2 = Math.max(depth, endDepth);
+        Set<Integer> locked = getLockedDepths();
         Set<Point> newCursor = new LinkedHashSet<>();
         for (int y = y1; y <= y2; y++) {
+            if (locked.contains(y)) {
+                continue;
+            }
             for (int x = x1; x <= x2; x++) {
                 newCursor.add(new Point(x, y));
             }
@@ -538,8 +558,10 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         this.endDepth = endDepth;*/
         scrollRectToVisible(getFrameBounds(frame, depth));
         List<Integer> depths = new ArrayList<>();
-        for (int d = depth; d <= endDepth; d++) {
-            depths.add(d);
+        for (int d = y1; d <= y2; d++) {
+            if (!locked.contains(d)) {
+                depths.add(d);
+            }
         }
         fireFrameSelected(frame, depths);
     }
@@ -558,11 +580,14 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         //rectSelect(frame, depth, frame, depth);
 
         Set<Point> newCursor = new LinkedHashSet<>();
+        Set<Integer> locked = getLockedDepths();
+        List<Integer> selectableDepths = new ArrayList<>(depths);
+        selectableDepths.removeAll(locked);
 
-        for (int d : depths) {
+        for (int d : selectableDepths) {
             newCursor.add(new Point(frame, d));
         }
-        if (depths.isEmpty()) {
+        if (selectableDepths.isEmpty()) {
             newCursor.add(new Point(frame, 0));
         }
 
@@ -581,7 +606,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         this.endFrame = frame;
          */
         if (notify) {
-            fireFrameSelected(frame, depths);
+            fireFrameSelected(frame, selectableDepths);
         }
     }
 
@@ -599,6 +624,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         Point p = e.getPoint();
         p.x = p.x / getFrameWidth();
         p.y = p.y / FRAME_HEIGHT;
+        if (getLockedDepths().contains(p.y) && (!shiftDown || SwingUtilities.isRightMouseButton(e))) {
+            return;
+        }
         /*if (p.x >= timeline.getFrameCount()) {
             p.x = timeline.getFrameCount() - 1;
         }*/
@@ -724,6 +752,11 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     private void replaceSelectedContent(Set<Point> cells) {
+        Set<Integer> locked = getLockedDepths();
+        cells.removeIf(cell -> locked.contains(cell.y));
+        if (cells.isEmpty()) {
+            return;
+        }
         Timelined timelined = timeline.timelined;
         Set<Integer> originalIds = new LinkedHashSet<>();
         for (Point cell : cells) {
@@ -741,8 +774,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         ReplaceTimelineContentOperation operation = new ReplaceTimelineContentOperation(swfPanel, timeline,
                 cells, replacement, () -> {
                     timeline = timelined.getTimeline();
-                    cursor.clear();
-                    cursor.addAll(selection);
+                    restoreSelection(selection);
                     refresh();
                     fireChanged();
                     fireFrameSelected(getFirstFrame(), getDepthsAtFirstFrame());
@@ -760,6 +792,19 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             }
         }
         return depths;
+    }
+
+    private void restoreSelection(Set<Point> selection) {
+        Set<Integer> locked = getLockedDepths();
+        cursor.clear();
+        for (Point cell : selection) {
+            if (!locked.contains(cell.y)) {
+                cursor.add(cell);
+            }
+        }
+        if (cursor.isEmpty() && !selection.isEmpty()) {
+            cursor.add(new Point(selection.iterator().next().x, 0));
+        }
     }
 
     private Set<Point> getBackOrderedCursor() {
@@ -1024,8 +1069,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             private void refreshAfterEdit(Set<Point> selection) {
                 timeline = timelined.getTimeline();
                 timelined.getSwf().clearImageCache();
-                cursor.clear();
-                cursor.addAll(selection);
+                restoreSelection(selection);
                 refresh();
                 fireChanged();
                 fireFrameSelected(getFirstFrame(), getDepthsAtFirstFrame());
@@ -1060,6 +1104,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (timeline == null) {
+            return;
+        }
         Point firstCursorItem = cursor.isEmpty() ? new Point(1, 1) : cursor.iterator().next();
         switch (e.getKeyCode()) {
             case 37: //left
@@ -1073,15 +1120,22 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 }
                 break;
             case 38: //up
-                if (firstCursorItem.y > 0) {
-                    frameSelect(firstCursorItem.x, firstCursorItem.y - 1, true);
-                }
+                selectNextUnlockedDepth(firstCursorItem, -1);
                 break;
             case 40: //down
-                if (firstCursorItem.y < timeline.getMaxDepth()) {
-                    frameSelect(firstCursorItem.x, firstCursorItem.y + 1, true);
-                }
+                selectNextUnlockedDepth(firstCursorItem, 1);
                 break;
+        }
+    }
+
+    private void selectNextUnlockedDepth(Point cell, int step) {
+        Set<Integer> locked = getLockedDepths();
+        int depth = cell.y + step;
+        while (locked.contains(depth)) {
+            depth += step;
+        }
+        if (depth >= 0 && depth <= timeline.getMaxDepth()) {
+            frameSelect(cell.x, depth, true);
         }
     }
 
