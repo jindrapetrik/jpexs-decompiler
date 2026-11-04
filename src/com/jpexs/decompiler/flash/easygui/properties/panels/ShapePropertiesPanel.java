@@ -1165,16 +1165,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
 
         private ImageIcon bitmapIcon(int id) {
             return bitmapIcons.computeIfAbsent(id, key -> bitmapIcon(bitmapSwf == null ? null : bitmapSwf.getImage(key)));
-        }
-
-        private static void paintCheckerboard(Graphics2D graphics, int width, int height) {
-            for (int y = 0; y < height; y += 4) {
-                for (int x = 0; x < width; x += 4) {
-                    graphics.setColor((x / 4 + y / 4) % 2 == 0 ? Color.white : Color.lightGray);
-                    graphics.fillRect(1 + x, 1 + y, Math.min(4, width - x), Math.min(4, height - y));
-                }
-            }
-        }
+        }       
 
         static ImageIcon bitmapIcon(ImageTag image) {
             int iconSize = BITMAP_PREVIEW_SIZE + 2;
@@ -1199,6 +1190,15 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 graphics.dispose();
             }
             return new ImageIcon(preview);
+        }
+        
+        private static void paintCheckerboard(Graphics2D graphics, int width, int height) {
+            for (int y = 0; y < height; y += 4) {
+                for (int x = 0; x < width; x += 4) {
+                    graphics.setColor((x / 4 + y / 4) % 2 == 0 ? Color.white : Color.lightGray);
+                    graphics.fillRect(1 + x, 1 + y, Math.min(4, width - x), Math.min(4, height - y));
+                }
+            }
         }
 
         public void setSwf(SWF swf) {

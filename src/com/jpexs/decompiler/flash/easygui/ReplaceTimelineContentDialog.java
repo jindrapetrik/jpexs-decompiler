@@ -86,7 +86,7 @@ final class ReplaceTimelineContentDialog {
         tree.setShowsRootHandles(true);
         tree.setRowHeight(18);
         tree.setUI(new BasicTreeUI());
-        tree.setCellRenderer(new LibraryTreeCellRenderer() );
+        tree.setCellRenderer(new LibraryTreeCellRenderer());
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         if (View.isOceanic()) {
             tree.setBackground(Color.WHITE);
@@ -167,7 +167,7 @@ final class ReplaceTimelineContentDialog {
         }
     }
 
-    private static class LibraryTreeCellRenderer extends DefaultTreeCellRenderer {   
+    private static class LibraryTreeCellRenderer extends DefaultTreeCellRenderer {
 
         public LibraryTreeCellRenderer() {
             setOpaque(false);
@@ -175,8 +175,7 @@ final class ReplaceTimelineContentDialog {
                 setBackgroundNonSelectionColor(Color.white);
             }
         }
-        
-        
+
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JLabel label = (JLabel) super.getTreeCellRendererComponent(tree, value,
@@ -190,7 +189,7 @@ final class ReplaceTimelineContentDialog {
                     label.setBackground(Color.white);
                 }
                 label.setOpaque(true);*/
-                /*if (selected) {
+ /*if (selected) {
                     label.setBackground(super.getBackgroundSelectionColor());
                 } else {
                     label.setBackground(Color.white);
@@ -198,9 +197,9 @@ final class ReplaceTimelineContentDialog {
                 //label.setOpaque(true);
             }
             return label;
-        }        
+        }
     }
-    
+
     private static CharacterTag getSelectedCharacter(JTree tree) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         Object item = node == null ? null : node.getUserObject();
