@@ -761,8 +761,8 @@ public class XFLConverter {
             source.lineStyles = lineStyles;
             List<String> layers = new ArrayList<>();
             for (SHAPEWITHSTYLE layer : ShapePaints.splitLayers(source, shapeNum)) {
-                layers.addAll(getShapeLayers(lastImportedId, characterNameMap, swf, mat, shapeNum,
-                        layer.shapeRecords, layer.fillStyles, layer.lineStyles, false, characterId, small));
+                layers.addAll(convertShapeLayer(lastImportedId, characterNameMap, swf, mat, shapeNum,
+                        layer.shapeRecords, layer.fillStyles, layer.lineStyles, false, characterId, small, true));
             }
             return layers;
         }
@@ -774,7 +774,13 @@ public class XFLConverter {
             return getShapePaintLayers(lastImportedId, characterNameMap, swf, mat, shapeNum, source,
                     characterId, small, ShapeTag.WIND_EVEN_ODD);
         }
+        return convertShapeLayer(lastImportedId, characterNameMap, swf, mat, shapeNum,
+                shapeRecords, fillStyles, lineStyles, morphshape, characterId, small, true);
+    }
 
+    private static List<String> convertShapeLayer(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap,
+            SWF swf, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles,
+            LINESTYLEARRAY lineStyles, boolean morphshape, int characterId, boolean small, boolean separatePaints) throws XMLStreamException {
         if (mat == null) {
             mat = new MATRIX();
         }
@@ -794,7 +800,7 @@ public class XFLConverter {
             shapeTransformer.transformStyles(scale, fillStyles, lineStyles, shapeNum);
         }
 
-        if (!morphshape && fillStyles != null && fillStyles.fillStyles.length > 0
+        if (separatePaints && !morphshape && fillStyles != null && fillStyles.fillStyles.length > 0
                 && swf.getCharacter(characterId) instanceof ShapeTag) {
             ShapeTag character = (ShapeTag) swf.getCharacter(characterId);
             SHAPEWITHSTYLE source = new SHAPEWITHSTYLE();
@@ -1031,8 +1037,10 @@ public class XFLConverter {
             SWF swf, MATRIX mat, int shapeNum, SHAPEWITHSTYLE source, int characterId, boolean small, int windingRule) throws XMLStreamException {
         List<String> paints = new ArrayList<>();
         for (SHAPEWITHSTYLE paint : ShapePaints.paints(swf, shapeNum, source, windingRule)) {
-            List<String> converted = getShapeLayers(lastImportedId, characterNameMap, swf, mat, shapeNum,
-                    paint.shapeRecords, paint.fillStyles, paint.lineStyles, false, characterId, small);
+            // Rounding normalized contours to twips can create coincident edges.
+            // Each paint already has its own plane, so serialize it without separating it again.
+            List<String> converted = convertShapeLayer(lastImportedId, characterNameMap, swf, mat, shapeNum,
+                    paint.shapeRecords, paint.fillStyles, paint.lineStyles, false, characterId, small, false);
             for (int i = converted.size() - 1; i >= 0; i--) {
                 paints.add(converted.get(i));
             }
