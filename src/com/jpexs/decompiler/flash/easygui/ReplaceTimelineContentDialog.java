@@ -181,21 +181,6 @@ final class ReplaceTimelineContentDialog {
             JLabel label = (JLabel) super.getTreeCellRendererComponent(tree, value,
                     selected, expanded, leaf, row, hasFocus);
             LibraryTreeTable.styleLibraryNode(label, value);
-
-            if (View.isOceanic()) {
-                /*if (selected) {
-                    label.setBackground(getBackgroundSelectionColor());
-                } else {
-                    label.setBackground(Color.white);
-                }
-                label.setOpaque(true);*/
- /*if (selected) {
-                    label.setBackground(super.getBackgroundSelectionColor());
-                } else {
-                    label.setBackground(Color.white);
-                }*/
-                //label.setOpaque(true);
-            }
             return label;
         }
     }
