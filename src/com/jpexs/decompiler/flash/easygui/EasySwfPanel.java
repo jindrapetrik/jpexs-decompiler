@@ -1773,9 +1773,39 @@ public class EasySwfPanel extends JPanel {
     void toggleDepthLock(int depth) {
         if (timelined != null) {
             toggleDepth(lockedDepthsByTimeline, depth);
-            timelinePanel.getTimelineBodyPanel().removeLockedSelection();
+            refreshDepthLocks();
+        }
+    }
+
+    void toggleAllDepthVisibility() {
+        if (toggleAllDepths(hiddenDepthsByTimeline)) {
             refreshDepthInteraction();
         }
+    }
+
+    void toggleAllDepthLocks() {
+        if (toggleAllDepths(lockedDepthsByTimeline)) {
+            refreshDepthLocks();
+        }
+    }
+
+    private void refreshDepthLocks() {
+        timelinePanel.getTimelineBodyPanel().removeLockedSelection();
+        refreshDepthInteraction();
+    }
+
+    private boolean toggleAllDepths(Map<Timelined, Set<Integer>> depthsByTimeline) {
+        int maxDepth = timelined == null ? 0 : timelined.getTimeline().getMaxDepth();
+        if (maxDepth == 0) {
+            return false;
+        }
+        Set<Integer> depths = depthsByTimeline.getOrDefault(timelined, Collections.emptySet());
+        Set<Integer> allDepths = new HashSet<>();
+        for (int depth = 1; depth <= maxDepth; depth++) {
+            allDepths.add(depth);
+        }
+        setDepths(depthsByTimeline, depths.containsAll(allDepths) ? Collections.emptySet() : allDepths);
+        return true;
     }
 
     private void toggleDepth(Map<Timelined, Set<Integer>> depthsByTimeline, int depth) {
@@ -1783,6 +1813,10 @@ public class EasySwfPanel extends JPanel {
         if (!depths.remove(depth)) {
             depths.add(depth);
         }
+        setDepths(depthsByTimeline, depths);
+    }
+
+    private void setDepths(Map<Timelined, Set<Integer>> depthsByTimeline, Set<Integer> depths) {
         if (depths.isEmpty()) {
             depthsByTimeline.remove(timelined);
         } else {

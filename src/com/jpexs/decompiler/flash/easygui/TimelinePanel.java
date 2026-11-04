@@ -79,9 +79,12 @@ public class TimelinePanel extends JPanel {
         timePanel = new TimelineTimePanel(depthPanel);
 
         gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(depthPanel.getHeader(), gbc);
+
+        gbc.gridx = 1;
         gbc.weightx = 1;
         add(timePanel, gbc);
 
