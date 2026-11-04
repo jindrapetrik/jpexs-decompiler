@@ -1809,4 +1809,14 @@ public class EasySwfPanel extends JPanel {
     public void setFrame(int frame, List<Integer> depths) {
         timelinePanel.setFrame(frame, depths);
     }
+
+    CharacterTag getSelectedLibraryCharacter() {
+        int row = libraryTreeTable.getSelectedRow();
+        if (row < 0) {
+            return null;
+        }
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) libraryTreeTable.getValueAt(row, 0);
+        Object item = node.getUserObject();
+        return item instanceof CharacterTag ? (CharacterTag) item : null;
+    }
 }

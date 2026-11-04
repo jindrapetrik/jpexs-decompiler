@@ -705,10 +705,66 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 popupMenu.add(removeFrameMenuItem);
             }
 
+            Set<Point> cells = new LinkedHashSet<>();
+            if (!(timeline.timelined instanceof ButtonTag)) {
+                for (Point cell : cursor) {
+                    if (cell.y > 0 && timeline.getFrame(cell.x) != null) {
+                        cells.add(cell);
+                    }
+                }
+            }
+            if (!cells.isEmpty()) {
+                if (popupMenu.getComponentCount() > 0) {
+                    popupMenu.addSeparator();
+                }
+                JMenuItem replaceContent = new JMenuItem(EasyStrings.translate("action.replaceSelectedContent") + "...");
+                replaceContent.addActionListener(event -> replaceSelectedContent(cells));
+                popupMenu.add(replaceContent);
+            }
+
             if (popupMenu.getComponentCount() > 0) {
                 popupMenu.show(this, e.getX(), e.getY());
             }
         }
+    }
+
+    private void replaceSelectedContent(Set<Point> cells) {
+        Timelined timelined = timeline.timelined;
+        Set<Integer> originalIds = new LinkedHashSet<>();
+        for (Point cell : cells) {
+            DepthState state = timeline.getDepthState(cell.x, cell.y);
+            CharacterTag original = state == null ? null : state.getCharacter();
+            originalIds.add(original == null ? -1 : original.getCharacterId());
+        }
+        CharacterTag replacement = ReplaceTimelineContentDialog.choose(this, timelined, cells,
+                originalIds, swfPanel.getSelectedLibraryCharacter());
+        if (replacement == null) {
+            return;
+        }
+
+        Set<Point> selection = new LinkedHashSet<>(cursor);
+        ReplaceTimelineContentOperation operation = new ReplaceTimelineContentOperation(swfPanel, timeline,
+                cells, replacement, () -> {
+                    timeline = timelined.getTimeline();
+                    cursor.clear();
+                    cursor.addAll(selection);
+                    refresh();
+                    fireChanged();
+                    fireFrameSelected(getFirstFrame(), getDepthsAtFirstFrame());
+                    repaint();
+                });
+        undoManager.doOperation(operation, timelined.getSwf());
+    }
+
+    private List<Integer> getDepthsAtFirstFrame() {
+        int frame = getFirstFrame();
+        List<Integer> depths = new ArrayList<>();
+        for (Point cell : cursor) {
+            if (cell.x == frame && cell.y > 0) {
+                depths.add(cell.y);
+            }
+        }
+        return depths;
     }
 
     private Set<Point> getBackOrderedCursor() {

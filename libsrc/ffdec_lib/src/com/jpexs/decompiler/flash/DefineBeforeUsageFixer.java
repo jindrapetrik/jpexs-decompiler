@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterModifier;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -47,9 +49,9 @@ public class DefineBeforeUsageFixer {
                 CharacterTag ch = swf.getCharacter(chId);
                 if (ch != null) {
                     int defineIndex = tags.indexOf(ch);
-                    int usageIndex = i;
-                    if (usageIndex < defineIndex) {
-                        i += moveCharacter(swf, i, chId);
+                    if (i < defineIndex) {
+                        moveCharacter(swf, t, ch);
+                        i = tags.indexOf(t);
                         changed = true;
                     }
                 }                
@@ -58,19 +60,21 @@ public class DefineBeforeUsageFixer {
         return changed;
     }
     
-    private int moveCharacter(SWF swf, int usageIndex, int characterId) {
-        int i = 0;
-        for (int j = 0; j < swf.getTags().size(); j++) {
-            Tag t2 = swf.getTags().get(j);
-            if (t2 instanceof CharacterModifier) {
-                CharacterModifier chit = (CharacterModifier) t2;                
-                if (chit.getCharacterId() == characterId) {                    
-                    swf.removeTag(j);
-                    swf.addTag(usageIndex + i, (Tag) chit);
-                    i++;
-                }
+    private void moveCharacter(SWF swf, Tag usage, CharacterTag character) {
+        List<Tag> definitions = new ArrayList<>();
+        definitions.add(character);
+        for (Tag tag : swf.getTags()) {
+            if (tag instanceof CharacterModifier
+                    && ((CharacterModifier) tag).getCharacterId() == character.getCharacterId()) {
+                definitions.add(tag);
             }
         }
-        return i;
+        for (Tag tag : definitions) {
+            swf.removeTag(tag);
+        }
+        int usageIndex = swf.indexOfTag(usage);
+        for (Tag tag : definitions) {
+            swf.addTag(usageIndex++, tag);
+        }
     }        
 }
