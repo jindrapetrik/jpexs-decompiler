@@ -89,8 +89,12 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -128,6 +132,7 @@ public class EasySwfPanel extends JPanel {
     private TransformPanel transformPanel;
     private ShapeSelectionTransform.State shapeTransformState;
     private Timelined timelined;
+    private final Map<Timelined, Set<Integer>> hiddenDepthsByTimeline = Collections.synchronizedMap(new WeakHashMap<>());
     private ShapeTag editingShape;
     private ShapeTool shapeTool = ShapeTool.SELECT;
     private ShapeSelection shapeSelection;
@@ -190,7 +195,7 @@ public class EasySwfPanel extends JPanel {
         this.mainPanel = mainPanel;
         setLayout(new BorderLayout());
 
-        stagePanel = new ImagePanel();
+        stagePanel = new ImagePanel(this::getHiddenDepths);
         stagePanel.setTagNameResolver(new EasyTagNameResolver());
         stagePanel.setShowAllDepthLevelsInfo(false);
         stagePanel.setSelectionMode(true);
@@ -1741,8 +1746,31 @@ public class EasySwfPanel extends JPanel {
         Main.getMainFrame().getPanel().updateUiWithCurrentOpenable();        
     }
 
+    Set<Integer> getHiddenDepths(Timelined timelineOwner) {
+        return hiddenDepthsByTimeline.getOrDefault(timelineOwner, Collections.emptySet());
+    }
+
+    void toggleDepthVisibility(int depth) {
+        if (timelined == null) {
+            return;
+        }
+        Set<Integer> hidden = new HashSet<>(getHiddenDepths(timelined));
+        if (!hidden.remove(depth)) {
+            hidden.add(depth);
+        }
+        if (hidden.isEmpty()) {
+            hiddenDepthsByTimeline.remove(timelined);
+        } else {
+            hiddenDepthsByTimeline.put(timelined, Collections.unmodifiableSet(hidden));
+        }
+        stagePanel.refreshDepthVisibility();
+        transformPanel.setVisible(!stagePanel.getSelectedDepths().isEmpty());
+        updatePropertiesPanel();
+    }
+
     public void dispose() {
         setTimelined(null);
+        hiddenDepthsByTimeline.clear();
         undoManager.clear();
     }
 

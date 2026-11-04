@@ -65,7 +65,7 @@ public class TimelinePanel extends JPanel {
 
         timelineBodyScrollPane = new FasterScrollPane(timelineBodyPanel);
 
-        depthPanel = new TimelineDepthPanel();
+        depthPanel = new TimelineDepthPanel(() -> swfPanel.getHiddenDepths(timelined), swfPanel::toggleDepthVisibility);
 
         timelineBodyPanel.addChangeListener(new Runnable() {
             @Override
