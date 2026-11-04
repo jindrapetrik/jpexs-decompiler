@@ -5409,8 +5409,9 @@ public class XFLConverter {
                 writer.writeAttribute("antiAliasThickness", antiAliasThickness);
             }
             Map<String, Object> attrs = TextTag.getTextRecordsAttributes(textRecords, swf, normalizedFonts);
-            writer.writeAttribute("width", tag.getBounds().getWidth() / 2);
-            writer.writeAttribute("height", tag.getBounds().getHeight());
+            // Empty static text can have invalid bounds that cannot be stored in a binary FLA.
+            writer.writeAttribute("width", textRecords.isEmpty() ? 0 : bounds.getWidth() / 2);
+            writer.writeAttribute("height", textRecords.isEmpty() ? 0 : bounds.getHeight());
             writer.writeAttribute("autoExpand", true);
             writer.writeAttribute("isSelectable", false);
             writer.writeStartElement("matrix");
