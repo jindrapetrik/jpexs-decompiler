@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.testng.annotations.Test;
 
@@ -195,13 +196,15 @@ public class ShapeGradientSettingsTest {
                 panel.setSelections(selected);
                 assertEquals(edits.get(), 0);
                 Object editor = field(panel, "fillEditor");
-                JComboBox<?> flow = (JComboBox<?>) field(editor, "flowComboBox");
+                JToggleButton[] flow = (JToggleButton[]) field(editor, "flowButtons");
                 JTriStateCheckBox linear = (JTriStateCheckBox) field(editor, "linearRGBCheckBox");
                 // Different gradient kinds still expose their shared controls.
                 assertTrue(((JPanel) field(editor, "gradientPanel")).isVisible());
-                assertEquals(flow.getSelectedIndex(), -1);
+                for (JToggleButton button : flow) {
+                    assertFalse(button.isSelected());
+                }
                 assertEquals(linear.getSelectionState(), 1);
-                flow.setSelectedIndex(GRADIENT.SPREAD_REPEAT_MODE);
+                flow[GRADIENT.SPREAD_REPEAT_MODE].doClick();
                 ShapeSelection.BatchEdit repeated = model.changeAll(selected,
                         item -> panel.applyFillChange(item.fill, item.geometry.getBounds2D(), "flow"), null);
                 assertEquals(at(repeated.model, 500, 500).fill.gradient.interpolationMode, GRADIENT.INTERPOLATION_RGB_MODE);
@@ -272,7 +275,7 @@ public class ShapeGradientSettingsTest {
                     assertTrue(stroke);
                     edits.incrementAndGet();
                 });
-                ((JComboBox<?>) field(editor, "flowComboBox")).setSelectedIndex(GRADIENT.SPREAD_REFLECT_MODE);
+                ((JToggleButton[]) field(editor, "flowButtons"))[GRADIENT.SPREAD_REFLECT_MODE].doClick();
                 LINESTYLE2 reflected = panel.applyStrokeChange(line, new Rectangle2D.Double(), "flow");
                 ((JTriStateCheckBox) field(editor, "linearRGBCheckBox")).setSelected(false);
                 ((JTriStateCheckBox) field(editor, "linearRGBCheckBox")).doClick();
@@ -303,7 +306,7 @@ public class ShapeGradientSettingsTest {
                     for (int gradientType : new int[]{2, 3}) {
                         type.setSelectedIndex(gradientType - (brush ? 1 : 0));
                         for (int flow : new int[]{GRADIENT.SPREAD_PAD_MODE, GRADIENT.SPREAD_REFLECT_MODE, GRADIENT.SPREAD_REPEAT_MODE}) {
-                            ((JComboBox<?>) field(editor, "flowComboBox")).setSelectedIndex(flow);
+                            ((JToggleButton[]) field(editor, "flowButtons"))[flow].doClick();
                             JTriStateCheckBox linear = (JTriStateCheckBox) field(editor, "linearRGBCheckBox");
                             linear.setSelected(false);
                             linear.doClick();

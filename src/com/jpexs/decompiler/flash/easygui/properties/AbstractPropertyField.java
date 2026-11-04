@@ -162,7 +162,7 @@ public abstract class AbstractPropertyField<E> extends JPanel {
         }
     }
 
-    private synchronized void finishEdit() {
+    synchronized void finishEdit() {
         if (!editing) {
             return;
         }

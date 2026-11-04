@@ -18,6 +18,7 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
+import com.jpexs.decompiler.flash.easygui.properties.TextPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.GradientEditor;
 import com.jpexs.decompiler.flash.easygui.properties.JTriStateCheckBox;
 import com.jpexs.decompiler.flash.easygui.properties.panels.ShapePropertiesPanel;
@@ -42,7 +43,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -218,7 +218,10 @@ public class ShapeMultiSelectionTest {
                 assertEquals(((JLabel) width.getComponent(0)).getText(), "-");
                 assertEquals(((JComboBox<?>) field(panel, "capComboBox")).getSelectedIndex(), -1);
                 assertEquals(((JComboBox<?>) field(panel, "scaleComboBox")).getSelectedIndex(), -1);
-                assertEquals(((JButton) field(field(panel, "strokeEditor"), "colorButton")).getText(), "-");
+                Object colorEditor = field(field(panel, "strokeEditor"), "colorEditor");
+                TextPropertyField hexField = (TextPropertyField) field(colorEditor, "hexField");
+                assertNull(hexField.getValue());
+                assertEquals(((JLabel) hexField.getComponent(0)).getText(), "-");
                 width.setValue(7f);
                 assertEquals(edits.get(), 1);
                 LINESTYLE2 changedFirst = panel.applyStrokeChange(first, lines.get(0).area.getBounds2D(), "width");

@@ -21,17 +21,20 @@ import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.function.Consumer;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 
 /**
  * Persistent drawing settings, independent of the selected shape geometry.
@@ -60,10 +63,16 @@ public class BrushPropertiesPanel extends AbstractPropertiesPanel {
         JPanel cards = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = -1;
-        JPanel fillPanel = new JPanel(new GridBagLayout());
-        addRow(fillPanel, "type", fillEditor, 0);
+        JToggleButton fillTab = eraser ? null : ShapePropertiesPanel.styleTab("fill", "shapetoolpaint16", fillEditor);
         if (!eraser) {
-            addCard(cards, "fill", null, fillPanel, gbc, false);
+            ButtonGroup group = new ButtonGroup();
+            group.add(fillTab);
+            fillTab.setSelected(true);
+            JPanel fillSection = ShapePropertiesPanel.createStyleSection(fillTab, fillEditor.paintOptions, fillEditor);
+            GridBagConstraints fillConstraints = new GridBagConstraints();
+            fillConstraints.gridy = ++gbc.gridy;
+            fillConstraints.insets = new Insets(3, 3, 3, 3);
+            cards.add(fillSection, fillConstraints);
         }
         JPanel brushPanel = new JPanel(new GridBagLayout());
         shapeEditor.setRenderer(new DefaultListCellRenderer() {
@@ -95,13 +104,13 @@ public class BrushPropertiesPanel extends AbstractPropertiesPanel {
         gbc.gridy++;
         gbc.weighty = 1;
         cards.add(new JPanel(), gbc);
-        if (!eraser) {
-            setCardOpened("fill", true);
-        }
         setCardOpened(toolCard, true);
         add(new FasterScrollPane(cards), BorderLayout.CENTER);
         lastFill = getFillStyle(null);
         fillEditor.setChangeListener(property -> {
+            if (fillTab != null) {
+                fillTab.repaint();
+            }
             if (updating) {
                 return;
             }
@@ -127,11 +136,6 @@ public class BrushPropertiesPanel extends AbstractPropertiesPanel {
         GridBagLayout layout = (GridBagLayout) panel.getLayout();
         JLabel label = new JLabel(formatPropertyName(property));
         addToGrid(layout, panel, label, 0, row);
-        if (editor == fillEditor) {
-            GridBagConstraints constraints = layout.getConstraints(label);
-            constraints.anchor = GridBagConstraints.NORTHEAST;
-            layout.setConstraints(label, constraints);
-        }
         addToGrid(layout, panel, editor, 1, row);
     }
 

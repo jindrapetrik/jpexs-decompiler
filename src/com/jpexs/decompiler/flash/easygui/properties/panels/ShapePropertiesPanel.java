@@ -24,14 +24,16 @@ import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.GradientEditor;
 import com.jpexs.decompiler.flash.easygui.properties.JTriStateCheckBox;
 import com.jpexs.decompiler.flash.easygui.properties.PropertyEditor;
+import com.jpexs.decompiler.flash.easygui.properties.ShapeColorEditor;
 import com.jpexs.decompiler.flash.gui.ComboBoxItem;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
-import com.jpexs.decompiler.flash.gui.ViewMessages;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.ILINESTYLE;
@@ -48,9 +50,15 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
@@ -67,13 +75,16 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.GrayFilter;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 
 /**
  * Style editors for the selected shape region. Changes are passed to the
@@ -92,6 +103,10 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
     private final FloatPropertyField miterEditor = new FloatPropertyField(3f, 1f, 255f);
     private final JPanel fillPanel = new JPanel(new GridBagLayout());
     private final JPanel strokePanel = new JPanel(new GridBagLayout());
+    private final JPanel styleCards = new JPanel(new VisibleCardLayout());
+    private final JPanel optionCards = new JPanel(new VisibleCardLayout());
+    private final JToggleButton fillTab = styleTab("fill", "shapetoolpaint16", fillEditor);
+    private final JToggleButton strokeTab = styleTab("stroke", "shapetoolpencil16", strokeEditor);
     private boolean updating;
     private Boolean selectedStroke;
     private Consumer<Boolean> changeListener;
@@ -119,7 +134,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             add(title, BorderLayout.NORTH);
         }
 
-        addRow(strokePanel, "type", strokeEditor, 0);
+        addToGrid((GridBagLayout) strokePanel.getLayout(), strokePanel, strokeEditor, 0, 0, 2, 1);
         widthEditor.setColumns(3);
         miterEditor.setColumns(3);
         JPanel widthPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -131,27 +146,32 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         addRow(strokePanel, "join", joinComboBox, 4);
         addRow(strokePanel, "miter", miterEditor, 5);
 
-        JPanel cards = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridy = -1;
-        addRow(fillPanel, "type", fillEditor, 0);
+        JPanel tabs = new JPanel(new GridLayout(0, 1, 0, 3));
+        ButtonGroup group = new ButtonGroup();
         if (!strokeOnly) {
-            addCard(cards, "fill", null, fillPanel, gbc, false);
-        }
-        // Keep the final card at its preferred height, with free space below it.
-        if (!fillOnly) {
-            addCard(cards, "stroke", null, strokePanel, gbc, false);
-        }
-        gbc.gridy++;
-        gbc.weighty = 1;
-        cards.add(new JPanel(), gbc);
-        if (!strokeOnly) {
-            setCardOpened("fill", true);
+            addToGrid((GridBagLayout) fillPanel.getLayout(), fillPanel, fillEditor, 0, 0, 2, 1);
+            styleCards.add(fillPanel, "fill");
+            optionCards.add(fillEditor.paintOptions, "fill");
+            group.add(fillTab);
+            fillTab.addActionListener(e -> showStyleTab(false));
+            tabs.add(fillTab);
         }
         if (!fillOnly) {
-            setCardOpened("stroke", true);
+            styleCards.add(strokePanel, "stroke");
+            optionCards.add(strokeEditor.paintOptions, "stroke");
+            group.add(strokeTab);
+            strokeTab.addActionListener(e -> showStyleTab(true));
+            tabs.add(strokeTab);
         }
-        add(new FasterScrollPane(cards), BorderLayout.CENTER);
+        JPanel styleSection = createStyleSection(tabs, optionCards, styleCards);
+        showStyleTab(strokeOnly);
+        JPanel contents = new JPanel(new GridBagLayout());
+        GridBagConstraints sectionConstraints = new GridBagConstraints();
+        sectionConstraints.weighty = 1;
+        sectionConstraints.anchor = GridBagConstraints.NORTH;
+        sectionConstraints.insets = new Insets(3, 3, 3, 3);
+        contents.add(styleSection, sectionConstraints);
+        add(new FasterScrollPane(contents), BorderLayout.CENTER);
         fillEditor.changeListener = property -> fireChange(false, property);
         strokeEditor.changeListener = property -> fireChange(true, property);
         widthEditor.addChangeListener(e -> fireChange(true, "width"));
@@ -179,6 +199,90 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         }
     }
 
+    static JPanel createStyleSection(Component tabs, JPanel options, JPanel body) {
+        JPanel tabColumn = new JPanel(new BorderLayout());
+        tabColumn.add(tabs, BorderLayout.NORTH);
+        JPanel styleHeader = new JPanel(new BorderLayout(4, 0));
+        styleHeader.add(tabColumn, BorderLayout.WEST);
+        styleHeader.add(options, BorderLayout.CENTER);
+        JPanel styleSection = new JPanel(new BorderLayout(0, 5));
+        styleSection.add(styleHeader, BorderLayout.NORTH);
+        JPanel insetBody = new JPanel(new BorderLayout());
+        insetBody.setBorder(BorderFactory.createEmptyBorder(0, tabs.getPreferredSize().width / 2, 0, 0));
+        insetBody.add(body, BorderLayout.CENTER);
+        styleSection.add(insetBody, BorderLayout.EAST);
+        return styleSection;
+    }
+
+    static JToggleButton styleTab(String name, String icon, FillEditor editor) {
+        String label = EasyStrings.translate("properties.shape.header." + name);
+        ImageIcon tool = View.getIcon(icon, 16);
+        ImageIcon disabledTool = new ImageIcon(GrayFilter.createDisabledImage(tool.getImage()));
+        int swatchWidth = 32;
+        int swatchHeight = 16;
+        int swatchOffset = tool.getIconWidth() + 5;
+        Icon tabIcon = new Icon() {
+            @Override
+            public int getIconWidth() {
+                return swatchOffset + swatchWidth;
+            }
+
+            @Override
+            public int getIconHeight() {
+                return swatchHeight;
+            }
+
+            @Override
+            public void paintIcon(Component component, Graphics graphics, int x, int y) {
+                (component.isEnabled() ? tool : disabledTool).paintIcon(component, graphics, x, y);
+            }
+        };
+        JToggleButton tab = new JToggleButton(tabIcon) {
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                super.paintComponent(graphics);
+                // Keep the live swatch out of the look and feel's icon effects and cache.
+                Insets insets = getInsets();
+                int x = insets.left + (getWidth() - insets.left - insets.right - tabIcon.getIconWidth()) / 2;
+                int y = insets.top + (getHeight() - insets.top - insets.bottom - tabIcon.getIconHeight()) / 2;
+                Graphics2D swatch = (Graphics2D) graphics.create(x + swatchOffset, y, swatchWidth, swatchHeight);
+                try {
+                    editor.paintSwatch(swatch, swatchWidth, swatchHeight);
+                } finally {
+                    swatch.dispose();
+                }
+            }
+        };
+        tab.setDisabledIcon(tabIcon);
+        tab.setMargin(new Insets(4, 9, 4, 9));
+        tab.setToolTipText(label);
+        tab.getAccessibleContext().setAccessibleName(label);
+        return tab;
+    }
+
+    private void showStyleTab(boolean stroke) {
+        (stroke ? strokeTab : fillTab).setSelected(true);
+        String card = stroke ? "stroke" : "fill";
+        ((CardLayout) optionCards.getLayout()).show(optionCards, card);
+        ((CardLayout) styleCards.getLayout()).show(styleCards, card);
+    }
+
+    private static class VisibleCardLayout extends CardLayout {
+
+        @Override
+        public Dimension preferredLayoutSize(Container parent) {
+            for (Component card : parent.getComponents()) {
+                if (card.isVisible()) {
+                    Dimension preferred = card.getPreferredSize();
+                    Insets insets = parent.getInsets();
+                    return new Dimension(preferred.width + insets.left + insets.right,
+                            preferred.height + insets.top + insets.bottom);
+                }
+            }
+            return super.preferredLayoutSize(parent);
+        }
+    }
+
     public static ShapePropertiesPanel createDrawingStyles() {
         return new ShapePropertiesPanel(false, false, true);
     }
@@ -196,6 +300,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
     }
 
     private void fireChange(boolean stroke, String property) {
+        (stroke ? strokeTab : fillTab).repaint();
         if (!updating && (selectedStroke == null || selectedStroke == stroke)) {
             if (changeListener != null) {
                 changeListener.accept(stroke);
@@ -440,13 +545,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
 
     private void addRow(JPanel panel, String property, Component editor, int row) {
         GridBagLayout layout = (GridBagLayout) panel.getLayout();
-        JLabel label = new JLabel(formatPropertyName(property));
-        addToGrid(layout, panel, label, 0, row);
-        if (editor instanceof FillEditor) {
-            GridBagConstraints constraints = layout.getConstraints(label);
-            constraints.anchor = GridBagConstraints.NORTHEAST;
-            layout.setConstraints(label, constraints);
-        }
+        addToGrid(layout, panel, new JLabel(formatPropertyName(property)), 0, row);
         addToGrid(layout, panel, editor, 1, row);
     }
 
@@ -519,6 +618,15 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         boolean strokeEnabled = !Boolean.FALSE.equals(selectedStroke);
         setEnabledRecursively(fillPanel, fillEnabled);
         setEnabledRecursively(strokePanel, strokeEnabled);
+        setEnabledRecursively(fillEditor.paintOptions, fillEnabled);
+        setEnabledRecursively(strokeEditor.paintOptions, strokeEnabled);
+        fillTab.setEnabled(fillEnabled);
+        strokeTab.setEnabled(strokeEnabled);
+        fillTab.repaint();
+        strokeTab.repaint();
+        if (selectedStroke != null) {
+            showStyleTab(selectedStroke);
+        }
         fillEditor.bitmapComboBox.setEnabled(fillEnabled && fillEditor.bitmapComboBox.getItemCount() > 0);
         strokeEditor.bitmapComboBox.setEnabled(strokeEnabled && strokeEditor.bitmapComboBox.getItemCount() > 0);
     }
@@ -553,20 +661,13 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         private static final int BITMAP_PREVIEW_SIZE = 32;
 
         private final JComboBox<String> typeComboBox = createComboBox("fill", "none", "solid", "linearGradient", "radialGradient", "bitmap");
-        private final JPanel valuePanel = new JPanel(new CardLayout()) {
-            @Override
-            public Dimension getPreferredSize() {
-                for (Component card : getComponents()) {
-                    if (card.isVisible()) {
-                        return card.getPreferredSize();
-                    }
-                }
-                return super.getPreferredSize();
-            }
-        };
-        private final JButton colorButton = new JButton();
+        final JPanel paintOptions = new JPanel(new BorderLayout(0, 5));
+        private final JPanel gradientOptions = new JPanel(new GridBagLayout());
+        private final JPanel valuePanel = new JPanel(new VisibleCardLayout());
+        private final ShapeColorEditor colorEditor = new ShapeColorEditor(this::changeColor);
         private final JPanel gradientPanel = new JPanel(new BorderLayout());
-        private final JComboBox<String> flowComboBox = createComboBox("flow", "pad", "reflect", "repeat");
+        private final ButtonGroup flowGroup = new ButtonGroup();
+        private final JToggleButton[] flowButtons = new JToggleButton[3];
         private final JTriStateCheckBox linearRGBCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.linearRGB"));
         private final JTriStateCheckBox focalPointCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.focalPoint"));
         private final JComboBox<ComboBoxItem<Integer>> bitmapComboBox = new JComboBox<>();
@@ -578,8 +679,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         private final boolean allowNone;
         private Color color;
         private FILLSTYLE originalStyle;
-        private GRADIENT gradient;
-        private GradientEditor gradientEditor;
+        private GRADIENT gradient = new GRADIENT();
+        private final GradientEditor gradientEditor = GradientEditor.createInline(gradient);
         private Consumer<String> changeListener = property -> { };
 
         public FillEditor(Color defaultColor) {
@@ -593,9 +694,11 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 typeComboBox.removeItemAt(0);
             }
             setLayout(new BorderLayout(0, 5));
-            add(typeComboBox, BorderLayout.NORTH);
+            typeComboBox.getAccessibleContext().setAccessibleName(EasyStrings.translate("property.shape.type"));
+            paintOptions.add(typeComboBox, BorderLayout.NORTH);
+            add(paintOptions, BorderLayout.NORTH);
             valuePanel.add(new JPanel(), "none");
-            valuePanel.add(colorButton, "solid");
+            valuePanel.add(colorEditor, "solid");
             valuePanel.add(gradientPanel, "gradient");
             JPanel bitmapPanel = new JPanel(new BorderLayout(0, 5));
             bitmapPanel.add(bitmapComboBox, BorderLayout.NORTH);
@@ -606,23 +709,51 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             valuePanel.add(bitmapPanel, "bitmap");
             valuePanel.add(new JLabel("-"), "indeterminate");
             add(valuePanel, BorderLayout.CENTER);
-            JPanel gradientOptions = new JPanel(new GridBagLayout());
             GridBagConstraints optionConstraints = new GridBagConstraints();
             optionConstraints.gridx = 0;
             optionConstraints.gridy = 0;
             optionConstraints.anchor = GridBagConstraints.WEST;
             gradientOptions.add(new JLabel(EasyStrings.translate("property.shape.flow") + ": "), optionConstraints);
             optionConstraints.gridx = 1;
-            gradientOptions.add(flowComboBox, optionConstraints);
+            JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
+            String[] flowNames = {"pad", "reflect", "repeat"};
+            CycleMethod[] flowCycles = {CycleMethod.NO_CYCLE, CycleMethod.REFLECT, CycleMethod.REPEAT};
+            for (int i = 0; i < flowButtons.length; i++) {
+                JToggleButton button = new JToggleButton(flowIcon(flowCycles[i]));
+                String name = EasyStrings.translate("property.shape.flow." + flowNames[i]);
+                button.setToolTipText(name);
+                button.getAccessibleContext().setAccessibleName(name);
+                button.setMargin(new Insets(3, 4, 3, 4));
+                button.addActionListener(e -> changeListener.accept("flow"));
+                flowButtons[i] = button;
+                flowGroup.add(button);
+                flowPanel.add(button);
+            }
+            optionConstraints.weightx = 1;
+            gradientOptions.add(flowPanel, optionConstraints);
             optionConstraints.gridx = 0;
             optionConstraints.gridy = 1;
             optionConstraints.gridwidth = 2;
             gradientOptions.add(linearRGBCheckBox, optionConstraints);
             optionConstraints.gridy = 2;
             gradientOptions.add(focalPointCheckBox, optionConstraints);
-            gradientPanel.add(gradientOptions, BorderLayout.SOUTH);
-            flowComboBox.addActionListener(e -> changeListener.accept("flow"));
-            linearRGBCheckBox.addActionListener(e -> changeListener.accept("linearRGB"));
+            paintOptions.add(gradientOptions, BorderLayout.CENTER);
+            gradientPanel.add(gradientEditor, BorderLayout.CENTER);
+            gradientEditor.addChangeListener(new ChangeListener() {
+                @Override
+                public void change(PropertyEditor editor) {
+                    editor.save();
+                    changeListener.accept("gradient");
+                }
+
+                @Override
+                public void linkChanged(boolean newValue) {
+                }
+            });
+            linearRGBCheckBox.addActionListener(e -> {
+                gradientEditor.setLinearRGB(linearRGBCheckBox.isSelected());
+                changeListener.accept("linearRGB");
+            });
             focalPointCheckBox.addActionListener(e -> changeListener.accept("focalPoint"));
             smoothedCheckBox.addActionListener(e -> changeListener.accept("smoothed"));
             repeatCheckBox.addActionListener(e -> changeListener.accept("repeat"));
@@ -641,20 +772,48 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 String card = index < 0 ? "indeterminate" : index == 0 ? "none" : index == 1 ? "solid" : index == 4 ? "bitmap" : "gradient";
                 ((CardLayout) valuePanel.getLayout()).show(valuePanel, card);
                 valuePanel.setVisible(index != 0);
+                gradientOptions.setVisible(index == 2 || index == 3);
                 focalPointCheckBox.setVisible(index == 3);
                 revalidate();
                 repaint();
                 changeListener.accept("type");
             });
             bitmapComboBox.addActionListener(e -> changeListener.accept("bitmap"));
-            colorButton.addActionListener(e -> {
-                Color selected = ViewMessages.showColorDialog(this, color, true);
-                if (selected != null) {
-                    updateColor(selected);
-                    changeListener.accept("color");
-                }
-            });
             setFillStyle(null);
+        }
+
+        private static ImageIcon flowIcon(CycleMethod cycle) {
+            int width = 28;
+            int height = 14;
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = image.createGraphics();
+            try {
+                graphics.setPaint(new LinearGradientPaint(9, 0, 18, 0,
+                        new float[]{0, 1}, new Color[]{Color.black, Color.white}, cycle));
+                graphics.fillRect(0, 0, width, height);
+                graphics.setColor(Color.gray);
+                graphics.drawRect(0, 0, width - 1, height - 1);
+            } finally {
+                graphics.dispose();
+            }
+            return new ImageIcon(image);
+        }
+
+        private void setFlow(int flow) {
+            if (flow >= 0 && flow < flowButtons.length) {
+                flowButtons[flow].setSelected(true);
+            } else {
+                flowGroup.clearSelection();
+            }
+        }
+
+        private int getFlow() {
+            for (int i = 0; i < flowButtons.length; i++) {
+                if (flowButtons[i].isSelected()) {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         private int getType() {
@@ -668,29 +827,48 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
 
         private void updateColor(Color color) {
             this.color = color;
-            colorButton.setText(String.format("#%02x%02x%02x (%d%%)", color.getRed(), color.getGreen(), color.getBlue(), Math.round(color.getAlpha() * 100f / 255)));
-            colorButton.setIcon(colorIcon(color));
+            colorEditor.setColor(color);
+        }
+
+        private void changeColor(Color color) {
+            this.color = color;
+            changeListener.accept("color");
+        }
+
+        private void paintSwatch(Graphics2D graphics, int width, int height) {
+            int type = getType();
+            graphics.setColor(Color.white);
+            graphics.fillRect(0, 0, width, height);
+            if (type == 0) {
+                graphics.setColor(Color.red);
+                graphics.drawLine(1, height - 2, width - 2, 1);
+            } else if (type < 0 || (type == 1 && colorEditor.isMixed())
+                    || ((type == 2 || type == 3) && (gradientEditor.isIndeterminate() || linearRGBCheckBox.getSelectionState() == 1))
+                    || (type == 4 && bitmapComboBox.getSelectedIndex() < 0)) {
+                graphics.setColor(Color.gray);
+                graphics.drawLine(width / 2 - 3, height / 2, width / 2 + 3, height / 2);
+            } else {
+                paintCheckerboard(graphics, width - 2, height - 2);
+                if (type == 1) {
+                    graphics.setColor(color);
+                    graphics.fillRect(1, 1, width - 2, height - 2);
+                } else if (type == 4) {
+                    int id = bitmapComboBox.getItemAt(bitmapComboBox.getSelectedIndex()).getValue();
+                    int left = (width - height) / 2 + 1;
+                    graphics.drawImage(bitmapIcon(id).getImage(), left, 1, left + height - 2, height - 1,
+                            1, 1, BITMAP_PREVIEW_SIZE + 1, BITMAP_PREVIEW_SIZE + 1, null);
+                } else {
+                    float focus = focalPointCheckBox.isSelected() && gradient instanceof FOCALGRADIENT
+                            ? ((FOCALGRADIENT) gradient).focalPoint : 0;
+                    gradientEditor.paintSwatch(graphics, new Rectangle(1, 1, width - 2, height - 2), type == 3, focus);
+                }
+            }
+            graphics.setColor(Color.gray);
+            graphics.drawRect(0, 0, width - 1, height - 1);
         }
 
         static ImageIcon colorIcon(Color color) {
-            // Paint the swatch independently of the look and feel's button colors.
-            BufferedImage swatch = new BufferedImage(18, 18, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D graphics = swatch.createGraphics();
-            try {
-                for (int y = 1; y < 17; y += 4) {
-                    for (int x = 1; x < 17; x += 4) {
-                        graphics.setColor(((x / 4 + y / 4) % 2) == 0 ? Color.white : Color.lightGray);
-                        graphics.fillRect(x, y, 4, 4);
-                    }
-                }
-                graphics.setColor(color);
-                graphics.fillRect(1, 1, 16, 16);
-                graphics.setColor(Color.gray);
-                graphics.drawRect(0, 0, 17, 17);
-            } finally {
-                graphics.dispose();
-            }
-            return new ImageIcon(swatch);
+            return ShapeColorEditor.createSwatchIcon(color);
         }
 
         void setChangeListener(Consumer<String> listener) {
@@ -711,24 +889,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             updateColor(style != null && style.color != null ? style.color.toColor() : defaultColor);
             // The gradient editor only receives a detached copy of the style.
             gradient = style != null && style.gradient != null ? Helper.deepCopy(style.gradient) : new GRADIENT();
-            gradientEditor = new GradientEditor(gradient);
-            gradientEditor.addChangeListener(new ChangeListener() {
-                @Override
-                public void change(PropertyEditor editor) {
-                    editor.save();
-                    changeListener.accept("gradient");
-                }
-
-                @Override
-                public void linkChanged(boolean newValue) {
-                }
-            });
-            Component previous = ((BorderLayout) gradientPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
-            if (previous != null) {
-                gradientPanel.remove(previous);
-            }
-            gradientPanel.add(gradientEditor, BorderLayout.CENTER);
-            flowComboBox.setSelectedIndex(gradient.spreadMode >= 0 && gradient.spreadMode <= 2 ? gradient.spreadMode : -1);
+            gradientEditor.setGradient(gradient);
+            setFlow(gradient.spreadMode);
             linearRGBCheckBox.setSelected(gradient.interpolationMode == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE);
             focalPointCheckBox.setSelected(style != null && style.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT);
             smoothedCheckBox.setSelected(style == null || isSmoothed(style));
@@ -782,8 +944,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 gradientEditor.save();
                 style.gradient = Helper.deepCopy(gradient);
                 setGradientType(style, type);
-                if (flowComboBox.getSelectedIndex() >= 0) {
-                    style.gradient.spreadMode = flowComboBox.getSelectedIndex();
+                if (getFlow() >= 0) {
+                    style.gradient.spreadMode = getFlow();
                 }
                 if (linearRGBCheckBox.getSelectionState() != 1) {
                     style.gradient.interpolationMode = linearRGBCheckBox.isSelected()
@@ -881,14 +1043,14 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             Integer type = common(styles, FillEditor::styleType);
             setType(type == null ? -1 : type);
             if (type != null && type == 1 && common(styles, style -> style.color.toColor()) == null) {
-                colorButton.setText("-");
-                colorButton.setIcon(null);
+                colorEditor.setMixed();
             }
             if (styles.stream().allMatch(style -> style != null && style.hasGradient())) {
                 ((CardLayout) valuePanel.getLayout()).show(valuePanel, "gradient");
+                gradientOptions.setVisible(true);
                 gradientEditor.setIndeterminate(common(styles, FillEditor::gradientStops) == null);
                 Integer flow = common(styles, style -> style.gradient.spreadMode);
-                flowComboBox.setSelectedIndex(flow == null || flow < 0 || flow > 2 ? -1 : flow);
+                setFlow(flow == null ? -1 : flow);
                 Integer interpolation = common(styles, style -> style.gradient.interpolationMode);
                 linearRGBCheckBox.setSelectionState(interpolation == null ? 1
                         : interpolation == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE ? 2 : 0);
@@ -925,8 +1087,8 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                     base.gradient.gradientRecords = Helper.deepCopy(gradient.gradientRecords);
                 }
             } else if (property.equals("flow")) {
-                if (base != null && base.hasGradient() && flowComboBox.getSelectedIndex() >= 0) {
-                    base.gradient.spreadMode = flowComboBox.getSelectedIndex();
+                if (base != null && base.hasGradient() && getFlow() >= 0) {
+                    base.gradient.spreadMode = getFlow();
                 }
             } else if (property.equals("linearRGB")) {
                 if (base != null && base.hasGradient() && linearRGBCheckBox.getSelectionState() != 1) {
@@ -981,17 +1143,21 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             return bitmapIcons.computeIfAbsent(id, key -> bitmapIcon(bitmapSwf == null ? null : bitmapSwf.getImage(key)));
         }
 
+        private static void paintCheckerboard(Graphics2D graphics, int width, int height) {
+            for (int y = 0; y < height; y += 4) {
+                for (int x = 0; x < width; x += 4) {
+                    graphics.setColor((x / 4 + y / 4) % 2 == 0 ? Color.white : Color.lightGray);
+                    graphics.fillRect(1 + x, 1 + y, Math.min(4, width - x), Math.min(4, height - y));
+                }
+            }
+        }
+
         static ImageIcon bitmapIcon(ImageTag image) {
             int iconSize = BITMAP_PREVIEW_SIZE + 2;
             BufferedImage preview = new BufferedImage(iconSize, iconSize, BufferedImage.TYPE_INT_ARGB);
             Graphics2D graphics = preview.createGraphics();
             try {
-                for (int y = 1; y <= BITMAP_PREVIEW_SIZE; y += 4) {
-                    for (int x = 1; x <= BITMAP_PREVIEW_SIZE; x += 4) {
-                        graphics.setColor((x / 4 + y / 4) % 2 == 0 ? Color.white : Color.lightGray);
-                        graphics.fillRect(x, y, 4, 4);
-                    }
-                }
+                paintCheckerboard(graphics, BITMAP_PREVIEW_SIZE, BITMAP_PREVIEW_SIZE);
                 Dimension size = image == null ? null : image.getImageDimension();
                 if (size != null && size.width > 0 && size.height > 0) {
                     SerializableImage source = image.getImageCached();

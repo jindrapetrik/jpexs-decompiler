@@ -174,7 +174,7 @@ public class ShapeDrawingSettingsTest {
                 settings.shared.setSwf(shape.getSwf());
                 type(settings.paint, "fillEditor").setSelectedIndex(2);
                 Object editor = field(settings.paint, "fillEditor");
-                ((JComboBox<?>) field(editor, "flowComboBox")).setSelectedIndex(GRADIENT.SPREAD_REFLECT_MODE);
+                ((JToggleButton[]) field(editor, "flowButtons"))[GRADIENT.SPREAD_REFLECT_MODE].doClick();
                 ((JTriStateCheckBox) field(editor, "linearRGBCheckBox")).doClick();
                 settings.shared.setSwf(shape.getSwf());
                 for (FILLSTYLE fill : new FILLSTYLE[]{settings.brush.getFillStyle(BOUNDS),
@@ -197,7 +197,7 @@ public class ShapeDrawingSettingsTest {
                 stroke.hasFillFlag = true;
                 stroke.fillType = sampled;
                 settings.shared.setSampledStroke(stroke);
-                ((JComboBox<?>) field(field(settings.pencil, "strokeEditor"), "flowComboBox")).setSelectedIndex(GRADIENT.SPREAD_REPEAT_MODE);
+                ((JToggleButton[]) field(field(settings.pencil, "strokeEditor"), "flowButtons"))[GRADIENT.SPREAD_REPEAT_MODE].doClick();
                 assertEquals(settings.ink.getStrokeStyle().fillType.gradient.spreadMode, GRADIENT.SPREAD_REPEAT_MODE);
                 assertEquals(settings.shapes.getStroke(BOUNDS).fillType.gradientMatrix.translateX, 12345);
                 FILLSTYLE fill = new FILLSTYLE();
