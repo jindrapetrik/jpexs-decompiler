@@ -529,6 +529,17 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     }
 
     @Override
+    public void toAS3(StringBuilder result, double unitDivisor) {
+        result.append("\tprivate function ").append(SWF.getTypePrefix(this)).append(getCharacterId()).append("():Sprite {\r\n");
+        result.append("\t\treturn new Sprite();\r\n");
+        result.append("\t}\r\n\r\n");
+
+        result.append("\tprivate function ").append(SWF.getTypePrefix(this)).append(getCharacterId()).append("_frame(sprite:Sprite, frame:int, ratio:Number, time:int):void {\r\n");
+        getTimeline().toAS3(result, unitDivisor, null);
+        result.append("\t}\r\n\r\n");
+    }
+
+    @Override
     public int getNumFrames() {
         // flashplayer ignores the count stored in frameCount
         return getTimeline().getFrameCount(); // frameCount

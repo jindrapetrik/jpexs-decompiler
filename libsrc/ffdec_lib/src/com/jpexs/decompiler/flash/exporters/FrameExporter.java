@@ -188,6 +188,9 @@ public class FrameExporter {
             case WEBP_ANIMATED:
                 fem = FrameExportMode.WEBP_ANIMATED;
                 break;
+            case AS3:
+                fem = FrameExportMode.AS3;
+                break;
             case SWF:
                 fem = FrameExportMode.SWF;
                 break;
@@ -558,6 +561,90 @@ public class FrameExporter {
                 evl.handleExportedEvent("canvas", 1, 1, parentTag == null ? "" : parentTag.getName());
             }
             return ret;
+        }
+
+        if (settings.mode == FrameExportMode.AS3) {
+
+            final Timeline ftim = tim;
+            final Color fbackgroundColor = null;
+            final SWF fswf = swf;
+            for (File foutdir : foutdirs) {
+                new RetryTask(() -> {
+                    String className = "Sprite" + ftim.id;
+                    File f = new File(foutdir + File.separator + className + ".as");
+                    int width = (int) (ftim.displayRect.getWidth() * settings.zoom / SWF.unitDivisor);
+                    int height = (int) (ftim.displayRect.getHeight() * settings.zoom / SWF.unitDivisor);
+                    try (final OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
+                        String currentName = ftim.id == 0 ? "main" : SWF.getTypePrefix(fswf.getCharacter(ftim.id)) + ftim.id;
+
+                        Set<Integer> library = new HashSet<>();
+                        Set<String> libraryClasses = new HashSet<>();
+                        ftim.getNeededCharacters(fframes, library, libraryClasses);
+                        
+                        // if no character has multiple frames, simply draw the
+                        // first frame once, instead of updating every frame
+                        boolean needsFrames = fframes.size() > 1;
+                        if (!needsFrames) {
+                            for (int c : library) {
+                                CharacterTag ch = fswf.getCharacter(c);
+                                if (ch instanceof DefineSpriteTag) {
+                                    DefineSpriteTag sp = (DefineSpriteTag) ch;
+                                    needsFrames = sp.getTimeline().getFrameCount() > 1;
+                                    break;
+                                }
+                            }
+                        }
+
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("package {\r\n");
+                        sb.append("import flash.display.*;\r\n");
+                        sb.append("import flash.events.*;\r\n");
+                        sb.append("import flash.geom.*;\r\n");
+                        sb.append("import flash.text.*;\r\n");
+                        sb.append("public class ").append(className).append(" extends Sprite {\r\n");
+                        sb.append("\tpublic function ").append(className).append("() {\r\n");
+                        sb.append("\t\tsuper();\r\n");
+                        sb.append("\t\ttransform.matrix = new Matrix(").append(settings.zoom).append(", 0, 0, ").append(settings.zoom).append(", ").append(-ftim.displayRect.Xmin * settings.zoom / SWF.unitDivisor).append(", ").append(-ftim.displayRect.Ymin * settings.zoom / SWF.unitDivisor).append(");\r\n");
+                        if (needsFrames) {
+                            sb.append("\t\tvar frame:int = -1;\r\n");
+                            sb.append("\t\tvar time:int = 0;\r\n");
+                            sb.append("\t\tvar frames:Array = [");
+                            for (int i = 0; i < fframes.size(); i++) {
+                                if (i > 0) {
+                                    sb.append(",");
+                                }
+                                sb.append(fframes.get(i));
+                            }
+                            sb.append("];\r\n");
+                            sb.append("\t\tvar self:Sprite = this;\r\n");
+                            sb.append("\t\taddEventListener(Event.ENTER_FRAME, function(event:Event):void {\r\n");
+                            sb.append("\t\t\tvar oldFrame:int = frame;\r\n");
+                            sb.append("\t\t\tframe = (frame + 1) % frames.length;\r\n");
+                            sb.append("\t\t\tif (frame == oldFrame) { time++; } else { time = 0; }\r\n");
+                            sb.append("\t\t\t").append(currentName).append("_frame(self, frames[frame], 0, time);\r\n");
+                            sb.append("\t\t});\r\n");
+                        } else {
+                            sb.append("\t\t").append(currentName).append("_frame(this, ").append(fframes.get(0)).append(", 0, 0);\r\n");
+                        }
+                        sb.append("\t}\r\n\r\n");
+                        fos.write(Utf8Helper.getBytes(sb.toString()));
+
+                        SWF.libraryToAS3(fswf, library, SWF.unitDivisor, fos);
+
+                        sb = new StringBuilder();
+                        sb.append("\tprivate function ").append(currentName).append("_frame(sprite:Sprite, frame:int, ratio:Number, time:int):void {\r\n");
+                        framesToAS3(sb, 1.0, ftim, fframes);
+                        sb.append("\t}\r\n");
+
+                        sb.append("}\r\n"); // end class
+                        sb.append("}\r\n"); // end package
+
+                        fos.write(Utf8Helper.getBytes(sb.toString()));
+                    }
+
+                    ret.add(f);
+                }, handler).run();
+            }
         }
 
         if (settings.mode == FrameExportMode.SWF) {
@@ -933,6 +1020,83 @@ public class FrameExporter {
 
             writer.close();
         }
+    }
+
+    public static void framesToAS3(StringBuilder result, double unitDivisor, Timeline timeline, List<Integer> frames) {
+        if (frames == null) {
+            frames = new ArrayList<>();
+            for (int i = 0; i < timeline.getFrameCount(); i++) {
+                frames.add(i);
+            }
+        }
+
+        result.append("\t\tvar frameCount:int = ").append(timeline.getFrameCount()).append(";\r\n");
+	    result.append("\t\tframe = frame % frameCount;\r\n");
+        result.append("\t\tswitch (frame) {\r\n");
+
+        int maxDepth = timeline.getMaxDepth();
+        for (int frame : frames) {
+
+            if (CancellableWorker.isInterrupted()) {
+                break;
+            }
+            Frame frameObj = timeline.getFrame(frame);
+            result.append("\t\t\tcase ").append(frame).append(":\r\n");
+            result.append("\t\t\t\tsprite.removeChildren();\r\n");
+            for (int i = 1; i <= maxDepth + 1; i++) {
+                if (!frameObj.layers.containsKey(i)) {
+                    continue;
+                }
+                DepthState layer = frameObj.layers.get(i);
+                if (!layer.isVisible) {
+                    continue;
+                }
+
+                CharacterTag character = layer.getCharacter();
+                if (character == null) {
+                    continue;
+                }
+
+                Matrix placeMatrix = new Matrix(layer.matrix);
+                placeMatrix.scaleX /= unitDivisor;
+                placeMatrix.scaleY /= unitDivisor;
+                placeMatrix.rotateSkew0 /= unitDivisor;
+                placeMatrix.rotateSkew1 /= unitDivisor;
+                placeMatrix.translateX /= unitDivisor;
+                placeMatrix.translateY /= unitDivisor;
+
+                String childVarName = new StringBuilder().append("child").append(i).append("_frame").append(frame).toString();
+                result.append("\t\t\t\tvar ").append(childVarName).append(":DisplayObject = ").append(SWF.getTypePrefix(character)).append(character.getCharacterId()).append("();\r\n");
+                if (character instanceof DefineSpriteTag) {
+                    DefineSpriteTag sp = (DefineSpriteTag) character;
+                    int f = 0;
+                    String fstr = "0";
+                    Timeline tim = sp.getTimeline();
+                    if (tim.getFrameCount() > 0) {
+                        f = layer.time % tim.getFrameCount();
+                        fstr = "(" + f + " + time) % " + tim.getFrameCount();
+                    }
+
+                    result.append("\t\t\t\t").append(SWF.getTypePrefix(character)).append(character.getCharacterId())
+                        .append("_frame(")
+                        .append("Sprite(").append(childVarName).append("), ")
+                        .append(fstr).append(", ")
+                        .append(layer.ratio < 0 ? 0 : layer.ratio).append(", ")
+                        .append("time")
+                        .append(");\r\n");
+                }
+                result.append("\t\t\t\t").append(childVarName).append(".transform.matrix = new Matrix(").append(placeMatrix.scaleX).append(", ")
+                        .append(placeMatrix.rotateSkew0).append(", ")
+                        .append(placeMatrix.rotateSkew1).append(", ")
+                        .append(placeMatrix.scaleY).append(", ")
+                        .append(placeMatrix.translateX).append(", ")
+                        .append(placeMatrix.translateY)
+                        .append(");\r\n");
+                result.append("\t\t\t\tsprite.addChild(").append(childVarName).append(");\r\n");
+            }
+            result.append("\t\t\t\tbreak;\r\n");
+        }
+        result.append("\t\t}\r\n");
     }
 
     public static void framesToHtmlCanvas(StringBuilder result, double unitDivisor, Timeline timeline, List<Integer> frames, int time, DepthState stateUnderCursor, int mouseButton, RECT displayRect, ColorTransform colorTransform, Color backGroundColor) {
