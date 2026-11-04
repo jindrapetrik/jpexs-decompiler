@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -97,9 +98,16 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
     private final FillEditor fillEditor = new FillEditor(Color.white);
     private final FillEditor strokeEditor = new FillEditor(Color.black);
     private final FloatPropertyField widthEditor = new FloatPropertyField(1f, 0f, 65535f / (float) SWF.unitDivisor);
-    private final JComboBox<String> scaleComboBox = createComboBox("scale", "normal", "horizontal", "vertical", "none");
-    private final JComboBox<String> capComboBox = createComboBox("cap", "round", "none", "square");
-    private final JComboBox<String> joinComboBox = createComboBox("join", "round", "bevel", "miter");
+    private final JComboBox<ComboBoxItem<Icon>> scaleComboBox = createStrokeComboBox("scale",
+            new String[]{"normal", "horizontal", "vertical", "none"},
+            StrokeOptionIcons.scale(true, true), StrokeOptionIcons.scale(true, false),
+            StrokeOptionIcons.scale(false, true), StrokeOptionIcons.scale(false, false));
+    private final JComboBox<ComboBoxItem<Icon>> capComboBox = createStrokeComboBox("cap",
+            new String[]{"round", "none", "square"}, StrokeOptionIcons.cap(BasicStroke.CAP_ROUND),
+            StrokeOptionIcons.cap(BasicStroke.CAP_BUTT), StrokeOptionIcons.cap(BasicStroke.CAP_SQUARE));
+    private final JComboBox<ComboBoxItem<Icon>> joinComboBox = createStrokeComboBox("join",
+            new String[]{"round", "bevel", "miter"}, StrokeOptionIcons.join(BasicStroke.JOIN_ROUND),
+            StrokeOptionIcons.join(BasicStroke.JOIN_BEVEL), StrokeOptionIcons.join(BasicStroke.JOIN_MITER));
     private final FloatPropertyField miterEditor = new FloatPropertyField(3f, 1f, 255f);
     private final JPanel fillPanel = new JPanel(new GridBagLayout());
     private final JPanel strokePanel = new JPanel(new GridBagLayout());
@@ -448,6 +456,22 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         comboBox.setRenderer(indeterminateRenderer());
         for (String value : values) {
             comboBox.addItem(EasyStrings.translate("property.shape." + property + "." + value));
+        }
+        return comboBox;
+    }
+
+    private static JComboBox<ComboBoxItem<Icon>> createStrokeComboBox(String property, String[] values, Icon... icons) {
+        JComboBox<ComboBoxItem<Icon>> comboBox = new JComboBox<>();
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean selected, boolean focus) {
+                super.getListCellRendererComponent(list, value == null ? "-" : value, index, selected, focus);
+                setIcon(value instanceof ComboBoxItem ? (Icon) ((ComboBoxItem<?>) value).getValue() : null);
+                return this;
+            }
+        });
+        for (int i = 0; i < values.length; i++) {
+            comboBox.addItem(new ComboBoxItem<>(EasyStrings.translate("property.shape." + property + "." + values[i]), icons[i]));
         }
         return comboBox;
     }
