@@ -136,3 +136,8 @@ Lexer\.java$
 ^Dockerfile$
 (?:^|/)DoAction\.as$
 ^libsrc/ffdec_lib/testdata/motion_object/
+^README_pt_BR\.md$
+^ARQUITETURA_IA\.md$
+^CHANGELOG_AI\.md$
+^TESTES_IA\.md$
+(?:^|/)ttf\.doubletype\.license\.txt$
