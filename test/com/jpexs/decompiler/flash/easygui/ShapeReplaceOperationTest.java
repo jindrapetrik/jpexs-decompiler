@@ -42,6 +42,26 @@ public class ShapeReplaceOperationTest {
     }
 
     @Test
+    public void resourceUndoRestoresOriginalBytesAfterImport() throws Exception {
+        DefineShape4Tag tag = original();
+        tag.createOriginalData();
+        byte[] originalData = tag.getData();
+        byte[] originalRange = tag.getOriginalRange().getRangeData();
+        ShapeReplaceOperation operation = new ShapeReplaceOperation(tag, "Replace", (shape, forward) -> { });
+        new SvgImporter().importSvg(tag,
+                "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\"><rect width=\"20\" height=\"20\" fill=\"#00ff00\"/></svg>", false);
+        assertTrue(operation.finishImport());
+        UndoManager history = new UndoManager();
+        history.doOperation(operation, tag.getSwf());
+        ShapeTag imported = (ShapeTag) tag.getSwf().getCharacter(tag.shapeId);
+        assertTrue(imported.canUndo());
+        assertEquals(imported.getOriginalRange().getRangeData(), originalRange);
+        imported.undo();
+        assertEquals(imported.getData(), originalData);
+        assertFalse(imported.canUndo());
+    }
+
+    @Test
     public void rasterReplacementUsesExistingBoundsOptionsAndUndoesImportedBitmapTags() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         ImageIO.write(new BufferedImage(27, 13, BufferedImage.TYPE_INT_ARGB), "png", output);
@@ -57,6 +77,7 @@ public class ShapeReplaceOperationTest {
             UndoManager undo = new UndoManager();
             undo.doOperation(replace, swf);
             ShapeTag imported = (ShapeTag) swf.getCharacter(tag.shapeId);
+            assertTrue(imported.isModified());
             assertEquals(imported.getRect().getWidth(), updateBounds ? 540 : 2000);
             assertEquals(imported.getRect().getHeight(), updateBounds ? 260 : 1000);
             assertNotNull(swf.getCharacter(bitmap));
@@ -66,11 +87,18 @@ public class ShapeReplaceOperationTest {
             assertEquals(((ShapeTag) swf.getCharacter(tag.shapeId)).getData(), before);
             assertNull(swf.getCharacter(bitmap), "Undo must also remove the newly imported bitmap");
             assertFalse(swf.isModified());
+            assertFalse(((ShapeTag) swf.getCharacter(tag.shapeId)).isModified());
             undo.redo(swf);
             assertEquals(((ShapeTag) swf.getCharacter(tag.shapeId)).getData(), after);
             assertNotNull(swf.getCharacter(bitmap));
             assertTrue(swf.isModified());
+            assertTrue(((ShapeTag) swf.getCharacter(tag.shapeId)).isModified());
             assertTrue(swf.indexOfTag(swf.getCharacter(bitmap)) < swf.indexOfTag(swf.getCharacter(tag.shapeId)));
+            swf.clearModified();
+            undo.undo(swf);
+            assertTrue(((ShapeTag) swf.getCharacter(tag.shapeId)).isModified());
+            undo.redo(swf);
+            assertFalse(((ShapeTag) swf.getCharacter(tag.shapeId)).isModified());
         }
     }
 

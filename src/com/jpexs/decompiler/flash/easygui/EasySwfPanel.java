@@ -1311,6 +1311,7 @@ public class EasySwfPanel extends JPanel {
                 refreshShapePoints(selected);
                 libraryTreeTable.setSwf(null);
                 libraryTreeTable.setSwf(tag.getSwf());
+                mainPanel.refreshTree(tag.getSwf());
             }), editingShape.getSwf());
         } catch (IOException | InterruptedException ex) {
             logShapeEditFailure(ex);
@@ -1615,6 +1616,7 @@ public class EasySwfPanel extends JPanel {
                 }
                 libraryTreeTable.setSwf(null);
                 libraryTreeTable.setSwf(tag.getSwf());
+                mainPanel.refreshTree(tag.getSwf());
             }), editingShape.getSwf());
         } catch (IOException | InterruptedException ex) {
             Logger.getLogger(EasySwfPanel.class.getName()).log(Level.SEVERE, "Cannot edit shape", ex);

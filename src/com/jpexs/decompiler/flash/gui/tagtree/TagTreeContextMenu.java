@@ -5296,6 +5296,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         AbstractTagTree tree = getTree();
         List<TreeItem> sel = getSelectedItems();
         Set<SWF> computeSWFs = new LinkedIdentityHashSet<>();
+        Map<TreeItem, TreeItem> replacements = new IdentityHashMap<>();
 
         for (TreeItem item : sel) {
             if (item instanceof TagScript) {
@@ -5307,7 +5308,13 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (item instanceof Tag) {
                 try {
                     Tag tag = (Tag) item;
+                    Timelined owner = tag.getTimelined() == null ? tag.getSwf() : tag.getTimelined();
+                    int tagIndex = owner.getTags().indexOf(tag);
                     tag.undo();
+                    if (tagIndex >= 0 && owner.getTags().get(tagIndex) != tag) {
+                        tag = owner.getTags().get(tagIndex);
+                        replacements.put(item, tag);
+                    }
                     SWF swf = tag.getSwf();
                     swf.clearAllCache();
                     if (tag instanceof Timelined) {
@@ -5322,7 +5329,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                         }
                     }
                     computeSWFs.add(swf);
-                    tree.getFullModel().updateNode(item);
+                    if (!replacements.containsKey(item)) {
+                        tree.getFullModel().updateNode(item);
+                    }
                 } catch (InterruptedException | IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
@@ -5334,7 +5343,20 @@ public class TagTreeContextMenu extends JPopupMenu {
             swf.computeDependentFrames();
         }
 
-        mainPanel.repaintTree();
+        if (replacements.isEmpty()) {
+            mainPanel.repaintTree();
+        } else {
+            mainPanel.refreshTree();
+            List<TreePath> restoredPaths = new ArrayList<>();
+            for (TreeItem item : sel) {
+                TreePath path = tree.getFullModel().getTreePath(replacements.getOrDefault(item, item));
+                if (path != null) {
+                    restoredPaths.add(path);
+                }
+            }
+            tree.setSelectionPaths(restoredPaths.toArray(new TreePath[0]));
+            mainPanel.reload(true);
+        }
     }
 
     private void closeSwfActionPerformed(ActionEvent evt) {

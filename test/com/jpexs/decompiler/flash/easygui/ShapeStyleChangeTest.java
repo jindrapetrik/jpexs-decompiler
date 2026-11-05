@@ -54,6 +54,56 @@ public class ShapeStyleChangeTest {
     }
 
     @Test
+    public void resourceUndoRestoresLoadedBytesAfterSeveralEdits() throws Exception {
+        DefineShape4Tag fixture = shape();
+        rectangle(fixture, 0, 0, 2000, 2000, 1, 0);
+        selection(fixture);
+        fixture.createOriginalData();
+        addClean(fixture);
+        ShapeTag shape = roundTrip(fixture);
+        byte[] originalRange = shape.getOriginalRange().getRangeData();
+        byte[] originalData = shape.getData();
+        UndoManager history = new UndoManager();
+        ShapeSelection model = new ShapeSelection(shape);
+        ShapeSelection.Edit green = model.change(at(model, 500, 500), fill(Color.green), null);
+        history.doOperation(new ShapeStyleChangeOperation(shape, green.model, "Green", null), shape.getSwf());
+        ShapeSelection.Edit blue = green.model.change(green.selected, fill(Color.blue), null);
+        history.doOperation(new ShapeStyleChangeOperation(current(shape), blue.model, "Blue", null), shape.getSwf());
+        ShapeTag edited = current(shape);
+        assertTrue(edited.canUndo());
+        assertEquals(edited.getOriginalRange().getRangeData(), originalRange);
+        edited.undo();
+        assertEquals(edited.getData(), originalData);
+        assertEquals(edited.getOriginalRange().getRangeData(), originalRange);
+        assertFalse(edited.isModified());
+        assertFalse(edited.canUndo());
+    }
+
+    @Test
+    public void resourceUndoUsesTheSavedBaselineAfterHistoryChanges() throws Exception {
+        DefineShape4Tag shape = shape();
+        rectangle(shape, 0, 0, 2000, 2000, 1, 0);
+        ShapeSelection model = selection(shape);
+        addClean(shape);
+        shape.createOriginalData();
+        UndoManager history = new UndoManager();
+        ShapeSelection.Edit green = model.change(at(model, 500, 500), fill(Color.green), null);
+        history.doOperation(new ShapeStyleChangeOperation(shape, green.model, "Green", null), shape.getSwf());
+        shape.getSwf().clearModified();
+        byte[] savedData = current(shape).getData();
+        byte[] savedRange = current(shape).getOriginalRange().getRangeData();
+        ShapeSelection.Edit blue = green.model.change(green.selected, fill(Color.blue), null);
+        history.doOperation(new ShapeStyleChangeOperation(current(shape), blue.model, "Blue", null), shape.getSwf());
+        history.undo(shape.getSwf());
+        history.undo(shape.getSwf());
+        assertTrue(current(shape).canUndo());
+        assertEquals(current(shape).getOriginalRange().getRangeData(), savedRange);
+        current(shape).undo();
+        assertEquals(current(shape).getData(), savedData);
+        assertFalse(current(shape).isModified());
+    }
+
+    @Test
     public void sharedFillIsIsolatedAndUndoRestoresOriginalBytesAndCleanFlag() throws Exception {
         DefineShape4Tag shape = shape();
         rectangle(shape, 0, 0, 2000, 2000, 1, 0);
@@ -67,6 +117,7 @@ public class ShapeStyleChangeTest {
         UndoManager history = new UndoManager();
         history.doOperation(new ShapeStyleChangeOperation(shape, edit.model, "Fill", null), shape.getSwf());
         ShapeTag changed = current(shape);
+        assertTrue(changed.isModified());
         assertEquals(at(new ShapeSelection(changed), 200, 200).fill.color.toColor(), Color.green);
         assertEquals(at(new ShapeSelection(changed), 3500, 500).fill.color.toColor(), Color.red);
         assertNull(at(new ShapeSelection(changed), 1000, 1000));
@@ -78,8 +129,10 @@ public class ShapeStyleChangeTest {
             assertSame(current(shape), shape);
             assertEquals(current(shape).getData(), original);
             assertFalse(shape.getSwf().isModified());
+            assertFalse(current(shape).isModified());
             history.redo(shape.getSwf());
             assertEquals(current(shape).getData(), after);
+            assertTrue(current(shape).isModified());
         }
     }
 
@@ -214,6 +267,38 @@ public class ShapeStyleChangeTest {
     }
 
     @Test
+    public void resourceUndoRestoresTheOriginalTagTypeAfterAnUpgrade() throws Exception {
+        DefineShape3Tag shape = new DefineShape3Tag(new SWF());
+        LINESTYLE line = new LINESTYLE();
+        line.width = 100;
+        line.color = new RGBA(Color.black);
+        shape.shapes.lineStyles.lineStyles = new LINESTYLE[]{line};
+        shape.shapes.shapeRecords = new ArrayList<>();
+        move(shape.shapes.shapeRecords, 0, 0, 0, 1);
+        edge(shape.shapes.shapeRecords, 2000, 0);
+        ShapeSelection model = selection(shape);
+        addClean(shape);
+        shape.createOriginalData();
+        byte[] originalData = shape.getData();
+        byte[] originalRange = shape.getOriginalRange().getRangeData();
+        LINESTYLE2 square = line.toLineStyle2();
+        square.startCapStyle = LINESTYLE2.SQUARE_CAP;
+        ShapeSelection.Edit changed = model.change(at(model, 1000, 0), null, square);
+        UndoManager history = new UndoManager();
+        history.doOperation(new ShapeStyleChangeOperation(shape, changed.model, "Cap", null), shape.getSwf());
+        ShapeTag upgraded = current(shape);
+        assertEquals(upgraded.getShapeNum(), 4);
+        assertEquals(((ShapeTag) upgraded.getOriginalTag()).getShapeNum(), 3);
+        upgraded.undo();
+        shape.getSwf().clearAllCache();
+        ShapeTag restored = current(shape);
+        assertEquals(restored.getShapeNum(), 3);
+        assertEquals(restored.getData(), originalData);
+        assertEquals(restored.getOriginalRange().getRangeData(), originalRange);
+        assertFalse(restored.canUndo());
+    }
+
+    @Test
     public void undoAfterSavingIsDirtyAndRedoBackToTheSavedPositionIsClean() throws Exception {
         DefineShape4Tag shape = shape();
         rectangle(shape, 0, 0, 2000, 2000, 1, 0);
@@ -225,14 +310,19 @@ public class ShapeStyleChangeTest {
         ShapeSelection.Edit blue = green.model.change(green.selected, fill(Color.blue), null);
         history.doOperation(new ShapeStyleChangeOperation(current(shape), blue.model, "Blue", null), shape.getSwf());
         shape.getSwf().clearModified(); // The application marks the SWF clean after saving it.
+        assertFalse(current(shape).isModified());
         history.undo(shape.getSwf());
         assertTrue(shape.getSwf().isModified());
+        assertTrue(current(shape).isModified());
         history.undo(shape.getSwf());
         assertTrue(shape.getSwf().isModified());
+        assertTrue(current(shape).isModified());
         history.redo(shape.getSwf());
         assertTrue(shape.getSwf().isModified());
+        assertTrue(current(shape).isModified());
         history.redo(shape.getSwf());
         assertFalse(shape.getSwf().isModified());
+        assertFalse(current(shape).isModified());
         assertEquals(at(new ShapeSelection(current(shape)), 500, 500).fill.color.toColor(), Color.blue);
         history.undo(shape.getSwf());
         ShapeSelection.Edit yellow = green.model.change(green.selected, fill(Color.yellow), null);

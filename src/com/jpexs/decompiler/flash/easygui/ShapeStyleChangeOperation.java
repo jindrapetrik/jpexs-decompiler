@@ -79,8 +79,10 @@ public class ShapeStyleChangeOperation implements DoableOperation {
     private void apply(ShapeTag target, boolean forward) {
         SWF swf = before.getSwf();
         ShapeTag current = (ShapeTag) swf.getCharacter(before.getCharacterId());
+        target.setOriginalRange(current.getOriginalRange());
         target.setTimelined(parent);
         parent.replaceTag(current, target);
+        target.setModified(true);
         int requiredVersion = after.getShapeNum() == 4 ? 8 : after.getShapeNum();
         swf.version = forward ? Math.max(version, requiredVersion) : version;
         swf.setHeaderModified(forward ? headerModified || swf.version != version : headerModified);

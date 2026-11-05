@@ -42,6 +42,7 @@ final class ShapeReplaceOperation implements DoableOperation {
 
     ShapeReplaceOperation(ShapeTag original, String description, BiConsumer<ShapeTag, Boolean> refresh) throws IOException, InterruptedException {
         before = (ShapeTag) original.cloneTag();
+        before.setOriginalRange(original.getOriginalRange());
         before.setModified(original.isModified());
         parent = original.getTimelined() == null ? original.getSwf() : original.getTimelined();
         parentModified = parent.isModified();
@@ -107,6 +108,9 @@ final class ShapeReplaceOperation implements DoableOperation {
             }
         }
         ShapeTag current = (ShapeTag) swf.getCharacter(before.shapeId);
+        if (notify) {
+            target.setOriginalRange(current.getOriginalRange());
+        }
         target.setTimelined(parent);
         parent.replaceTag(current, target);
         swf.version = forward ? importedVersion : version;
@@ -115,6 +119,7 @@ final class ShapeReplaceOperation implements DoableOperation {
         swf.setModified(forward || swfModified);
         swf.clearAllCache();
         if (notify) {
+            target.setModified(true);
             refresh.accept(target, forward);
         }
     }
