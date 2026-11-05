@@ -36,6 +36,7 @@ import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.IntegerValueItem;
 import com.jpexs.decompiler.graph.model.IntegerValueTypeItem;
@@ -62,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
@@ -1227,8 +1229,78 @@ public class Graph {
 
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
         //fixSwitchEnds(ret);
+        removeUnreadSetTemporaries(ret);
         handleSetTemporaryDeclarations(ret);
         return ret;
+    }
+
+    /**
+     * Removes side effect free temporaries that nothing prints anymore. A
+     * compound assign whose value branches (_s += (c ? a : b) + d) folds its
+     * dup back after the dup temp was output, which then printed as a stray
+     * var _temp_1:* = §§findproperty(_s).
+     *
+     * @param list List
+     */
+    private void removeUnreadSetTemporaries(List<GraphTargetItem> list) {
+        Set<Integer> read = new HashSet<>();
+        Set<GraphTargetItem> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (GraphTargetItem item : list) {
+            collectTempReads(item, read, visited);
+        }
+        removeUnreadSetTemporaries(list, read);
+    }
+
+    private void removeUnreadSetTemporaries(List<GraphTargetItem> list, Set<Integer> read) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof SetTemporaryItem) {
+                SetTemporaryItem st = (SetTemporaryItem) item;
+                if (!read.contains(st.tempIndex) && st.value != null && !st.value.hasSideEffect()) {
+                    list.remove(i);
+                    continue;
+                }
+            }
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    removeUnreadSetTemporaries(sub, read);
+                }
+            }
+        }
+    }
+
+    private void collectTempReads(GraphTargetItem item, Set<Integer> read, Set<GraphTargetItem> visited) {
+        if (item == null || !visited.add(item)) {
+            return;
+        }
+        if ((item instanceof HasTempIndex) && !(item instanceof SetTemporaryItem)) {
+            read.add(((HasTempIndex) item).getTempIndex());
+        }
+        List<GraphTargetItem> printed = getPrintedChildren(item);
+        if (printed != null) {
+            for (GraphTargetItem child : printed) {
+                collectTempReads(child, read, visited);
+            }
+            return;
+        }
+        item.visit(new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem child) {
+                collectTempReads(child, read, visited);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Gets the children an item prints, when they differ from the ones it
+     * visits.
+     *
+     * @param item Item
+     * @return Printed children or null to use the visited ones
+     */
+    protected List<GraphTargetItem> getPrintedChildren(GraphTargetItem item) {
+        return null;
     }
 
     private boolean containsPopItems(List<GraphTargetItem> list) {
