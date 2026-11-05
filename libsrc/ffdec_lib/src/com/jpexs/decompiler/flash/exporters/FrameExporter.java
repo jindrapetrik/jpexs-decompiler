@@ -150,7 +150,6 @@ public class FrameExporter {
             frames.add(ButtonTag.FRAME_DOWN);
             frames.add(ButtonTag.FRAME_HITTEST);
         }*/
-
         FrameExportSettings fes = new FrameExportSettings(fem, settings.zoom, true, settings.aaScale);
         return exportFrames(handler, outdir, swf, containerId, frames, 1, fes, evl, true, settings.mode == ButtonExportMode.SVG_COMBINED);
     }
@@ -301,11 +300,11 @@ public class FrameExporter {
         }
         return "" + frame + buttonSuffix;
     }
-    
+
     public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, int subFramesLength, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
         return exportFrames(handler, outdir, swf, containerId, frames, subFramesLength, settings, evl, false, false);
-    }        
-    
+    }
+
     private List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, int subFramesLength, final FrameExportSettings settings, final EventListener evl, boolean button, boolean combined) throws IOException, InterruptedException {
         final List<File> ret = new ArrayList<>();
         if (CancellableWorker.isInterrupted()) {
@@ -345,7 +344,7 @@ public class FrameExporter {
         final Timeline tim = tim0;
 
         boolean exportAll = frames == null;
-                
+
         if (exportAll) {
             frames = new ArrayList<>();
             List<Frame> timFrames = tim.getFrames();
@@ -376,7 +375,7 @@ public class FrameExporter {
             Map<Integer, FontTag> normalizedFonts = new LinkedHashMap<>();
             Map<Integer, TextTag> normalizedTexts = new LinkedHashMap<>();
             normalizer.normalizeFonts(tim.timelined.getSwf(), normalizedFonts, normalizedTexts);
-            
+
             if (combined) {
                 final Color fbackgroundColor = backgroundColor;
                 for (File foutdir : foutdirs) {
@@ -389,17 +388,16 @@ public class FrameExporter {
                             rect.xMin *= settings.zoom;
                             rect.yMin *= settings.zoom;
                             SVGExporter exporter = new SVGExporter(rect, settings.zoom, "frame", fbackgroundColor);
-                            exporter.setNormalizedFonts(normalizedFonts, normalizedTexts);                            
+                            exporter.setNormalizedFonts(normalizedFonts, normalizedTexts);
                             //Here is not timelined.toSVG, but drawableTag.toSVG, which draws combined button
                             ((DrawableTag) timelined).toSVG(0, 0, exporter, 0, null, 0, new Matrix(), new Matrix());
-                                
-                            
+
                             fos.write(Utf8Helper.getBytes(exporter.getSVG()));
                         }
                         ret.add(f);
                     }, handler).run();
                 }
-            } else {            
+            } else {
                 int max = frames.size();
                 if (subFramesLength > 1) {
                     max = subFramesLength;
@@ -414,7 +412,7 @@ public class FrameExporter {
                     final Color fbackgroundColor = backgroundColor;
                     for (File foutdir : foutdirs) {
                         new RetryTask(() -> {
-                            int frame = subFramesLength > 1 ? fframes.get(0) : fframes.get(fi);                        
+                            int frame = subFramesLength > 1 ? fframes.get(0) : fframes.get(fi);
                             File f = new File(foutdir + File.separator + getFrameFileName(((subFramesLength > 1 ? fi : fframes.get(fi)) + 1), button) + ".svg");
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                                 ExportRectangle rect = new ExportRectangle(tim.displayRect);
@@ -580,7 +578,7 @@ public class FrameExporter {
                         Set<Integer> library = new HashSet<>();
                         Set<String> libraryClasses = new HashSet<>();
                         ftim.getNeededCharacters(fframes, library, libraryClasses);
-                        
+
                         // if no character has multiple frames, simply draw the
                         // first frame once, instead of updating every frame
                         boolean needsFrames = fframes.size() > 1;
@@ -946,9 +944,9 @@ public class FrameExporter {
     }
 
     public static void makeAnimatedPng(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
-        
+
         List<AnimationFrameData> frames = new ArrayList<>();
-        
+
         int delayNumerator = 1000;
         int delayDenominator = Math.round(1000 * frameRate);
         int width = 0;
@@ -971,7 +969,7 @@ public class FrameExporter {
             AnimatedPngEncoder.encode(data, fos);
         }
     }
-    
+
     public static void makeAnimatedWebP(Iterator<BufferedImage> images, float frameRate, File file, EventListener evl) throws IOException {
         GifToWebPConfig config = GifToWebPConfig.createLosslessConfig();
         List<BufferedImage> allImages = new ArrayList<>();
@@ -1031,7 +1029,7 @@ public class FrameExporter {
         }
 
         result.append("\t\tvar frameCount:int = ").append(timeline.getFrameCount()).append(";\r\n");
-	    result.append("\t\tframe = frame % frameCount;\r\n");
+        result.append("\t\tframe = frame % frameCount;\r\n");
         result.append("\t\tswitch (frame) {\r\n");
 
         int maxDepth = timeline.getMaxDepth();
@@ -1078,12 +1076,12 @@ public class FrameExporter {
                     }
 
                     result.append("\t\t\t\t").append(SWF.getTypePrefix(character)).append(character.getCharacterId())
-                        .append("_frame(")
-                        .append("Sprite(").append(childVarName).append("), ")
-                        .append(fstr).append(", ")
-                        .append(layer.ratio < 0 ? 0 : layer.ratio).append(", ")
-                        .append("time")
-                        .append(");\r\n");
+                            .append("_frame(")
+                            .append("Sprite(").append(childVarName).append("), ")
+                            .append(fstr).append(", ")
+                            .append(layer.ratio < 0 ? 0 : layer.ratio).append(", ")
+                            .append("time")
+                            .append(");\r\n");
                 }
                 result.append("\t\t\t\t").append(childVarName).append(".transform.matrix = new Matrix(").append(placeMatrix.scaleX).append(", ")
                         .append(placeMatrix.rotateSkew0).append(", ")

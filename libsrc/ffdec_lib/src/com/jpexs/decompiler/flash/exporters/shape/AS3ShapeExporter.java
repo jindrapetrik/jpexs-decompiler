@@ -157,8 +157,7 @@ public class AS3ShapeExporter extends ShapeExporterBase {
     public void endShape() {
         if (forSprite) {
             shapeData.append("\t\treturn shape;\r\n");
-        }
-        else {
+        } else {
             shapeData.append("addChild(shape);\r\n");
         }
     }
