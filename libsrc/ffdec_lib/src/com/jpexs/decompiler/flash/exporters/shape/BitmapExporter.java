@@ -49,8 +49,14 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,13 +109,13 @@ public class BitmapExporter extends ShapeExporterBase {
     protected double thicknessScaleY;
 
     protected double unzoom;
-    
+
     protected int aaScale;
 
     protected static boolean linearGradientColorWarningShown = false;
 
     protected boolean scaleStrokes;
-    
+
     protected class TransformedStroke implements Stroke {
 
         /**
@@ -163,6 +169,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
     /**
      * Exports a shape to a bitmap.
+     *
      * @param windingRule Winding rule
      * @param shapeNum Shape number
      * @param swf SWF
@@ -183,7 +190,7 @@ public class BitmapExporter extends ShapeExporterBase {
         } else {
             BitmapExporter exporter = new BitmapExporter(windingRule, shapeNum, swf, shape, defaultColor, colorTransform);
             exporter.setCanUseSmoothing(canUseSmoothing);
-            exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes, aaScale);      
+            exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes, aaScale);
         }
     }
 
@@ -208,23 +215,24 @@ public class BitmapExporter extends ShapeExporterBase {
         this.aaScale = aaScale;
         super.export();
     }
-    
+
     protected void setTransform(Graphics2D g, Matrix transformation) {
         AffineTransform at = transformation.toTransform();
         at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
-        graphics.setTransform(at);        
-    }            
+        graphics.setTransform(at);
+    }
 
     protected void calculateThicknessScale() {
         com.jpexs.decompiler.flash.exporters.commonshape.Point p00 = strokeTransformation.transform(0, 0);
         com.jpexs.decompiler.flash.exporters.commonshape.Point p11 = strokeTransformation.transform(1, 1);
         thicknessScale = p00.distanceTo(p11) / Math.sqrt(2);
         thicknessScaleX = Math.abs(p11.x - p00.x);
-        thicknessScaleY = Math.abs(p11.y - p00.y);            
+        thicknessScaleY = Math.abs(p11.y - p00.y);
     }
 
     /**
      * Returns the image.
+     *
      * @return Image
      */
     public SerializableImage getImage() {
@@ -240,7 +248,7 @@ public class BitmapExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void beginFills() {        
+    public void beginFills() {
     }
 
     @Override
@@ -299,7 +307,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 break;
             }
         }
-        
+
         if (colors.isEmpty()) {
             colors.add(Color.red);
             ratios.add(0f);
@@ -390,17 +398,22 @@ public class BitmapExporter extends ShapeExporterBase {
 
         lineColor = color == null ? null : color.toColor();
         int capStyle = BasicStroke.CAP_ROUND;
-        switch (startCaps) {
-            case LINESTYLE2.NO_CAP:
-                capStyle = BasicStroke.CAP_BUTT;
-                break;
-            case LINESTYLE2.ROUND_CAP:
-                capStyle = BasicStroke.CAP_ROUND;
-                break;
-            case LINESTYLE2.SQUARE_CAP:
-                capStyle = BasicStroke.CAP_SQUARE;
-                break;
+        if (startCaps == endCaps) {
+            switch (startCaps) {
+                case LINESTYLE2.NO_CAP:
+                    capStyle = BasicStroke.CAP_BUTT;
+                    break;
+                case LINESTYLE2.ROUND_CAP:
+                    capStyle = BasicStroke.CAP_ROUND;
+                    break;
+                case LINESTYLE2.SQUARE_CAP:
+                    capStyle = BasicStroke.CAP_SQUARE;
+                    break;
+            }
+        } else {
+            capStyle = BasicStroke.CAP_BUTT;
         }
+
         int joinStyle = BasicStroke.JOIN_ROUND;
         switch (joints) {
             case LINESTYLE2.BEVEL_JOIN:
@@ -433,13 +446,26 @@ public class BitmapExporter extends ShapeExporterBase {
             //display minimum stroke of 1 pixel, no matter how zoomed it is
             if (thickness * unzoom / aaScale < 1 * SWF.unitDivisor) {
                 thickness = 1 * SWF.unitDivisor / (unzoom / aaScale);
-            }   
+            }
         }
-                
+
+        float fThickness = (float) thickness;
         if (joinStyle == BasicStroke.JOIN_MITER) {
-            lineStroke = new ExtendedBasicStroke((float) thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit);
+            lineStroke = new ExtendedBasicStroke((float) thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit) {
+                @Override
+                public Shape createStrokedShape(Shape s) {
+                    Shape ret = super.createStrokedShape(s);
+                    return applyStartEndCaps((AffineTransform) strokeTransformation.toTransform().clone(), s, ret, startCaps, endCaps, fThickness, noClose);
+                }
+            };
         } else {
-            lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
+            lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle) {
+                @Override
+                public Shape createStrokedShape(Shape s) {
+                    Shape ret = super.createStrokedShape(s);
+                    return applyStartEndCaps((AffineTransform) strokeTransformation.toTransform().clone(), s, ret, startCaps, endCaps, fThickness, noClose);
+                }
+            };
         }
 
         // Do not scale strokes automatically:
@@ -449,6 +475,162 @@ public class BitmapExporter extends ShapeExporterBase {
         } catch (NoninvertibleTransformException net) {
             // ignore
         }
+    }
+
+    private static Shape drawSquareCap(
+            Point2D point,
+            double dx,
+            double dy,
+            double width,
+            boolean start) {
+
+        double length = Math.hypot(dx, dy);
+        if (length == 0) {
+            return null;
+        }
+
+        double ux = dx / length;
+        double uy = dy / length;
+
+        double nx = -uy;
+        double ny = ux;
+
+        double half = width / 2.0;
+
+        double offset = start ? -half : half;
+
+        double x = point.getX();
+        double y = point.getY();
+
+        Path2D cap = new Path2D.Double();
+
+        cap.moveTo(x + nx * half, y + ny * half);
+        cap.lineTo(x - nx * half, y - ny * half);
+        cap.lineTo(x + ux * offset - nx * half,
+                y + uy * offset - ny * half);
+        cap.lineTo(x + ux * offset + nx * half,
+                y + uy * offset + ny * half);
+        cap.closePath();
+
+        return cap;
+    }
+
+    private void finishCaps(
+            Double startX, Double startY, Double startX2, Double startY2,
+            Double endX, Double endY, Double endX2, Double endY2,
+            Area area, float thickness, int startCaps, int endCaps, boolean noClose) {
+        double halfThickness = thickness / 2.0;
+        if (startX != null && endX != null) {
+            Shape startCapShape = null;
+            switch (startCaps) {
+                case LINESTYLE2.ROUND_CAP:
+                    startCapShape = new Ellipse2D.Double(startX - halfThickness, startY - halfThickness, thickness, thickness);
+                    break;
+                case LINESTYLE2.SQUARE_CAP:
+                    startCapShape = drawSquareCap(new Point2D.Double(startX, startY), startX2 - startX, startY2 - startY, thickness, true);
+                    break;
+            }
+
+            if (startCapShape != null) {
+                area.add(new Area(startCapShape));
+            }
+            if (noClose || startX != endX || startY != endY) {
+                Shape endCapShape = null;
+                switch (endCaps) {
+                    case LINESTYLE2.ROUND_CAP:
+                        endCapShape = new Ellipse2D.Double(endX - halfThickness, endY - halfThickness, thickness, thickness);
+                        break;
+                    case LINESTYLE2.SQUARE_CAP:
+                        endCapShape = drawSquareCap(new Point2D.Double(endX, endY), endX - endX2, endY - endY2, thickness, false);
+                        break;
+                }
+                if (endCapShape != null) {
+                    area.add(new Area(endCapShape));
+                }
+            }
+        }
+    }
+
+    private Shape applyStartEndCaps(AffineTransform trans, Shape original, Shape stroked, int startCaps, int endCaps, float thickness, boolean noClose) {
+        if (startCaps == endCaps) {
+            return stroked;
+        }
+
+        Area area = new Area(new Area(stroked));
+
+        Double startX = null;
+        Double startY = null;
+        Double startX2 = null;
+        Double startY2 = null;
+        Double endX = null;
+        Double endY = null;
+        Double endX2 = null;
+        Double endY2 = null;
+
+        Double x = null;
+        Double y = null;
+
+        PathIterator iterator = original.getPathIterator(null);
+        while (!iterator.isDone()) {
+            double[] coords = new double[6];
+            int type = iterator.currentSegment(coords);
+            switch (type) {
+                case PathIterator.SEG_MOVETO:
+                    finishCaps(startX, startY, startX2, startY2, endX, endY, endX2, endY2, area, thickness, startCaps, endCaps, noClose);
+
+                    startX = x = coords[0];
+                    startY = y = coords[1];
+                    startX2 = null;
+                    startY2 = null;
+                    endX = null;
+                    endY = null;
+                    break;
+                case PathIterator.SEG_LINETO:
+                    endX2 = x;
+                    endY2 = y;
+                    endX = x = coords[0];
+                    endY = y = coords[1];
+                    if (startX2 == null) {
+                        startX2 = x;
+                        startY2 = y;
+                    }
+                    break;
+                case PathIterator.SEG_QUADTO:
+                    endX2 = coords[0];
+                    endY2 = coords[1];
+                    endX = x = coords[2];
+                    endY = y = coords[3];
+
+                    if (startX2 == null) {
+                        startX2 = coords[0];
+                        startY2 = coords[1];
+                    }
+                    break;
+                case PathIterator.SEG_CUBICTO:
+                    endX2 = coords[2];
+                    endY2 = coords[3];
+                    endX = x = coords[4];
+                    endY = y = coords[5];
+                    if (startX2 == null) {
+                        startX2 = coords[0];
+                        startY2 = coords[1];
+                    }
+                    break;
+                case PathIterator.SEG_CLOSE:
+                    endX2 = x;
+                    endY2 = y;
+                    endX = x = startX;
+                    endY = y = startY;
+                    if (startX2 == null) {
+                        startX2 = x;
+                        startY2 = y;
+                    }
+                    break;
+            }
+            iterator.next();
+        }
+        finishCaps(startX, startY, startX2, startY2, endX, endY, endX2, endY2, area, thickness, startCaps, endCaps, noClose);
+        return area;
     }
 
     @Override
@@ -484,7 +666,7 @@ public class BitmapExporter extends ShapeExporterBase {
             colors.add(Color.RED);
             ratios.add(0f);
         }
-        
+
         if (colors.size() == 1) {
             colors.add(colors.get(0));
             ratios.set(0, 0f);
@@ -559,7 +741,7 @@ public class BitmapExporter extends ShapeExporterBase {
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
         path.quadTo(controlX, controlY, anchorX, anchorY);
     }
-    
+
     /**
      * Finalizes the path.
      */
@@ -707,8 +889,8 @@ public class BitmapExporter extends ShapeExporterBase {
                     Shape strokeShape = new BasicStroke((float) (1 * SWF.unitDivisor / unzoom), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(shp);
                     graphics.fill(strokeShape);                    
                 }
-                */
-            }            
+                 */
+            }
         }
         if (linePaint != null && lineStroke != null) {
             if (true) {
