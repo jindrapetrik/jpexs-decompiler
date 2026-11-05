@@ -493,12 +493,14 @@ public class LoopDetector {
             }
 
             //The natural exit of this loop (from its continue part) leading to the precontinue
-            //of a parent loop is the code after this loop, not a continue of the parent loop
+            //of a parent loop, or to the continue of the direct parent when this loop ends its
+            //body (as in a for each), is the code after this loop, not a continue of the parent loop
             for (GraphPartEdge edge : loop.edgesOutside) {
                 if (edge.from == loop.loopContinue
                         && !ignoredEdges.contains(edge)
                         && parentContinues.contains(edge.to)
-                        && isParentPreContinueOnly(loop, edge.to)) {
+                        && (isParentPreContinueOnly(loop, edge.to)
+                        || (loop.parentLoop != null && loop.parentLoop.loopContinue == edge.to))) {
                     parentContinues.remove(edge.to);
                 }
             }
