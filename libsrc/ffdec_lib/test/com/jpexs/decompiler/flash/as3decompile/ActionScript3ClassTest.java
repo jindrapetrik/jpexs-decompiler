@@ -49,6 +49,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
         addSwf("assembled", "testdata/as3_assembled/bin/as3_assembled.swf");
         addSwf("getouterscope", "testdata/getouterscope/getouterscope.swf");
         addSwf("haxe", "testdata/haxe/output.swf");
+        addSwf("haxe_ctor_skip_constructor", "testdata/haxe_ctor_skip_constructor/bin/haxe_ctor_skip_constructor.swf");
         addSwf("long", "testdata/as3_long/bin/as3_long.flex.swf");
     }
 
@@ -802,6 +803,34 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "      {\n"
                 + "         a = param1;\n"
                 + "         b = param2;\n"
+                + "      }\n"
+                + "   }\n"
+                + "}\n"
+        );
+    }
+
+    @Test
+    public void testHaxeCtorSkipConstructor() {
+        /*
+        AS3 does not allow super() after the return of Haxe's
+        if (flash.Boot.skip_constructor) return;
+         */
+        decompileScriptPack("haxe_ctor_skip_constructor", "tests.TestCtorSkip", "package tests\n"
+                + "{\n"
+                + "   import flash.Boot;\n"
+                + "   \n"
+                + "   public class TestCtorSkip extends TestCtorBase\n"
+                + "   {\n"
+                + "      \n"
+                + "      public var b:int;\n"
+                + "      \n"
+                + "      public function TestCtorSkip(param1:int = 0)\n"
+                + "      {\n"
+                + "         if(!Boot.skip_constructor)\n"
+                + "         {\n"
+                + "            super(param1);\n"
+                + "            b = param1 * 2;\n"
+                + "         }\n"
                 + "      }\n"
                 + "   }\n"
                 + "}\n"
