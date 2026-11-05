@@ -185,6 +185,11 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     }
 
     @Override
+    public void toAS3(StringBuilder result, double unitDivisor) {
+
+    }
+
+    @Override
     public boolean isSingleFrame() {
         if (!isSingleFrameInitialized) {
             initializeIsSingleFrame();

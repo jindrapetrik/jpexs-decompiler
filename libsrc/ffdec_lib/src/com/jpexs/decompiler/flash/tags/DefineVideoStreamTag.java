@@ -498,6 +498,11 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     }
 
     @Override
+    public void toAS3(StringBuilder result, double unitDivisor) {
+
+    }
+
+    @Override
     public int getNumFrames() {
         return numFrames;
     }

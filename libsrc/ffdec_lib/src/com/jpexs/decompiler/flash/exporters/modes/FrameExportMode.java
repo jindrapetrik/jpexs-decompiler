@@ -65,6 +65,10 @@ public enum FrameExportMode {
      */
     WEBP_ANIMATED,
     /**
+     * AS3 - Graphics commands
+     */
+    AS3,
+    /**
      * SWF - Shockwave Flash
      */
     SWF;

@@ -751,6 +751,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     @Override
+    public void toAS3(StringBuilder result, double unitDivisor) {
+
+    }
+
+    @Override
     public int getNumFrames() {
         int frameCount = (getGlyphShapeTable().size() - 1) / SHAPERECORD.MAX_CHARACTERS_IN_FONT_PREVIEW + 1;
         if (frameCount < 1) {

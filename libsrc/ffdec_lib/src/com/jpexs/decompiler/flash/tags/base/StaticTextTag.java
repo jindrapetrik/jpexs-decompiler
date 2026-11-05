@@ -1066,6 +1066,11 @@ public abstract class StaticTextTag extends TextTag {
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
         staticTextToHtmlCanvas(unitDivisor, swf, textRecords, getTextNum(), result, textBounds, textMatrix, null);
     }
+
+    @Override
+    public void toAS3(StringBuilder result, double unitDivisor) {
+
+    }
     
     @Override
     public Dimension getFilterDimensions() {

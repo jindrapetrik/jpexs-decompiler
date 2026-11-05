@@ -465,6 +465,11 @@ public abstract class MorphShapeTag extends DrawableTag {
         result.append(cmse.getShapeData());
     }
 
+    @Override
+    public void toAS3(StringBuilder result, double unitDivisor) {
+
+    }
+
     /**
      * Updates start bounds.
      */
