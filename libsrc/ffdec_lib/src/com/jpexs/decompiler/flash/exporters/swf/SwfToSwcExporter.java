@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.exporters.swf;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -332,6 +333,9 @@ public class SwfToSwcExporter {
             throw new RuntimeException(ex);
         }
 
+        //As compc, store library.swf uncompressed (the SWC zip compresses it): tools that read SWCs
+        //do not all support the LZMA compression a source SWF can have
+        swf.compression = SWFCompression.NONE;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         swf.saveTo(baos);
         byte[] swfBytes = baos.toByteArray();
