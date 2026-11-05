@@ -20,17 +20,26 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.OrItem;
+import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -114,7 +123,8 @@ public class CoerceAVM2Item extends AVM2Item {
                 displayCoerce = false;
                 break;
             default:
-                displayCoerce = false;
+                //Haxe casts with a coerce that AS3 does not do implicitly
+                displayCoerce = isDowncast(localData.abcIndex, value, valueReturnType, typeObj);
                 break;
             //default:
             // there should be something like instanceof, or not, just comment it out...
@@ -128,6 +138,91 @@ public class CoerceAVM2Item extends AVM2Item {
             writer.append(")");
         }
         return writer;
+    }
+
+    /**
+     * Checks whether coercing a value to a type is a downcast, which AS3 does
+     * not do implicitly.
+     *
+     * @param abcIndex ABC indexing
+     * @param value Value
+     * @param valueType Value type
+     * @param type Type coerced to
+     * @return True when the value type is known and is not the type nor one of
+     * its subtypes
+     */
+    private static boolean isDowncast(AbcIndexing abcIndex, GraphTargetItem value, GraphTargetItem valueType, GraphTargetItem type) {
+        if (abcIndex == null || !(valueType instanceof TypeItem) || !(type instanceof TypeItem)) {
+            return false;
+        }
+        GraphTargetItem notCoerced = value.getNotCoerced();
+        if (notCoerced instanceof OrItem || notCoerced instanceof AndItem || notCoerced instanceof TernarOpItem) {
+            //AS3 gives them any type
+            return false;
+        }
+        DottedChain typeName = ((TypeItem) type).fullTypeName;
+        DottedChain valueTypeName = ((TypeItem) valueType).fullTypeName;
+        if (typeName.equals(valueTypeName) || typeName.toRawString().equals("Object")) {
+            return false;
+        }
+        if (valueTypeName.toRawString().equals("Class")) {
+            //new on a Class value, whose return type is its Class, gives any type
+            return false;
+        }
+        if (valueTypeName.toRawString().equals("Object")) {
+            return true;
+        }
+        AbcIndexing.ClassIndex ci = abcIndex.findClass(valueType, null, null);
+        if (ci == null) {
+            return false;
+        }
+        Boolean assignable = isAssignableTo(abcIndex, ci, typeName, new HashSet<>());
+        return assignable != null && !assignable;
+    }
+
+    /**
+     * Checks whether a class is a type or one of its subtypes.
+     *
+     * @param abcIndex ABC indexing
+     * @param ci Class
+     * @param typeName Type name
+     * @param visited Visited classes
+     * @return True or false, null when part of its hierarchy is unknown
+     */
+    private static Boolean isAssignableTo(AbcIndexing abcIndex, AbcIndexing.ClassIndex ci, DottedChain typeName, Set<AbcIndexing.ClassIndex> visited) {
+        if (!visited.add(ci)) {
+            return false;
+        }
+        InstanceInfo ii = ci.abc.instance_info.get(ci.index);
+        if (typeName.equals(ii.getName(ci.abc.constants).getNameWithNamespace(new LinkedHashSet<>(), ci.abc, ci.abc.constants, false))) {
+            return true;
+        }
+        List<Integer> supers = new ArrayList<>();
+        if (ii.super_index > 0) {
+            supers.add(ii.super_index);
+        }
+        for (int i : ii.interfaces) {
+            supers.add(i);
+        }
+        boolean unknown = false;
+        for (int s : supers) {
+            DottedChain superName = ci.abc.constants.getMultiname(s).getNameWithNamespace(new LinkedHashSet<>(), ci.abc, ci.abc.constants, false);
+            if (typeName.equals(superName)) {
+                return true;
+            }
+            AbcIndexing.ClassIndex sci = abcIndex.findClass(new TypeItem(superName), ci.abc, null);
+            if (sci == null) {
+                unknown = true;
+                continue;
+            }
+            Boolean r = isAssignableTo(abcIndex, sci, typeName, visited);
+            if (r == null) {
+                unknown = true;
+            } else if (r) {
+                return true;
+            }
+        }
+        return unknown ? null : false;
     }
 
     @Override

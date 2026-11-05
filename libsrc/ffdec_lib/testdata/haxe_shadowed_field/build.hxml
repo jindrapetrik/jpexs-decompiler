@@ -1,0 +1,5 @@
+-cp src
+-main Main
+-swf bin/haxe_shadowed_field.swf
+-swf-version 11
+-debug

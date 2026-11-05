@@ -1232,6 +1232,7 @@ public class Graph {
 
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
         //fixSwitchEnds(ret);
+        removeUnreadSetTemporaries(ret);
         handleSetTemporaryDeclarations(ret);
         return ret;
     }
@@ -1360,6 +1361,75 @@ public class Graph {
             }
         }
         return true;
+    }
+    
+    /*
+     * Removes side effect free temporaries that nothing prints anymore. A
+     * compound assign whose value branches (_s += (c ? a : b) + d) folds its
+     * dup back after the dup temp was output, which then printed as a stray
+     * var _temp_1:* = §§findproperty(_s).
+     *
+     * @param list List
+     */
+    private void removeUnreadSetTemporaries(List<GraphTargetItem> list) {
+        Set<Integer> read = new HashSet<>();
+        Set<GraphTargetItem> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (GraphTargetItem item : list) {
+            collectTempReads(item, read, visited);
+        }
+        removeUnreadSetTemporaries(list, read);
+    }
+
+    private void removeUnreadSetTemporaries(List<GraphTargetItem> list, Set<Integer> read) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof SetTemporaryItem) {
+                SetTemporaryItem st = (SetTemporaryItem) item;
+                if (!read.contains(st.tempIndex) && st.value != null && !st.value.hasSideEffect()) {
+                    list.remove(i);
+                    continue;
+                }
+            }
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    removeUnreadSetTemporaries(sub, read);
+                }
+            }
+        }
+    }
+
+    private void collectTempReads(GraphTargetItem item, Set<Integer> read, Set<GraphTargetItem> visited) {
+        if (item == null || !visited.add(item)) {
+            return;
+        }
+        if ((item instanceof HasTempIndex) && !(item instanceof SetTemporaryItem)) {
+            read.add(((HasTempIndex) item).getTempIndex());
+        }
+        List<GraphTargetItem> printed = getPrintedChildren(item);
+        if (printed != null) {
+            for (GraphTargetItem child : printed) {
+                collectTempReads(child, read, visited);
+            }
+            return;
+        }
+        item.visit(new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem child) {
+                collectTempReads(child, read, visited);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Gets the children an item prints, when they differ from the ones it
+     * visits.
+     *
+     * @param item Item
+     * @return Printed children or null to use the visited ones
+     */
+    protected List<GraphTargetItem> getPrintedChildren(GraphTargetItem item) {
+        return null;
     }
 
     private boolean containsPopItems(List<GraphTargetItem> list) {
@@ -4281,6 +4351,11 @@ public class Graph {
                     for (Loop el : loops) {
                         loopPhases.add(el.phase);
                     }
+                    List<Integer> throwStatesBackup = new ArrayList<>();
+                    for (ThrowState ts : throwStates) {
+                        throwStatesBackup.add(ts.state);
+                    }
+                    Object localDataBackup = backupWalkedLocalData(localData);
                     precontinueCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, subVisited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
                     currentLoop.loopPreContinue = backup;
                     checkContinueAtTheEnd(precontinueCommands, currentLoop);
@@ -4314,11 +4389,16 @@ public class Graph {
                             precontinueCommands.clear();
 
                             /*
-                             * Restore loop phases
+                             * Restore loop phases, throw states and the local
+                             * data the discarded walk changed
                              */
                             for (int i = 0; i < loopPhases.size(); i++) {
                                 loops.get(i).phase = loopPhases.get(i);
                             }
+                            for (int i = 0; i < throwStatesBackup.size(); i++) {
+                                throwStates.get(i).state = throwStatesBackup.get(i);
+                            }
+                            restoreWalkedLocalData(localData, localDataBackup);
                         }
                     }
                 }
@@ -5578,6 +5658,27 @@ public class Graph {
      */
     public BaseLocalData prepareBranchLocalData(BaseLocalData localData) {
         return localData;
+    }
+
+    /**
+     * Backs up the local data that walking parts changes, so a walk whose
+     * result is discarded can be undone. Override this method when the local
+     * data has such state.
+     *
+     * @param localData Local data
+     * @return Backup to pass to restoreWalkedLocalData
+     */
+    protected Object backupWalkedLocalData(BaseLocalData localData) {
+        return null;
+    }
+
+    /**
+     * Restores the local data backed up by backupWalkedLocalData.
+     *
+     * @param localData Local data
+     * @param backup Backup
+     */
+    protected void restoreWalkedLocalData(BaseLocalData localData, Object backup) {
     }
 
     /**

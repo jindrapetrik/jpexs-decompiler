@@ -307,6 +307,7 @@ alias /?
 
 -swf2swc <outfile> <swffile>
     Generate SWC file from SWF.
+    With -selectclass, only the scripts of the selected classes are kept.
     <outfile>: Where to save SWC file
     <swffile>: Input SWF file
 
@@ -465,7 +466,7 @@ Pre-options:
                 2-5,7,9-     ... exports characters 2,3,4,5,7,9 and all ids after
 
 -selectclass <classnames>
-    Applies to: -export
+    Applies to: -export, -swf2swc
     Select scripts to export by class name (AS 3 ONLY).
     <classnames> format:
         com.example.MyClass

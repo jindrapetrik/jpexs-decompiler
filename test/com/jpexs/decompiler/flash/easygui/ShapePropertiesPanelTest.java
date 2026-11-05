@@ -10,8 +10,10 @@ package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.easygui.properties.AbstractPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.FloatPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.GradientEditor;
+import com.jpexs.decompiler.flash.easygui.properties.TextPropertyField;
 import com.jpexs.decompiler.flash.easygui.properties.panels.ShapePropertiesPanel;
 import com.jpexs.decompiler.flash.tags.DefineBitsLossless2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
@@ -23,6 +25,8 @@ import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Constructor;
 import java.io.ByteArrayOutputStream;
@@ -30,7 +34,12 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -41,6 +50,19 @@ public class ShapePropertiesPanelTest {
         Field field = object.getClass().getDeclaredField(name);
         field.setAccessible(true);
         return field.get(object);
+    }
+
+    private void editColorField(AbstractPropertyField<?> field, String value) {
+        JLabel label = (JLabel) field.getComponent(0);
+        label.dispatchEvent(new MouseEvent(label, MouseEvent.MOUSE_CLICKED, 0, 0, 1, 1, 1, false, MouseEvent.BUTTON1));
+        JTextField input = (JTextField) field.getComponent(1);
+        assertTrue(input.isVisible());
+        input.setText(value);
+        KeyEvent enter = new KeyEvent(input, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_ENTER, '\n');
+        for (KeyListener listener : input.getKeyListeners()) {
+            listener.keyPressed(enter);
+        }
+        assertTrue(label.isVisible());
     }
 
     private byte[] data(ShapeTag shape) throws Exception {
@@ -304,6 +326,107 @@ public class ShapePropertiesPanelTest {
             assertEquals(empty.gradientRecords.length, 2);
             assertEquals(empty.gradientRecords[0].ratio, 0);
             assertEquals(empty.gradientRecords[1].ratio, 255);
+        });
+    }
+
+    @Test
+    public void inlineGradientColorTargetsTheSelectedStopAcrossReloads() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                ShapePropertiesPanel panel = new ShapePropertiesPanel();
+                FILLSTYLE fill = new FILLSTYLE();
+                fill.fillStyleType = FILLSTYLE.LINEAR_GRADIENT;
+                fill.gradient = gradient();
+                GRADRECORD hardStop = new GRADRECORD();
+                hardStop.ratio = 30;
+                hardStop.color = new RGBA(255, 255, 0, 100);
+                fill.gradient.gradientRecords = new GRADRECORD[]{
+                    fill.gradient.gradientRecords[0], hardStop, fill.gradient.gradientRecords[1]
+                };
+                panel.setSelectedFill(fill);
+                Object fillEditor = field(panel, "fillEditor");
+                GradientEditor editor = (GradientEditor) field(fillEditor, "gradientEditor");
+                JPanel strip = (JPanel) field(editor, "inlineStops");
+                strip.setSize(210, 50);
+                int x = Math.round(200 * 220f / 255) + 5;
+                strip.dispatchEvent(new MouseEvent(strip, MouseEvent.MOUSE_PRESSED, 0, 0, x, 44, 1, false, MouseEvent.BUTTON1));
+                strip.dispatchEvent(new MouseEvent(strip, MouseEvent.MOUSE_RELEASED, 0, 0, x, 44, 1, false, MouseEvent.BUTTON1));
+
+                AtomicInteger edits = new AtomicInteger();
+                panel.setPropertyChangeListener((stroke, property) -> {
+                    assertFalse(stroke);
+                    assertEquals(property, "gradient");
+                    FILLSTYLE changed = panel.getFillStyle();
+                    panel.setSelectedFill(null);
+                    panel.setSelectedFill(changed);
+                    edits.incrementAndGet();
+                });
+                Object stopColorEditor = field(editor, "stopColorEditor");
+                TextPropertyField hex = (TextPropertyField) field(stopColorEditor, "hexField");
+                assertEquals(hex.getValue(), "0000FF");
+                FloatPropertyField red = ((FloatPropertyField[]) field(stopColorEditor, "rgbFields"))[0];
+                editColorField(red, "68");
+                assertEquals(hex.getValue(), "4400FF");
+                assertEquals(panel.getFillStyle().gradient.gradientRecords[2].color, new RGBA(68, 0, 255, 200));
+                editColorField(hex, " #112233AA ");
+                assertEquals(edits.get(), 2);
+                GRADRECORD[] stops = panel.getFillStyle().gradient.gradientRecords;
+                assertEquals(stops[0].ratio, 30);
+                assertEquals(stops[0].color, new RGBA(255, 0, 0, 80));
+                assertEquals(stops[1].ratio, 30);
+                assertEquals(stops[1].color, hardStop.color);
+                assertEquals(stops[2].ratio, 220);
+                assertEquals(stops[2].color, new RGBA(17, 34, 51, 170));
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+    }
+
+    @Test
+    public void swatchAndChannelEditsUpdateStrokeColor() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                ShapePropertiesPanel panel = ShapePropertiesPanel.createDrawingStyles();
+                AtomicInteger edits = new AtomicInteger();
+                panel.setPropertyChangeListener((stroke, property) -> {
+                    assertTrue(stroke);
+                    assertEquals(property, "color");
+                    edits.incrementAndGet();
+                });
+                JToggleButton strokeTab = (JToggleButton) field(panel, "strokeTab");
+                strokeTab.doClick();
+                assertTrue(((JPanel) field(panel, "strokePanel")).isVisible());
+                assertFalse(((JPanel) field(panel, "fillPanel")).isVisible());
+                Object colorEditor = field(field(panel, "strokeEditor"), "colorEditor");
+                assertEquals(edits.get(), 0);
+                TextPropertyField hex = (TextPropertyField) field(colorEditor, "hexField");
+                editColorField(hex, "33669980");
+                assertEquals(edits.get(), 1);
+                assertEquals(panel.getDrawingStrokeStyle().color, new RGBA(51, 102, 153, 128));
+                FloatPropertyField[] rgb = (FloatPropertyField[]) field(colorEditor, "rgbFields");
+                assertEquals(rgb[0].getValue(), Float.valueOf(51));
+                editColorField(rgb[0], "76");
+                assertEquals(panel.getDrawingStrokeStyle().color, new RGBA(76, 102, 153, 128));
+                JPopupMenu palette = (JPopupMenu) field(colorEditor, "swatchesPopup");
+                JMenuItem red = (JMenuItem) palette.getComponent(6);
+                red.doClick();
+                assertEquals(hex.getValue(), "FF0000");
+                assertEquals(rgb[0].getValue(), Float.valueOf(255));
+                FloatPropertyField hue = ((FloatPropertyField[]) field(colorEditor, "channelFields"))[0];
+                editColorField(hue, "120");
+                assertEquals(rgb[0].getValue(), Float.valueOf(0));
+                assertEquals(rgb[1].getValue(), Float.valueOf(255));
+                assertEquals(panel.getDrawingStrokeStyle().color, new RGBA(0, 255, 0, 128));
+                editColorField((FloatPropertyField) field(colorEditor, "alphaField"), "25,1");
+                editColorField(hex, "invalid");
+                editColorField(rgb[1], "256");
+                assertEquals(panel.getDrawingStrokeStyle().color, new RGBA(0, 255, 0, 64));
+                assertEquals(edits.get(), 5);
+                assertEquals(panel.getFillStyle().color.toColor(), Color.white);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         });
     }
 }

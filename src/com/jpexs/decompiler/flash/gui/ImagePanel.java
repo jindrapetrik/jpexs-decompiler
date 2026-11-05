@@ -130,6 +130,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -543,6 +544,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private List<Integer> selectedDepths = new ArrayList<>();
 
     private Integer isolatedDepth = null;
+    private final Function<Timelined, Set<Integer>> hiddenDepths;
+    private final Function<Timelined, Set<Integer>> lockedDepths;
 
     private final List<Integer> parentFrames = new ArrayList<>();
 
@@ -2075,6 +2078,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             depths = new ArrayList<>();
         } else {
             Frame fr = timelined.getTimeline().getFrame(frame);
+            removeUnavailableDepths(depths);
 
             for (int i = 0; i < depths.size(); i++) {
                 int depth = depths.get(i);
@@ -2106,6 +2110,27 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public synchronized void setIsolatedDepth(Integer depth) {
         isolatedDepth = depth;
         redraw();
+    }
+
+    private void removeUnavailableDepths(List<Integer> depths) {
+        depths.removeAll(hiddenDepths.apply(timelined));
+        depths.removeAll(lockedDepths.apply(timelined));
+    }
+
+    public synchronized void refreshDepthInteraction() {
+        Set<Integer> hidden = hiddenDepths.apply(timelined);
+        Set<Integer> locked = lockedDepths.apply(timelined);
+        if (depthStateUnderCursor != null && (hidden.contains(depthStateUnderCursor.depth)
+                || locked.contains(depthStateUnderCursor.depth))) {
+            depthStateUnderCursor = null;
+        }
+        if (Collections.disjoint(selectedDepths, hidden) && Collections.disjoint(selectedDepths, locked)) {
+            redraw();
+        } else if (doFreeTransform) {
+            setFreeTransformDepths(selectedDepths);
+        } else {
+            selectDepths(selectedDepths);
+        }
     }
 
     private void calculateFreeOrSelectionTransform() {
@@ -2167,8 +2192,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public synchronized void freeTransformDepths(List<Integer> depths) {
+        setFreeTransformDepths(depths);
+        iconPanel.requestFocusInWindow();
+    }
+
+    private void setFreeTransformDepths(List<Integer> depths) {
         selectedDepths = new ArrayList<>(depths);
-        doFreeTransform = !depths.isEmpty();
+        removeUnavailableDepths(selectedDepths);
+        doFreeTransform = !selectedDepths.isEmpty();
         hilightedEdge = null;
         setHilightedFillInternal(null);
         setHilightedLineInternal(null);
@@ -2178,7 +2209,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         calculateFreeOrSelectionTransform();
         hideMouseSelection();
         redraw();
-        iconPanel.requestFocusInWindow();
     }
 
     private void centerImage() {
@@ -3532,7 +3562,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 Frame fr = timelined.getTimeline().getFrame(frame);
                                 List<Integer> newSelectedDepths = new ArrayList<>();
                                 if (fr != null) {
+                                    Set<Integer> hidden = hiddenDepths.apply(timelined);
+                                    Set<Integer> locked = lockedDepths.apply(timelined);
                                     for (int d : fr.layers.keySet()) {
+                                        if (hidden.contains(d) || locked.contains(d)) {
+                                            continue;
+                                        }
                                         DepthState ds = fr.layers.get(d);
                                         CharacterTag cht = ds.getCharacter();
                                         if (!(cht instanceof DrawableTag)) {
@@ -3849,8 +3884,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         }
                                     }
 
+                                    Set<Integer> hidden = hiddenDepths.apply(timelined);
                                     for (DepthState ds : fr.layers.values()) {
-                                        if (selectedDepths.contains(ds.depth)) {
+                                        if (selectedDepths.contains(ds.depth) || hidden.contains(ds.depth)) {
                                             continue;
                                         }
                                         CharacterTag ct = ds.getCharacter();
@@ -5393,7 +5429,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public ImagePanel() {
+        this(timelined -> Collections.emptySet(), timelined -> Collections.emptySet());
+    }
+
+    public ImagePanel(Function<Timelined, Set<Integer>> hiddenDepths, Function<Timelined, Set<Integer>> lockedDepths) {
         super(new BorderLayout());
+        this.hiddenDepths = hiddenDepths;
+        this.lockedDepths = lockedDepths;
         JPanel p = new JPanel();
         add(p, BorderLayout.CENTER);
 
@@ -6869,7 +6911,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private static SerializableImage getFrame(Rectangle realRect, RECT rect, ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, List<Integer> selectedDepths, Integer isolatedDepth, boolean doFreeTransform, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix, Matrix newMatrix, boolean selectionMode,
             List<Timelined> parentTimelineds, List<Integer> parentDepths, List<Integer> parentFrames,
-            Matrix parentMatrix
+            Matrix parentMatrix, Function<Timelined, Set<Integer>> hiddenDepths
     ) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
@@ -6940,6 +6982,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             ignoreDepths.add(parentDepthState.depth);
             if (Configuration.halfTransparentParentLayersEasy.get()) {
+                ignoreDepths.addAll(hiddenDepths.apply(parentTimelined));
                 parentTimelined.getTimeline().toImage(parentFrames.get(i), 0, new RenderContext(), image, image, false,
                         parentMatrix.preConcatenate(m), new Matrix(), parentMatrix.preConcatenate(m), null, zoom, true, viewRect, viewRect, parentMatrix.preConcatenate(m), true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get(),
                         ignoreDepths, aaScale);
@@ -6954,6 +6997,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             g.fillRect(realRectAA.x, realRectAA.y, realRectAA.width, realRectAA.height);
         }
 
+        ignoreDepths.addAll(hiddenDepths.apply(drawable));
         if (isolatedDepth != null) {
             for (Integer depth : fr.layers.keySet()) {
                 if (!isolatedDepth.equals(depth)) {
@@ -7451,7 +7495,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         parentFramesSnapshot = new ArrayList<>(parentFrames);
                         parentMatrixSnapshot = getParentMatrix();
                     }
-                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, rendered, renderContext, selectedDepths, isolatedDepth, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelinesSnapshot, parentDepthsSnapshot, parentFramesSnapshot, parentMatrixSnapshot);
+                    img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, rendered, renderContext, selectedDepths, isolatedDepth, doFreeTransform, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2), transform, selectionMode, parentTimelinesSnapshot, parentDepthsSnapshot, parentFramesSnapshot, parentMatrixSnapshot, hiddenDepths);
                 }
 
                 synchronized (ImagePanel.this) {
@@ -7532,16 +7576,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             boolean hasHandCursor = renderContext.mouseOverButton != null || !autoPlayed && !frozenButtons;
 
-            if (autoPlayed) {
-                if (!renderContext.stateUnderCursor.isEmpty()) {
-                    depthStateUnderCursor = renderContext.stateUnderCursor.get(renderContext.stateUnderCursor.size() - 1);
-                } else {
-                    depthStateUnderCursor = null;
-                }
-            } else {
-                depthStateUnderCursor = null;
-            }
-
             if (showObjectsUnderCursor && autoPlayed) {
                 boolean first = true;
                 for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
@@ -7576,6 +7610,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             boolean doFreeTransform = this.doFreeTransform;
             synchronized (ImagePanel.this) {
                 if (timer == thisTimer) {
+                    depthStateUnderCursor = autoPlayed ? getSelectableHit(timelined, renderContext.stateUnderCursor) : null;
                     iconPanel.setImg(img);
                     lastMouseOverButton = iconPanel.mouseOverButton;
                     lastMouseOverText = iconPanel.mouseOverText;
@@ -8483,6 +8518,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         gotoFrame(1);
     }
 
+    private DepthState getSelectableHit(Timelined timelined, List<DepthState> hits) {
+        Set<Integer> locked = lockedDepths.apply(timelined);
+        Set<Integer> hidden = hiddenDepths.apply(timelined);
+        for (int i = hits.size() - 1; i >= 0; i--) {
+            DepthState hit = hits.get(i);
+            // The hit list includes sprite children before their containing instance.
+            if ((locked.isEmpty() && hidden.isEmpty()) || (hit.frame.timeline.timelined == timelined
+                    && !locked.contains(hit.depth) && !hidden.contains(hit.depth))) {
+                return hit;
+            }
+        }
+        return null;
+    }
+
     public boolean closeShapeEdit() {
         int parentFrame;
         synchronized (lock) {
@@ -8496,6 +8545,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             editedShape = null;
             selectedDepths.clear();
             selectedDepths.add(depth);
+            removeUnavailableDepths(selectedDepths);
             depthStateUnderCursor = null;
             displayObjectCache.clear();
         }
@@ -8547,7 +8597,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public void openDepth(int frame, int depth) {
         Timelined tim = timelined;
-        if (tim == null) {
+        if (tim == null || lockedDepths.apply(tim).contains(depth)) {
             return;
         }
         if (tim.getTimeline().getFrame(frame) == null) {

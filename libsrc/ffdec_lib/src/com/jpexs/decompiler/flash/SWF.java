@@ -3917,6 +3917,25 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
+     * Converts set of characters to AS3 code.
+     *
+     * @param fswf SWF
+     * @param library Set of characterIds
+     * @param fos OutputStream
+     * @throws IOException On I/O error
+     */
+    public static void libraryToAS3(SWF fswf, Set<Integer> library, double unitDivisor, OutputStream fos) throws IOException {
+        for (int c : library) {
+            CharacterTag ch = fswf.getCharacter(c);
+            if (ch instanceof DrawableTag) {
+                StringBuilder sb = new StringBuilder();
+                ((DrawableTag) ch).toAS3(sb, unitDivisor);
+                fos.write(Utf8Helper.getBytes(sb.toString()));
+            }
+        }
+    }
+
+    /**
      * Gets variables from AS1/2 code.
      *
      * @param constantPool Constant pool

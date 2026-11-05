@@ -89,8 +89,12 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -128,6 +132,8 @@ public class EasySwfPanel extends JPanel {
     private TransformPanel transformPanel;
     private ShapeSelectionTransform.State shapeTransformState;
     private Timelined timelined;
+    private final Map<Timelined, Set<Integer>> hiddenDepthsByTimeline = Collections.synchronizedMap(new WeakHashMap<>());
+    private final Map<Timelined, Set<Integer>> lockedDepthsByTimeline = Collections.synchronizedMap(new WeakHashMap<>());
     private ShapeTag editingShape;
     private ShapeTool shapeTool = ShapeTool.SELECT;
     private ShapeSelection shapeSelection;
@@ -190,7 +196,7 @@ public class EasySwfPanel extends JPanel {
         this.mainPanel = mainPanel;
         setLayout(new BorderLayout());
 
-        stagePanel = new ImagePanel();
+        stagePanel = new ImagePanel(this::getHiddenDepths, this::getLockedDepths);
         stagePanel.setTagNameResolver(new EasyTagNameResolver());
         stagePanel.setShowAllDepthLevelsInfo(false);
         stagePanel.setSelectionMode(true);
@@ -430,8 +436,18 @@ public class EasySwfPanel extends JPanel {
                             || (tag instanceof ShapeTag)
                             || (tag instanceof TextTag)
                             || (tag instanceof ButtonTag)) {
+                        Timelined target = stagePanel.getTimelined();
+                        int depth = target.getTimeline().getMaxDepth() + 1;
+                        Set<Integer> locked = getLockedDepths(target);
+                        while (locked.contains(depth)) {
+                            depth++;
+                        }
+                        if (depth > 0xffff) {
+                            return false;
+                        }
+                        final int newDepth = depth;
 
-                        undoManager.doOperation(new TimelinedTagListDoableOperation(EasySwfPanel.this, stagePanel.getTimelined()) {
+                        undoManager.doOperation(new TimelinedTagListDoableOperation(EasySwfPanel.this, target) {
 
                             private List<Tag> swfTags;
 
@@ -439,8 +455,6 @@ public class EasySwfPanel extends JPanel {
                             public void doOperation() {
                                 super.doOperation();
                                 CharacterTag ch = (CharacterTag) tag;
-                                int maxDepth = timelined.getTimeline().getMaxDepth();
-                                int newDepth = maxDepth + 1;
 
                                 if (timelined.getSwf() != timelined) {
                                     swfTags = timelined.getSwf().getTags().toArrayList();
@@ -1741,8 +1755,90 @@ public class EasySwfPanel extends JPanel {
         Main.getMainFrame().getPanel().updateUiWithCurrentOpenable();        
     }
 
+    Set<Integer> getHiddenDepths(Timelined timelineOwner) {
+        return hiddenDepthsByTimeline.getOrDefault(timelineOwner, Collections.emptySet());
+    }
+
+    Set<Integer> getLockedDepths(Timelined timelineOwner) {
+        return lockedDepthsByTimeline.getOrDefault(timelineOwner, Collections.emptySet());
+    }
+
+    void toggleDepthVisibility(int depth) {
+        if (timelined != null) {
+            toggleDepth(hiddenDepthsByTimeline, depth);
+            refreshDepthInteraction();
+        }
+    }
+
+    void toggleDepthLock(int depth) {
+        if (timelined != null) {
+            toggleDepth(lockedDepthsByTimeline, depth);
+            refreshDepthLocks();
+        }
+    }
+
+    void toggleAllDepthVisibility() {
+        if (toggleAllDepths(hiddenDepthsByTimeline)) {
+            refreshDepthInteraction();
+        }
+    }
+
+    void toggleAllDepthLocks() {
+        if (toggleAllDepths(lockedDepthsByTimeline)) {
+            refreshDepthLocks();
+        }
+    }
+
+    private void refreshDepthLocks() {
+        timelinePanel.getTimelineBodyPanel().removeLockedSelection();
+        refreshDepthInteraction();
+    }
+
+    private boolean toggleAllDepths(Map<Timelined, Set<Integer>> depthsByTimeline) {
+        int maxDepth = timelined == null ? 0 : timelined.getTimeline().getMaxDepth();
+        if (maxDepth == 0) {
+            return false;
+        }
+        Set<Integer> depths = depthsByTimeline.getOrDefault(timelined, Collections.emptySet());
+        Set<Integer> allDepths = new HashSet<>();
+        for (int depth = 1; depth <= maxDepth; depth++) {
+            allDepths.add(depth);
+        }
+        setDepths(depthsByTimeline, depths.containsAll(allDepths) ? Collections.emptySet() : allDepths);
+        return true;
+    }
+
+    private void toggleDepth(Map<Timelined, Set<Integer>> depthsByTimeline, int depth) {
+        Set<Integer> depths = new HashSet<>(depthsByTimeline.getOrDefault(timelined, Collections.emptySet()));
+        if (!depths.remove(depth)) {
+            depths.add(depth);
+        }
+        setDepths(depthsByTimeline, depths);
+    }
+
+    private void setDepths(Map<Timelined, Set<Integer>> depthsByTimeline, Set<Integer> depths) {
+        if (depths.isEmpty()) {
+            depthsByTimeline.remove(timelined);
+        } else {
+            depthsByTimeline.put(timelined, Collections.unmodifiableSet(depths));
+        }
+    }
+
+    private void refreshDepthInteraction() {
+        stagePanel.refreshDepthInteraction();
+        transformPanel.setVisible(!stagePanel.getSelectedDepths().isEmpty());
+        updatePropertiesPanel();
+    }
+
+    void swfClosed(SWF swf) {
+        hiddenDepthsByTimeline.keySet().removeIf(owner -> owner.getSwf() == swf);
+        lockedDepthsByTimeline.keySet().removeIf(owner -> owner.getSwf() == swf);
+    }
+
     public void dispose() {
         setTimelined(null);
+        hiddenDepthsByTimeline.clear();
+        lockedDepthsByTimeline.clear();
         undoManager.clear();
     }
 
@@ -1751,11 +1847,7 @@ public class EasySwfPanel extends JPanel {
     }
 
     public int getFrame() {
-        Point p = timelinePanel.getTimelineBodyPanel().cursor.iterator().next();
-        if (p == null) {
-            return 0;
-        }
-        return p.x;
+        return timelinePanel.getTimelineBodyPanel().getFirstFrame();
     }
 
     public ImagePanel getStagePanel() {
@@ -1808,5 +1900,15 @@ public class EasySwfPanel extends JPanel {
 
     public void setFrame(int frame, List<Integer> depths) {
         timelinePanel.setFrame(frame, depths);
+    }
+
+    CharacterTag getSelectedLibraryCharacter() {
+        int row = libraryTreeTable.getSelectedRow();
+        if (row < 0) {
+            return null;
+        }
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) libraryTreeTable.getValueAt(row, 0);
+        Object item = node.getUserObject();
+        return item instanceof CharacterTag ? (CharacterTag) item : null;
     }
 }

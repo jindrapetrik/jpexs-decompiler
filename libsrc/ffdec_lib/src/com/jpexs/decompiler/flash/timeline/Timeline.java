@@ -2080,6 +2080,10 @@ public class Timeline {
         FrameExporter.framesToHtmlCanvas(result, unitDivisor, this, frames, 0, null, 0, displayRect, null, null);
     }
 
+    public void toAS3(StringBuilder result, double unitDivisor, List<Integer> frames) {
+        FrameExporter.framesToAS3(result, 1.0, this, frames);
+    }
+
     /**
      * Gets all sounds from the frame.
      *

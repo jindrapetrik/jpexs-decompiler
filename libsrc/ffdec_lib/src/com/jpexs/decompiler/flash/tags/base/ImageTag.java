@@ -391,6 +391,16 @@ public abstract class ImageTag extends DrawableTag {
     }
 
     @Override
+    public void toAS3(StringBuilder result, double unitDivisor) {
+        String typePrefix = SWF.getTypePrefix(this);
+        result.append("\t[Embed(source=\"image").append(getCharacterId()).append(getImageFormat().getExtension()).append("\")]\r\n");
+        result.append("\tpublic static const IMAGE_").append(getCharacterId()).append(":Class;\r\n\r\n");
+        result.append("\tprivate function ").append(typePrefix).append(getCharacterId()).append("():BitmapData {\r\n");
+        result.append("\t\treturn new ").append(typePrefix.toUpperCase()).append("_").append(getCharacterId()).append("().bitmapData;\r\n");
+        result.append("\t}\r\n\r\n");
+    }
+
+    @Override
     public int getNumFrames() {
         return 1;
     }

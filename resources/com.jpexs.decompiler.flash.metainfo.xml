@@ -67,6 +67,98 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="26.4.0" date="2026-10-19">
+			<description>
+				<p>Features</p>
+				<ul>
+					<li>add add multiple tags dialog (#2755)</li>
+					<li>add configurable default as3 linkage parent class names (#2754)</li>
+					<li>add linked asset panel to as3 view</li>
+					<li>add special icon for classes with linked asset</li>
+					<li>add jump to character on AS3 classes, jump to class on characters</li>
+					<li>add flash.display.SimpleButton as default button as link parent</li>
+					<li>add sound waveform clickable preview</li>
+					<li>add placeobject matrix tween creation support (#2760)</li>
+					<li>add placeobject ratio, colortransform tween support (#2760)</li>
+					<li>add depth state after place panel to placeobjects (#2760)</li>
+					<li>add auto preview checkbox while editing morph/shape/placeobject</li>
+					<li>add editing, xml import/export of zonedata float16 instead of ui16</li>
+					<li>highlight selected morph/shape fill/line style</li>
+					<li>add handles for gradient/bitmap matrix and focal point changes</li>
+					<li>add alt+click on morph/shape selects fillstyle</li>
+					<li>add ctrl+click on morph/shape selects linestyle</li>
+					<li>remember selection when pressing Edit/Save/Cancel on raw edit</li>
+					<li>add black default, hand and move canvas cursor</li>
+					<li>add new msaa renderer icon</li>
+					<li>add button attributes panel</li>
+					<li>add editing place matrix with transform handles</li>
+					<li>add editing place matrix for button records (in attributes edit)</li>
+					<li>add support for bioshock image format (#2734)</li>
+					<li>add custom tag profiles like bioshock (#2734)</li>
+					<li>add setting tag profile in CLI interface (#2734)</li>
+					<li>allow drag and drop sol files into sol editor (#2693)</li>
+					<li>add option to use system file dialogs instead of swing (#2693)</li>
+					<li>add text to shape conversion (#2700)</li>
+					<li>fla export: add classic tween detection</li>
+					<li>fla export: add motion tween detection (#2597)</li>
+					<li>add support for JPEG-XR (#1084)</li>
+					<li>add Castle Crashers SWF profile - prefer DefineFunction2 (#2766)</li>
+					<li>add Castle Crashers SWF profile with its actions support</li>
+					<li>add Castle Crashers Pixl image tag support</li>
+					<li>add brokerProductManager+brokerLocalConnection to fileAttributes</li>
+					<li>as1/2: add better handling of unknown actions</li>
+					<li>a2: recognize static members and use short name (#2509)</li>
+					<li>sound: show bits per sample in basic tag info</li>
+					<li>improve iggy format support (#1305,#1442,#1736,#1745,#2002,#2768)</li>
+					<li>add replace sprite with other kinds of images, not just GIF (#2767)</li>
+				</ul>
+				<p>Bug Fixes</p>
+				<ul>
+					<li>fix aero-snap nullpointer exception</li>
+					<li>fix nullpointer when renaming class</li>
+					<li>fix global renaming identifiers not saving (#2753)</li>
+					<li>simple editor: fix adding new frames at the end of the timeline</li>
+					<li>simple editor: fix remembering last selected timeline</li>
+					<li>build: remove -noverify option - not available on JDK 27 (#2761)</li>
+					<li>fix bitmap exporter when gradient fill has zero records</li>
+					<li>fix raw editor fields border / size</li>
+					<li>fix unescaping p-code string last character</li>
+					<li>correctly encode and decode FLOAT16 values</li>
+					<li>preserve unsigned EncodedU32 values</li>
+					<li>preserve unsigned AMF U32 values</li>
+					<li>handle short AMF3 stream reads</li>
+					<li>make morph shape distance symmetric</li>
+					<li>make polynomial simplification scale invariant</li>
+					<li>keep seekable stream positions consistent</li>
+					<li>fix bitmap exporter when gradient stroke has zero records</li>
+					<li>fix copying DefineEditTexts text when font has no characters</li>
+					<li>fix disappearing popups and tooltips</li>
+					<li>remove JApplet reference to work on Java 26 (#2709)</li>
+					<li>fix tag cloning causing incorrect unknown tags export bytes</li>
+					<li>fix data of unknown tag not visible in hex dump</li>
+					<li>allow dragging tags in tag list (#2712)</li>
+					<li>fix unnecessary labeled breaks (#2763)</li>
+					<li>fix another unnecessary labeled breaks (#2749)</li>
+					<li>fix calculating text bounds on text tag conversion (#2383)</li>
+					<li>pdf export: keep real control font glyphs, escape control bytes in strings</li>
+					<li>pdf export: escape backslash in makePDFString</li>
+					<li>fix DefineBitsJPEG4 incorrect alphaDataOffset</li>
+					<li>use offset field in DefineMorphShape/2</li>
+					<li>skip reading characterId when PlaceObject3/4 has class</li>
+					<li>add support for GIF87a</li>
+					<li>fix defineBitsLossless2 import images without alpha</li>
+					<li>fix defineFunction compilation - used registers backup (#2766)</li>
+					<li>add support for filters and blendMode in DefineButton(1)</li>
+					<li>as3 editor: disallow attributes with duplicate names (#2576)</li>
+					<li>sound: decode unsigned PCM8 and correct preview timing</li>
+				</ul>
+				<p>Performance Improvements</p>
+				<ul>
+					<li>as3 editing: optimize name resolving (PR266)</li>
+					<li>as: hoist reachability out of always-break detection walk (PR288)</li>
+				</ul>
+			</description>
+		</release>
 		<release version="26.3.0" date="2026-09-14">
 			<description>
 				<p>Features</p>

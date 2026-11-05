@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.shape.AS3ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
@@ -291,6 +292,16 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
         CanvasShapeExporter cse = new CanvasShapeExporter(getWindingRule(), getShapeNum(), null, unitDivisor, swf, getShapes(), null, 0, 0);
         cse.export();
         result.append(cse.getShapeData());
+    }
+
+    @Override
+    public void toAS3(StringBuilder result, double unitDivisor) {
+        AS3ShapeExporter cse = new AS3ShapeExporter(getWindingRule(), getShapeNum(), null, unitDivisor, swf, getShapes(), null, 0, 0, true);
+        cse.export();
+
+        result.append("\tprivate function ").append(SWF.getTypePrefix(this)).append(getCharacterId()).append("():Shape {\r\n");
+        result.append(cse.getShapeData());
+        result.append("\t}\r\n\r\n");
     }
 
     @Override
