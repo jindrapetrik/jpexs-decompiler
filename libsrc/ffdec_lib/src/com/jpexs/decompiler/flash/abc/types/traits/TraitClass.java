@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.InitPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructPropAVM2Item;
@@ -135,6 +138,43 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         //instance initializer
         DependencyParser.parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, null, scriptIndex, class_info, false, customNamespace, abc, instanceInfo.iinit_index, dependencies, packageName, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
+
+        //Haxe initializes static vars in the script initializer, and their values are printed in the class
+        int scriptInit = abc.script_info.get(scriptIndex).init_index;
+        if (scriptInitializerSetsStaticVar(abc, scriptInit, classInfo)) {
+            DependencyParser.parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, null, scriptIndex, class_info, true, customNamespace, abc, scriptInit, dependencies, packageName, fullyQualifiedNames, new ArrayList<>(), uses, numberContextRef);
+        }
+    }
+
+    /**
+     * Checks whether a script initializer sets a static var of a class.
+     *
+     * @param abc ABC
+     * @param scriptInit Script initializer method index
+     * @param classInfo Class info
+     * @return True if it sets one
+     */
+    private static boolean scriptInitializerSetsStaticVar(ABC abc, int scriptInit, ClassInfo classInfo) {
+        MethodBody body = abc.findBody(scriptInit);
+        if (body == null) {
+            return false;
+        }
+        Set<Integer> staticVarNames = new HashSet<>();
+        for (Trait t : classInfo.static_traits.traits) {
+            if (t instanceof TraitSlotConst) {
+                staticVarNames.add(t.name_index);
+            }
+        }
+        if (staticVarNames.isEmpty()) {
+            return false;
+        }
+        for (AVM2Instruction ins : body.getCode().code) {
+            if ((ins.definition instanceof InitPropertyIns || ins.definition instanceof SetPropertyIns)
+                    && staticVarNames.contains(ins.operands[0])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
