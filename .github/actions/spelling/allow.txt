@@ -3,3 +3,16 @@ https
 ssh
 ubuntu
 workarounds
+arquitetura
+awt
+cardan
+clickable
+fourcc
+headlessly
+idct
+jceks
+openai
+opencode
+openrouter
+payg
+unescaping
