@@ -249,6 +249,11 @@ public class AVM2Graph extends Graph {
      * @return True if part can be break candidate, false otherwise
      */
     @Override
+    protected boolean canResolvePopsAfterExitIfs() {
+        return true;
+    }
+
+    @Override
     protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part, List<ThrowState> throwStates) {
         for (ThrowState ts : throwStates) {
             if (ts.targetPart == part) {

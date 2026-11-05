@@ -1222,6 +1222,9 @@ public class Graph {
         propagateBreaks(ret);
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
+        if (canResolvePopsAfterExitIfs()) {
+            resolvePopsAfterExitIfs(ret);
+        }
 
         if (!hasEmptyStackPops.getVal() || !containsPopItems(ret)) {
             promotePushItemsToCommands(ret);
@@ -1235,6 +1238,132 @@ public class Graph {
     }
 
     /**
+     * Whether resolvePopsAfterExitIfs applies. AS1/2 builds a typed catch from
+     * the pushes and pops around its rethrowing if.
+     *
+     * @return True to resolve them
+     */
+    protected boolean canResolvePopsAfterExitIfs() {
+        return false;
+    }
+
+    /**
+     * Gives the pops of a command the values pushed before ifs that exit.
+     * Haxe checks a cast inside an expression: in return "a" + f(cast(o,
+     * String)), "a" and f's object are pushed, then if (!(o is String)) throw
+     * runs with them on the stack, which printed §§push and §§pop. When only
+     * temporaries and such ifs (with side effect free conditions) follow the
+     * pushes, and the pushed values have no side effect and read no
+     * temporary set after them, the next command reads them in place of its
+     * pops.
+     *
+     * @param list List
+     */
+    private void resolvePopsAfterExitIfs(List<GraphTargetItem> list) {
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    resolvePopsAfterExitIfs(sub);
+                }
+                continue;
+            }
+            if (item instanceof PushItem) {
+                continue;
+            }
+            List<PopItem> pops = getUnresolvedPops(item);
+            if (pops.isEmpty()) {
+                continue;
+            }
+            List<Integer> pushIndices = new ArrayList<>();
+            int start = i - 1;
+            for (; start >= 0; start--) {
+                GraphTargetItem prev = list.get(start);
+                if (prev instanceof PushItem) {
+                    pushIndices.add(0, start);
+                    if (pushIndices.size() == pops.size()) {
+                        break;
+                    }
+                } else if (!(prev instanceof SetTemporaryItem) && !isExitIf(prev)) {
+                    break;
+                }
+            }
+            if (pushIndices.size() != pops.size() || !canMovePushedValues(list, pushIndices, i)) {
+                continue;
+            }
+            pops.sort((a, b) -> Long.compare(a.order, b.order));
+            for (int p = 0; p < pops.size(); p++) {
+                int pushIndex = pushIndices.get(pushIndices.size() - 1 - p);
+                pops.get(p).resolvedValue = ((PushItem) list.get(pushIndex)).value;
+            }
+            for (int p = pushIndices.size() - 1; p >= 0; p--) {
+                list.remove((int) pushIndices.get(p));
+            }
+            i -= pushIndices.size();
+        }
+    }
+
+    private static List<PopItem> getUnresolvedPops(GraphTargetItem item) {
+        List<PopItem> pops = new ArrayList<>();
+        Set<GraphTargetItem> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        if (item instanceof PopItem) {
+            pops.add((PopItem) item);
+            return pops;
+        }
+        item.visitRecursively(new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem sub) {
+                if (sub instanceof PopItem && ((PopItem) sub).resolvedValue == null && seen.add(sub)) {
+                    pops.add((PopItem) sub);
+                }
+                return true;
+            }
+        });
+        return pops;
+    }
+
+    private static boolean isExitIf(GraphTargetItem item) {
+        if (!(item instanceof IfItem)) {
+            return false;
+        }
+        IfItem ifItem = (IfItem) item;
+        if (ifItem.expression == null || ifItem.expression.hasSideEffect()) {
+            return false;
+        }
+        List<GraphTargetItem> exit = ifItem.onFalse.isEmpty() ? ifItem.onTrue : ifItem.onTrue.isEmpty() ? ifItem.onFalse : null;
+        return exit != null && !exit.isEmpty() && (exit.get(exit.size() - 1) instanceof ExitItem);
+    }
+
+    private static boolean canMovePushedValues(List<GraphTargetItem> list, List<Integer> pushIndices, int commandIndex) {
+        for (int pushIndex : pushIndices) {
+            GraphTargetItem value = ((PushItem) list.get(pushIndex)).value;
+            if (value == null || value.hasSideEffect()) {
+                return false;
+            }
+            Set<Integer> readTemps = new HashSet<>();
+            if (value instanceof HasTempIndex) {
+                readTemps.add(((HasTempIndex) value).getTempIndex());
+            }
+            value.visitRecursively(new AbstractGraphTargetVisitor() {
+                @Override
+                public boolean visit(GraphTargetItem sub) {
+                    if (sub instanceof HasTempIndex) {
+                        readTemps.add(((HasTempIndex) sub).getTempIndex());
+                    }
+                    return true;
+                }
+            });
+            for (int j = pushIndex + 1; j < commandIndex; j++) {
+                GraphTargetItem between = list.get(j);
+                if ((between instanceof SetTemporaryItem) && readTemps.contains(((SetTemporaryItem) between).tempIndex)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    /*
      * Removes side effect free temporaries that nothing prints anymore. A
      * compound assign whose value branches (_s += (c ? a : b) + d) folds its
      * dup back after the dup temp was output, which then printed as a stray
@@ -1306,13 +1435,13 @@ public class Graph {
     private boolean containsPopItems(List<GraphTargetItem> list) {
         Reference<Boolean> containsPopItem = new Reference<>(false);
         for (GraphTargetItem item : list) {
-            if (item instanceof PopItem) {
+            if (item instanceof PopItem && ((PopItem) item).resolvedValue == null) {
                 return true;
             }
             item.visitRecursively(new AbstractGraphTargetVisitor() {
                 @Override
                 public boolean visit(GraphTargetItem item) {
-                    if (item instanceof PopItem) {
+                    if (item instanceof PopItem && ((PopItem) item).resolvedValue == null) {
                         containsPopItem.setVal(true);
                         return false;
                     }
