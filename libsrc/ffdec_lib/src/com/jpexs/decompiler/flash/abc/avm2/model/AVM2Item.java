@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2GraphTargetDialect;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -26,6 +27,11 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
@@ -108,6 +114,115 @@ public abstract class AVM2Item extends GraphTargetItem {
     }
 
     /**
+     * Gets how to qualify a property of the class found through the scope
+     * chain (findproperty) when a local variable of the same name would
+     * shadow it in ActionScript. Haxe assigns fields so, as in
+     * findproperty key; getlocal1; initproperty key for this.key = key.
+     *
+     * @param localData Local data
+     * @param propertyName Property name
+     * @return "this", the class name, or null when it does not need to be
+     * qualified
+     */
+    private static String getShadowedTraitQualifier(LocalData localData, GraphTargetItem propertyName) {
+        if (!(propertyName instanceof FullMultinameAVM2Item) || localData.localRegNames == null || localData.abc == null
+                || localData.callStack == null || localData.callStack.isEmpty()) {
+            return null;
+        }
+        MethodBody body = localData.callStack.get(localData.callStack.size() - 1);
+        //in an activation, the scope chain finds the local variable itself
+        if (body == null || localData.abc.method_info.get(body.method_info).flagNeed_activation()) {
+            return null;
+        }
+        int multinameIndex = ((FullMultinameAVM2Item) propertyName).multinameIndex;
+        if (multinameIndex <= 0 || multinameIndex >= localData.constantsAvm2.getMultinameCount()) {
+            return null;
+        }
+        Multiname m = localData.constantsAvm2.getMultiname(multinameIndex);
+        if (m.name_index <= 0) {
+            return null;
+        }
+        String name = localData.constantsAvm2.getString(m.name_index);
+        if (!localData.localRegNames.containsValue(name)) {
+            return null;
+        }
+        ABC abc = localData.abc;
+        if (isInitializer(abc, body.method_info)) {
+            //Flex names registers of the static code like the static vars it sets
+            return null;
+        }
+        int classIndex = localData.classIndex > -1 ? localData.classIndex : findMethodClass(abc, body.method_info);
+        if (classIndex < 0) {
+            return null;
+        }
+        if (hasTraitNamed(abc, abc.instance_info.get(classIndex).instance_traits, name)) {
+            return "this";
+        }
+        if (hasTraitNamed(abc, abc.class_info.get(classIndex).static_traits, name)) {
+            return abc.constants.getString(abc.instance_info.get(classIndex).getName(abc.constants).name_index);
+        }
+        return null;
+    }
+
+    /**
+     * Checks whether a method is a class or script initializer.
+     *
+     * @param abc ABC
+     * @param methodInfo Method info index
+     * @return True if it is
+     */
+    private static boolean isInitializer(ABC abc, int methodInfo) {
+        for (int i = 0; i < abc.class_info.size(); i++) {
+            if (abc.class_info.get(i).cinit_index == methodInfo) {
+                return true;
+            }
+        }
+        for (int i = 0; i < abc.script_info.size(); i++) {
+            if (abc.script_info.get(i).init_index == methodInfo) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Finds the class whose initializers or methods include a method.
+     *
+     * @param abc ABC
+     * @param methodInfo Method info index
+     * @return Class index or -1
+     */
+    private static int findMethodClass(ABC abc, int methodInfo) {
+        for (int i = 0; i < abc.instance_info.size(); i++) {
+            if (abc.instance_info.get(i).iinit_index == methodInfo
+                    || hasMethod(abc.instance_info.get(i).instance_traits, methodInfo)
+                    || hasMethod(abc.class_info.get(i).static_traits, methodInfo)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static boolean hasMethod(Traits traits, int methodInfo) {
+        for (Trait t : traits.traits) {
+            if ((t instanceof TraitMethodGetterSetter) && ((TraitMethodGetterSetter) t).method_info == methodInfo) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasTraitNamed(ABC abc, Traits traits, String name) {
+        for (Trait t : traits.traits) {
+            Multiname tm = t.getName(abc);
+            if (tm != null && tm.name_index > 0 && name.equals(abc.constants.getString(tm.name_index))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Formats property.
      * @param writer Writer
      * @param object Object
@@ -164,6 +279,10 @@ public abstract class AVM2Item extends GraphTargetItem {
             if (localData.classIndex > -1) {
                 DottedChain thisClass = localData.abc.instance_info.get(localData.classIndex).getName(localData.constantsAvm2).getNameWithNamespace(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, false);
                 parentType = new TypeItem(thisClass);
+            }
+            String qualifier = getShadowedTraitQualifier(localData, propertyName);
+            if (qualifier != null) {
+                writer.append(qualifier).append(".");
             }
             ((FullMultinameAVM2Item) propertyName).appendTo(writer, localData, false, parentType, isStatic);
             return writer;
