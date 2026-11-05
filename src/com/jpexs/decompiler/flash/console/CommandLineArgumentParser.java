@@ -702,7 +702,7 @@ public class CommandLineArgumentParser {
             parseAbcMerge(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("swf2swc")) {
-            parseSwf2Swc(args, charset, swfProfile);
+            parseSwf2Swc(selectionClasses, args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("linkreport")) {
             parseLinkReport(selectionClasses, args, charset, swfProfile);
@@ -1112,7 +1112,7 @@ public class CommandLineArgumentParser {
         }, charset, swfProfile);
     }
 
-    private static void parseSwf2Swc(Stack<String> args, String charset, SwfProfile swfProfile) {
+    private static void parseSwf2Swc(List<String> selectionClasses, Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 2) {
             badArguments("swf2swc");
         }
@@ -1121,7 +1121,7 @@ public class CommandLineArgumentParser {
         processReadSWF(swfFile, null, (SWF swf, OutputStream stdout) -> {
             SwfToSwcExporter exporter = new SwfToSwcExporter();
             try {
-                exporter.exportSwf(swf, outFile, false);
+                exporter.exportSwf(swf, outFile, false, selectionClasses);
             } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
             }
