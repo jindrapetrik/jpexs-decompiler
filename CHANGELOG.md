@@ -1,6 +1,92 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [26.4.0] - 2026-10-19
+### Features
+- add add multiple tags dialog ([#2755])
+- add configurable default as3 linkage parent class names ([#2754])
+- add linked asset panel to as3 view
+- add special icon for classes with linked asset
+- add jump to character on AS3 classes, jump to class on characters
+- add flash.display.SimpleButton as default button as link parent
+- add sound waveform clickable preview
+- add placeobject matrix tween creation support ([#2760])
+- add placeobject ratio, colortransform tween support ([#2760])
+- add depth state after place panel to placeobjects ([#2760])
+- add auto preview checkbox while editing morph/shape/placeobject
+- add editing, xml import/export of zonedata float16 instead of ui16
+- highlight selected morph/shape fill/line style
+- add handles for gradient/bitmap matrix and focal point changes
+- add alt+click on morph/shape selects fillstyle
+- add ctrl+click on morph/shape selects linestyle
+- remember selection when pressing Edit/Save/Cancel on raw edit
+- add black default, hand and move canvas cursor
+- add new msaa renderer icon
+- add button attributes panel
+- add editing place matrix with transform handles
+- add editing place matrix for button records (in attributes edit)
+- add support for bioshock image format ([#2734])
+- add custom tag profiles like bioshock ([#2734])
+- add setting tag profile in CLI interface ([#2734])
+- allow drag and drop sol files into sol editor ([#2693])
+- add option to use system file dialogs instead of swing ([#2693])
+- add text to shape conversion ([#2700])
+- fla export: add classic tween detection
+- fla export: add motion tween detection ([#2597])
+- add support for JPEG-XR ([#1084])
+- add Castle Crashers SWF profile - prefer DefineFunction2 ([#2766])
+- add Castle Crashers SWF profile with its actions support
+- add Castle Crashers Pixl image tag support
+- add brokerProductManager+brokerLocalConnection to fileAttributes
+- as1/2: add better handling of unknown actions
+- a2: recognize static members and use short name ([#2509])
+- sound: show bits per sample in basic tag info
+- improve iggy format support ([#1305],[#1442],[#1736],[#1745],[#2002],[#2768])
+- add replace sprite with other kinds of images, not just GIF ([#2767])
+
+### Bug Fixes
+- fix aero-snap nullpointer exception
+- fix nullpointer when renaming class
+- fix global renaming identifiers not saving ([#2753])
+- simple editor: fix adding new frames at the end of the timeline
+- simple editor: fix remembering last selected timeline
+- build: remove -noverify option - not available on JDK 27 ([#2761])
+- fix bitmap exporter when gradient fill has zero records
+- fix raw editor fields border / size
+- fix unescaping p-code string last character
+- correctly encode and decode FLOAT16 values
+- preserve unsigned EncodedU32 values
+- preserve unsigned AMF U32 values
+- handle short AMF3 stream reads
+- make morph shape distance symmetric
+- make polynomial simplification scale invariant
+- keep seekable stream positions consistent
+- fix bitmap exporter when gradient stroke has zero records
+- fix copying DefineEditTexts text when font has no characters
+- fix disappearing popups and tooltips
+- remove JApplet reference to work on Java 26 ([#2709])
+- fix tag cloning causing incorrect unknown tags export bytes
+- fix data of unknown tag not visible in hex dump
+- allow dragging tags in tag list ([#2712])
+- fix unnecessary labeled breaks ([#2763])
+- fix another unnecessary labeled breaks ([#2749])
+- fix calculating text bounds on text tag conversion ([#2383])
+- pdf export: keep real control font glyphs, escape control bytes in strings
+- pdf export: escape backslash in makePDFString
+- fix DefineBitsJPEG4 incorrect alphaDataOffset
+- use offset field in DefineMorphShape/2
+- skip reading characterId when PlaceObject3/4 has class
+- add support for GIF87a
+- fix defineBitsLossless2 import images without alpha
+- fix defineFunction compilation - used registers backup ([#2766])
+- add support for filters and blendMode in DefineButton(1)
+- as3 editor: disallow attributes with duplicate names ([#2576])
+- sound: decode unsigned PCM8 and correct preview timing
+
+### Performance Improvements
+- as3 editing: optimize name resolving ([PR266])
+- as: hoist reachability out of always-break detection walk ([PR288])
+
 ## [26.3.0] - 2026-09-14
 ### Features
 - add translation support to the translator ([PR269])
@@ -4165,6 +4251,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[26.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.3.0...version26.4.0
 [26.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.2.1...version26.3.0
 [26.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.2.0...version26.2.1
 [26.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.1.0...version26.2.0
@@ -4349,6 +4436,31 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2755]: https://www.free-decompiler.com/flash/issues/2755
+[#2754]: https://www.free-decompiler.com/flash/issues/2754
+[#2760]: https://www.free-decompiler.com/flash/issues/2760
+[#2734]: https://www.free-decompiler.com/flash/issues/2734
+[#2693]: https://www.free-decompiler.com/flash/issues/2693
+[#2700]: https://www.free-decompiler.com/flash/issues/2700
+[#2597]: https://www.free-decompiler.com/flash/issues/2597
+[#1084]: https://www.free-decompiler.com/flash/issues/1084
+[#2766]: https://www.free-decompiler.com/flash/issues/2766
+[#2509]: https://www.free-decompiler.com/flash/issues/2509
+[#1305]: https://www.free-decompiler.com/flash/issues/1305
+[#1442]: https://www.free-decompiler.com/flash/issues/1442
+[#1736]: https://www.free-decompiler.com/flash/issues/1736
+[#1745]: https://www.free-decompiler.com/flash/issues/1745
+[#2002]: https://www.free-decompiler.com/flash/issues/2002
+[#2768]: https://www.free-decompiler.com/flash/issues/2768
+[#2767]: https://www.free-decompiler.com/flash/issues/2767
+[#2753]: https://www.free-decompiler.com/flash/issues/2753
+[#2761]: https://www.free-decompiler.com/flash/issues/2761
+[#2709]: https://www.free-decompiler.com/flash/issues/2709
+[#2712]: https://www.free-decompiler.com/flash/issues/2712
+[#2763]: https://www.free-decompiler.com/flash/issues/2763
+[#2749]: https://www.free-decompiler.com/flash/issues/2749
+[#2383]: https://www.free-decompiler.com/flash/issues/2383
+[#2576]: https://www.free-decompiler.com/flash/issues/2576
 [#2736]: https://www.free-decompiler.com/flash/issues/2736
 [#2059]: https://www.free-decompiler.com/flash/issues/2059
 [#2716]: https://www.free-decompiler.com/flash/issues/2716
@@ -4374,7 +4486,6 @@ Major version of SWF to XML export changed to 2.
 [#2718]: https://www.free-decompiler.com/flash/issues/2718
 [#2750]: https://www.free-decompiler.com/flash/issues/2750
 [#2720]: https://www.free-decompiler.com/flash/issues/2720
-[#2383]: https://www.free-decompiler.com/flash/issues/2383
 [#2702]: https://www.free-decompiler.com/flash/issues/2702
 [#2707]: https://www.free-decompiler.com/flash/issues/2707
 [#2710]: https://www.free-decompiler.com/flash/issues/2710
@@ -5696,6 +5807,8 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR266]: https://github.com/jindrapetrik/jpexs-decompiler/pull/266
+[PR288]: https://github.com/jindrapetrik/jpexs-decompiler/pull/288
 [PR269]: https://github.com/jindrapetrik/jpexs-decompiler/pull/269
 [PR270]: https://github.com/jindrapetrik/jpexs-decompiler/pull/270
 [PR268]: https://github.com/jindrapetrik/jpexs-decompiler/pull/268
