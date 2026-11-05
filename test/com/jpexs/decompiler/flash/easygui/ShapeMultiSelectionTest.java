@@ -192,7 +192,9 @@ public class ShapeMultiSelectionTest {
         second.color = new RGBA(Color.blue);
         second.noHScaleFlag = true;
         second.startCapStyle = LINESTYLE2.SQUARE_CAP;
-        second.endCapStyle = LINESTYLE2.SQUARE_CAP;
+        second.endCapStyle = LINESTYLE2.NO_CAP;
+        second.pixelHintingFlag = true;
+        second.noClose = true;
         second.miterLimitFactor = 9;
         shape.shapes.lineStyles.lineStyles2 = new LINESTYLE2[]{first, second};
         rectangle(shape, 0, 0, 2000, 2000, 1, 1);
@@ -216,7 +218,14 @@ public class ShapeMultiSelectionTest {
                 assertNull(width.getValue());
                 assertNull(miter.getValue());
                 assertEquals(((JLabel) width.getComponent(0)).getText(), "-");
-                assertEquals(((JComboBox<?>) field(panel, "capComboBox")).getSelectedIndex(), -1);
+                JComboBox<?> startCap = (JComboBox<?>) field(panel, "startCapComboBox");
+                JComboBox<?> endCap = (JComboBox<?>) field(panel, "endCapComboBox");
+                JTriStateCheckBox pixelHinting = (JTriStateCheckBox) field(panel, "pixelHintingCheckBox");
+                JTriStateCheckBox noClose = (JTriStateCheckBox) field(panel, "noCloseCheckBox");
+                assertEquals(startCap.getSelectedIndex(), -1);
+                assertEquals(endCap.getSelectedIndex(), -1);
+                assertEquals(pixelHinting.getSelectionState(), 1);
+                assertEquals(noClose.getSelectionState(), 1);
                 assertEquals(((JComboBox<?>) field(panel, "scaleComboBox")).getSelectedIndex(), -1);
                 Object colorEditor = field(field(panel, "strokeEditor"), "colorEditor");
                 TextPropertyField hexField = (TextPropertyField) field(colorEditor, "hexField");
@@ -241,6 +250,29 @@ public class ShapeMultiSelectionTest {
                 panel.setSelections(Arrays.asList(at(model, 500, 500), lines.get(0), lines.get(1)));
                 assertTrue(((JComboBox<?>) field(field(panel, "fillEditor"), "typeComboBox")).isEnabled());
                 assertTrue(((JComboBox<?>) field(field(panel, "strokeEditor"), "typeComboBox")).isEnabled());
+
+                List<String> properties = new ArrayList<>();
+                panel.setPropertyChangeListener((stroke, property) -> {
+                    assertTrue(stroke);
+                    properties.add(property);
+                });
+                startCap.setSelectedIndex(LINESTYLE2.NO_CAP);
+                endCap.setSelectedIndex(LINESTYLE2.SQUARE_CAP);
+                pixelHinting.doClick();
+                noClose.doClick();
+                assertEquals(properties, Arrays.asList("startCap", "endCap", "pixelHinting", "noClose"));
+                LINESTYLE2 newStart = panel.applyStrokeChange(second, null, "startCap");
+                assertEquals(newStart.startCapStyle, LINESTYLE2.NO_CAP);
+                assertEquals(newStart.endCapStyle, LINESTYLE2.NO_CAP);
+                LINESTYLE2 newEnd = panel.applyStrokeChange(first, null, "endCap");
+                assertEquals(newEnd.startCapStyle, LINESTYLE2.ROUND_CAP);
+                assertEquals(newEnd.endCapStyle, LINESTYLE2.SQUARE_CAP);
+                LINESTYLE2 hinted = panel.applyStrokeChange(first, null, "pixelHinting");
+                assertTrue(hinted.pixelHintingFlag);
+                assertFalse(hinted.noClose);
+                LINESTYLE2 open = panel.applyStrokeChange(first, null, "noClose");
+                assertTrue(open.noClose);
+                assertFalse(open.pixelHintingFlag);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }

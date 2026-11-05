@@ -246,11 +246,7 @@ public class DrawingShapesPropertiesPanel extends AbstractPropertiesPanel {
     }
 
     public LINESTYLE2 getStroke(Rectangle2D bounds) {
-        LINESTYLE2 line = styles.getStrokeStyle(bounds);
-        if (line != null) {
-            line.noClose = getKind() == DrawingShape.LINE;
-        }
-        return line;
+        return styles.getStrokeStyle(bounds);
     }
 
     public void setSwf(SWF swf) {

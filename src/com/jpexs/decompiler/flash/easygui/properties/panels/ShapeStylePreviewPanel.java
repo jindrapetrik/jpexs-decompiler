@@ -41,9 +41,12 @@ public class ShapeStylePreviewPanel extends AbstractPropertiesPanel {
     private final FillPreview strokePreview = new FillPreview();
     private final JLabel widthLabel = new JLabel();
     private final JLabel scaleLabel = new JLabel();
-    private final JLabel capLabel = new JLabel();
+    private final JLabel startCapLabel = new JLabel();
+    private final JLabel endCapLabel = new JLabel();
     private final JLabel joinLabel = new JLabel();
     private final JLabel miterLabel = new JLabel();
+    private final JLabel pixelHintingLabel = new JLabel();
+    private final JLabel noCloseLabel = new JLabel();
     private final Map<Integer, ImageIcon> bitmapIcons = new HashMap<>();
     private SWF swf;
 
@@ -59,9 +62,12 @@ public class ShapeStylePreviewPanel extends AbstractPropertiesPanel {
         addRow(stroke, "type", strokePreview, 0);
         addRow(stroke, "width", widthLabel, 1);
         addRow(stroke, "scale", scaleLabel, 2);
-        addRow(stroke, "cap", capLabel, 3);
-        addRow(stroke, "join", joinLabel, 4);
-        addRow(stroke, "miter", miterLabel, 5);
+        addRow(stroke, "startCap", startCapLabel, 3);
+        addRow(stroke, "endCap", endCapLabel, 4);
+        addRow(stroke, "join", joinLabel, 5);
+        addRow(stroke, "miter", miterLabel, 6);
+        addRow(stroke, "pixelHinting", pixelHintingLabel, 7);
+        addRow(stroke, "noClose", noCloseLabel, 8);
         JPanel cards = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = -1;
@@ -113,11 +119,19 @@ public class ShapeStylePreviewPanel extends AbstractPropertiesPanel {
         widthLabel.setText(line == null ? "-" : number(line.getWidth() / (float) SWF.unitDivisor) + " px");
         int scale = line2 == null ? 0 : (line2.noHScaleFlag ? 2 : 0) + (line2.noVScaleFlag ? 1 : 0);
         scaleLabel.setText(line == null ? "-" : option("scale", new String[]{"normal", "horizontal", "vertical", "none"}[scale]));
-        capLabel.setText(line == null ? "-" : option("cap", new String[]{"round", "none", "square"}[line2 == null ? 0 : line2.startCapStyle]));
+        startCapLabel.setText(line == null ? "-" : capOption(line2 == null ? LINESTYLE2.ROUND_CAP : line2.startCapStyle));
+        endCapLabel.setText(line == null ? "-" : capOption(line2 == null ? LINESTYLE2.ROUND_CAP : line2.endCapStyle));
         joinLabel.setText(line == null ? "-" : option("join", new String[]{"round", "bevel", "miter"}[line2 == null ? 0 : line2.joinStyle]));
         miterLabel.setText(line2 == null || line2.joinStyle != LINESTYLE2.MITER_JOIN ? "-" : number(line2.miterLimitFactor));
+        pixelHintingLabel.setText(line == null ? "-" : line2 != null && line2.pixelHintingFlag ? "\u2713" : "\u2717");
+        noCloseLabel.setText(line == null ? "-" : line2 != null && line2.noClose ? "\u2713" : "\u2717");
         revalidate();
         repaint();
+    }
+
+    private static String capOption(int cap) {
+        String[] names = {"round", "none", "square"};
+        return cap >= 0 && cap < names.length ? option("cap", names[cap]) : "-";
     }
 
     private static String option(String property, String value) {

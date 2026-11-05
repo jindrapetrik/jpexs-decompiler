@@ -155,7 +155,10 @@ public class ShapePencilTest {
                 assertEquals(panel.getStrokeStyle().color.toColor(), Color.black);
                 ((FloatPropertyField) field(panel, "widthEditor")).setValue(12f);
                 ((JComboBox<?>) field(panel, "scaleComboBox")).setSelectedIndex(3);
-                ((JComboBox<?>) field(panel, "capComboBox")).setSelectedIndex(2);
+                ((JComboBox<?>) field(panel, "startCapComboBox")).setSelectedIndex(LINESTYLE2.SQUARE_CAP);
+                ((JComboBox<?>) field(panel, "endCapComboBox")).setSelectedIndex(LINESTYLE2.NO_CAP);
+                ((javax.swing.JCheckBox) field(panel, "pixelHintingCheckBox")).doClick();
+                ((javax.swing.JCheckBox) field(panel, "noCloseCheckBox")).doClick();
                 ((JComboBox<?>) field(panel, "joinComboBox")).setSelectedIndex(2);
                 ((FloatPropertyField) field(panel, "miterEditor")).setValue(8f);
                 DefineShape4Tag shape = shape();
@@ -187,6 +190,10 @@ public class ShapePencilTest {
                     assertTrue(restored.hasFillFlag);
                     assertEquals(restored.fillType.fillStyleType, expected[i]);
                     assertEquals(restored.width, 240);
+                    assertEquals(restored.startCapStyle, LINESTYLE2.SQUARE_CAP);
+                    assertEquals(restored.endCapStyle, LINESTYLE2.NO_CAP);
+                    assertTrue(restored.pixelHintingFlag);
+                    assertTrue(restored.noClose);
                     if (i == 2) {
                         assertEquals(restored.fillType.bitmapId, image.getCharacterId());
                     } else {

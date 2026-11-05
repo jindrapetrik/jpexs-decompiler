@@ -127,6 +127,8 @@ public class ShapeDrawingSettingsTest {
                 sampled.noVScaleFlag = true;
                 sampled.startCapStyle = LINESTYLE2.SQUARE_CAP;
                 sampled.endCapStyle = LINESTYLE2.NO_CAP;
+                sampled.pixelHintingFlag = true;
+                sampled.noClose = true;
                 sampled.joinStyle = LINESTYLE2.MITER_JOIN;
                 sampled.miterLimitFactor = 7.5f;
                 settings.shared.setSampledStroke(sampled);
@@ -138,12 +140,15 @@ public class ShapeDrawingSettingsTest {
                     assertTrue(line.noVScaleFlag);
                     assertEquals(line.startCapStyle, LINESTYLE2.SQUARE_CAP);
                     assertEquals(line.endCapStyle, LINESTYLE2.NO_CAP);
+                    assertTrue(line.pixelHintingFlag);
+                    assertTrue(line.noClose);
                     assertEquals(line.joinStyle, LINESTYLE2.MITER_JOIN);
                     assertEquals(line.miterLimitFactor, 7.5f);
                 }
                 ((FloatPropertyField) field(settings.pencil, "widthEditor")).setValue(12.5f);
                 assertEquals(settings.ink.getStrokeStyle().width, 250);
                 assertEquals(settings.shapes.getStroke(BOUNDS).width, 250);
+                assertTrue(settings.shapes.getStroke(BOUNDS).noClose);
                 solid(settings.ink, "strokeEditor", Color.magenta);
                 assertEquals(settings.pencil.getStrokeStyle().color.toColor(), Color.magenta);
                 assertEquals(settings.shapes.getStroke(BOUNDS).color.toColor(), Color.magenta);

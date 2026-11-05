@@ -1062,9 +1062,6 @@ public class EasySwfPanel extends JPanel {
                 return;
             }
             LINESTYLE2 line = inkPropertiesPanel.getStrokeStyle(region.geometry.getBounds2D());
-            if (line != null) {
-                line.noClose = false;
-            }
             edit = shapeSelection.outlineRegion(region, line);
         }
         if (edit.changed) {
@@ -1333,9 +1330,6 @@ public class EasySwfPanel extends JPanel {
         Path2D.Double path = finished ? pen.getPath() : pen.getPreviewPath();
         Rectangle2D bounds = path.getBounds2D();
         LINESTYLE2 line = penPropertiesPanel.getStrokeStyle(bounds);
-        if (line != null) {
-            line.noClose = !pen.isClosed();
-        }
         applyDrawing(shapeSelection.drawShape(path, penPropertiesPanel.getFillStyle(bounds), line),
                 EasyStrings.translate("action.pen"), finished);
     }

@@ -134,7 +134,7 @@ public class ShapePropertiesPanelTest {
                 }
                 ((FloatPropertyField) field(panel, "widthEditor")).setValue(7f);
                 ((FloatPropertyField) field(panel, "miterEditor")).setValue(8f);
-                for (String name : new String[]{"scaleComboBox", "capComboBox", "joinComboBox"}) {
+                for (String name : new String[]{"scaleComboBox", "startCapComboBox", "endCapComboBox", "joinComboBox"}) {
                     ((JComboBox<?>) field(panel, name)).setSelectedIndex(2);
                 }
                 assertEquals(data(shape), before);
@@ -166,7 +166,7 @@ public class ShapePropertiesPanelTest {
                 assertFalse(strokeType.isEnabled());
                 assertFalse(((FloatPropertyField) field(panel, "widthEditor")).isEnabled());
                 assertFalse(((FloatPropertyField) field(panel, "miterEditor")).isEnabled());
-                for (String name : new String[]{"scaleComboBox", "capComboBox", "joinComboBox"}) {
+                for (String name : new String[]{"scaleComboBox", "startCapComboBox", "endCapComboBox", "joinComboBox"}) {
                     assertFalse(((JComboBox<?>) field(panel, name)).isEnabled());
                 }
                 LINESTYLE2 line = new LINESTYLE2();
@@ -186,7 +186,8 @@ public class ShapePropertiesPanelTest {
                 assertEquals(((FloatPropertyField) field(panel, "widthEditor")).getValue(), Float.valueOf(5));
                 assertEquals(((FloatPropertyField) field(panel, "miterEditor")).getValue(), Float.valueOf(6));
                 assertEquals(((JComboBox<?>) field(panel, "scaleComboBox")).getSelectedIndex(), 2);
-                assertEquals(((JComboBox<?>) field(panel, "capComboBox")).getSelectedIndex(), 2);
+                assertEquals(((JComboBox<?>) field(panel, "startCapComboBox")).getSelectedIndex(), LINESTYLE2.SQUARE_CAP);
+                assertEquals(((JComboBox<?>) field(panel, "endCapComboBox")).getSelectedIndex(), LINESTYLE2.ROUND_CAP);
                 assertEquals(((JComboBox<?>) field(panel, "joinComboBox")).getSelectedIndex(), 2);
                 // A selected region remains the same kind when its style is None.
                 panel.setSelectedStyles(null, null, null, true);
@@ -209,7 +210,7 @@ public class ShapePropertiesPanelTest {
     }
 
     @Test
-    public void loadingDoesNotEmitEditsAndUnexposedStrokeFlagsArePreserved() throws Exception {
+    public void loadingDoesNotEmitEditsAndWidthPreservesOtherStrokeProperties() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             try {
                 ShapePropertiesPanel panel = new ShapePropertiesPanel();

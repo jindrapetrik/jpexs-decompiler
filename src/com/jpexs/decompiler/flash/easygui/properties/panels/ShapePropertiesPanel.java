@@ -100,11 +100,15 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
     private final FloatPropertyField widthEditor = new FloatPropertyField(1f, 0f, 65535f / (float) SWF.unitDivisor);
     private final JComboBox<ComboBoxItem<Icon>> scaleComboBox = createStrokeComboBox("scale",
             new String[]{"normal", "horizontal", "vertical", "none"});
-    private final JComboBox<ComboBoxItem<Icon>> capComboBox = createStrokeComboBox("cap",
+    private final JComboBox<ComboBoxItem<Icon>> startCapComboBox = createStrokeComboBox("cap",
+            new String[]{"round", "none", "square"});
+    private final JComboBox<ComboBoxItem<Icon>> endCapComboBox = createStrokeComboBox("cap",
             new String[]{"round", "none", "square"});
     private final JComboBox<ComboBoxItem<Icon>> joinComboBox = createStrokeComboBox("join",
             new String[]{"round", "bevel", "miter"});
     private final FloatPropertyField miterEditor = new FloatPropertyField(3f, 1f, 255f);
+    private final JTriStateCheckBox pixelHintingCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.pixelHinting"));
+    private final JTriStateCheckBox noCloseCheckBox = new JTriStateCheckBox(EasyStrings.translate("property.shape.noClose"));
     private final JPanel fillPanel = new JPanel(new GridBagLayout());
     private final JPanel strokePanel = new JPanel(new GridBagLayout());
     private final JPanel styleCards = new JPanel(new VisibleCardLayout());
@@ -146,9 +150,12 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         widthPanel.add(new JLabel(" px"));
         addRow(strokePanel, "width", widthPanel, 1);
         addRow(strokePanel, "scale", scaleComboBox, 2);
-        addRow(strokePanel, "cap", capComboBox, 3);
-        addRow(strokePanel, "join", joinComboBox, 4);
-        addRow(strokePanel, "miter", miterEditor, 5);
+        addRow(strokePanel, "startCap", startCapComboBox, 3);
+        addRow(strokePanel, "endCap", endCapComboBox, 4);
+        addRow(strokePanel, "join", joinComboBox, 5);
+        addRow(strokePanel, "miter", miterEditor, 6);
+        addToGrid((GridBagLayout) strokePanel.getLayout(), strokePanel, pixelHintingCheckBox, 0, 7, 2, 1);
+        addToGrid((GridBagLayout) strokePanel.getLayout(), strokePanel, noCloseCheckBox, 0, 8, 2, 1);
 
         JPanel tabs = new JPanel(new GridLayout(0, 1, 0, 3));
         ButtonGroup group = new ButtonGroup();
@@ -181,14 +188,16 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         widthEditor.addChangeListener(e -> fireChange(true, "width"));
         miterEditor.addChangeListener(e -> fireChange(true, "miter"));
         scaleComboBox.addActionListener(e -> fireChange(true, "scale"));
-        capComboBox.addActionListener(e -> fireChange(true, "cap"));
+        startCapComboBox.addActionListener(e -> fireChange(true, "startCap"));
+        endCapComboBox.addActionListener(e -> fireChange(true, "endCap"));
         joinComboBox.addActionListener(e -> fireChange(true, "join"));
+        pixelHintingCheckBox.addActionListener(e -> fireChange(true, "pixelHinting"));
+        noCloseCheckBox.addActionListener(e -> fireChange(true, "noClose"));
         if (drawing) {
             LINESTYLE2 line = new LINESTYLE2();
             line.color = new RGBA(Color.black);
             line.width = (int) SWF.unitDivisor;
             line.miterLimitFactor = 3;
-            line.noClose = strokeOnly;
             if (strokeOnly) {
                 setSelectedStroke(line);
             } else if (fillOnly) {
@@ -349,9 +358,17 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                     line.noHScaleFlag = scale == 2 || scale == 3;
                     line.noVScaleFlag = scale == 1 || scale == 3;
                     break;
-                case "cap":
-                    line.startCapStyle = capComboBox.getSelectedIndex();
-                    line.endCapStyle = line.startCapStyle;
+                case "startCap":
+                    line.startCapStyle = startCapComboBox.getSelectedIndex();
+                    break;
+                case "endCap":
+                    line.endCapStyle = endCapComboBox.getSelectedIndex();
+                    break;
+                case "pixelHinting":
+                    line.pixelHintingFlag = pixelHintingCheckBox.isSelected();
+                    break;
+                case "noClose":
+                    line.noClose = noCloseCheckBox.isSelected();
                     break;
                 case "join":
                     line.joinStyle = joinComboBox.getSelectedIndex();
@@ -397,10 +414,17 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             line.noHScaleFlag = scale == 2 || scale == 3;
             line.noVScaleFlag = scale == 1 || scale == 3;
         }
-        int cap = capComboBox.getSelectedIndex();
-        if (cap >= 0 && (originalLine == null || cap != originalLine.startCapStyle)) {
-            line.startCapStyle = cap;
-            line.endCapStyle = cap;
+        if (startCapComboBox.getSelectedIndex() >= 0) {
+            line.startCapStyle = startCapComboBox.getSelectedIndex();
+        }
+        if (endCapComboBox.getSelectedIndex() >= 0) {
+            line.endCapStyle = endCapComboBox.getSelectedIndex();
+        }
+        if (pixelHintingCheckBox.getSelectionState() != 1) {
+            line.pixelHintingFlag = pixelHintingCheckBox.isSelected();
+        }
+        if (noCloseCheckBox.getSelectionState() != 1) {
+            line.noClose = noCloseCheckBox.isSelected();
         }
         if (joinComboBox.getSelectedIndex() >= 0) {
             line.joinStyle = joinComboBox.getSelectedIndex();
@@ -551,10 +575,16 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 miterEditor.setValue(miters, true);
                 Integer scale = common(lines, line -> line instanceof LINESTYLE2
                         ? (((LINESTYLE2) line).noHScaleFlag ? 2 : 0) + (((LINESTYLE2) line).noVScaleFlag ? 1 : 0) : 0);
-                Integer cap = common(lines, line -> line instanceof LINESTYLE2 ? ((LINESTYLE2) line).startCapStyle : 0);
+                Integer startCap = common(lines, line -> line instanceof LINESTYLE2 ? ((LINESTYLE2) line).startCapStyle : LINESTYLE2.ROUND_CAP);
+                Integer endCap = common(lines, line -> line instanceof LINESTYLE2 ? ((LINESTYLE2) line).endCapStyle : LINESTYLE2.ROUND_CAP);
+                Boolean pixelHinting = common(lines, line -> line instanceof LINESTYLE2 && ((LINESTYLE2) line).pixelHintingFlag);
+                Boolean noClose = common(lines, line -> line instanceof LINESTYLE2 && ((LINESTYLE2) line).noClose);
                 Integer join = common(lines, line -> line instanceof LINESTYLE2 ? ((LINESTYLE2) line).joinStyle : 0);
                 scaleComboBox.setSelectedIndex(scale == null ? -1 : scale);
-                capComboBox.setSelectedIndex(cap == null ? -1 : cap);
+                setCapStyle(startCapComboBox, startCap);
+                setCapStyle(endCapComboBox, endCap);
+                pixelHintingCheckBox.setSelectionState(pixelHinting == null ? 1 : pixelHinting ? 2 : 0);
+                noCloseCheckBox.setSelectionState(noClose == null ? 1 : noClose ? 2 : 0);
                 joinComboBox.setSelectedIndex(join == null ? -1 : join);
             }
             updateStyleEnabled();
@@ -671,9 +701,16 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         widthEditor.setValue(line == null ? 1f : line.getWidth() / (float) SWF.unitDivisor);
         LINESTYLE2 line2 = line instanceof LINESTYLE2 ? (LINESTYLE2) line : null;
         scaleComboBox.setSelectedIndex(line2 == null ? 0 : (line2.noHScaleFlag ? 2 : 0) + (line2.noVScaleFlag ? 1 : 0));
-        capComboBox.setSelectedIndex(line2 == null ? 0 : line2.startCapStyle);
+        setCapStyle(startCapComboBox, line2 == null ? LINESTYLE2.ROUND_CAP : line2.startCapStyle);
+        setCapStyle(endCapComboBox, line2 == null ? LINESTYLE2.ROUND_CAP : line2.endCapStyle);
+        pixelHintingCheckBox.setSelected(line2 != null && line2.pixelHintingFlag);
+        noCloseCheckBox.setSelected(line2 != null && line2.noClose);
         joinComboBox.setSelectedIndex(line2 == null ? 0 : line2.joinStyle);
         miterEditor.setValue(line2 == null || line2.joinStyle != LINESTYLE2.MITER_JOIN ? 3f : line2.miterLimitFactor);
+    }
+
+    private static void setCapStyle(JComboBox<?> comboBox, Integer cap) {
+        comboBox.setSelectedIndex(cap == null || cap < 0 || cap >= comboBox.getItemCount() ? -1 : cap);
     }
 
     static class FillEditor extends JPanel {
