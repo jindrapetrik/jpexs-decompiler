@@ -4222,6 +4222,11 @@ public class Graph {
                     for (Loop el : loops) {
                         loopPhases.add(el.phase);
                     }
+                    List<Integer> throwStatesBackup = new ArrayList<>();
+                    for (ThrowState ts : throwStates) {
+                        throwStatesBackup.add(ts.state);
+                    }
+                    Object localDataBackup = backupWalkedLocalData(localData);
                     precontinueCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, subVisited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
                     currentLoop.loopPreContinue = backup;
                     checkContinueAtTheEnd(precontinueCommands, currentLoop);
@@ -4255,11 +4260,16 @@ public class Graph {
                             precontinueCommands.clear();
 
                             /*
-                             * Restore loop phases
+                             * Restore loop phases, throw states and the local
+                             * data the discarded walk changed
                              */
                             for (int i = 0; i < loopPhases.size(); i++) {
                                 loops.get(i).phase = loopPhases.get(i);
                             }
+                            for (int i = 0; i < throwStatesBackup.size(); i++) {
+                                throwStates.get(i).state = throwStatesBackup.get(i);
+                            }
+                            restoreWalkedLocalData(localData, localDataBackup);
                         }
                     }
                 }
@@ -5519,6 +5529,27 @@ public class Graph {
      */
     public BaseLocalData prepareBranchLocalData(BaseLocalData localData) {
         return localData;
+    }
+
+    /**
+     * Backs up the local data that walking parts changes, so a walk whose
+     * result is discarded can be undone. Override this method when the local
+     * data has such state.
+     *
+     * @param localData Local data
+     * @return Backup to pass to restoreWalkedLocalData
+     */
+    protected Object backupWalkedLocalData(BaseLocalData localData) {
+        return null;
+    }
+
+    /**
+     * Restores the local data backed up by backupWalkedLocalData.
+     *
+     * @param localData Local data
+     * @param backup Backup
+     */
+    protected void restoreWalkedLocalData(BaseLocalData localData, Object backup) {
     }
 
     /**
