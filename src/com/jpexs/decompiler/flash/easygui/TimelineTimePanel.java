@@ -51,19 +51,19 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
 
     private final List<FrameSelectionListener> listeners = new ArrayList<>();   
     
-    private final boolean singleFrame;
+    private final int singleFrameWidth;
 
     public TimelineTimePanel(TimelineDepthPanel depthPanel) {
-        this(false);
+        this(0);
     }
 
-    TimelineTimePanel(boolean singleFrame) {
-        this.singleFrame = singleFrame;
+    TimelineTimePanel(int singleFrameWidth) {
+        this.singleFrameWidth = singleFrameWidth;
         Dimension dim = new Dimension(Integer.MAX_VALUE, TimelineBodyPanel.FRAME_HEIGHT);
         setSize(dim);
         setPreferredSize(dim);
         setMinimumSize(new Dimension(0, TimelineBodyPanel.FRAME_HEIGHT));
-        if (singleFrame) {
+        if (singleFrameWidth > 0) {
             selectedFrame = 0;
         } else {
             addMouseListener(this);
@@ -100,24 +100,26 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
     @Override
     protected void paintComponent(Graphics g) {
         Rectangle clip = g.getClipBounds();
-        int frameWidth = TimelineBodyPanel.getFrameWidthForTimeline(timeline);
+        boolean singleFrame = singleFrameWidth > 0;
+        int frameWidth = singleFrame ? singleFrameWidth : TimelineBodyPanel.getFrameWidthForTimeline(timeline);
         int start_f = singleFrame ? 0 : (scrollOffset + clip.x) / frameWidth;
         int end_f = singleFrame ? 0 : (scrollOffset + clip.x + clip.width) / frameWidth;
         g.setColor(TimelineBodyPanel.getBackgroundColor());
         g.fillRect(0, 0, getWidth(), getHeight());
         g.setColor(BORDER_COLOR);
-        int xofs = -scrollOffset % frameWidth;
+        int xofs = singleFrame ? 0 : 1 - scrollOffset % frameWidth;
         for (int f = 0; f <= end_f; f++) {
-            g.drawLine(xofs + f * frameWidth + 1, TimelineBodyPanel.FRAME_HEIGHT - 1, xofs + f * frameWidth + 1, TimelineBodyPanel.FRAME_HEIGHT - LINE_LENGTH);
+            g.drawLine(xofs + f * frameWidth, TimelineBodyPanel.FRAME_HEIGHT - 1, xofs + f * frameWidth, TimelineBodyPanel.FRAME_HEIGHT - LINE_LENGTH);
         }
         g.setFont(g.getFont().deriveFont(fontSize));
         for (int f = 0; f <= end_f; f++) {
             int cur_f = start_f + f;
+            int frameX = xofs + f * frameWidth;
             if (selectedFrame == cur_f) {
                 g.setColor(TimelineBodyPanel.SELECTED_COLOR);
-                g.fillRect(xofs + f * frameWidth + 1, 0, frameWidth, TimelineBodyPanel.FRAME_HEIGHT - 1);
+                g.fillRect(frameX, 0, frameWidth, TimelineBodyPanel.FRAME_HEIGHT - 1);
                 g.setColor(TimelineBodyPanel.SELECTED_BORDER_COLOR);
-                g.drawRect(xofs + f * frameWidth + 1, 0, frameWidth, TimelineBodyPanel.FRAME_HEIGHT - 1);
+                g.drawRect(frameX, 0, frameWidth, TimelineBodyPanel.FRAME_HEIGHT - 1);
             }
             g.setColor(FONT_COLOR);
             
@@ -139,13 +141,13 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
                             break;
                     }
                     int w = g.getFontMetrics().stringWidth(timeStr);
-                    g.drawString(timeStr, xofs + f * frameWidth + frameWidth / 2 - w / 2 + 1, TimelineBodyPanel.FRAME_HEIGHT - LINE_LENGTH - LINE_TEXT_SPACE);
+                    g.drawString(timeStr, frameX + frameWidth / 2 - w / 2, TimelineBodyPanel.FRAME_HEIGHT - LINE_LENGTH - LINE_TEXT_SPACE);
                 }
             } else {
                 if ((cur_f + 1) % 5 == 0 || cur_f == 0) {
                     String timeStr = Integer.toString(cur_f + 1);
                     int w = g.getFontMetrics().stringWidth(timeStr);
-                    g.drawString(timeStr, xofs + f * frameWidth + frameWidth / 2 - w / 2 + 1, TimelineBodyPanel.FRAME_HEIGHT - LINE_LENGTH - LINE_TEXT_SPACE);
+                    g.drawString(timeStr, frameX + frameWidth / 2 - w / 2, TimelineBodyPanel.FRAME_HEIGHT - LINE_LENGTH - LINE_TEXT_SPACE);
                 }
             }
         }

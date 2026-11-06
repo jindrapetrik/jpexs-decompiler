@@ -48,6 +48,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -262,19 +263,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         int maxDepth = getDepthCount();
         int max_f = timeline.getFrameCount() - 1;
 
-        // draw background
-        for (int f = start_f; f <= end_f; f++) {
-            g.setColor((f + 1) % 5 == 0 ? getEmptyFrameSecondColor() : getEmptyFrameColor());
-            g.fillRect(f * frameWidth, firstRow * frameHeight, frameWidth, (lastRow - firstRow + 1) * frameHeight);
-            for (int row = firstRow; row <= lastRow; row++) {
-                if (layerSelection.get().depths.contains(flipLayerOrder(row, maxDepth))) {
-                    g.setColor(getSelectedColor());
-                    g.fillRect(f * frameWidth, row * frameHeight, frameWidth, frameHeight);
-                }
-                g.setColor(EMPTY_BORDER_COLOR);
-                g.drawRect(f * frameWidth, row * frameHeight, frameWidth, frameHeight);
-            }
-        }
+        Set<Integer> selectedDepths = layerSelection.get().depths;
+        drawFrameGrid(g, clip, frameWidth, row -> selectedDepths.contains(flipLayerOrder(row, maxDepth)));
 
         // draw selected cell
         for (Point c : cursor) {
@@ -338,6 +328,27 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
         if (dropRow >= 0) {
             TimelineLayerDrag.paintDropLine(g, getWidth(), dropRow * frameHeight);
+        }
+    }
+
+    static void drawFrameGrid(Graphics g, Rectangle clip, int frameWidth, IntPredicate rowSelected) {
+        int firstFrame = clip.x / frameWidth;
+        int lastFrame = (clip.x + clip.width) / frameWidth;
+        int firstRow = clip.y / FRAME_HEIGHT;
+        int lastRow = (clip.y + clip.height) / FRAME_HEIGHT;
+        for (int frame = firstFrame; frame <= lastFrame; frame++) {
+            int x = frame * frameWidth;
+            g.setColor((frame + 1) % 5 == 0 ? getEmptyFrameSecondColor() : getEmptyFrameColor());
+            g.fillRect(x, firstRow * FRAME_HEIGHT, frameWidth, (lastRow - firstRow + 1) * FRAME_HEIGHT);
+            for (int row = firstRow; row <= lastRow; row++) {
+                int y = row * FRAME_HEIGHT;
+                if (rowSelected.test(row)) {
+                    g.setColor(getSelectedColor());
+                    g.fillRect(x, y, frameWidth, FRAME_HEIGHT);
+                }
+                g.setColor(EMPTY_BORDER_COLOR);
+                g.drawRect(x, y, frameWidth, FRAME_HEIGHT);
+            }
         }
     }
 

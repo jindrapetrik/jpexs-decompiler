@@ -35,7 +35,7 @@ import javax.swing.SwingUtilities;
 /** One frame for each style bank, with the frontmost layer at the top. */
 final class ShapeTimelinePanel extends JPanel {
 
-    private static final int FRAME_WIDTH = TimelineBodyPanel.getFrameWidthForTimeline(null);
+    private static final int FRAME_WIDTH = 40;
     private static final int ROW_HEIGHT = TimelineBodyPanel.FRAME_HEIGHT;
 
     private final TimelineDepthPanel depths;
@@ -52,18 +52,18 @@ final class ShapeTimelinePanel extends JPanel {
             Graphics2D g = (Graphics2D) graphics;
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             Rectangle clip = g.getClipBounds();
-            g.setColor(TimelineBodyPanel.getBackgroundColor());
-            g.fillRect(clip.x, clip.y, clip.width, clip.height);
+            Set<Integer> selectedDepths = layerSelection.get().depths;
+            TimelineBodyPanel.drawFrameGrid(g, clip, FRAME_WIDTH, row -> selectedDepths.contains(layerAt(row) + 1));
             int lastRow = Math.min(layers.size() - 1, (clip.y + clip.height - 1) / ROW_HEIGHT);
             for (int row = clip.y / ROW_HEIGHT; row <= lastRow; row++) {
                 int layer = layerAt(row);
                 int y = row * ROW_HEIGHT;
                 boolean empty = !ShapeLayers.hasEdges(layers.get(layer));
                 boolean selected = selectedLayers.isEmpty() ? layer == activeLayer : selectedLayers.contains(layer);
-                boolean rowSelected = layerSelection.get().depths.contains(layer + 1);
+                boolean rowSelected = selectedDepths.contains(layer + 1);
                 g.setColor(selected || rowSelected ? TimelineBodyPanel.getSelectedColor()
                         : empty ? TimelineBodyPanel.getEmptyFrameColor() : TimelineBodyPanel.getFrameColor());
-                g.fillRect(0, y, rowSelected ? getWidth() : FRAME_WIDTH, ROW_HEIGHT);
+                g.fillRect(0, y, FRAME_WIDTH, ROW_HEIGHT);
                 g.setColor(TimelineBodyPanel.BORDER_COLOR);
                 g.drawRect(0, y, FRAME_WIDTH, ROW_HEIGHT);
                 g.setColor(TimelineBodyPanel.KEY_COLOR);
@@ -84,7 +84,7 @@ final class ShapeTimelinePanel extends JPanel {
         super(new BorderLayout());
         depths = new TimelineDepthPanel(swfPanel, true, layerSelection);
         layerSelection.addListener(frames::repaint);
-        TimelineTimePanel time = new TimelineTimePanel(true);
+        TimelineTimePanel time = new TimelineTimePanel(FRAME_WIDTH);
         JScrollPane scroll = new FasterScrollPane(frames);
         scroll.setRowHeaderView(depths);
         scroll.setColumnHeaderView(time);
@@ -212,7 +212,7 @@ final class ShapeTimelinePanel extends JPanel {
         if (event.getSource() == depths) {
             return depths.getDepthAt(event) - 1;
         }
-        return event.getX() <= FRAME_WIDTH ? layerAt(event.getY() / ROW_HEIGHT) : -1;
+        return event.getX() < FRAME_WIDTH ? layerAt(event.getY() / ROW_HEIGHT) : -1;
     }
 
     private int layerAt(int row) {
