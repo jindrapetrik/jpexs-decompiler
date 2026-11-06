@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,15 @@ import java.util.TreeSet;
  */
 final class TimelineFrameEdits {
 
+    static final int MAX_FRAME = 0xfffe;
+
+    enum KeyEdit {
+        INSERT, INSERT_BLANK, CLEAR, CONVERT, CONVERT_BLANK, CLEAR_FRAMES
+    }
+
     private final Timeline timeline;
     private final Timelined timelined;
+    private final TimelineBlankFrames blankFrames;
     private final int originalFrameCount;
     private final int originalTagCount;
     private final boolean implicitLastFrame;
@@ -59,7 +67,12 @@ final class TimelineFrameEdits {
     private final Map<Integer, List<Tag>> appendedFrames = new TreeMap<>();
 
     TimelineFrameEdits(Timeline timeline) {
+        this(timeline, new TimelineBlankFrames());
+    }
+
+    TimelineFrameEdits(Timeline timeline, TimelineBlankFrames blankFrames) {
         this.timeline = timeline;
+        this.blankFrames = blankFrames.copy();
         timelined = timeline.timelined;
         originalFrameCount = timeline.getFrameCount();
         implicitLastFrame = originalFrameCount > 0 && timeline.getFrame(originalFrameCount - 1).showFrameTag == null;
@@ -72,26 +85,42 @@ final class TimelineFrameEdits {
     }
 
     void insertFrames(Set<Point> cells) {
+        insertFrames(cells, blankFrames, Collections.emptySet());
+    }
+
+    private void insertFrames(Set<Point> cells, TimelineBlankFrames blanks, Set<Integer> endedDepths) {
         Map<Integer, Integer> lastFrames = new TreeMap<>(timeline.getDepthMaxFrame());
         for (Map.Entry<Integer, NavigableSet<Integer>> entry : groupByDepth(cells).entrySet()) {
             int depth = entry.getKey();
             int last = lastFrames.getOrDefault(depth, -1);
-            if (!isPlaced(timeline.getDepthState(last, depth))) {
+            NavigableSet<Integer> selection = new TreeSet<>(entry.getValue());
+            if (blanks.end(depth) > last || last < 0) {
+                for (int frame : new ArrayList<>(selection.tailSet(last, false).descendingSet())) {
+                    if (frame >= blanks.end(depth)) {
+                        blanks.extend(depth, Math.max(frame, blanks.end(depth) + 1));
+                    } else {
+                        blanks.insert(depth, frame + 1, 1);
+                    }
+                    selection.remove(frame);
+                }
+            }
+            if (selection.isEmpty() || !isPlaced(timeline.getDepthState(last, depth))) {
                 continue;
             }
             NavigableMap<Integer, List<Tag>> original = getCommands(depth);
             NavigableMap<Integer, List<Tag>> edited = new TreeMap<>(original);
-            NavigableSet<Integer> selection = entry.getValue();
             for (int frame : selection.headSet(originalFrameCount, false).descendingSet()) {
                 int start = Math.min(frame, last) + 1;
                 int count = Math.max(1, frame - last);
                 shiftCommandsRight(edited, start, count);
+                blanks.insert(depth, start, count);
                 last += count;
             }
             int requestedEnd = selection.last();
             if (requestedEnd >= originalFrameCount && requestedEnd > last) {
                 // Move the commands after the last occupied frame so the existing placement holds.
                 shiftCommandsRight(edited, last + 1, requestedEnd - last);
+                blanks.insert(depth, last + 1, requestedEnd - last);
                 last = requestedEnd;
             }
             lastFrames.put(depth, last);
@@ -107,7 +136,7 @@ final class TimelineFrameEdits {
             for (Map.Entry<Integer, Integer> entry : lastFrames.entrySet()) {
                 int depth = entry.getKey();
                 int last = entry.getValue();
-                if (last >= originalFrameCount - 1 && last + 1 < frameCount) {
+                if (last >= originalFrameCount - 1 && last + 1 < frameCount && !endedDepths.contains(depth)) {
                     // A layer only extends as far as its own edited content.
                     DepthState state = timeline.getDepthState(timeline.getDepthMaxFrame().get(depth), depth);
                     List<Tag> commands = appendedFrames.get(last + 1);
@@ -128,8 +157,18 @@ final class TimelineFrameEdits {
 
     void removeFrames(Set<Point> cells) {
         shiftsCommandsEarlier = true;
+        while (frameCount > 1 && canTrimLastFrame(frameCount - 1, cells)) {
+            frameCount--;
+            ShowFrameTag showFrame = timeline.getFrame(frameCount).showFrameTag;
+            if (showFrame != null) {
+                removals.add(indices.get(showFrame));
+            }
+        }
         for (Map.Entry<Integer, NavigableSet<Integer>> entry : groupByDepth(cells).entrySet()) {
             int depth = entry.getKey();
+            for (int frame : entry.getValue().descendingSet()) {
+                blankFrames.remove(depth, frame);
+            }
             NavigableMap<Integer, List<Tag>> original = getCommands(depth);
             if (original.isEmpty()) {
                 continue;
@@ -164,9 +203,211 @@ final class TimelineFrameEdits {
                     edited.put(frame, commands);
                 }
             }
-            edited.tailMap(originalFrameCount, true).clear();
+            edited.tailMap(frameCount, true).clear();
             recordChanges(original, edited);
         }
+    }
+
+    private boolean canTrimLastFrame(int frame, Set<Point> cells) {
+        if (blankFrames.lastFrame() >= frame) {
+            return false;
+        }
+        Frame last = timeline.getFrame(frame);
+        boolean hasPlacement = false;
+        for (Map.Entry<Integer, DepthState> layer : last.layers.entrySet()) {
+            if (isPlaced(layer.getValue())) {
+                if (!cells.contains(new Point(frame, layer.getKey()))) {
+                    return false;
+                }
+                hasPlacement = true;
+            }
+        }
+        return hasPlacement && last.allInnerTags.stream().allMatch(tag ->
+                tag == last.showFrameTag || cells.contains(new Point(frame, getCommandDepth(tag))));
+    }
+
+    TimelineBlankFrames getBlankFrames() {
+        return blankFrames;
+    }
+
+    boolean fitsSwf() {
+        return frameCount <= MAX_FRAME + 1 && blankFrames.lastFrame() <= MAX_FRAME;
+    }
+
+    void editKeyframes(Set<Point> cells, KeyEdit action) {
+        Set<Point> occupiedExtensions = new HashSet<>();
+        Set<Integer> endedDepths = new HashSet<>();
+        for (Map.Entry<Integer, NavigableSet<Integer>> layer : groupByDepth(cells).entrySet()) {
+            int depth = layer.getKey();
+            NavigableSet<Integer> selected = layer.getValue();
+            int occupiedEnd = timeline.getDepthMaxFrame().getOrDefault(depth, -1);
+            int blankEnd = blankFrames.end(depth);
+            NavigableSet<Integer> targets = keyTargets(selected, action);
+            if (action == KeyEdit.CLEAR_FRAMES) {
+                clearFrames(depth, selected, occupiedEnd);
+            } else if (action == KeyEdit.INSERT || action == KeyEdit.CONVERT) {
+                DepthState tail = action == KeyEdit.INSERT && blankEnd <= occupiedEnd && targets.last() > occupiedEnd
+                        ? placedAt(occupiedEnd, depth) : null;
+                for (int frame : targets) {
+                    addKey(depth, frame, frame > occupiedEnd ? tail : null);
+                }
+                if (tail != null) {
+                    occupiedExtensions.add(new Point(targets.last(), depth));
+                }
+            } else {
+                int end = Math.max(Math.max(occupiedEnd, blankEnd), selected.last());
+                boolean lastPlacementReplaced = editKeySpans(depth, targets, end, action, occupiedEnd);
+                if (action == KeyEdit.INSERT_BLANK && occupiedEnd >= 0) {
+                    if (lastPlacementReplaced) {
+                        endedDepths.add(depth);
+                    } else if (blankEnd <= occupiedEnd) {
+                        Integer blankKey = targets.higher(occupiedEnd);
+                        if (blankKey != null && blankKey > occupiedEnd + 1) {
+                            occupiedExtensions.add(new Point(blankKey - 1, depth));
+                        }
+                    }
+                }
+            }
+        }
+        if (!occupiedExtensions.isEmpty()) {
+            // Extend the old placement while keeping the new keys at their requested frames.
+            insertFrames(occupiedExtensions, new TimelineBlankFrames(), endedDepths);
+        }
+    }
+
+    private void clearFrames(int depth, NavigableSet<Integer> selected, int occupiedEnd) {
+        NavigableMap<Integer, DepthState> replacement = new TreeMap<>();
+        for (int frame : selected) {
+            if (placedAt(frame, depth) != null) {
+                if (replacement.containsKey(frame - 1)) {
+                    blankFrames.clearKey(depth, frame);
+                    blankFrames.extend(depth, frame);
+                } else {
+                    blankFrames.addKey(depth, frame);
+                }
+                replacement.put(frame, null);
+            }
+        }
+        rewriteSpans(depth, replacement, Math.max(occupiedEnd, blankFrames.end(depth)));
+    }
+
+    static NavigableSet<Integer> keyTargets(NavigableSet<Integer> selected, KeyEdit action) {
+        if (action != KeyEdit.INSERT && action != KeyEdit.INSERT_BLANK) {
+            return selected;
+        }
+        NavigableSet<Integer> starts = new TreeSet<>();
+        for (int frame : selected) {
+            if (!selected.contains(frame - 1)) {
+                starts.add(frame);
+            }
+        }
+        return starts;
+    }
+
+    private void addKey(int depth, int frame, DepthState tail) {
+        DepthState state = placedAt(frame, depth);
+        if (state != null && state.key) {
+            return;
+        }
+        if (state == null) {
+            state = tail;
+        }
+        if (state == null) {
+            blankFrames.addKey(depth, frame);
+            return;
+        }
+        boolean move = timelined.getSwf().version >= 3;
+        if (!move) {
+            addToFrame(frame, makeRemove(timelined, state, depth));
+        }
+        addToFrame(frame, makePlacement(timelined, state, depth, move));
+    }
+
+    private boolean editKeySpans(int depth, NavigableSet<Integer> selected, int end, KeyEdit action, int occupiedEnd) {
+        NavigableSet<Integer> keys = new TreeSet<>(blankFrames.keys(depth));
+        for (int frame = 0; frame < originalFrameCount && frame <= end + 1; frame++) {
+            DepthState state = placedAt(frame, depth);
+            if (state != null ? state.key : isRemovalFrame(frame, depth)) {
+                keys.add(frame);
+            } else if (state != null) {
+                keys.remove(frame);
+            }
+        }
+        NavigableMap<Integer, DepthState> replacement = new TreeMap<>();
+        for (int frame : selected) {
+            if (action == KeyEdit.CLEAR && !keys.contains(frame)) {
+                continue;
+            }
+            Integer nextKey = keys.higher(frame);
+            int until = nextKey == null ? end + 1 : nextKey;
+            if (action == KeyEdit.CLEAR && nextKey == null) {
+                until = Math.max(until, originalFrameCount);
+            }
+            DepthState state = null;
+            if (action == KeyEdit.CLEAR) {
+                state = replacement.containsKey(frame - 1) ? replacement.get(frame - 1) : placedAt(frame - 1, depth);
+                blankFrames.clearKey(depth, frame);
+            } else {
+                blankFrames.addKey(depth, frame);
+                blankFrames.extend(depth, until - 1);
+            }
+            for (int index = frame; index < until && index < originalFrameCount; index++) {
+                replacement.put(index, state);
+            }
+        }
+        rewriteSpans(depth, replacement, Math.max(occupiedEnd, blankFrames.end(depth)));
+        return replacement.containsKey(occupiedEnd);
+    }
+
+    private void rewriteSpans(int depth, NavigableMap<Integer, DepthState> replacement, int layerEnd) {
+        if (replacement.isEmpty()) {
+            return;
+        }
+        NavigableMap<Integer, List<Tag>> original = getCommands(depth);
+        NavigableMap<Integer, List<Tag>> edited = new TreeMap<>(original);
+        for (Map.Entry<Integer, DepthState> entry : replacement.entrySet()) {
+            int frame = entry.getKey();
+            DepthState originalPrevious = placedAt(frame - 1, depth);
+            DepthState previous = replacement.containsKey(frame - 1) ? replacement.get(frame - 1) : originalPrevious;
+            if (previous != originalPrevious || entry.getValue() != null || placedAt(frame, depth) != null) {
+                writeState(edited, depth, frame, previous, entry.getValue());
+            }
+            int next = frame + 1;
+            if (next < originalFrameCount && !replacement.containsKey(next) && entry.getValue() != placedAt(frame, depth)) {
+                // A following Move or hold can depend on the placement that the edit just removed.
+                DepthState nextState = placedAt(next, depth);
+                if (next <= layerEnd && nextState == null && entry.getValue() == null && isRemovalFrame(next, depth)) {
+                    blankFrames.addKey(depth, next);
+                }
+                writeState(edited, depth, next, entry.getValue(), nextState);
+            }
+        }
+        recordChanges(original, edited);
+    }
+
+    private void writeState(NavigableMap<Integer, List<Tag>> commands, int depth, int frame,
+            DepthState previous, DepthState state) {
+        commands.remove(frame);
+        if (previous == state) {
+            return;
+        }
+        List<Tag> tags = new ArrayList<>();
+        if (previous != null) {
+            tags.add(makeRemove(timelined, previous, depth));
+        }
+        if (state != null) {
+            tags.add(makePlacement(timelined, state, depth, false));
+        }
+        commands.put(frame, tags);
+    }
+
+    private DepthState placedAt(int frame, int depth) {
+        DepthState state = timeline.getDepthState(frame, depth);
+        return isPlaced(state) ? state : null;
+    }
+
+    private boolean isRemovalFrame(int frame, int depth) {
+        return frame < originalFrameCount && placedAt(frame - 1, depth) != null;
     }
 
     void addToFrame(int frame, Tag tag) {
@@ -177,6 +418,18 @@ final class TimelineFrameEdits {
             int index = showFrame == null ? originalTagCount : indices.get(showFrame);
             insertions.computeIfAbsent(index, key -> new ArrayList<>()).add(tag);
         }
+    }
+
+    void endPlacementBeforeFrame(int frame, RemoveTag removal) {
+        for (Tag tag : timeline.getFrame(frame).allInnerTags) {
+            if (getCommandDepth(tag) == removal.getDepth()) {
+                if (!(tag instanceof RemoveTag)) {
+                    insertions.computeIfAbsent(indices.get(tag), key -> new ArrayList<>()).add(removal);
+                }
+                return;
+            }
+        }
+        addToFrame(frame, removal);
     }
 
     void extendTo(int frame) {
@@ -219,7 +472,7 @@ final class TimelineFrameEdits {
                 appendShowFrame();
             } else {
                 timelined.resetTimeline();
-                if (timelined.getTimeline().getFrameCount() < originalFrameCount) {
+                if (timelined.getTimeline().getFrameCount() < frameCount) {
                     appendShowFrame();
                 }
             }
@@ -240,7 +493,7 @@ final class TimelineFrameEdits {
         timelined.addTag(tag);
     }
 
-    private static Map<Integer, NavigableSet<Integer>> groupByDepth(Set<Point> cells) {
+    static Map<Integer, NavigableSet<Integer>> groupByDepth(Set<Point> cells) {
         Map<Integer, NavigableSet<Integer>> result = new TreeMap<>();
         for (Point cell : cells) {
             if (cell.x >= 0 && cell.y > 0) {

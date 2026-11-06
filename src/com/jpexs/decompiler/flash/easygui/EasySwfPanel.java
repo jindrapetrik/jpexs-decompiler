@@ -49,7 +49,6 @@ import com.jpexs.decompiler.flash.gui.player.ZoomPanel;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
-import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -59,6 +58,7 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
@@ -142,8 +142,10 @@ public class EasySwfPanel extends JPanel {
     private TransformPanel transformPanel;
     private ShapeSelectionTransform.State shapeTransformState;
     private Timelined timelined;
+    private volatile Timelined virtualStageTimeline;
     // SWF has no records for trailing empty depths. Keep their rows in the editor.
     private final Map<Timelined, Integer> depthCountsByTimeline = new WeakHashMap<>();
+    private final Map<Timelined, TimelineBlankFrames> blankFramesByTimeline = new WeakHashMap<>();
     private final Map<Timelined, Set<Integer>> hiddenDepthsByTimeline = Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<Timelined, Set<Integer>> lockedDepthsByTimeline = Collections.synchronizedMap(new WeakHashMap<>());
     // Tag replacements share the state objects of layers that survive the edit.
@@ -221,7 +223,7 @@ public class EasySwfPanel extends JPanel {
         this.mainPanel = mainPanel;
         setLayout(new BorderLayout());
 
-        stagePanel = new ImagePanel(this::getHiddenDepths, this::getLockedDepths);
+        stagePanel = new ImagePanel(this::getStageHiddenDepths, this::getLockedDepths);
         stagePanel.setTagNameResolver(new EasyTagNameResolver());
         stagePanel.setShowAllDepthLevelsInfo(false);
         stagePanel.setSelectionMode(true);
@@ -450,15 +452,34 @@ public class EasySwfPanel extends JPanel {
                             || (tag instanceof TextTag)
                             || (tag instanceof ButtonTag)) {
                         Timelined target = stagePanel.getTimelined();
-                        int depth = depthForStagePlacement(target);
-                        if (depth > 0xffff) {
+                        int frame = getFrame();
+                        if (frame < 0 || frame > TimelineFrameEdits.MAX_FRAME
+                                || (target instanceof ButtonTag && frame > ButtonTag.FRAME_HITTEST)) {
                             return false;
                         }
-                        final int newDepth = depth;
+                        TimelineBodyPanel body = timelinePanel.getTimelineBodyPanel();
+                        int selectedDepth = body.getFirstDepth();
+                        int depthCount = getTimelineDepthCount(target);
+                        boolean insertAbove = selectedDepth > 0 && selectedDepth <= depthCount
+                                && isStagePlacementOccupied(target, frame, selectedDepth);
+                        int depth = insertAbove ? selectedDepth + 1 : depthForEmptyStagePlacement(target, selectedDepth, depthCount);
+                        if (depth > TimelineLayerEdit.MAX_DEPTH || (insertAbove
+                                && (depthCount == TimelineLayerEdit.MAX_DEPTH || !TimelineLayerEdit.canInsert(target)))) {
+                            return false;
+                        }
+                        TimelineLayerEdit insertedLayer = insertAbove ? new TimelineLayerEdit(target, depth, true) : null;
+                        TimelineBodyPanel.FrameSpan span = body.getStagePlacementSpan(frame, selectedDepth);
+                        Set<Point> originalSelection = body.copySelection();
+                        TimelineBlankFrames originalBlanks = getTimelineBlankFrames(target);
+                        TimelineBlankFrames placedBlanks = insertAbove
+                                ? originalBlanks.remap(value -> TimelineLayerEdit.mapDepth(value, depth, true)) : originalBlanks.copy();
+                        placedBlanks.clearKey(depth, span.first);
 
                         undoManager.doOperation(new TimelinedTagListDoableOperation(EasySwfPanel.this, target) {
 
                             private List<Tag> swfTags;
+                            private boolean hidden;
+                            private boolean locked;
 
                             @Override
                             public void doOperation() {
@@ -468,11 +489,15 @@ public class EasySwfPanel extends JPanel {
                                 if (timelined.getSwf() != timelined) {
                                     swfTags = timelined.getSwf().getTags().toArrayList();
                                 }
+                                if (insertedLayer != null) {
+                                    insertedLayer.apply(true);
+                                    setTimelineDepthCount(target, depthCount + 1);
+                                    remapDepthInteraction(value -> TimelineLayerEdit.mapDepth(value, depth, true));
+                                    restoreLayerFlags(depth, hidden, locked);
+                                }
 
-                                Frame frame = timelined.getTimeline().getFrame(fframe);
-                                ShowFrameTag showFrameTag = frame == null ? null : frame.showFrameTag;
                                 PlaceObject2Tag place = new PlaceObject2Tag(timelined.getSwf());
-                                place.depth = newDepth;
+                                place.depth = depth;
                                 place.placeFlagHasCharacter = true;
                                 place.characterId = ch.getCharacterId();
                                 place.matrix = new MATRIX();
@@ -481,19 +506,23 @@ public class EasySwfPanel extends JPanel {
 
                                 if (timelined instanceof ButtonTag) {
                                     ButtonTag button = (ButtonTag) timelined;
-                                    button.getButtonRecordAt(fframe, newDepth, true).fromPlaceObject(place);
-                                } else {
-                                    if (showFrameTag == null) {
-                                        timelined.addTag(place);
-                                    } else {
-                                        timelined.addTag(timelined.indexOfTag(showFrameTag), place);
-
-                                        if (fframe < timelined.getFrameCount() - 1) {
-                                            RemoveObject2Tag remove = new RemoveObject2Tag(timelined.getSwf());
-                                            remove.depth = newDepth;
-                                            timelined.addTag(timelined.indexOfTag(showFrameTag) + 1, remove);
-                                        }
+                                    BUTTONRECORD record = button.getButtonRecordAt(span.first, depth, true);
+                                    record.fromPlaceObject(place);
+                                    for (int state = span.first + 1; state <= span.last; state++) {
+                                        record.setFrame(state, true);
                                     }
+                                } else {
+                                    Timeline timeline = timelined.getTimeline();
+                                    TimelineFrameEdits edits = new TimelineFrameEdits(timeline);
+                                    edits.extendTo(span.last);
+                                    edits.addToFrame(span.first, place);
+                                    if (span.last + 1 < timeline.getFrameCount()) {
+                                        RemoveObject2Tag remove = new RemoveObject2Tag(timelined.getSwf());
+                                        remove.depth = depth;
+                                        remove.setTimelined(timelined);
+                                        edits.endPlacementBeforeFrame(span.last + 1, remove);
+                                    }
+                                    edits.apply();
                                 }
 
                                 DefineBeforeUsageFixer fixer = new DefineBeforeUsageFixer();
@@ -503,9 +532,8 @@ public class EasySwfPanel extends JPanel {
                                 }
 
                                 timelined.resetTimeline();
-                                stagePanel.repaint();
-                                timelinePanel.refresh();
-                                timelinePanel.setDepth(newDepth);
+                                setTimelineBlankFrames(timelined, placedBlanks);
+                                body.refreshAfterEdit(timelined, Collections.singleton(new Point(frame, depth)));
                             }
 
                             @Override
@@ -526,9 +554,16 @@ public class EasySwfPanel extends JPanel {
                                     }
                                     swf.resetTimeline();
                                 }
-                                stagePanel.repaint();
-                                timelinePanel.refresh();
-                                timelinePanel.setFrame(fframe, fdepths);
+                                if (insertedLayer != null) {
+                                    // The restored tag list still refers to the shifted tag objects.
+                                    insertedLayer.apply(false);
+                                    hidden = getHiddenDepths(target).contains(depth);
+                                    locked = getLockedDepths(target).contains(depth);
+                                    setTimelineDepthCount(target, depthCount);
+                                    remapDepthInteraction(value -> TimelineLayerEdit.mapDepth(value, depth, false));
+                                }
+                                setTimelineBlankFrames(timelined, originalBlanks);
+                                body.refreshAfterEdit(timelined, originalSelection);
                             }
 
                             @Override
@@ -631,7 +666,7 @@ public class EasySwfPanel extends JPanel {
         timelinePanel.addChangeListener(new Runnable() {
             @Override
             public void run() {
-                stagePanel.gotoFrame(1 + timelinePanel.getTimelineBodyPanel().getFirstFrame());
+                showTimelineFrame(timelinePanel.getTimelineBodyPanel().getFirstFrame());
                 stagePanel.repaint();              
             }
         });
@@ -639,13 +674,14 @@ public class EasySwfPanel extends JPanel {
             @Override
             public void frameSelected(int frame, List<Integer> depths) {
                 stagePanel.pause();
-                stagePanel.gotoFrame(frame + 1);
-                stagePanel.selectDepths(depths);
+                showTimelineFrame(frame);
+                List<Integer> stageDepths = virtualStageTimeline == null ? depths : Collections.emptyList();
+                stagePanel.selectDepths(stageDepths);
                 if (transformEnabled()) {
-                    stagePanel.freeTransformDepths(depths);
+                    stagePanel.freeTransformDepths(stageDepths);
                 }
 
-                transformPanel.setVisible(!depths.isEmpty());
+                transformPanel.setVisible(!stageDepths.isEmpty());
                 updatePropertiesPanel();                
             }
         });
@@ -1976,6 +2012,7 @@ public class EasySwfPanel extends JPanel {
         shapeTransformState = null;
         stagePanel.setShapeSelectionTransform(null, null);
         this.timelined = timelined;
+        virtualStageTimeline = null;
         stagePanel.setSelectionMode(editingShape == null);
         stagePanel.setMultiSelect(editingShape == null);
         stagePanel.setAltSelectionEnabled(editingShape == null);
@@ -2172,12 +2209,43 @@ public class EasySwfPanel extends JPanel {
         depthCountsByTimeline.put(owner, count);
     }
 
-    private int depthForStagePlacement(Timelined owner) {
-        int count = getTimelineDepthCount(owner);
-        int selected = timelinePanel.getTimelineBodyPanel().getFirstDepth();
+    TimelineBlankFrames getTimelineBlankFrames(Timelined owner) {
+        TimelineBlankFrames frames = blankFramesByTimeline.get(owner);
+        return frames == null ? new TimelineBlankFrames() : frames;
+    }
+
+    void setTimelineBlankFrames(Timelined owner, TimelineBlankFrames frames) {
+        if (frames.lastFrame() < 0) {
+            blankFramesByTimeline.remove(owner);
+        } else {
+            blankFramesByTimeline.put(owner, frames);
+        }
+    }
+
+    private void showTimelineFrame(int frame) {
+        Timelined shown = stagePanel.getTimelined();
+        virtualStageTimeline = shown != null && frame >= shown.getTimeline().getFrameCount()
+                && frame <= getTimelineBlankFrames(shown).lastFrame() ? shown : null;
+        stagePanel.gotoFrame(frame + 1);
+    }
+
+    private Set<Integer> getStageHiddenDepths(Timelined owner) {
+        if (owner != null && owner == virtualStageTimeline && !stagePanel.isPlaying()) {
+            Timeline timeline = owner.getTimeline();
+            Frame last = timeline.getFrame(timeline.getFrameCount() - 1);
+            return last == null ? Collections.emptySet() : last.layers.keySet();
+        }
+        return getHiddenDepths(owner);
+    }
+
+    private boolean isStagePlacementOccupied(Timelined owner, int frame, int depth) {
+        return owner instanceof ButtonTag ? ((ButtonTag) owner).getButtonRecordAt(frame, depth, false) != null
+                : TimelineFrameEdits.isPlaced(owner.getTimeline().getDepthState(frame, depth));
+    }
+
+    private int depthForEmptyStagePlacement(Timelined owner, int selected, int count) {
         Set<Integer> locked = getLockedDepths(owner);
-        if (selected > 0 && selected <= count && !locked.contains(selected) && !getHiddenDepths(owner).contains(selected)
-                && !owner.getTimeline().getDepthMaxFrameButtons().containsKey(selected)) {
+        if (selected > 0 && selected <= count && !locked.contains(selected) && !getHiddenDepths(owner).contains(selected)) {
             return selected;
         }
         int depth = count + 1;
@@ -2290,6 +2358,7 @@ public class EasySwfPanel extends JPanel {
     void swfClosed(SWF swf) {
         shapeLayerStatesByTag.keySet().removeIf(shape -> shape.getSwf() == swf);
         depthCountsByTimeline.keySet().removeIf(owner -> owner.getSwf() == swf);
+        blankFramesByTimeline.keySet().removeIf(owner -> owner.getSwf() == swf);
         hiddenDepthsByTimeline.keySet().removeIf(owner -> owner.getSwf() == swf);
         lockedDepthsByTimeline.keySet().removeIf(owner -> owner.getSwf() == swf);
     }
@@ -2297,6 +2366,7 @@ public class EasySwfPanel extends JPanel {
     public void dispose() {
         setTimelined(null);
         depthCountsByTimeline.clear();
+        blankFramesByTimeline.clear();
         hiddenDepthsByTimeline.clear();
         lockedDepthsByTimeline.clear();
         shapeLayerStatesByTag.clear();

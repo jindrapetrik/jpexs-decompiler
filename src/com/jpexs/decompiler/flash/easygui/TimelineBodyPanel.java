@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.easygui.TimelineFrameEdits.KeyEdit;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -35,7 +36,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.SystemColor;
-import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -47,10 +47,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -252,11 +249,6 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
         int frameWidth = getFrameWidth();
 
-        Set<Integer> emptyFrames = new LinkedHashSet<>();
-        if (timeline.timelined instanceof ButtonTag) {
-            emptyFrames = ((ButtonTag) timeline.timelined).getEmptyFrames();
-            frameWidth = BUTTON_FRAME_WIDTH;
-        }
         Rectangle clip = g.getClipBounds();
         int frameHeight = FRAME_HEIGHT;
         int start_f = clip.x / frameWidth;
@@ -289,14 +281,14 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             Frame fr = timeline.getFrame(f);
             if (fr != null && !fr.actions.isEmpty()) {
                 if (firstAction) {
-                    drawBlock(g, getEmptyFrameColor(), 0, 0, f, BlockType.EMPTY, frameWidth);
+                    drawBlock(g, getEmptyFrameColor(), 0, 0, f, BlockType.EMPTY, frameWidth, true);
                 }
 
                 int f2 = f + 1;
                 while (f2 <= max_f && timeline.getFrame(f2) != null && timeline.getFrame(f2).actions.isEmpty()) {
                     f2++;
                 }
-                drawBlock(g, getEmptyFrameColor(), 0, f, f2 - f, BlockType.EMPTY, frameWidth);
+                drawBlock(g, getEmptyFrameColor(), 0, f, f2 - f, BlockType.EMPTY, frameWidth, true);
                 g.setColor(A_COLOR);
                 g.setFont(getFont().deriveFont(FONT_SIZE));
                 g.drawString("a", f * frameWidth + frameWidth / 2 - awidth / 2, frameHeight / 2);
@@ -304,80 +296,31 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             }
         }
 
-        Map<Integer, Integer> depthMaxFrames = timeline.getDepthMaxFrameButtons();
-        for (int row = firstRow; row <= Math.min(lastRow, maxDepth); row++) {
+        TimelineBlankFrames blanks = getBlankFrames();
+        for (int row = Math.max(1, firstRow); row <= Math.min(lastRow, maxDepth); row++) {
             int depth = flipLayerOrder(row, maxDepth);
-            int maxFrame = depthMaxFrames.getOrDefault(depth, -1);
-            if (maxFrame < 0) {
+            int end = getLayerEnd(depth, blanks);
+            if (start_f > end) {
                 continue;
             }
 
-            int end_f2 = Math.min(end_f, maxFrame);
-            int start_f2 = Math.min(start_f, end_f2);
-
-            // find the start frame number of the current block
-            DepthState dsStart = timeline.getFrame(start_f2).layers.get(depth);
-            for (; start_f2 >= 1; start_f2--) {
-                DepthState ds = timeline.getFrame(start_f2 - 1).layers.get(depth);
-                if (((dsStart == null) != (ds == null))
-                        || (ds != null && (dsStart.characterId != ds.characterId || !Objects.equals(dsStart.className, ds.className)))) {
-                    break;
-                }
+            int frame = start_f;
+            while (frame > 0 && !startsFrameBlock(frame, depth, blanks)) {
+                frame--;
             }
-
-            for (int f = start_f2; f <= end_f2; f++) {
-                DepthState fl = timeline.getFrame(f).layers.get(depth);
-
-                if (emptyFrames.contains(f)) {
-                    fl = null;
+            while (frame <= end && frame <= end_f) {
+                DepthState state = getPlacedState(frame, depth);
+                int next = frame + 1;
+                while (next <= end && !startsFrameBlock(next, depth, blanks)) {
+                    next++;
                 }
-
-                boolean motionTween = fl == null ? false : fl.motionTween;
-
-                DepthState flNext = f < max_f ? timeline.getFrame(f + 1).layers.get(depth) : null;
-                DepthState flPrev = f > 0 ? timeline.getFrame(f - 1).layers.get(depth) : null;
-
-                CharacterTag cht = fl == null ? null : fl.getCharacter();
-                boolean shapeTween = cht != null && (cht instanceof MorphShapeTag);
-                boolean motionTweenStart = !motionTween && (flNext != null && flNext.motionTween);
-                boolean motionTweenEnd = !motionTween && (flPrev != null && flPrev.motionTween);
-                //boolean shapeTweenStart = shapeTween && (flPrev == null || flPrev.characterId != fl.characterId);
-                //boolean shapeTweenEnd = shapeTween && (flNext == null || flNext.characterId != fl.characterId);
-
-                /*if (motionTweenStart || motionTweenEnd) {
-                 motionTween = true;
-                 }*/
-                int draw_f = f;
-                int num_frames = 1;
-                Color backColor;
-                BlockType blockType;
-                if (fl == null) {
-                    for (; f + 1 < timeline.getFrameCount(); f++) {
-                        fl = timeline.getFrame(f + 1).layers.get(depth);
-                        if (fl != null && fl.getCharacter() != null) {
-                            break;
-                        }
-
-                        num_frames++;
-                    }
-
-                    backColor = getEmptyFrameColor();
-                    blockType = BlockType.EMPTY;
-                } else {
-                    for (; f + 1 < timeline.getFrameCount(); f++) {
-                        fl = timeline.getFrame(f + 1).layers.get(depth);
-                        if (fl == null || fl.key) {
-                            break;
-                        }
-
-                        num_frames++;
-                    }
-
-                    backColor = shapeTween ? SHAPE_TWEEN_COLOR : motionTween ? MOTION_TWEEN_COLOR : getFrameColor();
-                    blockType = shapeTween ? BlockType.SHAPE_TWEEN : motionTween ? BlockType.MOTION_TWEEN : BlockType.NORMAL;
-                }
-
-                drawBlock(g, backColor, depth, draw_f, num_frames, blockType, frameWidth);
+                boolean shapeTween = state != null && state.getCharacter() instanceof MorphShapeTag;
+                boolean motionTween = state != null && state.motionTween;
+                Color color = state == null ? getEmptyFrameColor() : shapeTween ? SHAPE_TWEEN_COLOR : getFrameColor();
+                BlockType block = state == null ? BlockType.EMPTY
+                        : motionTween ? BlockType.MOTION_TWEEN : shapeTween ? BlockType.SHAPE_TWEEN : BlockType.NORMAL;
+                drawBlock(g, color, depth, frame, next - frame, block, frameWidth, isKey(frame, depth, blanks));
+                frame = next;
             }
         }
 
@@ -408,7 +351,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
     }
 
-    private void drawBlock(Graphics2D g, Color backColor, int depth, int frame, int num_frames, BlockType blockType, int frameWidth) {
+    private void drawBlock(Graphics2D g, Color backColor, int depth, int frame, int num_frames, BlockType blockType, int frameWidth, boolean key) {
         int frameHeight = FRAME_HEIGHT;
         int rowY = flipLayerOrder(depth, getDepthCount()) * frameHeight;
 
@@ -453,7 +396,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         } else {
             g.setColor(KEY_COLOR);
         }
-        drawKeyMarker(g, frame * frameWidth + frameWidth / 2, rowY, blockType == BlockType.EMPTY);
+        if (key) {
+            drawKeyMarker(g, frame * frameWidth + frameWidth / 2, rowY, blockType == BlockType.EMPTY);
+        }
 
         if (num_frames > 1) {
             int endFrame = frame + num_frames - 1;
@@ -509,7 +454,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         if (timeline == null || getLockedDepths().contains(depth)) {
             return;
         }
-        int frameCount = timeline.getFrameCount();
+        int frameCount = getDisplayedFrameCount();
         int activeFrame = Math.max(0, Math.min(getFirstFrame(), frameCount - 1));
         cursor.clear();
         cursor.add(new Point(activeFrame, depth));
@@ -537,8 +482,62 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         return cursor.iterator().next().y;
     }
 
+    Set<Point> copySelection() {
+        return new LinkedHashSet<>(cursor);
+    }
+
+    FrameSpan getStagePlacementSpan(int frame, int depth) {
+        if (depth <= 0 || depth > getDepthCount()) {
+            return new FrameSpan(frame, frame);
+        }
+        TimelineBlankFrames blanks = getBlankFrames();
+        ButtonTag button = timeline.timelined instanceof ButtonTag ? (ButtonTag) timeline.timelined : null;
+        int frameLimit = button == null ? TimelineFrameEdits.MAX_FRAME : ButtonTag.FRAME_HITTEST;
+        boolean occupied = button == null ? getPlacedState(frame, depth) != null : button.getButtonRecordAt(frame, depth, false) != null;
+        int first = frame;
+        if (occupied) {
+            int lastSelected = frame;
+            while (first > 0 && cursor.contains(new Point(first - 1, depth))) {
+                first--;
+            }
+            while (lastSelected < frameLimit && cursor.contains(new Point(lastSelected + 1, depth))) {
+                lastSelected++;
+            }
+            if (first != lastSelected) {
+                return new FrameSpan(first, lastSelected);
+            }
+        }
+        if (occupied || frame <= getLayerEnd(depth, blanks)) {
+            while (first > 0 && !startsFrameBlock(first, depth, blanks)) {
+                first--;
+            }
+        }
+
+        int realEnd = timeline.getFrameCount() - 1;
+        int blankEnd = blanks.end(depth);
+        int end = Math.min(frameLimit, Math.max(realEnd, blankEnd));
+        for (int next = frame + 1; next <= end; next++) {
+            if (startsFrameBlock(next, depth, blanks)) {
+                return new FrameSpan(first, next - 1);
+            }
+        }
+        int last = !occupied && blankEnd >= frame ? blankEnd : realEnd;
+        return new FrameSpan(first, Math.max(frame, Math.min(frameLimit, last)));
+    }
+
+    static final class FrameSpan {
+
+        final int first;
+        final int last;
+
+        FrameSpan(int first, int last) {
+            this.first = first;
+            this.last = last;
+        }
+    }
+
     private Set<Integer> getLockedDepths() {
-        return swfPanel.getLockedDepths(timeline == null ? null : timeline.timelined);
+        return swfPanel == null ? Collections.emptySet() : swfPanel.getLockedDepths(timeline == null ? null : timeline.timelined);
     }
 
     void removeLockedSelection() {
@@ -682,95 +681,86 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         requestFocusInWindow();
         if (SwingUtilities.isRightMouseButton(e)) {
 
-            JPopupMenu popupMenu = new JPopupMenu();
-
-            int frame = getFirstFrame();
-            int depth = getFirstDepth();
-
-            Frame fr = timeline.getFrame(frame);
-            DepthState ds = fr == null ? null : fr.layers.get(depth);
-            Set<Integer> emptyFrames = new LinkedHashSet<>();
-            if (timeline.timelined instanceof ButtonTag) {
-                emptyFrames = ((ButtonTag) timeline.timelined).getEmptyFrames();
-            }
-            boolean thisEmpty = emptyFrames.contains(frame) || ds == null || ds.getCharacter() == null;
-            boolean previousEmpty = true;
-            boolean emptyDepth = true;
-            boolean somethingBefore = false;
-            boolean somethingAfter = false;
-            if (frame > 0) {
-                fr = timeline.getFrame(frame - 1);
-                ds = fr == null ? null : fr.layers.get(depth);
-                previousEmpty = emptyFrames.contains(frame - 1) || ds == null || ds.getCharacter() == null;
-            }
-            for (int f = frame - 1; f >= 0; f--) {
-                fr = timeline.getFrame(f);
-                ds = fr == null ? null : fr.layers.get(depth);
-                boolean empty = emptyFrames.contains(f) || ds == null || ds.getCharacter() == null;
-                if (!empty) {
-                    somethingBefore = true;
-                    break;
-                }
-            }
-            for (int f = frame + 1; f < timeline.getFrameCount(); f++) {
-                fr = timeline.getFrame(f);
-                ds = fr == null ? null : fr.layers.get(depth);
-                boolean empty = emptyFrames.contains(f) || ds == null || ds.getCharacter() == null;
-                if (!empty) {
-                    somethingAfter = true;
-                    break;
-                }
-            }
-            emptyDepth = thisEmpty && !somethingBefore && !somethingAfter;
-
-            JMenuItem addKeyFrameMenuItem = new JMenuItem(EasyStrings.translate("action.addKeyFrame"));
-            addKeyFrameMenuItem.addActionListener(this::addKeyFrame);
-            JMenuItem addKeyFrameEmptyBeforeMenuItem = new JMenuItem(EasyStrings.translate("action.addKeyFrameWithBlankFrameBefore"));
-            addKeyFrameEmptyBeforeMenuItem.addActionListener(this::addKeyFrameEmptyBefore);
-            JMenuItem addFrameMenuItem = new JMenuItem(EasyStrings.translate("action.addFrame"));
-            addFrameMenuItem.addActionListener(this::addFrame);
-            JMenuItem removeFrameMenuItem = new JMenuItem(EasyStrings.translate("action.removeFrame"));
-            removeFrameMenuItem.addActionListener(this::removeFrame);
-
-            boolean multiSelect = cursor != null && (cursor.size() > 1);
-
-            if (!thisEmpty || multiSelect) {
-                popupMenu.add(addKeyFrameMenuItem);
-            }
-
-            if (thisEmpty && previousEmpty && somethingBefore && !somethingAfter && !multiSelect
-                    && (!(timeline.timelined instanceof ButtonTag) || frame <= ButtonTag.FRAME_HITTEST)) {
-                popupMenu.add(addKeyFrameEmptyBeforeMenuItem);
-            }
-            if (!emptyDepth || multiSelect) {
-                popupMenu.add(addFrameMenuItem);
-            }
-
-            if (!thisEmpty || somethingAfter || multiSelect) {
-                popupMenu.add(removeFrameMenuItem);
-            }
-
-            Set<Point> cells = new LinkedHashSet<>();
-            if (!(timeline.timelined instanceof ButtonTag)) {
-                for (Point cell : cursor) {
-                    if (cell.y > 0 && timeline.getFrame(cell.x) != null) {
-                        cells.add(cell);
-                    }
-                }
-            }
-            if (!cells.isEmpty()) {
-                if (popupMenu.getComponentCount() > 0) {
-                    popupMenu.addSeparator();
-                }
-                JMenuItem replaceContent = new JMenuItem(EasyStrings.translate("action.replaceSelectedContent") + "...");
-                replaceContent.addActionListener(event -> replaceSelectedContent(cells));
-                popupMenu.add(replaceContent);
-            }
-
+            JPopupMenu popupMenu = createFrameMenu();
             if (popupMenu.getComponentCount() > 0) {
                 popupMenu.show(this, e.getX(), e.getY());
             }
         }
+    }
+
+    JPopupMenu createFrameMenu() {
+        JPopupMenu menu = new JPopupMenu();
+        Set<Point> cells = getEditableCells();
+        if (cells.isEmpty()) {
+            return menu;
+        }
+        TimelineBlankFrames blanks = getBlankFrames();
+        boolean canRemove = cells.stream().anyMatch(cell -> cell.x <= getLayerEnd(cell.y, blanks));
+        Set<Point> keys = new LinkedHashSet<>(cells);
+        keys.removeIf(cell -> cell.x > getLayerEnd(cell.y, blanks) || !isKey(cell.x, cell.y, blanks));
+        boolean canInsert = !(timeline.timelined instanceof ButtonTag)
+                || cells.stream().anyMatch(cell -> ((ButtonTag) timeline.timelined).getButtonRecordAt(ButtonTag.FRAME_HITTEST, cell.y, false) == null);
+        addFrameMenuItem(menu, "action.insertFrame", canInsert, () -> editFrames(cells, true));
+        addFrameMenuItem(menu, "action.removeFrames", canRemove, () -> editFrames(cells, false));
+        menu.addSeparator();
+        addFrameMenuItem(menu, "action.insertKeyframe", true, () -> editKeyframes(cells, KeyEdit.INSERT, "action.insertKeyframe"));
+        addFrameMenuItem(menu, "action.insertBlankKeyframe", true, () -> editKeyframes(cells, KeyEdit.INSERT_BLANK, "action.insertBlankKeyframe"));
+        addFrameMenuItem(menu, "action.clearKeyframe", !keys.isEmpty(), () -> editKeyframes(keys, KeyEdit.CLEAR, "action.clearKeyframe"));
+        addFrameMenuItem(menu, "action.convertToKeyframes", true, () -> editKeyframes(cells, KeyEdit.CONVERT, "action.convertToKeyframes"));
+        addFrameMenuItem(menu, "action.convertToBlankKeyframes", true, () -> editKeyframes(cells, KeyEdit.CONVERT_BLANK, "action.convertToBlankKeyframes"));
+        addFrameMenuItem(menu, "action.clearFrames", canClearFrames(cells), () -> editKeyframes(cells, KeyEdit.CLEAR_FRAMES, "action.clearFrames"));
+
+        if (!(timeline.timelined instanceof ButtonTag)) {
+            Set<Point> realCells = new LinkedHashSet<>(cells);
+            realCells.removeIf(cell -> timeline.getFrame(cell.x) == null);
+            if (!realCells.isEmpty()) {
+                menu.addSeparator();
+                JMenuItem replace = new JMenuItem(EasyStrings.translate("action.replaceSelectedContent") + "...");
+                replace.addActionListener(event -> replaceSelectedContent(realCells));
+                menu.add(replace);
+            }
+        }
+        return menu;
+    }
+
+    private boolean canClearFrames(Set<Point> cells) {
+        if (!(timeline.timelined instanceof ButtonTag)) {
+            return cells.stream().anyMatch(cell -> getPlacedState(cell.x, cell.y) != null);
+        }
+        boolean selected = false;
+        boolean remaining = false;
+        for (BUTTONRECORD record : ((ButtonTag) timeline.timelined).getRecords()) {
+            for (int frame = ButtonTag.FRAME_UP; frame <= ButtonTag.FRAME_HITTEST; frame++) {
+                if (record.hasFrame(frame)) {
+                    if (cells.contains(new Point(frame, record.placeDepth))) {
+                        selected = true;
+                    } else {
+                        remaining = true;
+                    }
+                }
+            }
+        }
+        return selected && remaining;
+    }
+
+    private Set<Point> getEditableCells() {
+        Set<Point> cells = new LinkedHashSet<>();
+        Set<Integer> locked = getLockedDepths();
+        int last = timeline.timelined instanceof ButtonTag ? ButtonTag.FRAME_HITTEST : TimelineFrameEdits.MAX_FRAME;
+        int depthCount = getDepthCount();
+        for (Point cell : cursor) {
+            if (cell.x >= 0 && cell.x <= last && cell.y > 0 && cell.y <= depthCount && !locked.contains(cell.y)) {
+                cells.add(cell);
+            }
+        }
+        return cells;
+    }
+
+    private static void addFrameMenuItem(JPopupMenu menu, String key, boolean enabled, Runnable action) {
+        JMenuItem item = new JMenuItem(EasyStrings.translate(key));
+        item.setEnabled(enabled);
+        item.addActionListener(event -> action.run());
+        menu.add(item);
     }
 
     private void replaceSelectedContent(Set<Point> cells) {
@@ -829,243 +819,62 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
     }
 
-    private Set<Point> getBackOrderedCursor() {
-        Set<Point> orderedCursor = new TreeSet<>(new Comparator<Point>() {
-            @Override
-            public int compare(Point o1, Point o2) {
-                int dx = o2.x - o1.x; //later frames first
-                if (dx != 0) {
-                    return dx;
-                }
-                return o1.y - o2.y;
-            }
-        });
-        orderedCursor.addAll(cursor);
-        return orderedCursor;
-    }
-
-    private void removeFrame(ActionEvent e) {
-        Point firstCell = cursor.stream()
-                .min(Comparator.comparingInt((Point cell) -> cell.x).thenComparingInt(cell -> cell.y))
-                .orElse(null);
-        if (firstCell == null) {
-            return;
-        }
-        Set<Point> remainingSelection = Collections.singleton(firstCell);
+    private void editFrames(Set<Point> cells, boolean insert) {
+        String description = insert ? "action.insertFrame" : "action.removeFrames";
+        Set<Point> after = insert ? cursor : selectionAfterRemovingFrames(cells);
         if (timeline.timelined instanceof ButtonTag) {
             ButtonTag button = (ButtonTag) timeline.timelined;
-            List<BUTTONRECORD> records = copyButtonRecords(button.getRecords());
-            boolean changed = false;
-            for (Point cell : getBackOrderedCursor()) {
-                int frame = cell.x;
-                int depth = cell.y;
-                if (depth <= 0 || frame < ButtonTag.FRAME_UP || frame > ButtonTag.FRAME_HITTEST) {
-                    continue;
-                }
-                BUTTONRECORD record = findButtonRecord(records, frame, depth);
-                if (record != null) {
-                    record.setFrame(frame, false);
-                    changed = true;
-                }
-                for (int next = frame + 1; next <= ButtonTag.FRAME_HITTEST; next++) {
-                    record = findButtonRecord(records, next, depth);
-                    if (record != null) {
-                        record.setFrame(next - 1, true);
-                        record.setFrame(next, false);
-                        changed = true;
-                    }
-                }
+            TimelineButtonFrameEdits edit = new TimelineButtonFrameEdits(button, getBlankFrames());
+            edit.editFrames(cells, insert);
+            applyButtonEdit(button, edit, description, after);
+        } else {
+            TimelineFrameEdits edit = new TimelineFrameEdits(timeline, getBlankFrames());
+            if (insert) {
+                edit.insertFrames(cells);
+            } else {
+                edit.removeFrames(cells);
             }
-            if (changed) {
-                records.removeIf(BUTTONRECORD::isEmpty);
-                applyButtonEdit(button, records, "action.removeFrame", remainingSelection);
-            }
-            return;
-        }
-        TimelineFrameEdits edits = new TimelineFrameEdits(timeline);
-        edits.removeFrames(cursor);
-        applyFrameEdits(edits, "action.removeFrame", remainingSelection);
-    }
-
-    private void addKeyFrame(ActionEvent e) {
-        Timelined timelined = timeline.timelined;
-        if (timelined instanceof ButtonTag) {
-            ButtonTag button = (ButtonTag) timelined;
-            List<BUTTONRECORD> records = copyButtonRecords(button.getRecords());
-            boolean changed = false;
-            for (Point cell : getBackOrderedCursor()) {
-                DepthState state = timeline.getDepthState(cell.x, cell.y);
-                BUTTONRECORD record = findButtonRecord(records, cell.x, cell.y);
-                if (state == null || state.key || record == null) {
-                    continue;
-                }
-                BUTTONRECORD split = new BUTTONRECORD(record);
-                for (int frame = ButtonTag.FRAME_UP; frame <= ButtonTag.FRAME_HITTEST; frame++) {
-                    if (frame < cell.x) {
-                        split.setFrame(frame, false);
-                    } else {
-                        record.setFrame(frame, false);
-                    }
-                }
-                records.add(split);
-                changed = true;
-            }
-            if (changed) {
-                records.removeIf(BUTTONRECORD::isEmpty);
-                applyButtonEdit(button, records, "action.addKeyFrame", cursor);
-            }
-            return;
-        }
-        TimelineFrameEdits edits = new TimelineFrameEdits(timeline);
-        for (Point cell : cursor) {
-            DepthState state = timeline.getDepthState(cell.x, cell.y);
-            if (cell.y <= 0 || !TimelineFrameEdits.isPlaced(state) || state.key) {
-                continue;
-            }
-            boolean move = timelined.getSwf().version >= 3;
-            if (!move) {
-                edits.addToFrame(cell.x, TimelineFrameEdits.makeRemove(timelined, state, cell.y));
-            }
-            edits.addToFrame(cell.x, TimelineFrameEdits.makePlacement(timelined, state, cell.y, move));
-        }
-        applyFrameEdits(edits, "action.addKeyFrame", cursor);
-    }
-
-    private void addKeyFrameEmptyBefore(ActionEvent e) {
-        int frame = getFirstFrame();
-        int depth = getFirstDepth();
-        Timelined timelined = timeline.timelined;
-        if (depth <= 0 || frame <= 0) {
-            return;
-        }
-        if (timelined instanceof ButtonTag) {
-            ButtonTag button = (ButtonTag) timelined;
-            if (frame > ButtonTag.FRAME_HITTEST || button.getButtonRecordAt(frame, depth, false) != null) {
-                return;
-            }
-            List<BUTTONRECORD> records = copyButtonRecords(button.getRecords());
-            BUTTONRECORD previous = findPreviousButtonRecord(records, frame, depth);
-            if (previous != null) {
-                BUTTONRECORD key = new BUTTONRECORD(previous);
-                for (int i = ButtonTag.FRAME_UP; i <= ButtonTag.FRAME_HITTEST; i++) {
-                    key.setFrame(i, i == frame);
-                }
-                records.add(key);
-                applyButtonEdit(button, records, "action.addKeyFrame", cursor);
-            }
-            return;
-        }
-        if (TimelineFrameEdits.isPlaced(timeline.getDepthState(frame, depth))) {
-            return;
-        }
-        int previous = Math.min(frame, timeline.getFrameCount()) - 1;
-        while (previous >= 0) {
-            DepthState state = timeline.getDepthState(previous, depth);
-            if (TimelineFrameEdits.isPlaced(state)) {
-                TimelineFrameEdits edits = new TimelineFrameEdits(timeline);
-                edits.extendTo(frame);
-                edits.addToFrame(frame, TimelineFrameEdits.makePlacement(timelined, state, depth, false));
-                applyFrameEdits(edits, "action.addKeyFrame", cursor);
-                return;
-            }
-            previous--;
+            applyFrameEdit(edit, description, after);
         }
     }
 
-    private void addFrame(ActionEvent e) {
+    private Set<Point> selectionAfterRemovingFrames(Set<Point> cells) {
+        Point first = Collections.min(cells, Comparator.comparingInt((Point cell) -> cell.x).thenComparingInt(cell -> cell.y));
+        int end = getLayerEnd(first.y, getBlankFrames());
+        int removed = (int) cells.stream().filter(cell -> cell.y == first.y && cell.x <= end).count();
+        return Collections.singleton(new Point(Math.max(0, Math.min(first.x, end - removed)), first.y));
+    }
+
+    private void editKeyframes(Set<Point> cells, KeyEdit action, String description) {
         if (timeline.timelined instanceof ButtonTag) {
             ButtonTag button = (ButtonTag) timeline.timelined;
-            List<BUTTONRECORD> records = copyButtonRecords(button.getRecords());
-            boolean changed = false;
-            for (Point cell : getBackOrderedCursor()) {
-                changed |= insertButtonFrame(records, cell.x, cell.y);
-            }
-            if (changed) {
-                applyButtonEdit(button, records, "action.addFrame", cursor);
-            }
+            TimelineButtonFrameEdits edit = new TimelineButtonFrameEdits(button, getBlankFrames());
+            edit.editKeyframes(cells, action);
+            applyButtonEdit(button, edit, description, cursor);
+        } else {
+            TimelineFrameEdits edit = new TimelineFrameEdits(timeline, getBlankFrames());
+            edit.editKeyframes(cells, action);
+            applyFrameEdit(edit, description, cursor);
+        }
+    }
+
+    private void applyFrameEdit(TimelineFrameEdits edit, String description, Set<Point> after) {
+        if (edit.fitsSwf()) {
+            applyTimelineEdit(edit::apply, !edit.isEmpty(), edit.getBlankFrames(), description, after);
+        }
+    }
+
+    private void applyButtonEdit(ButtonTag button, TimelineButtonFrameEdits edit, String description, Set<Point> after) {
+        if (edit.changesRecords() && edit.getRecords().isEmpty()) {
             return;
         }
-        TimelineFrameEdits edits = new TimelineFrameEdits(timeline);
-        edits.insertFrames(cursor);
-        applyFrameEdits(edits, "action.addFrame", cursor);
-    }
-
-    private static boolean insertButtonFrame(List<BUTTONRECORD> records, int frame, int depth) {
-        if (depth <= 0 || frame < ButtonTag.FRAME_UP || frame > ButtonTag.FRAME_HITTEST) {
-            return false;
-        }
-        // Shifting right requires a free last state so no record is discarded.
-        if (findButtonRecord(records, ButtonTag.FRAME_HITTEST, depth) != null) {
-            return false;
-        }
-        BUTTONRECORD current = findButtonRecord(records, frame, depth);
-        int insertion = frame + 1;
-        boolean shifted = false;
-        for (int next = ButtonTag.FRAME_HITTEST - 1; next >= insertion; next--) {
-            BUTTONRECORD record = findButtonRecord(records, next, depth);
-            if (record != null) {
-                record.setFrame(next + 1, true);
-                record.setFrame(next, false);
-                shifted = true;
-            }
-        }
-        if (current != null) {
-            current.setFrame(insertion, true);
-            return true;
-        }
-        if (!shifted) {
-            for (int previous = frame - 1; previous >= ButtonTag.FRAME_UP; previous--) {
-                BUTTONRECORD record = findButtonRecord(records, previous, depth);
-                if (record != null) {
-                    for (int added = previous + 1; added <= frame; added++) {
-                        record.setFrame(added, true);
-                    }
-                    return true;
-                }
-            }
-        }
-        return shifted;
-    }
-
-    private static List<BUTTONRECORD> copyButtonRecords(List<BUTTONRECORD> records) {
-        List<BUTTONRECORD> copy = new ArrayList<>(records.size());
-        for (BUTTONRECORD record : records) {
-            copy.add(new BUTTONRECORD(record));
-        }
-        return copy;
-    }
-
-    private static BUTTONRECORD findButtonRecord(List<BUTTONRECORD> records, int frame, int depth) {
-        for (BUTTONRECORD record : records) {
-            if (record.placeDepth == depth && record.hasFrame(frame)) {
-                return record;
-            }
-        }
-        return null;
-    }
-
-    private static BUTTONRECORD findPreviousButtonRecord(List<BUTTONRECORD> records, int frame, int depth) {
-        for (int previous = frame - 1; previous >= ButtonTag.FRAME_UP; previous--) {
-            BUTTONRECORD record = findButtonRecord(records, previous, depth);
-            if (record != null) {
-                return record;
-            }
-        }
-        return null;
-    }
-
-    private void applyFrameEdits(TimelineFrameEdits edits, String description, Set<Point> selectionAfterEdit) {
-        if (!edits.isEmpty()) {
-            applyTimelineEdit(edits::apply, description, selectionAfterEdit);
-        }
-    }
-
-    private void applyButtonEdit(ButtonTag button, List<BUTTONRECORD> records, String description, Set<Point> selectionAfterEdit) {
         applyTimelineEdit(() -> {
             button.getRecords().clear();
-            button.getRecords().addAll(copyButtonRecords(records));
+            for (BUTTONRECORD record : edit.getRecords()) {
+                button.getRecords().add(new BUTTONRECORD(record));
+            }
             button.resetTimeline();
-        }, description, selectionAfterEdit);
+        }, edit.changesRecords(), edit.getBlankFrames(), description, after);
     }
 
     boolean canAddLayer() {
@@ -1099,6 +908,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     private void editLayer(int depth, boolean inserting) {
         Timelined target = timeline.timelined;
         TimelineLayerEdit edit = new TimelineLayerEdit(target, depth, inserting);
+        TimelineBlankFrames originalBlanks = getBlankFrames();
+        TimelineBlankFrames movedBlanks = originalBlanks.remap(value -> TimelineLayerEdit.mapDepth(value, depth, inserting));
         int beforeCount = getDepthCount();
         int afterCount = beforeCount + (inserting ? 1 : -1);
         Set<Point> before = new LinkedHashSet<>(cursor);
@@ -1139,6 +950,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 }
                 edit.apply(forward);
                 swfPanel.setTimelineDepthCount(target, forward ? afterCount : beforeCount);
+                swfPanel.setTimelineBlankFrames(target, forward ? movedBlanks : originalBlanks);
                 swfPanel.remapDepthInteraction(value -> TimelineLayerEdit.mapDepth(value, depth, grows));
                 if (grows) {
                     swfPanel.restoreLayerFlags(depth, hidden, locked);
@@ -1172,7 +984,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                     EasyStrings.translate("timeline.shape.moveLayer"), JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (result == TimelineDepthMove.Result.UNCHANGED) {
+        TimelineBlankFrames originalBlanks = getBlankFrames();
+        TimelineBlankFrames movedBlanks = originalBlanks.remap(move::mapDepth);
+        if (result == TimelineDepthMove.Result.UNCHANGED && originalBlanks.equals(movedBlanks)) {
             return;
         }
         int depthCount = getDepthCount();
@@ -1184,18 +998,19 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         undoManager.doOperation(new DoableOperation() {
             @Override
             public void doOperation() {
-                apply(move, after);
+                apply(move, movedBlanks, after);
             }
 
             @Override
             public void undoOperation() {
-                apply(move.reversed(), before);
+                apply(move.reversed(), originalBlanks, before);
             }
 
-            private void apply(TimelineDepthMove step, Set<Point> selection) {
+            private void apply(TimelineDepthMove step, TimelineBlankFrames frames, Set<Point> selection) {
                 swfPanel.setTimelined(target);
                 step.apply(target);
                 swfPanel.setTimelineDepthCount(target, depthCount);
+                swfPanel.setTimelineBlankFrames(target, frames);
                 swfPanel.remapDepthInteraction(step::mapDepth);
                 refreshAfterEdit(target, selection);
                 swfPanel.refreshDepthInteraction();
@@ -1205,37 +1020,67 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             public String getDescription() {
                 return EasyStrings.translate("timeline.shape.moveLayer");
             }
+
+            @Override
+            public boolean modifiesSwf() {
+                return result == TimelineDepthMove.Result.VALID;
+            }
         }, target.getSwf());
     }
 
-    private void applyTimelineEdit(Runnable edit, String description, Set<Point> selectionAfterEdit) {
+    private void applyTimelineEdit(Runnable edit, boolean changesTags, TimelineBlankFrames blankFrames,
+            String description, Set<Point> selectionAfterEdit) {
+        TimelineBlankFrames originalBlanks = getBlankFrames();
+        if (!changesTags && originalBlanks.equals(blankFrames)) {
+            return;
+        }
         Timelined timelined = timeline.timelined;
         Set<Point> originalSelection = new LinkedHashSet<>(cursor);
         Set<Point> editedSelection = new LinkedHashSet<>(selectionAfterEdit);
         int originalFrameCount = timelined.getFrameCount();
+        int depthCount = getDepthCount();
         undoManager.doOperation(new TimelinedTagListDoableOperation(swfPanel, timelined) {
             @Override
             public void doOperation() {
-                super.doOperation();
-                edit.run();
-                refreshAfterEdit(timelined, editedSelection);
+                if (changesTags) {
+                    super.doOperation();
+                    edit.run();
+                } else {
+                    swfPanel.setTimelined(timelined);
+                }
+                restore(blankFrames, editedSelection);
             }
 
             @Override
             public void undoOperation() {
-                super.undoOperation();
-                timelined.setFrameCount(originalFrameCount);
-                refreshAfterEdit(timelined, originalSelection);
+                if (changesTags) {
+                    super.undoOperation();
+                    timelined.setFrameCount(originalFrameCount);
+                } else {
+                    swfPanel.setTimelined(timelined);
+                }
+                restore(originalBlanks, originalSelection);
+            }
+
+            private void restore(TimelineBlankFrames frames, Set<Point> selection) {
+                swfPanel.setTimelineDepthCount(timelined, depthCount);
+                swfPanel.setTimelineBlankFrames(timelined, frames);
+                refreshAfterEdit(timelined, selection);
             }
 
             @Override
             public String getDescription() {
                 return EasyStrings.translate(description);
             }
+
+            @Override
+            public boolean modifiesSwf() {
+                return changesTags;
+            }
         }, timelined.getSwf());
     }
 
-    private void refreshAfterEdit(Timelined target, Set<Point> selection) {
+    void refreshAfterEdit(Timelined target, Set<Point> selection) {
         timeline = target.getTimeline();
         target.getSwf().clearImageCache();
         restoreSelection(selection);
@@ -1277,7 +1122,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 }
                 break;
             case 39: //right
-                if (firstCursorItem.x < timeline.getFrameCount() - 1) {
+                if (firstCursorItem.x < getDisplayedFrameCount() - 1) {
                     frameSelect(firstCursorItem.x + 1, firstCursorItem.y, true);
                 }
                 break;
@@ -1331,8 +1176,48 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         return swfPanel == null ? timeline.getMaxDepth() : swfPanel.getTimelineDepthCount(timeline.timelined);
     }
 
+    private TimelineBlankFrames getBlankFrames() {
+        return timeline == null || swfPanel == null ? new TimelineBlankFrames() : swfPanel.getTimelineBlankFrames(timeline.timelined);
+    }
+
+    private int getDisplayedFrameCount() {
+        return timeline == null ? 0 : Math.max(timeline.getFrameCount(), getBlankFrames().lastFrame() + 1);
+    }
+
+    private int getLayerEnd(int depth, TimelineBlankFrames blanks) {
+        int lastOccupied = timeline.getDepthMaxFrameButtons().getOrDefault(depth, -1);
+        return Math.max(lastOccupied, blanks.end(depth));
+    }
+
+    private DepthState getPlacedState(int frame, int depth) {
+        if (timeline.timelined instanceof ButtonTag && ((ButtonTag) timeline.timelined).getButtonRecordAt(frame, depth, false) == null) {
+            return null;
+        }
+        DepthState state = timeline.getDepthState(frame, depth);
+        return TimelineFrameEdits.isPlaced(state) ? state : null;
+    }
+
+    private boolean isKey(int frame, int depth, TimelineBlankFrames blanks) {
+        if (timeline.timelined instanceof ButtonTag) {
+            ButtonTag button = (ButtonTag) timeline.timelined;
+            BUTTONRECORD record = button.getButtonRecordAt(frame, depth, false);
+            return record != button.getButtonRecordAt(frame - 1, depth, false)
+                    || (record == null && blanks.hasKey(depth, frame));
+        }
+        DepthState state = getPlacedState(frame, depth);
+        if (state != null) {
+            return state.key;
+        }
+        return blanks.hasKey(depth, frame) || (frame < timeline.getFrameCount() && getPlacedState(frame - 1, depth) != null);
+    }
+
+    private boolean startsFrameBlock(int frame, int depth, TimelineBlankFrames blanks) {
+        return isKey(frame, depth, blanks)
+                || (frame == timeline.getFrameCount() && getPlacedState(frame - 1, depth) != null);
+    }
+
     public void refresh() {
-        int frameCount = timeline == null ? 0 : timeline.getFrameCount();
+        int frameCount = getDisplayedFrameCount();
         int maxDepth = getDepthCount();
         Dimension dim = new Dimension(getFrameWidth() * frameCount + 1, FRAME_HEIGHT * (maxDepth + 1 /*actions*/ + 1 /*one additional*/));
         setSize(dim);
