@@ -28,6 +28,9 @@ import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
+import com.jpexs.decompiler.flash.gui.ai.AIContextManager;
+import com.jpexs.decompiler.flash.gui.ai.AISettingsDialog;
+import com.jpexs.decompiler.flash.gui.ai.AIStudioDialog;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
@@ -930,6 +933,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Main.advancedSettings();
     }
 
+    protected void aiSettingsActionPerformed(ActionEvent evt) {
+        new AISettingsDialog(mainFrame.getWindow()).setVisible(true);
+    }
+
+    protected void aiStudioActionPerformed(ActionEvent evt) {
+        SWF swf = mainFrame.getPanel().getCurrentSwf();
+        String swfTitle = swf == null ? "" : swf.getTitleOrShortFileName();
+        String swfContext = new AIContextManager().describe(swf);
+        new AIStudioDialog(mainFrame.getWindow(), swfTitle, swfContext).setVisible(true);
+    }
+
     protected void solEditorActionPerformed(ActionEvent evt) {
         Main.openSolEditor();
     }
@@ -1462,6 +1476,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         finishMenu("/debuggingListen");
 
         addMenuItem("/tools", translate("menu.tools"), null, null, 0, null, false, null, false);
+        addMenuItem("/tools/aiStudio", translate("menu.ai.studio"), "abcexplorer32",
+                this::aiStudioActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/tools/search", translate("menu.tools.search"), "search16", this::searchActionPerformed, PRIORITY_TOP, this::loadRecentSearches, !supportsMenuAction(), null, false);
 
         if (!supportsMenuAction()) {
@@ -1534,6 +1550,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/settings/advancedSettings/clearRecentSearches", translate("menu.tools.otherTools.clearRecentSearches"), "clearrecent16", this::clearRecentSearchesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/settings/advancedSettings/clearPinnedItems", translate("menu.tools.otherTools.clearPinnedItems"), "clearrecent16", this::clearPinnedItemsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/settings/advancedSettings");
+
+        addMenuItem("/settings/ai", translate("menu.ai.settings"), "settings32",
+                this::aiSettingsActionPerformed, PRIORITY_TOP, null, true, null, false);
 
         finishMenu("/settings");
 
