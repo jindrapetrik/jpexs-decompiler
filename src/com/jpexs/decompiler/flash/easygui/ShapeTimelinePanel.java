@@ -177,7 +177,7 @@ final class ShapeTimelinePanel extends JPanel {
         boolean activeChanged = this.activeLayer != activeLayer;
         setSelection(activeLayer, Collections.emptySet());
         if (!activeChanged) {
-            scrollToLayer();
+            scrollToActiveLayer();
         }
     }
 
@@ -191,11 +191,11 @@ final class ShapeTimelinePanel extends JPanel {
         this.selectedLayers = selectedLayers;
         frames.repaint();
         if (activeChanged) {
-            scrollToLayer();
+            scrollToActiveLayer();
         }
     }
 
-    private void scrollToLayer() {
+    void scrollToActiveLayer() {
         if (!layers.isEmpty()) {
             frames.scrollRectToVisible(new Rectangle(0, layerAt(activeLayer) * ROW_HEIGHT, FRAME_WIDTH, ROW_HEIGHT));
         }

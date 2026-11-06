@@ -331,8 +331,7 @@ public class EasySwfPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 List<Integer> depths = stagePanel.getSelectedDepths();
-                //timelinePanel.setDepths(depths);
-                timelinePanel.setFrame(stagePanel.getFrame(), depths);
+                timelinePanel.setStageSelection(stagePanel.getFrame(), depths);
                 transformPanel.setVisible(!depths.isEmpty());
                 updatePropertiesPanel();
             }
@@ -1730,6 +1729,9 @@ public class EasySwfPanel extends JPanel {
     private void showStageSelection(Map<Integer, List<ShapeSelection.Selection>> selected) {
         shapeTimelinePanel.getLayerSelection().clear();
         showLayerSelections(selected);
+        if (!shapeSelections.isEmpty()) {
+            shapeTimelinePanel.scrollToActiveLayer();
+        }
         if (rightTabbedPane.getSelectedIndex() != 2) {
             rightTabbedPane.setSelectedIndex(0);
         }

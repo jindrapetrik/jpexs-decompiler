@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
@@ -219,6 +220,17 @@ public class TimelinePanel extends JPanel {
     public void setFrame(int frame, List<Integer> depths) {
         timePanel.frameSelect(frame);
         timelineBodyPanel.frameSelect(frame, depths, false);
+    }
+
+    void setStageSelection(int frame, List<Integer> depths) {
+        setFrame(frame, depths);
+        if (!depths.isEmpty()) {
+            int depth = depths.get(depths.size() - 1);
+            Rectangle row = timelineBodyPanel.getFrameBounds(frame, depth);
+            row.x = timelineBodyScrollPane.getViewport().getViewPosition().x;
+            row.width = 1;
+            timelineBodyPanel.scrollRectToVisible(row);
+        }
     }
 
     public void refresh() {
