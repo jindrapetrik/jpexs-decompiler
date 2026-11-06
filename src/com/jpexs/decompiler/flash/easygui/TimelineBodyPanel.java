@@ -486,20 +486,18 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         return new LinkedHashSet<>(cursor);
     }
 
-    FrameSpan getStagePlacementSpan(int frame, int depth) {
+    FrameSpan getSelectedFrameSpan(int frame, int depth) {
         if (depth <= 0 || depth > getDepthCount()) {
             return new FrameSpan(frame, frame);
         }
-        TimelineBlankFrames blanks = getBlankFrames();
-        ButtonTag button = timeline.timelined instanceof ButtonTag ? (ButtonTag) timeline.timelined : null;
-        int frameLimit = button == null ? TimelineFrameEdits.MAX_FRAME : ButtonTag.FRAME_HITTEST;
-        boolean occupied = button == null ? getPlacedState(frame, depth) != null : button.getButtonRecordAt(frame, depth, false) != null;
-        int first = frame;
+        boolean occupied = isFrameOccupied(frame, depth);
         if (occupied) {
+            int first = frame;
             int lastSelected = frame;
             while (first > 0 && cursor.contains(new Point(first - 1, depth))) {
                 first--;
             }
+            int frameLimit = getFrameLimit();
             while (lastSelected < frameLimit && cursor.contains(new Point(lastSelected + 1, depth))) {
                 lastSelected++;
             }
@@ -507,6 +505,12 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 return new FrameSpan(first, lastSelected);
             }
         }
+        return getFrameBlock(frame, depth, occupied);
+    }
+
+    private FrameSpan getFrameBlock(int frame, int depth, boolean occupied) {
+        TimelineBlankFrames blanks = getBlankFrames();
+        int first = frame;
         if (occupied || frame <= getLayerEnd(depth, blanks)) {
             while (first > 0 && !startsFrameBlock(first, depth, blanks)) {
                 first--;
@@ -515,6 +519,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
         int realEnd = timeline.getFrameCount() - 1;
         int blankEnd = blanks.end(depth);
+        int frameLimit = getFrameLimit();
         int end = Math.min(frameLimit, Math.max(realEnd, blankEnd));
         for (int next = frame + 1; next <= end; next++) {
             if (startsFrameBlock(next, depth, blanks)) {
@@ -523,6 +528,15 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
         int last = !occupied && blankEnd >= frame ? blankEnd : realEnd;
         return new FrameSpan(first, Math.max(frame, Math.min(frameLimit, last)));
+    }
+
+    private boolean isFrameOccupied(int frame, int depth) {
+        return timeline.timelined instanceof ButtonTag ? ((ButtonTag) timeline.timelined).getButtonRecordAt(frame, depth, false) != null
+                : getPlacedState(frame, depth) != null;
+    }
+
+    private int getFrameLimit() {
+        return timeline.timelined instanceof ButtonTag ? ButtonTag.FRAME_HITTEST : TimelineFrameEdits.MAX_FRAME;
     }
 
     static final class FrameSpan {
@@ -708,7 +722,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         addFrameMenuItem(menu, "action.clearKeyframe", !keys.isEmpty(), () -> editKeyframes(keys, KeyEdit.CLEAR, "action.clearKeyframe"));
         addFrameMenuItem(menu, "action.convertToKeyframes", true, () -> editKeyframes(cells, KeyEdit.CONVERT, "action.convertToKeyframes"));
         addFrameMenuItem(menu, "action.convertToBlankKeyframes", true, () -> editKeyframes(cells, KeyEdit.CONVERT_BLANK, "action.convertToBlankKeyframes"));
-        addFrameMenuItem(menu, "action.clearFrames", canClearFrames(cells), () -> editKeyframes(cells, KeyEdit.CLEAR_FRAMES, "action.clearFrames"));
+        addFrameMenuItem(menu, "action.clearFrames", canClearFrames(cells), () -> clearFrames(cells));
 
         if (!(timeline.timelined instanceof ButtonTag)) {
             Set<Point> realCells = new LinkedHashSet<>(cells);
@@ -743,10 +757,30 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         return selected && remaining;
     }
 
+    private void clearFrames(Set<Point> cells) {
+        if (canClearFrames(cells)) {
+            editKeyframes(cells, KeyEdit.CLEAR_FRAMES, "action.clearFrames");
+        }
+    }
+
+    Set<Point> getSelectedBlockCells() {
+        Set<Point> cells = new LinkedHashSet<>();
+        for (Point cell : getEditableCells()) {
+            if (cells.contains(cell) || !isFrameOccupied(cell.x, cell.y)) {
+                continue;
+            }
+            FrameSpan span = getFrameBlock(cell.x, cell.y, true);
+            for (int frame = span.first; frame <= span.last; frame++) {
+                cells.add(new Point(frame, cell.y));
+            }
+        }
+        return cells;
+    }
+
     private Set<Point> getEditableCells() {
         Set<Point> cells = new LinkedHashSet<>();
         Set<Integer> locked = getLockedDepths();
-        int last = timeline.timelined instanceof ButtonTag ? ButtonTag.FRAME_HITTEST : TimelineFrameEdits.MAX_FRAME;
+        int last = getFrameLimit();
         int depthCount = getDepthCount();
         for (Point cell : cursor) {
             if (cell.x >= 0 && cell.x <= last && cell.y > 0 && cell.y <= depthCount && !locked.contains(cell.y)) {
@@ -1116,6 +1150,13 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
         Point firstCursorItem = cursor.isEmpty() ? new Point(1, 1) : cursor.iterator().next();
         switch (e.getKeyCode()) {
+            case KeyEvent.VK_DELETE:
+                if (e.getModifiersEx() == 0) {
+                    clearFrames(getSelectedBlockCells());
+                    requestFocusInWindow();
+                    e.consume();
+                }
+                break;
             case 37: //left
                 if (firstCursorItem.x > 0) {
                     frameSelect(firstCursorItem.x - 1, firstCursorItem.y, true);

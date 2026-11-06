@@ -381,6 +381,31 @@ public class TimelineFrameEditsTest {
     }
 
     @Test
+    public void deleteExpandsEachSelectedCellToItsOwnLayerBlock() throws Exception {
+        SWF swf = new SWF();
+        int character = shape(swf);
+        place(swf, 1, character, 0, false);
+        place(swf, 2, character, 0, false);
+        endFrame(swf);
+        place(swf, 2, character, 100, true);
+        endFrame(swf);
+        endFrame(swf);
+        place(swf, 1, character, 200, true);
+        endFrame(swf);
+        place(swf, 2, character, 300, true);
+        endFrame(swf);
+
+        SwingUtilities.invokeAndWait(() -> {
+            TimelineBodyPanel body = new TimelineBodyPanel(null, new UndoManager());
+            body.setTimeline(swf.getTimeline());
+            body.frameSelect(2, Arrays.asList(1, 2), false);
+            Set<Point> expected = new HashSet<>(Arrays.asList(new Point(0, 1), new Point(1, 1), new Point(2, 1),
+                    new Point(1, 2), new Point(2, 2), new Point(3, 2)));
+            assertEquals(body.getSelectedBlockCells(), expected);
+        });
+    }
+
+    @Test
     public void stagePlacementFollowsTheSelectedBlockOrFrameRange() throws Exception {
         SWF swf = new SWF();
         int first = shape(swf);
@@ -400,22 +425,22 @@ public class TimelineFrameEditsTest {
             TimelineBodyPanel body = new TimelineBodyPanel(null, new UndoManager());
             body.setTimeline(swf.getTimeline());
             body.frameSelect(1, 1, false);
-            TimelineBodyPanel.FrameSpan occupied = body.getStagePlacementSpan(1, 1);
+            TimelineBodyPanel.FrameSpan occupied = body.getSelectedFrameSpan(1, 1);
             assertEquals(occupied.first, 0);
             assertEquals(occupied.last, 1);
 
             body.frameSelect(3, 1, false);
-            TimelineBodyPanel.FrameSpan blank = body.getStagePlacementSpan(3, 1);
+            TimelineBodyPanel.FrameSpan blank = body.getSelectedFrameSpan(3, 1);
             assertEquals(blank.first, 2);
             assertEquals(blank.last, 4);
 
-            TimelineBodyPanel.FrameSpan beyondLayer = body.getStagePlacementSpan(8, 1);
+            TimelineBodyPanel.FrameSpan beyondLayer = body.getSelectedFrameSpan(8, 1);
             assertEquals(beyondLayer.first, 8);
             assertEquals(beyondLayer.last, 8);
 
             body.frameSelect(1, 1, false);
             body.selectLayerFrames(1);
-            TimelineBodyPanel.FrameSpan selection = body.getStagePlacementSpan(1, 1);
+            TimelineBodyPanel.FrameSpan selection = body.getSelectedFrameSpan(1, 1);
             assertEquals(selection.first, 0);
             assertEquals(selection.last, 6);
         });

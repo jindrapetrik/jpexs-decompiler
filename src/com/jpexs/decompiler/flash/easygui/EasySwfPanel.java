@@ -545,7 +545,7 @@ public class EasySwfPanel extends JPanel {
                             return false;
                         }
                         TimelineLayerEdit insertedLayer = insertAbove ? new TimelineLayerEdit(target, depth, true) : null;
-                        TimelineBodyPanel.FrameSpan span = body.getStagePlacementSpan(frame, selectedDepth);
+                        TimelineBodyPanel.FrameSpan span = body.getSelectedFrameSpan(frame, selectedDepth);
                         Set<Point> originalSelection = body.copySelection();
                         TimelineBlankFrames originalBlanks = getTimelineBlankFrames(target);
                         TimelineBlankFrames placedBlanks = insertAbove
