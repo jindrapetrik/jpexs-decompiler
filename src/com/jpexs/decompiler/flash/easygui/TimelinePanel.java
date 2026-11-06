@@ -67,14 +67,7 @@ public class TimelinePanel extends JPanel {
 
         depthPanel = new TimelineDepthPanel(swfPanel);
 
-        timelineBodyPanel.addChangeListener(new Runnable() {
-            @Override
-            public void run() {
-                timeline = timelined.getTimeline();
-                depthPanel.setTimeline(timeline);
-                timePanel.setTimeline(timeline);                
-            }
-        });
+        timelineBodyPanel.addChangeListener(this::refresh);
 
         timePanel = new TimelineTimePanel(depthPanel);
 
@@ -174,7 +167,10 @@ public class TimelinePanel extends JPanel {
     }
 
     public void refresh() {
-        timelineBodyPanel.refresh();
+        timeline = timelined == null ? null : timelined.getTimeline();
+        timelineBodyPanel.setTimeline(timeline);
+        depthPanel.setTimeline(timeline);
+        timePanel.setTimeline(timeline);
     }
 
     public void addChangeListener(Runnable l) {
@@ -187,15 +183,8 @@ public class TimelinePanel extends JPanel {
 
     public void setTimelined(Timelined timelined) {
         this.timelined = timelined;
-        if (timelined == null) {
-            timelineBodyPanel.setTimeline(null);
-            depthPanel.setTimeline(null);
-            timePanel.setTimeline(null);
-        } else {
-            timelineBodyPanel.setTimeline(timelined.getTimeline());
-            depthPanel.setTimeline(timelined.getTimeline());
-            timePanel.setTimeline(timelined.getTimeline());
-            
+        refresh();
+        if (timelined != null) {
             SWF swf = timelined.getSwf();
             SwfSpecificCustomConfiguration conf = swf == null ? null : Configuration.getSwfSpecificCustomConfiguration(swf);
             

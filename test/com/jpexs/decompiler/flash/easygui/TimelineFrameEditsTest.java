@@ -22,8 +22,10 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.HashSet;
+import javax.swing.SwingUtilities;
 import org.testng.annotations.Test;
 
 public class TimelineFrameEditsTest {
@@ -112,6 +114,33 @@ public class TimelineFrameEditsTest {
             assertEquals(key.matrix.translateX, 100);
         }
         assertNull(swf.getTimeline().getDepthState(3, 1));
+    }
+
+    @Test
+    public void layerLabelsAndFrameBoundsUseTheSameReversedDepthOrder() throws Exception {
+        SWF swf = new SWF();
+        int character = shape(swf);
+        place(swf, 1, character, 0, false);
+        place(swf, 5, character, 0, false);
+        endFrame(swf);
+
+        SwingUtilities.invokeAndWait(() -> {
+            TimelineBodyPanel frames = new TimelineBodyPanel(null, new UndoManager());
+            TimelineDepthPanel labels = new TimelineDepthPanel(null);
+            frames.setTimeline(swf.getTimeline());
+            labels.setTimeline(swf.getTimeline());
+
+            int height = TimelineBodyPanel.FRAME_HEIGHT;
+            assertEquals(frames.getDepthBounds(0).y, 0, "Actions stay above the layers");
+            assertEquals(frames.getDepthBounds(5).y, height, "The highest depth is the first layer");
+            assertEquals(frames.getDepthBounds(1).y, 5 * height, "Depth 1 is the last layer");
+            assertEquals(frames.getDepthBounds(6).y, 6 * height, "Spare rows keep their existing depth indexes");
+
+            labels.scroll(height);
+            MouseEvent click = new MouseEvent(labels, MouseEvent.MOUSE_PRESSED, 0, 0, 0, height + 1, 1, false);
+            assertEquals(labels.getDepthAt(click), 4, "A scrolled layer control resolves to the same depth as its frame");
+            assertEquals(frames.getDepthBounds(4).y, 2 * height);
+        });
     }
 
     private static int shape(SWF swf) {

@@ -151,7 +151,7 @@ public class TimelineDepthPanel extends JPanel {
         maxDepth = count;
         setFont(getFont().deriveFont(FONT_SIZE));
         int height = (maxDepth + (shapeTimeline ? 0 : 1)) * TimelineBodyPanel.FRAME_HEIGHT + 1;
-        int maxDepthW = getFontMetrics(getFont()).stringWidth(shapeTimeline ? depthLabel(maxDepth) : Integer.toString(maxDepth));
+        int maxDepthW = getFontMetrics(getFont()).stringWidth(depthLabel(Math.max(1, maxDepth)));
         visibilityX = maxDepthW + 2 * PADDING;
         lockX = visibilityX + showIcon.getIconWidth() + PADDING;
         int width = lockX + lockIcon.getIconWidth() + PADDING;
@@ -171,7 +171,7 @@ public class TimelineDepthPanel extends JPanel {
 
     int getDepthAt(MouseEvent e) {
         int row = (scrollOffset + e.getY()) / TimelineBodyPanel.FRAME_HEIGHT;
-        int depth = shapeTimeline ? maxDepth - row : row;
+        int depth = shapeTimeline ? maxDepth - row : TimelineBodyPanel.flipLayerOrder(row, maxDepth);
         return depth > 0 && depth <= maxDepth ? depth : 0;
     }
 
@@ -180,10 +180,8 @@ public class TimelineDepthPanel extends JPanel {
     }
 
     private String depthLabel(int depth) {
-        if (shapeTimeline) {
-            return EasyStrings.translate("timeline.shape.layerNumber").replace("%number%", Integer.toString(depth));
-        }
-        return depth == 0 ? "a" : Integer.toString(depth);
+        return depth == 0 ? "a"
+                : EasyStrings.translate("timeline.shape.layerNumber").replace("%number%", Integer.toString(depth));
     }
 
     private boolean isHidden(int depth) {
@@ -227,7 +225,7 @@ public class TimelineDepthPanel extends JPanel {
         g.setColor(TimelineBodyPanel.getBackgroundColor());
         g.fillRect(clip.x, clip.y, clip.width, clip.height);
         for (int row = firstRow; row <= lastRow; row++) {
-            int depth = shapeTimeline ? maxDepth - row : row;
+            int depth = shapeTimeline ? maxDepth - row : TimelineBodyPanel.flipLayerOrder(row, maxDepth);
             int y = row * rowHeight - scrollOffset;
             g.setColor(BORDER_COLOR);
             g.drawLine(0, y + rowHeight, getWidth(), y + rowHeight);
