@@ -521,20 +521,20 @@ public class BitmapExporter extends ShapeExporterBase {
             Area area, float thickness, int startCaps, int endCaps, boolean noClose) {
         double halfThickness = thickness / 2.0;
         if (startX != null && endX != null) {
-            Shape startCapShape = null;
-            switch (startCaps) {
-                case LINESTYLE2.ROUND_CAP:
-                    startCapShape = new Ellipse2D.Double(startX - halfThickness, startY - halfThickness, thickness, thickness);
-                    break;
-                case LINESTYLE2.SQUARE_CAP:
-                    startCapShape = drawSquareCap(new Point2D.Double(startX, startY), startX2 - startX, startY2 - startY, thickness, true);
-                    break;
-            }
-
-            if (startCapShape != null) {
-                area.add(new Area(startCapShape));
-            }
             if (noClose || startX != endX || startY != endY) {
+                Shape startCapShape = null;
+                switch (startCaps) {
+                    case LINESTYLE2.ROUND_CAP:
+                        startCapShape = new Ellipse2D.Double(startX - halfThickness, startY - halfThickness, thickness, thickness);
+                        break;
+                    case LINESTYLE2.SQUARE_CAP:
+                        startCapShape = drawSquareCap(new Point2D.Double(startX, startY), startX2 - startX, startY2 - startY, thickness, true);
+                        break;
+                }
+
+                if (startCapShape != null) {
+                    area.add(new Area(startCapShape));
+                }
                 Shape endCapShape = null;
                 switch (endCaps) {
                     case LINESTYLE2.ROUND_CAP:
