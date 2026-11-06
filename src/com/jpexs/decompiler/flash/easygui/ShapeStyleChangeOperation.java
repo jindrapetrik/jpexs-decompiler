@@ -15,9 +15,11 @@ import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.ShapeLayers;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -28,7 +30,11 @@ import java.awt.Shape;
 import java.awt.geom.PathIterator;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
@@ -100,6 +106,43 @@ public class ShapeStyleChangeOperation implements DoableOperation {
     }
 
     public static ShapeTag createShape(ShapeTag original, ShapeSelection model) throws IOException, InterruptedException {
+        return createShape(original, Collections.singletonList(original.getShapes()), 0, model);
+    }
+
+    static ShapeTag createShape(ShapeTag original, List<SHAPEWITHSTYLE> layers, int activeLayer, ShapeSelection model)
+            throws IOException, InterruptedException {
+        return createShape(original, layers, Collections.singletonMap(activeLayer, model));
+    }
+
+    static ShapeTag createShape(ShapeTag original, List<SHAPEWITHSTYLE> layers, Map<Integer, ShapeSelection> models)
+            throws IOException, InterruptedException {
+        Map<Integer, SHAPEWITHSTYLE> edits = new HashMap<>();
+        int shapeNum = original.getShapeNum();
+        for (Map.Entry<Integer, ShapeSelection> entry : models.entrySet()) {
+            SHAPEWITHSTYLE data = createShapeData(entry.getValue());
+            shapeNum = Math.max(shapeNum, data.getMinShapeNum(4));
+            edits.put(entry.getKey(), data);
+        }
+        List<SHAPEWITHSTYLE> editedLayers = new ArrayList<>(layers.size());
+        for (int i = 0; i < layers.size(); i++) {
+            SHAPEWITHSTYLE edit = edits.get(i);
+            editedLayers.add(edit == null ? convertLayer(layers.get(i), original.getShapeNum(), shapeNum)
+                    : convertLayer(edit, 4, shapeNum));
+        }
+        return createTag(original, editedLayers, shapeNum);
+    }
+
+    static ShapeTag createShape(ShapeTag original, List<SHAPEWITHSTYLE> layers) throws IOException, InterruptedException {
+        int sourceShapeNum = original.getShapeNum();
+        int shapeNum = Math.max(sourceShapeNum, layers.size() > 1 ? 2 : 1);
+        List<SHAPEWITHSTYLE> converted = new ArrayList<>(layers.size());
+        for (SHAPEWITHSTYLE layer : layers) {
+            converted.add(convertLayer(layer, sourceShapeNum, shapeNum));
+        }
+        return createTag(original, converted, shapeNum);
+    }
+
+    private static SHAPEWITHSTYLE createShapeData(ShapeSelection model) {
         SHAPEWITHSTYLE data = SHAPEWITHSTYLE.createEmpty(4);
         data.shapeRecords.clear();
         List<FILLSTYLE> fills = new ArrayList<>();
@@ -128,13 +171,12 @@ public class ShapeStyleChangeOperation implements DoableOperation {
         data.shapeRecords.add(new EndShapeRecord());
         data.fillStyles.fillStyles = fills.toArray(new FILLSTYLE[0]);
         data.lineStyles.lineStyles2 = lines.toArray(new LINESTYLE2[0]);
-        int shapeNum = Math.max(original.getShapeNum(), data.getMinShapeNum(4));
-        for (int i = 0; i < fills.size(); i++) {
-            data.fillStyles.fillStyles[i] = fills.get(i).toShapeNum(shapeNum);
-        }
-        if (shapeNum < 4) {
-            data.lineStyles = data.lineStyles.toShapeNum(4, shapeNum);
-        }
+        return data;
+    }
+
+    private static ShapeTag createTag(ShapeTag original, List<SHAPEWITHSTYLE> layers, int shapeNum)
+            throws IOException, InterruptedException {
+        SHAPEWITHSTYLE data = ShapeLayers.combine(layers);
         ShapeTag result;
         if (shapeNum == original.getShapeNum()) {
             result = (ShapeTag) original.cloneTag();
@@ -150,11 +192,26 @@ public class ShapeStyleChangeOperation implements DoableOperation {
         result.updateBounds();
         if (result instanceof DefineShape4Tag) {
             DefineShape4Tag shape4 = (DefineShape4Tag) result;
-            shape4.usesScalingStrokes = lines.stream().anyMatch(l -> !l.noHScaleFlag || !l.noVScaleFlag);
-            shape4.usesNonScalingStrokes = lines.stream().anyMatch(l -> l.noHScaleFlag || l.noVScaleFlag);
+            shape4.usesScalingStrokes = layers.stream().flatMap(layer -> Arrays.stream(layer.lineStyles.lineStyles2))
+                    .anyMatch(line -> !line.noHScaleFlag || !line.noVScaleFlag);
+            shape4.usesNonScalingStrokes = layers.stream().flatMap(layer -> Arrays.stream(layer.lineStyles.lineStyles2))
+                    .anyMatch(line -> line.noHScaleFlag || line.noVScaleFlag);
         }
         result.setModified(true);
         return result;
+    }
+
+    private static SHAPEWITHSTYLE convertLayer(SHAPEWITHSTYLE layer, int sourceShapeNum, int shapeNum) {
+        if (sourceShapeNum == shapeNum) {
+            return layer;
+        }
+        SHAPEWITHSTYLE converted = new SHAPEWITHSTYLE();
+        converted.shapeRecords = layer.shapeRecords;
+        converted.fillStyles = new FILLSTYLEARRAY();
+        converted.fillStyles.fillStyles = Arrays.stream(layer.fillStyles.fillStyles)
+                .map(fill -> fill.toShapeNum(shapeNum)).toArray(FILLSTYLE[]::new);
+        converted.lineStyles = layer.lineStyles.toShapeNum(sourceShapeNum, shapeNum);
+        return converted;
     }
 
     private static StyleChangeRecord styles(int fill, int line) {

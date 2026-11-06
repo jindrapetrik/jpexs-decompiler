@@ -63,8 +63,8 @@ public class ShapeSelection {
 
     private static class Paths extends PathExporter {
 
-        Paths(ShapeTag shape) {
-            super(shape.getWindingRule(), shape.getShapeNum(), shape.getSwf(), shape.getShapes(), null);
+        Paths(ShapeTag shape, SHAPEWITHSTYLE styles) {
+            super(shape.getWindingRule(), shape.getShapeNum(), shape.getSwf(), styles, null);
         }
 
         List<List<IEdge>> fills() {
@@ -104,8 +104,11 @@ public class ShapeSelection {
     }
 
     public ShapeSelection(ShapeTag shape) {
-        Paths paths = new Paths(shape);
-        SHAPEWITHSTYLE styles = shape.getShapes();
+        this(shape, shape.getShapes());
+    }
+
+    ShapeSelection(ShapeTag shape, SHAPEWITHSTYLE styles) {
+        Paths paths = new Paths(shape, styles);
         List<FILLSTYLE> fills = new ArrayList<>(Arrays.asList(styles.fillStyles.fillStyles));
         List<ILINESTYLE> lines = new ArrayList<>();
         addLineStyles(lines, styles.lineStyles, shape.getShapeNum());
@@ -175,7 +178,11 @@ public class ShapeSelection {
          * their indexes refer to this model rather than the exported paths.
          */
         public ShapeSelection committedModel(ShapeTag shape) {
-            return selected.isEmpty() && !model.hasFloatingSelection() ? new ShapeSelection(shape) : model;
+            return committedModel(shape, shape.getShapes());
+        }
+
+        ShapeSelection committedModel(ShapeTag shape, SHAPEWITHSTYLE layer) {
+            return selected.isEmpty() && !model.hasFloatingSelection() ? new ShapeSelection(shape, layer) : model;
         }
     }
 
@@ -1424,6 +1431,21 @@ public class ShapeSelection {
                 stroke || line != null ? geometry : null, geometry, stroke, parts.size());
         parts.add(part);
         return part;
+    }
+
+    List<Selection> selectAll() {
+        List<Selection> selected = new ArrayList<>();
+        for (Selection part : parts) {
+            if (part.stroke && part.line != null) {
+                List<Path2D.Double> edges = strokeEdges(part.geometry);
+                for (int i = 0; i < edges.size(); i++) {
+                    selected.add(rebase(part, part, edges.get(i), i));
+                }
+            } else if (part.fill != null) {
+                selected.add(part);
+            }
+        }
+        return selected;
     }
 
     List<Selection> getParts() {

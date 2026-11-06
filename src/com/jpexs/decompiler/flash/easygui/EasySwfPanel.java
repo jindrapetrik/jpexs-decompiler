@@ -66,6 +66,8 @@ import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.ShapeLayers;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -89,12 +91,17 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -125,6 +132,8 @@ public class EasySwfPanel extends JPanel {
     private ImagePanel libraryPreviewPanel;
     private ImagePanel stagePanel;
     private TimelinePanel timelinePanel;
+    private ShapeTimelinePanel shapeTimelinePanel;
+    private JPanel timelineArea;
     private JButton undoButton;
     private JButton redoButton;
     private UndoManager undoManager;
@@ -134,9 +143,16 @@ public class EasySwfPanel extends JPanel {
     private Timelined timelined;
     private final Map<Timelined, Set<Integer>> hiddenDepthsByTimeline = Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<Timelined, Set<Integer>> lockedDepthsByTimeline = Collections.synchronizedMap(new WeakHashMap<>());
+    // Tag replacements share the state objects of layers that survive the edit.
+    private final Map<ShapeTag, List<ShapeLayerState>> shapeLayerStatesByTag = new WeakHashMap<>();
     private ShapeTag editingShape;
+    private ShapeTag unfilteredShapePreview;
+    private List<SHAPEWITHSTYLE> shapeLayers = Collections.emptyList();
+    private List<ShapeLayerState> shapeLayerStates = Collections.emptyList();
+    private int activeShapeLayer;
     private ShapeTool shapeTool = ShapeTool.SELECT;
-    private ShapeSelection shapeSelection;
+    private final Map<Integer, ShapeSelection> shapeModels = new HashMap<>();
+    private Map<Integer, List<ShapeSelection.Selection>> shapeSelections = Collections.emptyMap();
     private BrushStroke brushStroke;
     private PencilStroke pencilStroke;
     private ShapeDrawingGesture shapeDrawing;
@@ -158,6 +174,12 @@ public class EasySwfPanel extends JPanel {
     private JLabel timelineLabel;
     private JButton closeTimelineButton;
     private JPanel propertiesPanel;
+
+    private static final class ShapeLayerState {
+
+        private boolean hidden;
+        private boolean locked;
+    }
 
     private static final String PROPERTIES_DOCUMENT = "Document";
     private static final String PROPERTIES_INSTANCE = "Instance";
@@ -204,7 +226,7 @@ public class EasySwfPanel extends JPanel {
         stagePanel.addPointUpdateListener(new PointUpdateListener() {
             @Override
             public void pointsUpdated(List<DisplayPoint> points) {
-                if (editingShape == null || shapeTool != ShapeTool.EDIT_POINTS) {
+                if (!shapeLayerEditable() || shapeTool != ShapeTool.EDIT_POINTS) {
                     return;
                 }
                 if (pointEdit == null) {
@@ -213,7 +235,11 @@ public class EasySwfPanel extends JPanel {
                 }
                 if (pointEdit != null) {
                     pointEdit.updatePoints(points);
-                    stagePanel.setShapePreview(pointEdit.getShape());
+                    try {
+                        previewShape(createShapeWithEditedLayer(pointEdit.getShape()));
+                    } catch (IOException | InterruptedException ex) {
+                        logShapeEditFailure(ex);
+                    }
                     if (!pointEditDragging) {
                         finishPointEdit(false);
                     }
@@ -228,7 +254,7 @@ public class EasySwfPanel extends JPanel {
 
             @Override
             public void pointsRemoved(List<Integer> positions) {
-                if (editingShape != null && shapeTool == ShapeTool.EDIT_POINTS && !positions.isEmpty()) {
+                if (shapeLayerEditable() && shapeTool == ShapeTool.EDIT_POINTS && !positions.isEmpty()) {
                     beginPointEdit();
                     if (pointEdit != null) {
                         pointEdit.removePoints(positions);
@@ -239,7 +265,7 @@ public class EasySwfPanel extends JPanel {
 
             @Override
             public boolean edgeSplit(int position, double splitPoint) {
-                if (editingShape != null && shapeTool == ShapeTool.EDIT_POINTS) {
+                if (shapeLayerEditable() && shapeTool == ShapeTool.EDIT_POINTS) {
                     beginPointEdit();
                     if (pointEdit != null) {
                         pointEdit.splitEdge(position, splitPoint);
@@ -253,27 +279,11 @@ public class EasySwfPanel extends JPanel {
         stagePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (shapeSelection == null || shapeTool != ShapeTool.SELECT || e.isConsumed() || e.getClickCount() != 1
+                if (editingShape == null || shapeTool != ShapeTool.SELECT || e.isConsumed() || e.getClickCount() != 1
                         || !SwingUtilities.isLeftMouseButton(e) || e.isAltDown()) {
                     return;
                 }
-                Point2D point = stagePanel.toTimelinedPoint(e.getPoint());
-                if (!e.isShiftDown()) {
-                    if (shapeSelection.hasFloatingSelection() && shapeSelectionContains(point)) {
-                        return;
-                    }
-                    finishFloatingSelection();
-                }
-                ShapeSelection.Selection selected = shapeSelection.select(point, 3, stagePanel.getTimelinedToPanelTransform());
-                List<ShapeSelection.Selection> next = ShapeSelection.updateSelection(selectedShapeParts, selected, e.isShiftDown());
-                if (next.isEmpty()) {
-                    finishFloatingSelection();
-                }
-                showShapeSelections(next);
-                if (rightTabbedPane.getSelectedIndex() != 2) {
-                    rightTabbedPane.setSelectedIndex(0);
-                }
-                updatePropertiesPanel();
+                selectShapeAt(stagePanel.toTimelinedPoint(e.getPoint()), e.isShiftDown());
             }
         });
 
@@ -640,7 +650,12 @@ public class EasySwfPanel extends JPanel {
             }
         });
 
-        verticalSplitPane = new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, timelinePanel, Configuration.guiSplitPaneEasyVerticalDividerLocationPercent);
+        shapeTimelinePanel = new ShapeTimelinePanel(this, this::selectShapeLayer, this::addShapeLayer,
+                this::removeShapeLayer, this::moveShapeLayer);
+        timelineArea = new JPanel(new CardLayout());
+        timelineArea.add(timelinePanel, "timeline");
+        timelineArea.add(shapeTimelinePanel, "shape");
+        verticalSplitPane = new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, timelineArea, Configuration.guiSplitPaneEasyVerticalDividerLocationPercent);
 
         libraryTreeTable = new LibraryTreeTable(this);
         JScrollPane libraryScrollPane = new FasterScrollPane(libraryTreeTable);
@@ -874,18 +889,23 @@ public class EasySwfPanel extends JPanel {
     }
 
     public void replaceShape(boolean updateBounds) {
-        if (editingShape == null || Main.isWorking()) {
+        if (editingShape == null || Main.isWorking() || shapeLayerStates.stream().anyMatch(state -> state.locked)) {
             return;
         }
         prepareShapeTransfer();
         ImagePanel.ShapeEditContext context = stagePanel.getShapeEditContext();
         Point2D origin = stagePanel.toTimelinedPoint(new Point(0, 0));
         SWF swf = editingShape.getSwf();
+        int layer = activeShapeLayer;
+        List<ShapeLayerState> beforeStates = shapeLayerStates;
         try {
             ShapeReplaceOperation operation = new ShapeReplaceOperation(editingShape,
                     mainPanel.translate(updateBounds ? "button.replaceNoFill" : "button.replace"), (tag, forward) -> {
+                        if (!forward) {
+                            shapeLayerStatesByTag.put(tag, beforeStates);
+                        }
                         mainPanel.refreshTree(tag.getSwf());
-                        editShape(tag, context);
+                        editShape(tag, context, forward ? 0 : layer);
                         if (context == null && !stagePanel.getZoom().fit) {
                             stagePanel.setViewPosition(origin);
                         }
@@ -909,11 +929,15 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void prepareShapeTransfer() {
+        finishPendingShapeEdit();
+        finishFloatingSelection();
+    }
+
+    private void finishPendingShapeEdit() {
         if (penTool.isPending()) {
             penTool.finish(false);
         }
         finishPointEdit(false);
-        finishFloatingSelection();
     }
 
     public void setShapeTool(ShapeTool tool) {
@@ -956,8 +980,8 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void selectFillTransform(Point2D point) {
-        ShapeSelection.RectangleSelection selection = shapeSelection.selectFillTransform(point, stagePanel.getTimelinedToPanelTransform());
-        shapeSelection = selection.model;
+        ShapeSelection.RectangleSelection selection = shapeModel(activeShapeLayer).selectFillTransform(point, stagePanel.getTimelinedToPanelTransform());
+        shapeModels.put(activeShapeLayer, selection.model);
         showShapeSelections(!selection.selected.isEmpty() && ShapeFillTransform.canTransform(selection.selected.get(0))
                 ? selection.selected : Collections.emptyList());
     }
@@ -994,7 +1018,7 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void beginFillTransform() {
-        fillTransformSession = new ShapeFillTransform(shapeSelection, selectedShapeParts);
+        fillTransformSession = new ShapeFillTransform(shapeModel(activeShapeLayer), selectedShapeParts);
         fillTransformEdit = null;
     }
 
@@ -1007,7 +1031,7 @@ public class EasySwfPanel extends JPanel {
         ShapeSelection.BatchEdit edit = fillTransformEdit;
         fillTransformSession = null;
         fillTransformEdit = null;
-        stagePanel.setShapePreview(null);
+        clearShapePreview();
         if (!canceled && edit != null && edit.changed) {
             applyShapeEdit(edit, EasyStrings.translate("action.transformFill"));
         } else if (shapeTool == ShapeTool.GRADIENT_TRANSFORM) {
@@ -1016,11 +1040,11 @@ public class EasySwfPanel extends JPanel {
     }
 
     private ShapeSelection.Selection styleAt(Point2D point) {
-        if (point == null || shapeSelection == null) {
+        if (point == null || editingShape == null) {
             return null;
         }
         double minimum = Configuration.useMinimumStrokeWidth1Px.get() ? SWF.unitDivisor / stagePanel.getZoom().value : 1;
-        return shapeSelection.sampleStyle(point, stagePanel.getParentMatrix().toTransform(), minimum);
+        return shapeModel(activeShapeLayer).sampleStyle(point, stagePanel.getParentMatrix().toTransform(), minimum);
     }
 
     private void previewStyleAt(Point2D point) {
@@ -1051,18 +1075,18 @@ public class EasySwfPanel extends JPanel {
     private void applyStyleAt(Point2D point) {
         ShapeSelection.BatchEdit edit;
         if (shapeTool == ShapeTool.PAINT) {
-            ShapeSelection.Selection region = shapeSelection.fillRegionAt(point);
+            ShapeSelection.Selection region = shapeModel(activeShapeLayer).fillRegionAt(point);
             if (region == null) {
                 return;
             }
-            edit = shapeSelection.setRegionFill(region, paintPropertiesPanel.getFillStyle(region.geometry.getBounds2D()));
+            edit = shapeModel(activeShapeLayer).setRegionFill(region, paintPropertiesPanel.getFillStyle(region.geometry.getBounds2D()));
         } else {
-            ShapeSelection.Selection region = shapeSelection.fillRegionAt(point);
+            ShapeSelection.Selection region = shapeModel(activeShapeLayer).fillRegionAt(point);
             if (region == null) {
                 return;
             }
             LINESTYLE2 line = inkPropertiesPanel.getStrokeStyle(region.geometry.getBounds2D());
-            edit = shapeSelection.outlineRegion(region, line);
+            edit = shapeModel(activeShapeLayer).outlineRegion(region, line);
         }
         if (edit.changed) {
             applyShapeEdit(edit, EasyStrings.translate(shapeTool == ShapeTool.PAINT ? "action.paintFill" : "action.inkStroke"));
@@ -1095,31 +1119,24 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void updateShapeTool() {
-        stagePanel.setShapeOriginVisible(editingShape != null && shapeTool == ShapeTool.ANCHOR_POINT);
-        if (shapeTool == ShapeTool.GRADIENT_TRANSFORM) {
+        unfilteredShapePreview = null;
+        boolean editable = shapeLayerEditable();
+        boolean anchorEditable = editable && shapeTool == ShapeTool.ANCHOR_POINT
+                && shapeLayerStates.stream().noneMatch(state -> state.hidden || state.locked);
+        stagePanel.setShapeOriginVisible(anchorEditable);
+        if (editable && shapeTool == ShapeTool.GRADIENT_TRANSFORM) {
             stagePanel.setGradientTransformGestureListeners(this::beginFillTransform, this::finishFillTransform);
         } else {
             stagePanel.clearGradientTransform();
             stagePanel.setGradientTransformGestureListeners(null, null);
         }
-        boolean selecting = editingShape != null && (shapeTool == ShapeTool.SELECT || shapeTool == ShapeTool.LASSO);
-        stagePanel.setAreaSelectionListener(!selecting ? null : (area, additive) -> {
-            if (!additive) {
-                finishFloatingSelection();
-            }
-            ShapeSelection.RectangleSelection selection = shapeSelection.selectArea(area, selectedShapeParts, additive);
-            shapeSelection = selection.model;
-            showShapeSelections(selection.selected);
-            if (rightTabbedPane.getSelectedIndex() != 2) {
-                rightTabbedPane.setSelectedIndex(0);
-            }
-            updatePropertiesPanel();
-        }, shapeTool == ShapeTool.LASSO);
+        boolean selecting = shapeSelectionTool();
+        stagePanel.setAreaSelectionListener(selecting ? this::selectShapeArea : null, shapeTool == ShapeTool.LASSO);
         stagePanel.setSelectionMoveListeners(!selecting ? null
                 : this::shapeSelectionContains,
                 !selecting ? null : this::moveShapeSelection);
         stagePanel.setSelectionDeleteListener(!selecting ? null : this::deleteShapeSelection);
-        boolean drawing = editingShape != null && drawingToolSelected();
+        boolean drawing = editable && (shapeTool == ShapeTool.ANCHOR_POINT ? anchorEditable : drawingToolSelected());
         stagePanel.setShapeDrawingTool(!drawing || clickToolSelected() || shapeTool == ShapeTool.ANCHOR_POINT || shapeTool == ShapeTool.PEN
                 ? null : this::drawingCursor,
                 !drawing ? null : shapeTool == ShapeTool.PEN ? penTool : new ImagePanel.ShapeDrawListener() {
@@ -1191,7 +1208,7 @@ public class EasySwfPanel extends JPanel {
                         styleClickStart = null;
                         drawingShapesPropertiesPanel.setOuterRadiusPending(false);
                         stagePanel.setShapeDrawingGuide(null);
-                        stagePanel.setShapePreview(null);
+                        clearShapePreview();
                     }
 
                     @Override
@@ -1220,7 +1237,7 @@ public class EasySwfPanel extends JPanel {
                         : shapeTool == ShapeTool.INK ? ImagePanel.ShapeDrawingPointer.INK
                                 : shapeTool == ShapeTool.EYEDROPPER ? ImagePanel.ShapeDrawingPointer.EYEDROPPER : ImagePanel.ShapeDrawingPointer.DEFAULT);
         updateFillTransformHandles();
-        if (editingShape != null && shapeTool == ShapeTool.EDIT_POINTS) {
+        if (editable && shapeTool == ShapeTool.EDIT_POINTS) {
             editingPoints = true;
             stagePanel.setPointEditGestureListeners(this::beginPointEdit, this::finishPointEdit);
             refreshShapePoints(Collections.emptyList());
@@ -1233,11 +1250,11 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void beginPointEdit() {
-        if (editingShape == null || shapeTool != ShapeTool.EDIT_POINTS) {
+        if (!shapeLayerEditable() || shapeTool != ShapeTool.EDIT_POINTS) {
             return;
         }
         try {
-            pointEdit = new ShapePointEdit(editingShape);
+            pointEdit = new ShapePointEdit(editingShape, shapeLayers.get(activeShapeLayer));
             pointEditDragging = true;
         } catch (IOException | InterruptedException ex) {
             logShapeEditFailure(ex);
@@ -1245,11 +1262,11 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void refreshShapePoints(List<Integer> selected) {
-        if (editingShape == null || shapeTool != ShapeTool.EDIT_POINTS) {
+        if (!shapeLayerEditable() || shapeTool != ShapeTool.EDIT_POINTS) {
             return;
         }
         try {
-            ShapePointEdit edit = new ShapePointEdit(editingShape);
+            ShapePointEdit edit = new ShapePointEdit(editingShape, shapeLayers.get(activeShapeLayer));
             stagePanel.setHilightedPoints(edit.getPoints(), edit.getPathStarts());
             stagePanel.setSelectedPointIndices(selected);
         } catch (IOException | InterruptedException ex) {
@@ -1262,12 +1279,27 @@ public class EasySwfPanel extends JPanel {
         pointEdit = null;
         pointEditDragging = false;
         List<Integer> selected = stagePanel.getSelectedPointIndices();
-        stagePanel.setShapePreview(null);
+        clearShapePreview();
         if (canceled || edit == null || !edit.isChanged()) {
             refreshShapePoints(selected);
             return;
         }
-        applyShapeTagEdit(edit.getShape(), EasyStrings.translate("action.editShapePoints"), selected);
+        try {
+            applyShapeTagEdit(createShapeWithEditedLayer(edit.getShape()),
+                    EasyStrings.translate("action.editShapePoints"), selected, activeShapeLayer);
+        } catch (IOException | InterruptedException ex) {
+            logShapeEditFailure(ex);
+            refreshShapePoints(selected);
+        }
+    }
+
+    private ShapeTag createShapeWithEditedLayer(ShapeTag editedLayer) throws IOException, InterruptedException {
+        if (shapeLayers.size() == 1) {
+            return editedLayer;
+        }
+        List<SHAPEWITHSTYLE> layers = new ArrayList<>(shapeLayers);
+        layers.set(activeShapeLayer, editedLayer.getShapes());
+        return ShapeStyleChangeOperation.createShape(editingShape, layers);
     }
 
     private void moveWholeShape(Point2D point, boolean finished) {
@@ -1278,34 +1310,55 @@ public class EasySwfPanel extends JPanel {
             ShapeTag moved = anchorMove.moveTo(point);
             if (finished) {
                 anchorMove = null;
-                stagePanel.setShapePreview(null);
+                clearShapePreview();
                 if (moved != null) {
-                    applyShapeTagEdit(moved, EasyStrings.translate("action.move"), Collections.emptyList());
+                    applyShapeTagEdit(moved, EasyStrings.translate("action.move"), Collections.emptyList(), activeShapeLayer);
                 }
             } else {
-                stagePanel.setShapePreview(moved);
+                previewShape(moved);
             }
         } catch (IOException | InterruptedException ex) {
             anchorMove = null;
-            stagePanel.setShapePreview(null);
+            clearShapePreview();
             logShapeEditFailure(ex);
         }
     }
 
-    private void applyShapeTagEdit(ShapeTag edited, String description, List<Integer> selected) {
+    private void applyShapeTagEdit(ShapeTag edited, String description, List<Integer> selected, int afterLayer) {
+        applyShapeTagEdit(edited, description, selected, afterLayer, shapeLayerStates);
+    }
+
+    private void applyShapeTagEdit(ShapeTag edited, String description, List<Integer> selected, int afterLayer,
+            List<ShapeLayerState> afterStates) {
+        applyShapeTagEdit(edited, description, selected, afterLayer, afterStates, null);
+    }
+
+    private void applyShapeTagEdit(ShapeTag edited, String description, List<Integer> selected, int afterLayer,
+            List<ShapeLayerState> afterStates, Consumer<Boolean> restoreSelection) {
+        List<ShapeLayerState> beforeStates = shapeLayerStates;
+        int beforeLayer = activeShapeLayer;
         ImagePanel.ShapeEditContext context = stagePanel.getShapeEditContext();
         try {
             undoManager.doOperation(new ShapeStyleChangeOperation(editingShape, edited, description, (tag, forward) -> {
+                int activeTab = rightTabbedPane.getSelectedIndex();
                 Point2D origin = stagePanel.toTimelinedPoint(new Point(0, 0));
                 boolean sameShape = editingShape != null && editingShape.getSwf() == tag.getSwf()
                         && editingShape.getCharacterId() == tag.getCharacterId();
                 ImagePanel.ShapeEditContext active = stagePanel.getShapeEditContext();
                 boolean preserveView = sameShape && context == null && active == null && !stagePanel.getZoom().fit;
-                editShape(tag, sameShape && context != null && context.sameLocation(active) ? active : context);
+                shapeLayerStatesByTag.put(tag, forward ? afterStates : beforeStates);
+                editShape(tag, sameShape && context != null && context.sameLocation(active) ? active : context,
+                        forward ? afterLayer : beforeLayer);
                 if (preserveView) {
                     stagePanel.setViewPosition(origin);
                 }
                 refreshShapePoints(selected);
+                if (restoreSelection != null) {
+                    if (activeTab == 2 && rightTabbedPane.isEnabledAt(activeTab)) {
+                        rightTabbedPane.setSelectedIndex(activeTab);
+                    }
+                    restoreSelection.accept(forward);
+                }
                 libraryTreeTable.setSwf(null);
                 libraryTreeTable.setSwf(tag.getSwf());
                 mainPanel.refreshTree(tag.getSwf());
@@ -1330,7 +1383,7 @@ public class EasySwfPanel extends JPanel {
         Path2D.Double path = finished ? pen.getPath() : pen.getPreviewPath();
         Rectangle2D bounds = path.getBounds2D();
         LINESTYLE2 line = penPropertiesPanel.getStrokeStyle(bounds);
-        applyDrawing(shapeSelection.drawShape(path, penPropertiesPanel.getFillStyle(bounds), line),
+        applyDrawing(shapeModel(activeShapeLayer).drawShape(path, penPropertiesPanel.getFillStyle(bounds), line),
                 EasyStrings.translate("action.pen"), finished);
     }
 
@@ -1342,7 +1395,7 @@ public class EasySwfPanel extends JPanel {
         boolean finished = released && shapeDrawing.release();
         Shape geometry = shapeDrawing.getGeometry();
         Rectangle2D bounds = geometry.getBounds2D();
-        ShapeSelection.BatchEdit edit = shapeSelection.drawShape(geometry, drawingShapesPropertiesPanel.getFill(bounds),
+        ShapeSelection.BatchEdit edit = shapeModel(activeShapeLayer).drawShape(geometry, drawingShapesPropertiesPanel.getFill(bounds),
                 drawingShapesPropertiesPanel.getStroke(bounds));
         stagePanel.setShapeDrawingGuide(finished ? null : shapeDrawing.getGuide());
         drawingShapesPropertiesPanel.setOuterRadiusPending(!finished && shapeDrawing.isAwaitingOuterRadius());
@@ -1361,10 +1414,10 @@ public class EasySwfPanel extends JPanel {
         boolean erasing = shapeTool == ShapeTool.ERASER;
         ShapeSelection.BatchEdit edit;
         if (erasing) {
-            edit = shapeSelection.erase(area, stagePanel.getParentMatrix().toTransform());
+            edit = shapeModel(activeShapeLayer).erase(area, stagePanel.getParentMatrix().toTransform());
         } else {
             FILLSTYLE fill = brushPropertiesPanel.getFillStyle(area.getBounds2D());
-            edit = shapeSelection.paint(area, fill);
+            edit = shapeModel(activeShapeLayer).paint(area, fill);
         }
         if (finished) {
             brushStroke = null;
@@ -1383,7 +1436,7 @@ public class EasySwfPanel extends JPanel {
         double halfWidth = line == null ? 0 : line.width / 2.0;
         line = pencilPropertiesPanel.getStrokeStyle(new Rectangle2D.Double(bounds.getX() - halfWidth, bounds.getY() - halfWidth,
                 bounds.getWidth() + 2 * halfWidth, bounds.getHeight() + 2 * halfWidth));
-        ShapeSelection.BatchEdit edit = shapeSelection.drawStroke(path, line);
+        ShapeSelection.BatchEdit edit = shapeModel(activeShapeLayer).drawStroke(path, line);
         if (finished) {
             pencilStroke = null;
         }
@@ -1392,13 +1445,13 @@ public class EasySwfPanel extends JPanel {
 
     private void applyDrawing(ShapeSelection.BatchEdit edit, String description, boolean finished) {
         if (finished || !edit.changed) {
-            stagePanel.setShapePreview(null);
+            clearShapePreview();
             if (finished && edit.changed) {
                 applyShapeEdit(edit, description);
             }
         } else {
             try {
-                stagePanel.setShapePreview(ShapeStyleChangeOperation.createShape(editingShape, edit.model));
+                previewShape(ShapeStyleChangeOperation.createShape(editingShape, shapeLayers, activeShapeLayer, edit.model));
             } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(EasySwfPanel.class.getName()).log(Level.SEVERE, "Cannot preview drawing", ex);
                 if (ex instanceof InterruptedException) {
@@ -1409,53 +1462,256 @@ public class EasySwfPanel extends JPanel {
     }
 
     public void editShape(ShapeTag shape) {
-        setTimelined(TimelinedMaker.makeTimelined(shape), true, shape);
+        editShape(shape, null, 0);
+    }
+
+    private void editShape(ShapeTag shape, ImagePanel.ShapeEditContext context, int layer) {
+        if (context == null) {
+            setTimelined(TimelinedMaker.makeTimelined(shape), true, shape, layer);
+        } else {
+            updatingTimelined = true;
+            try {
+                stagePanel.restoreShapeEditContext(shape, context);
+                updateTimelined(stagePanel.getTimelined(), false, shape, layer);
+            } finally {
+                updatingTimelined = false;
+            }
+        }
         rightTabbedPane.setSelectedIndex(0);
     }
 
-    private void editShape(ShapeTag shape, ImagePanel.ShapeEditContext context) {
-        if (context == null) {
-            editShape(shape);
+    void selectShapeLayerContents(int layer) {
+        selectShapeLayer(layer, shapeSelectionTool());
+    }
+
+    private void selectShapeLayer(int layer) {
+        selectShapeLayer(layer, false);
+    }
+
+    private void selectShapeLayer(int layer, boolean selectContents) {
+        if (!selectContents && layer == activeShapeLayer && shapeSelections.isEmpty()) {
             return;
         }
-        updatingTimelined = true;
-        try {
-            stagePanel.restoreShapeEditContext(shape, context);
-            updateTimelined(stagePanel.getTimelined(), false, shape);
-        } finally {
-            updatingTimelined = false;
+        prepareShapeTransfer();
+        activeShapeLayer = layer;
+        shapeModels.clear();
+        eyedropperSample = null;
+        eyedropperPropertiesPanel.setSample(null);
+        showShapeSelections(selectContents && shapeLayerEditable() ? shapeModel(layer).selectAll() : Collections.emptyList());
+        updateShapeTool();
+        updatePropertiesPanel();
+    }
+
+    private ShapeSelection shapeModel(int layer) {
+        return shapeModels.computeIfAbsent(layer, index -> new ShapeSelection(editingShape, shapeLayers.get(index)));
+    }
+
+    private void selectShapeAt(Point2D point, boolean additive) {
+        AffineTransform transform = stagePanel.getTimelinedToPanelTransform();
+        if (!additive) {
+            if (isFloatingSelectionAt(point, transform)) {
+                return;
+            }
+            finishFloatingSelection();
         }
-        rightTabbedPane.setSelectedIndex(0);
+        Map<Integer, List<ShapeSelection.Selection>> selected = additive ? new LinkedHashMap<>(shapeSelections) : new LinkedHashMap<>();
+        for (int layer = shapeLayers.size() - 1; layer >= 0; layer--) {
+            if (!shapeLayerEditable(layer)) {
+                continue;
+            }
+            ShapeSelection.Selection hit = shapeModel(layer).select(point, 3, transform);
+            if (hit == null) {
+                continue;
+            }
+            List<ShapeSelection.Selection> next = ShapeSelection.updateSelection(selected.getOrDefault(layer, Collections.emptyList()), hit, additive);
+            if (next.isEmpty()) {
+                selected.remove(layer);
+            } else {
+                selected.put(layer, next);
+                activeShapeLayer = layer;
+            }
+            break;
+        }
+        if (selected.isEmpty()) {
+            finishFloatingSelection();
+        }
+        showStageSelection(selected);
+    }
+
+    private boolean isFloatingSelectionAt(Point2D point, AffineTransform transform) {
+        if (shapeModels.values().stream().noneMatch(ShapeSelection::hasFloatingSelection) || !shapeSelectionContains(point)) {
+            return false;
+        }
+        for (int layer = shapeLayers.size() - 1; layer >= 0; layer--) {
+            if (shapeLayerEditable(layer) && shapeModel(layer).select(point, 3, transform) != null) {
+                return shapeModel(layer).selectionContains(shapeSelections.getOrDefault(layer, Collections.emptyList()), point, 3, transform);
+            }
+        }
+        return false;
+    }
+
+    private void selectShapeArea(Shape area, boolean additive) {
+        if (!additive) {
+            finishFloatingSelection();
+        }
+        Map<Integer, List<ShapeSelection.Selection>> selected = new LinkedHashMap<>();
+        for (int layer = 0; layer < shapeLayers.size(); layer++) {
+            if (!shapeLayerEditable(layer)) {
+                continue;
+            }
+            ShapeSelection.RectangleSelection result = shapeModel(layer).selectArea(area,
+                    shapeSelections.getOrDefault(layer, Collections.emptyList()), additive);
+            if (!result.selected.isEmpty()) {
+                shapeModels.put(layer, result.model);
+                selected.put(layer, result.selected);
+            }
+        }
+        showStageSelection(selected);
+    }
+
+    private void showStageSelection(Map<Integer, List<ShapeSelection.Selection>> selected) {
+        showLayerSelections(selected);
+        if (rightTabbedPane.getSelectedIndex() != 2) {
+            rightTabbedPane.setSelectedIndex(0);
+        }
+        updatePropertiesPanel();
+    }
+
+    private void addShapeLayer(int layer) {
+        prepareShapeTransfer();
+        List<SHAPEWITHSTYLE> layers = new ArrayList<>(shapeLayers);
+        int inserted = layer + 1;
+        layers.add(inserted, SHAPEWITHSTYLE.createEmpty(editingShape.getShapeNum()));
+        List<ShapeLayerState> states = new ArrayList<>(shapeLayerStates);
+        states.add(inserted, new ShapeLayerState());
+        applyShapeLayers(layers, states, inserted, "timeline.shape.addLayer");
+    }
+
+    private void removeShapeLayer(int layer) {
+        if (shapeLayers.size() <= 1 || isShapeLayerLocked(layer)) {
+            return;
+        }
+        prepareShapeTransfer();
+        List<SHAPEWITHSTYLE> layers = new ArrayList<>(shapeLayers);
+        layers.remove(layer);
+        List<ShapeLayerState> states = new ArrayList<>(shapeLayerStates);
+        states.remove(layer);
+        // Keep the active layer if it survives. Otherwise prefer the layer below.
+        int next = activeShapeLayer < layer ? activeShapeLayer : Math.max(0, activeShapeLayer - 1);
+        applyShapeLayers(layers, states, next, "timeline.shape.removeLayer");
+    }
+
+    private void moveShapeLayer(int source, int destination) {
+        if (source == destination) {
+            return;
+        }
+        finishPendingShapeEdit();
+        List<SHAPEWITHSTYLE> layers = new ArrayList<>(shapeLayers);
+        layers.add(destination, layers.remove(source));
+        List<ShapeLayerState> states = new ArrayList<>(shapeLayerStates);
+        states.add(destination, states.remove(source));
+        int nextLayer = movedShapeLayerIndex(activeShapeLayer, source, destination);
+
+        Map<Integer, List<ShapeSelection.Selection>> previous = shapeSelections;
+        Map<Integer, ShapeSelection> previousModels = new HashMap<>();
+        shapeModels.forEach((index, model) -> {
+            if (previous.containsKey(index) || model.hasFloatingSelection()) {
+                previousModels.put(index, model);
+            }
+        });
+        ShapeSelectionTransform.State transformState = stagePanel.getShapeSelectionTransformState();
+        try {
+            ShapeTag edited = ShapeStyleChangeOperation.createShape(editingShape, layers);
+            applyShapeTagEdit(edited, EasyStrings.translate("timeline.shape.moveLayer"),
+                    stagePanel.getSelectedPointIndices(), nextLayer, states, forward -> {
+                        Map<Integer, List<ShapeSelection.Selection>> selection = new LinkedHashMap<>();
+                        previousModels.forEach((index, model) -> {
+                            int moved = forward ? movedShapeLayerIndex(index, source, destination) : index;
+                            if (shapeLayerEditable(moved)) {
+                                shapeModels.put(moved, model);
+                            }
+                        });
+                        previous.forEach((index, parts) -> selection.put(forward ? movedShapeLayerIndex(index, source, destination) : index, parts));
+                        if (!selection.isEmpty()) {
+                            showLayerSelections(selection);
+                            if (!selectedShapeParts.isEmpty()) {
+                                shapeTransformState = transformState;
+                                stagePanel.restoreShapeSelectionTransformState(transformState);
+                            }
+                        }
+                    });
+        } catch (IOException | InterruptedException ex) {
+            logShapeEditFailure(ex);
+        }
+    }
+
+    private static int movedShapeLayerIndex(int index, int source, int destination) {
+        if (index == source) {
+            return destination;
+        }
+        if (source < index && index <= destination) {
+            return index - 1;
+        }
+        if (destination <= index && index < source) {
+            return index + 1;
+        }
+        return index;
+    }
+
+    private void applyShapeLayers(List<SHAPEWITHSTYLE> layers, List<ShapeLayerState> states, int activeLayer, String action) {
+        try {
+            ShapeTag edited = ShapeStyleChangeOperation.createShape(editingShape, layers);
+            applyShapeTagEdit(edited, EasyStrings.translate(action), Collections.emptyList(), activeLayer, states);
+        } catch (IOException | InterruptedException ex) {
+            logShapeEditFailure(ex);
+        }
     }
 
     private void showShapeSelections(List<ShapeSelection.Selection> selected) {
+        showLayerSelections(Collections.singletonMap(activeShapeLayer, selected));
+    }
+
+    private void showLayerSelections(Map<Integer, List<ShapeSelection.Selection>> selected) {
+        shapeSelections = new LinkedHashMap<>();
+        for (Map.Entry<Integer, List<ShapeSelection.Selection>> entry : selected.entrySet()) {
+            if (!entry.getValue().isEmpty() && shapeLayerEditable(entry.getKey())) {
+                shapeSelections.put(entry.getKey(), entry.getValue());
+            }
+        }
+        if (!shapeSelections.isEmpty() && !shapeSelections.containsKey(activeShapeLayer)) {
+            activeShapeLayer = Collections.max(shapeSelections.keySet());
+        }
+        shapeTimelinePanel.setSelection(activeShapeLayer, shapeSelections.keySet());
         stagePanel.setShapeSelectionTransform(null, null);
         shapeTransformState = null;
+        selectedShapeParts = highlightShapeSelections(this::shapeModel, shapeSelections);
         if (shapeTool == ShapeTool.EDIT_POINTS) {
-            selectedShapeParts = new ArrayList<>();
             refreshShapePoints(Collections.emptyList());
             return;
         }
-        selectedShapeParts = highlightShapeSelections(shapeSelection, selected);
         shapePropertiesPanel.setSelections(selectedShapeParts);
         updateFillTransformHandles();
         updateShapeSelectionTransform();
     }
 
-    private List<ShapeSelection.Selection> highlightShapeSelections(ShapeSelection model, List<ShapeSelection.Selection> selected) {
+    private List<ShapeSelection.Selection> highlightShapeSelections(IntFunction<ShapeSelection> models,
+            Map<Integer, List<ShapeSelection.Selection>> selected) {
         List<ShapeSelection.Selection> displayed = new ArrayList<>();
         List<java.awt.Shape> fills = new ArrayList<>();
         List<ImagePanel.LineHilight> lines = new ArrayList<>();
-        for (ShapeSelection.Selection item : selected) {
-            ShapeSelection.Selection current = model.displaySelection(item);
-            displayed.add(current);
-            if (shapeTool == ShapeTool.GRADIENT_TRANSFORM) {
-                continue;
-            }
-            if (current.stroke && current.line != null) {
-                lines.add(new ImagePanel.LineHilight(current.area, current.linePath, current.line));
-            } else if (!current.stroke) {
-                fills.add(current.area);
+        for (Map.Entry<Integer, List<ShapeSelection.Selection>> entry : selected.entrySet()) {
+            ShapeSelection model = models.apply(entry.getKey());
+            for (ShapeSelection.Selection item : entry.getValue()) {
+                ShapeSelection.Selection current = model.displaySelection(item);
+                displayed.add(current);
+                if (shapeTool == ShapeTool.GRADIENT_TRANSFORM) {
+                    continue;
+                }
+                if (current.stroke && current.line != null) {
+                    lines.add(new ImagePanel.LineHilight(current.area, current.linePath, current.line));
+                } else if (!current.stroke) {
+                    fills.add(current.area);
+                }
             }
         }
         stagePanel.setHilightedShapes(fills, lines);
@@ -1489,118 +1745,164 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void moveShapeSelection(Point2D delta, boolean commit) {
-        if (editingShape == null || selectedShapeParts.isEmpty()) {
+        Map<Integer, ShapeSelection.BatchEdit> edits = editShapeSelections(
+                (model, selected) -> model.moveFloatingSelection(selected, delta.getX(), delta.getY()));
+        if (!commit || edits.isEmpty()) {
+            previewShapeSelections(edits);
             return;
         }
-        ShapeSelection.BatchEdit edit = shapeSelection.moveFloatingSelection(selectedShapeParts, delta.getX(), delta.getY());
-        if (commit || !edit.changed) {
-            stagePanel.setShapePreview(null);
-        }
-        if (!edit.changed) {
-            showShapeSelections(selectedShapeParts);
-        } else if (commit) {
-            ShapeSelectionTransform.State before = shapeTransformState;
-            applyShapeEdit(edit, EasyStrings.translate("action.move"), before,
-                    before == null ? null : before.transformed(Matrix.getTranslateInstance(Math.rint(delta.getX()), Math.rint(delta.getY()))));
-        } else {
-            try {
-                stagePanel.setShapePreview(ShapeStyleChangeOperation.createShape(editingShape, edit.model));
-                highlightShapeSelections(edit.model, edit.selected);
-            } catch (IOException | InterruptedException ex) {
-                Logger.getLogger(EasySwfPanel.class.getName()).log(Level.SEVERE, "Cannot preview shape move", ex);
-                if (ex instanceof InterruptedException) {
-                    Thread.currentThread().interrupt();
-                }
-                stagePanel.setShapePreview(null);
-                showShapeSelections(selectedShapeParts);
-            }
-        }
+        clearShapePreview();
+        ShapeSelectionTransform.State before = shapeTransformState;
+        applyShapeEdits(edits, EasyStrings.translate("action.move"), before,
+                before == null ? null : before.transformed(Matrix.getTranslateInstance(Math.rint(delta.getX()), Math.rint(delta.getY()))));
     }
 
     private void finishFloatingSelection() {
-        if (editingShape != null && shapeSelection != null && shapeSelection.hasFloatingSelection()) {
-            applyShapeEdit(shapeSelection.mergeFloatingSelection(), EasyStrings.translate("action.move"));
+        finishFloatingSelection(-1);
+    }
+
+    private void finishFloatingSelection(int layer) {
+        Map<Integer, ShapeSelection.BatchEdit> edits = new LinkedHashMap<>();
+        for (Map.Entry<Integer, ShapeSelection> entry : shapeModels.entrySet()) {
+            int index = entry.getKey();
+            if ((layer < 0 || layer == index) && shapeLayerEditable(index) && entry.getValue().hasFloatingSelection()) {
+                edits.put(index, entry.getValue().mergeFloatingSelection());
+            }
         }
+        applyShapeEdits(edits, EasyStrings.translate("action.move"));
     }
 
     private void transformShapeSelection(Matrix matrix, boolean commit) {
-        if (!shapeSelectionTool() || selectedShapeParts.isEmpty()) {
+        if (!shapeSelectionTool() || shapeSelections.isEmpty()) {
             return;
         }
-        ShapeSelection.BatchEdit edit = shapeSelection.transformFloatingSelection(selectedShapeParts, matrix.toTransform());
-        if (commit) {
-            stagePanel.setShapePreview(null);
-            if (edit.changed) {
-                ShapeSelectionTransform.State before = stagePanel.getShapeSelectionTransformState();
-                applyShapeEdit(edit, EasyStrings.translate("action.transform"), before, before == null ? null : before.transformed(matrix));
-            }
+        Map<Integer, ShapeSelection.BatchEdit> edits = editShapeSelections(
+                (model, selected) -> model.transformFloatingSelection(selected, matrix.toTransform()));
+        if (commit && !edits.isEmpty()) {
+            clearShapePreview();
+            ShapeSelectionTransform.State before = stagePanel.getShapeSelectionTransformState();
+            applyShapeEdits(edits, EasyStrings.translate("action.transform"), before, before == null ? null : before.transformed(matrix));
         } else {
-            applyDrawing(edit, EasyStrings.translate("action.transform"), false);
-            highlightShapeSelections(edit.model, edit.selected);
+            previewShapeSelections(edits);
         }
     }
 
-    private void deleteShapeSelection() {
-        if (editingShape == null || selectedShapeParts.isEmpty()) {
+    void deleteShapeSelection() {
+        if (!shapeSelectionTool() || shapeSelections.isEmpty()) {
             return;
         }
-        stagePanel.setShapePreview(null);
-        ShapeSelection.BatchEdit edit = shapeSelection.deleteAll(selectedShapeParts);
-        if (edit.changed) {
-            applyShapeEdit(edit, EasyStrings.translate("action.deleteShapeSelection"));
-        } else {
-            showShapeSelections(edit.selected);
-        }
+        clearShapePreview();
+        applyShapeEdits(editShapeSelections(ShapeSelection::deleteAll), EasyStrings.translate("action.deleteShapeSelection"));
     }
 
     private void changeShapeStyle(boolean stroke, String property) {
-        if (editingShape == null || selectedShapeParts.stream().noneMatch(item -> item.stroke == stroke)) {
+        if (selectedShapeParts.stream().noneMatch(item -> item.stroke == stroke)) {
             return;
         }
-        List<ShapeSelection.Selection> previous = new ArrayList<>(selectedShapeParts);
         if (!shapePropertiesPanel.isPropertyChangeValid(stroke, property)) {
-            showShapeSelections(previous);
+            showLayerSelections(shapeSelections);
             return;
         }
-        ShapeSelection.BatchEdit edit = shapeSelection.changeAll(previous,
+        Map<Integer, ShapeSelection.BatchEdit> edits = editShapeSelections((model, selected) -> model.changeAll(selected,
                 stroke ? null : item -> shapePropertiesPanel.applyFillChange(item.fill, item.geometry.getBounds2D(), property),
-                stroke ? item -> shapePropertiesPanel.applyStrokeChange(item.line, item.area.getBounds2D(), property) : null);
-        if (!edit.changed) {
-            showShapeSelections(previous);
-            return;
-        }
+                stroke ? item -> shapePropertiesPanel.applyStrokeChange(item.line, item.area.getBounds2D(), property) : null));
         String description = EasyStrings.translate("action.change").replace("%item%",
                 EasyStrings.translate("properties.shape.header." + (stroke ? "stroke" : "fill")));
-        applyShapeEdit(edit, description);
+        if (edits.isEmpty()) {
+            showLayerSelections(shapeSelections);
+        }
+        applyShapeEdits(edits, description);
+    }
+
+    private Map<Integer, ShapeSelection.BatchEdit> editShapeSelections(
+            BiFunction<ShapeSelection, List<ShapeSelection.Selection>, ShapeSelection.BatchEdit> operation) {
+        Map<Integer, ShapeSelection.BatchEdit> edits = new LinkedHashMap<>();
+        for (Map.Entry<Integer, List<ShapeSelection.Selection>> entry : shapeSelections.entrySet()) {
+            ShapeSelection.BatchEdit edit = operation.apply(shapeModel(entry.getKey()), entry.getValue());
+            if (edit.changed) {
+                edits.put(entry.getKey(), edit);
+            }
+        }
+        return edits;
+    }
+
+    private ShapeTag createEditedShape(Map<Integer, ShapeSelection.BatchEdit> edits) throws IOException, InterruptedException {
+        Map<Integer, ShapeSelection> models = new HashMap<>();
+        edits.forEach((layer, edit) -> models.put(layer, edit.model));
+        return ShapeStyleChangeOperation.createShape(editingShape, shapeLayers, models);
+    }
+
+    private Map<Integer, List<ShapeSelection.Selection>> selectionsAfter(Map<Integer, ShapeSelection.BatchEdit> edits) {
+        Map<Integer, List<ShapeSelection.Selection>> selected = new LinkedHashMap<>(shapeSelections);
+        edits.forEach((layer, edit) -> selected.put(layer, edit.selected));
+        return selected;
+    }
+
+    private void previewShapeSelections(Map<Integer, ShapeSelection.BatchEdit> edits) {
+        if (!edits.isEmpty()) {
+            try {
+                previewShape(createEditedShape(edits));
+                highlightShapeSelections(layer -> edits.containsKey(layer) ? edits.get(layer).model : shapeModel(layer), selectionsAfter(edits));
+                return;
+            } catch (IOException | InterruptedException ex) {
+                logShapeEditFailure(ex);
+            }
+        }
+        clearShapePreview();
+        highlightShapeSelections(this::shapeModel, shapeSelections);
     }
 
     private void applyShapeEdit(ShapeSelection.BatchEdit edit, String description) {
+        if (shapeLayerEditable()) {
+            applyShapeEdits(Collections.singletonMap(activeShapeLayer, edit), description);
+        }
+    }
+
+    private void applyShapeEdits(Map<Integer, ShapeSelection.BatchEdit> edits, String description) {
         ShapeSelectionTransform.State state = stagePanel.getShapeSelectionTransformState();
         if (state == null) {
             state = shapeTransformState;
         }
-        applyShapeEdit(edit, description, state, state);
+        applyShapeEdits(edits, description, state, state);
     }
 
-    private void applyShapeEdit(ShapeSelection.BatchEdit edit, String description,
+    private void applyShapeEdits(Map<Integer, ShapeSelection.BatchEdit> edits, String description,
             ShapeSelectionTransform.State beforeTransform, ShapeSelectionTransform.State afterTransform) {
-        List<ShapeSelection.Selection> previous = new ArrayList<>(selectedShapeParts);
-        ShapeSelection beforeModel = shapeSelection;
+        if (edits.isEmpty()) {
+            return;
+        }
+        List<ShapeLayerState> states = shapeLayerStates;
+        Map<Integer, List<ShapeSelection.Selection>> previous = shapeSelections;
+        Map<Integer, List<ShapeSelection.Selection>> next = selectionsAfter(edits);
+        Map<Integer, ShapeSelection> beforeModels = new HashMap<>();
+        shapeModels.forEach((index, model) -> {
+            if (previous.containsKey(index) || edits.containsKey(index) || model.hasFloatingSelection()) {
+                beforeModels.put(index, model);
+            }
+        });
+        int layer = activeShapeLayer;
         ImagePanel.ShapeEditContext context = stagePanel.getShapeEditContext();
         try {
-            undoManager.doOperation(new ShapeStyleChangeOperation(editingShape, edit.model, description, (tag, forward) -> {
+            ShapeTag edited = createEditedShape(edits);
+            undoManager.doOperation(new ShapeStyleChangeOperation(editingShape, edited, description, (tag, forward) -> {
                 int activeTab = rightTabbedPane.getSelectedIndex();
                 Point2D origin = stagePanel.toTimelinedPoint(new Point(0, 0));
                 boolean sameShape = editingShape != null && editingShape.getSwf() == tag.getSwf()
                         && editingShape.getCharacterId() == tag.getCharacterId();
                 ImagePanel.ShapeEditContext activeContext = stagePanel.getShapeEditContext();
                 boolean preserveView = sameShape && context == null && activeContext == null && !stagePanel.getZoom().fit;
-                editShape(tag, sameShape && context != null && context.sameLocation(activeContext) ? activeContext : context);
-                shapeSelection = forward ? edit.committedModel(tag) : beforeModel;
+                shapeLayerStatesByTag.put(tag, states);
+                editShape(tag, sameShape && context != null && context.sameLocation(activeContext) ? activeContext : context, layer);
+                beforeModels.forEach((index, model) -> {
+                    if (shapeLayerEditable(index)) {
+                        ShapeSelection.BatchEdit edit = edits.get(index);
+                        shapeModels.put(index, forward && edit != null ? edit.committedModel(tag, shapeLayers.get(index)) : model);
+                    }
+                });
                 if (preserveView) {
                     stagePanel.setViewPosition(origin);
                 }
-                showShapeSelections(forward ? edit.selected : previous);
+                showLayerSelections(forward ? next : previous);
                 if (activeTab == 2 && rightTabbedPane.isEnabledAt(activeTab)) {
                     rightTabbedPane.setSelectedIndex(activeTab);
                 }
@@ -1613,11 +1915,8 @@ public class EasySwfPanel extends JPanel {
                 mainPanel.refreshTree(tag.getSwf());
             }), editingShape.getSwf());
         } catch (IOException | InterruptedException ex) {
-            Logger.getLogger(EasySwfPanel.class.getName()).log(Level.SEVERE, "Cannot edit shape", ex);
-            if (ex instanceof InterruptedException) {
-                Thread.currentThread().interrupt();
-            }
-            showShapeSelections(previous);
+            logShapeEditFailure(ex);
+            showLayerSelections(previous);
         }
     }
 
@@ -1630,6 +1929,10 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void setTimelined(Timelined timelined, boolean updateStage, ShapeTag shape) {
+        setTimelined(timelined, updateStage, shape, 0);
+    }
+
+    private void setTimelined(Timelined timelined, boolean updateStage, ShapeTag shape, int layer) {
         if (this.timelined == timelined) {
             return;
         }
@@ -1643,19 +1946,32 @@ public class EasySwfPanel extends JPanel {
         }
         updatingTimelined = true;
         try {
-            updateTimelined(timelined, updateStage, shape);
+            updateTimelined(timelined, updateStage, shape, layer);
         } finally {
             updatingTimelined = false;
         }
     }
 
-    private void updateTimelined(Timelined timelined, boolean updateStage, ShapeTag shape) {
+    private void updateTimelined(Timelined timelined, boolean updateStage, ShapeTag shape, int layer) {
         if (shape == null || editingShape == null || shape.getSwf() != editingShape.getSwf()
                 || shape.getCharacterId() != editingShape.getCharacterId()) {
             shapeTool = ShapeTool.SELECT;
         }
         editingShape = shape;
-        shapeSelection = shape == null ? null : new ShapeSelection(shape);
+        shapeLayers = shape == null ? Collections.emptyList() : ShapeLayers.split(shape.getShapes(), shape.getShapeNum());
+        shapeLayerStates = shape == null ? Collections.emptyList() : shapeLayerStatesByTag.compute(shape, (tag, states) -> {
+            if (states != null && states.size() == shapeLayers.size()) {
+                return states;
+            }
+            List<ShapeLayerState> newStates = new ArrayList<>();
+            for (int i = 0; i < shapeLayers.size(); i++) {
+                newStates.add(new ShapeLayerState());
+            }
+            return newStates;
+        });
+        activeShapeLayer = shape == null ? 0 : Math.min(layer, shapeLayers.size() - 1);
+        shapeModels.clear();
+        shapeSelections = Collections.emptyMap();
         selectedShapeParts = new ArrayList<>();
         shapeTransformState = null;
         stagePanel.setShapeSelectionTransform(null, null);
@@ -1665,7 +1981,8 @@ public class EasySwfPanel extends JPanel {
         stagePanel.setAltSelectionEnabled(editingShape == null);
         updateShapeTool();
         stagePanel.setTransformSelectionMode(transformEnabled());
-        timelinePanel.setVisible(editingShape == null);
+        ((CardLayout) timelineArea.getLayout()).show(timelineArea, editingShape == null ? "timeline" : "shape");
+        shapeTimelinePanel.setLayers(shapeLayers, activeShapeLayer);
         rightTabbedPane.setEnabledAt(2, editingShape == null || shapeSelectionTool());
         transformPanel.setVisible(false);
         shapePropertiesPanel.setShape(editingShape);
@@ -1718,6 +2035,7 @@ public class EasySwfPanel extends JPanel {
             instancePropertiesPanel.update();
             textInstancePropertiesPanel.update();
         }
+        refreshShapeDisplay();
         updatePropertiesPanel();
         updateUndos();
         refreshShapePoints(Collections.emptyList());
@@ -1749,6 +2067,101 @@ public class EasySwfPanel extends JPanel {
         }
         updatePropertiesPanel();
         Main.getMainFrame().getPanel().updateUiWithCurrentOpenable();        
+    }
+
+    boolean isShapeLayerHidden(int layer) {
+        return shapeLayerStates.get(layer).hidden;
+    }
+
+    boolean isShapeLayerLocked(int layer) {
+        return shapeLayerStates.get(layer).locked;
+    }
+
+    private boolean shapeLayerEditable() {
+        return shapeLayerEditable(activeShapeLayer);
+    }
+
+    private boolean shapeLayerEditable(int layer) {
+        return editingShape != null && !isShapeLayerHidden(layer) && !isShapeLayerLocked(layer);
+    }
+
+    void toggleShapeLayerVisibility(int layer) {
+        toggleShapeLayerState(layer, true);
+    }
+
+    void toggleShapeLayerLock(int layer) {
+        toggleShapeLayerState(layer, false);
+    }
+
+    private void toggleShapeLayerState(int layer, boolean visibility) {
+        List<ShapeLayerState> affected = layer < 0 ? shapeLayerStates : Collections.singletonList(shapeLayerStates.get(layer));
+        boolean enabled = !affected.stream().allMatch(state -> visibility ? state.hidden : state.locked);
+        boolean wasEditable = shapeLayerEditable();
+        boolean blocksSelection = enabled && (layer < 0 ? !shapeSelections.isEmpty() : shapeSelections.containsKey(layer));
+        if (enabled && shapeSelectionTool()) {
+            finishFloatingSelection(layer);
+        } else if (enabled && wasEditable && (layer < 0 || layer == activeShapeLayer)) {
+            prepareShapeTransfer();
+        }
+        for (ShapeLayerState state : affected) {
+            if (visibility) {
+                state.hidden = enabled;
+            } else {
+                state.locked = enabled;
+            }
+        }
+        if (wasEditable != shapeLayerEditable() || shapeTool == ShapeTool.ANCHOR_POINT) {
+            if (!shapeLayerEditable()) {
+                eyedropperSample = null;
+                eyedropperPropertiesPanel.setSample(null);
+            }
+            updateShapeTool();
+        }
+        if (blocksSelection) {
+            showLayerSelections(shapeSelections);
+        }
+        if (visibility) {
+            refreshShapeDisplay();
+        }
+        shapeTimelinePanel.repaint();
+    }
+
+    private void refreshShapeDisplay() {
+        try {
+            stagePanel.setShapeDisplay(editingShape != null && shapeLayerStates.stream().anyMatch(state -> state.hidden)
+                    ? visibleShape(editingShape, shapeLayers) : null);
+            if (unfilteredShapePreview != null) {
+                previewShape(unfilteredShapePreview);
+            }
+        } catch (IOException | InterruptedException ex) {
+            logShapeEditFailure(ex);
+        }
+    }
+
+    private void clearShapePreview() {
+        unfilteredShapePreview = null;
+        stagePanel.setShapePreview(null);
+    }
+
+    private void previewShape(ShapeTag shape) throws IOException, InterruptedException {
+        unfilteredShapePreview = shape;
+        if (shapeLayerStates.stream().anyMatch(state -> state.hidden)) {
+            shape = visibleShape(shape, ShapeLayers.split(shape.getShapes(), shape.getShapeNum()));
+        }
+        stagePanel.setShapePreview(shape);
+    }
+
+    private ShapeTag visibleShape(ShapeTag shape, List<SHAPEWITHSTYLE> layers) throws IOException, InterruptedException {
+        List<SHAPEWITHSTYLE> visible = new ArrayList<>();
+        for (int i = 0; i < layers.size(); i++) {
+            if (!isShapeLayerHidden(i)) {
+                visible.add(layers.get(i));
+            }
+        }
+        if (visible.isEmpty()) {
+            visible.add(SHAPEWITHSTYLE.createEmpty(shape.getShapeNum()));
+        }
+        return ShapeStyleChangeOperation.createShape(shape, visible);
     }
 
     Set<Integer> getHiddenDepths(Timelined timelineOwner) {
@@ -1827,6 +2240,7 @@ public class EasySwfPanel extends JPanel {
     }
 
     void swfClosed(SWF swf) {
+        shapeLayerStatesByTag.keySet().removeIf(shape -> shape.getSwf() == swf);
         hiddenDepthsByTimeline.keySet().removeIf(owner -> owner.getSwf() == swf);
         lockedDepthsByTimeline.keySet().removeIf(owner -> owner.getSwf() == swf);
     }
@@ -1835,6 +2249,7 @@ public class EasySwfPanel extends JPanel {
         setTimelined(null);
         hiddenDepthsByTimeline.clear();
         lockedDepthsByTimeline.clear();
+        shapeLayerStatesByTag.clear();
         undoManager.clear();
     }
 

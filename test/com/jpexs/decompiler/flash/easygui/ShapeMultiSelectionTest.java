@@ -78,6 +78,25 @@ public class ShapeMultiSelectionTest {
     }
 
     @Test
+    public void selectAllIncludesTheFillAndEveryEdgeOfAClosedStroke() {
+        DefineShape4Tag shape = shape();
+        rectangle(shape, 0, 0, 2000, 2000, 1, 1);
+        ShapeSelection model = selection(shape);
+        List<ShapeSelection.Selection> selected = model.selectAll();
+        assertEquals(selected.stream().filter(item -> !item.stroke).count(), 1L);
+        assertEquals(selected.stream().filter(item -> item.stroke).count(), 4L);
+
+        ShapeSelection.BatchEdit moved = model.moveFloatingSelection(selected, 3000, 0);
+        assertTrue(moved.changed);
+        assertNull(at(moved.model, 500, 500));
+        assertEquals(at(moved.model, 3500, 500).fill.color.toColor(), Color.RED);
+        assertTrue(at(moved.model, 3000, 1000).stroke);
+        assertTrue(at(moved.model, 5000, 1000).stroke);
+        assertNull(at(moved.model, 0, 1000));
+        assertTrue(moved.model.deleteAll(moved.selected).model.selectAll().isEmpty());
+    }
+
+    @Test
     public void ctrlClickTogglesIndividualRegionsAndEdgesAndKeepsSelectionOnEmptySpace() {
         DefineShape4Tag shape = shape();
         rectangle(shape, 0, 0, 2000, 2000, 1, 1);

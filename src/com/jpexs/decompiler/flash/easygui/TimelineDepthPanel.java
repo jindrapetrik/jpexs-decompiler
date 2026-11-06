@@ -25,7 +25,6 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -40,6 +39,7 @@ public class TimelineDepthPanel extends JPanel {
     private final Icon lockIcon = View.getIcon("lock16");
     private final Icon bulletIcon = View.getIcon("bullet16");
     private final EasySwfPanel swfPanel;
+    private final boolean shapeTimeline;
     private final JPanel header = new JPanel() {
         @Override
         public String getToolTipText(MouseEvent e) {
@@ -79,7 +79,12 @@ public class TimelineDepthPanel extends JPanel {
     public static final Color FONT_COLOR = Color.black;
 
     public TimelineDepthPanel(EasySwfPanel swfPanel) {
+        this(swfPanel, false);
+    }
+
+    TimelineDepthPanel(EasySwfPanel swfPanel, boolean shapeTimeline) {
         this.swfPanel = swfPanel;
+        this.shapeTimeline = shapeTimeline;
         Dimension headerSize = new Dimension(0, TimelineBodyPanel.FRAME_HEIGHT);
         header.setPreferredSize(headerSize);
         header.setMinimumSize(headerSize);
@@ -91,9 +96,17 @@ public class TimelineDepthPanel extends JPanel {
                     return;
                 }
                 if (isOverIcon(e, visibilityX, showIcon)) {
-                    swfPanel.toggleAllDepthVisibility();
+                    if (shapeTimeline) {
+                        swfPanel.toggleShapeLayerVisibility(-1);
+                    } else {
+                        swfPanel.toggleAllDepthVisibility();
+                    }
                 } else if (isOverIcon(e, lockX, lockIcon)) {
-                    swfPanel.toggleAllDepthLocks();
+                    if (shapeTimeline) {
+                        swfPanel.toggleShapeLayerLock(-1);
+                    } else {
+                        swfPanel.toggleAllDepthLocks();
+                    }
                 }
                 repaint();
             }
@@ -107,9 +120,17 @@ public class TimelineDepthPanel extends JPanel {
                     return;
                 }
                 if (isOverIcon(e, visibilityX, showIcon)) {
-                    swfPanel.toggleDepthVisibility(depth);
+                    if (shapeTimeline) {
+                        swfPanel.toggleShapeLayerVisibility(depth - 1);
+                    } else {
+                        swfPanel.toggleDepthVisibility(depth);
+                    }
                 } else if (isOverIcon(e, lockX, lockIcon)) {
-                    swfPanel.toggleDepthLock(depth);
+                    if (shapeTimeline) {
+                        swfPanel.toggleShapeLayerLock(depth - 1);
+                    } else {
+                        swfPanel.toggleDepthLock(depth);
+                    }
                 }
                 repaint();
             }
@@ -123,11 +144,14 @@ public class TimelineDepthPanel extends JPanel {
 
     public void setTimeline(Timeline timeline) {
         timelined = timeline == null ? null : timeline.timelined;
-        maxDepth = timeline == null ? 0 : timeline.getMaxDepth();
-        String maxDepthStr = Integer.toString(maxDepth);
+        setDepthCount(timeline == null ? 0 : timeline.getMaxDepth());
+    }
+
+    void setDepthCount(int count) {
+        maxDepth = count;
         setFont(getFont().deriveFont(FONT_SIZE));
-        int height = (maxDepth + 1) * TimelineBodyPanel.FRAME_HEIGHT + 1;
-        int maxDepthW = getFontMetrics(getFont()).stringWidth(maxDepthStr);
+        int height = (maxDepth + (shapeTimeline ? 0 : 1)) * TimelineBodyPanel.FRAME_HEIGHT + 1;
+        int maxDepthW = getFontMetrics(getFont()).stringWidth(shapeTimeline ? depthLabel(maxDepth) : Integer.toString(maxDepth));
         visibilityX = maxDepthW + 2 * PADDING;
         lockX = visibilityX + showIcon.getIconWidth() + PADDING;
         int width = lockX + lockIcon.getIconWidth() + PADDING;
@@ -145,10 +169,29 @@ public class TimelineDepthPanel extends JPanel {
         repaint();
     }
 
-    private int getDepthAt(MouseEvent e) {
-        int rowHeight = TimelineBodyPanel.FRAME_HEIGHT;
-        int depth = (scrollOffset + e.getY()) / rowHeight;
+    int getDepthAt(MouseEvent e) {
+        int row = (scrollOffset + e.getY()) / TimelineBodyPanel.FRAME_HEIGHT;
+        int depth = shapeTimeline ? maxDepth - row : row;
         return depth > 0 && depth <= maxDepth ? depth : 0;
+    }
+
+    boolean isOverControls(MouseEvent e) {
+        return isOverIcon(e, visibilityX, showIcon) || isOverIcon(e, lockX, lockIcon);
+    }
+
+    private String depthLabel(int depth) {
+        if (shapeTimeline) {
+            return EasyStrings.translate("timeline.shape.layerNumber").replace("%number%", Integer.toString(depth));
+        }
+        return depth == 0 ? "a" : Integer.toString(depth);
+    }
+
+    private boolean isHidden(int depth) {
+        return shapeTimeline ? swfPanel.isShapeLayerHidden(depth - 1) : swfPanel.getHiddenDepths(timelined).contains(depth);
+    }
+
+    private boolean isLocked(int depth) {
+        return shapeTimeline ? swfPanel.isShapeLayerLocked(depth - 1) : swfPanel.getLockedDepths(timelined).contains(depth);
     }
 
     private boolean isOverIcon(MouseEvent e, int x, Icon icon) {
@@ -164,11 +207,11 @@ public class TimelineDepthPanel extends JPanel {
         int depth = getDepthAt(e);
         if (depth > 0) {
             if (isOverIcon(e, visibilityX, showIcon)) {
-                return EasyStrings.translate(swfPanel.getHiddenDepths(timelined).contains(depth)
+                return EasyStrings.translate(isHidden(depth)
                         ? "timeline.depth.show" : "timeline.depth.hide");
             }
             if (isOverIcon(e, lockX, lockIcon)) {
-                return EasyStrings.translate(swfPanel.getLockedDepths(timelined).contains(depth)
+                return EasyStrings.translate(isLocked(depth)
                         ? "timeline.depth.unlock" : "timeline.depth.lock");
             }
         }
@@ -179,21 +222,20 @@ public class TimelineDepthPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         Rectangle clip = g.getClipBounds();
         int rowHeight = TimelineBodyPanel.FRAME_HEIGHT;
-        int firstDepth = (scrollOffset + clip.y) / rowHeight;
-        int lastDepth = Math.min(maxDepth, (scrollOffset + clip.y + clip.height - 1) / rowHeight);
-        Set<Integer> hidden = swfPanel.getHiddenDepths(timelined);
-        Set<Integer> locked = swfPanel.getLockedDepths(timelined);
+        int firstRow = (scrollOffset + clip.y) / rowHeight;
+        int lastRow = Math.min(shapeTimeline ? maxDepth - 1 : maxDepth, (scrollOffset + clip.y + clip.height - 1) / rowHeight);
         g.setColor(TimelineBodyPanel.getBackgroundColor());
         g.fillRect(clip.x, clip.y, clip.width, clip.height);
-        for (int depth = firstDepth; depth <= lastDepth; depth++) {
-            int y = depth * rowHeight - scrollOffset;
+        for (int row = firstRow; row <= lastRow; row++) {
+            int depth = shapeTimeline ? maxDepth - row : row;
+            int y = row * rowHeight - scrollOffset;
             g.setColor(BORDER_COLOR);
             g.drawLine(0, y + rowHeight, getWidth(), y + rowHeight);
             g.setColor(FONT_COLOR);
-            g.drawString(depth == 0 ? "a" : Integer.toString(depth), PADDING, y + rowHeight - PADDING);
+            g.drawString(depthLabel(depth), PADDING, y + rowHeight - PADDING);
             if (depth > 0) {
-                Icon visibility = hidden.contains(depth) ? crossIcon : bulletIcon;
-                Icon lock = locked.contains(depth) ? lockIcon : bulletIcon;
+                Icon visibility = isHidden(depth) ? crossIcon : bulletIcon;
+                Icon lock = isLocked(depth) ? lockIcon : bulletIcon;
                 paintColumnIcon(g, visibility, visibilityX, showIcon.getIconWidth(), y, rowHeight);
                 paintColumnIcon(g, lock, lockX, lockIcon.getIconWidth(), y, rowHeight);
             }

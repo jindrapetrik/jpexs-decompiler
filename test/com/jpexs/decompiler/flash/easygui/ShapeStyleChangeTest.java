@@ -11,6 +11,7 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
+import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
@@ -19,12 +20,19 @@ import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.ShapeLayers;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.testng.annotations.Test;
 import static com.jpexs.decompiler.flash.easygui.ShapeSelectionTest.*;
 import static org.testng.Assert.*;
@@ -51,6 +59,144 @@ public class ShapeStyleChangeTest {
         shape.getSwf().saveTo(bytes);
         SWF restored = new SWF(new ByteArrayInputStream(bytes.toByteArray()), false);
         return (ShapeTag) restored.getCharacter(shape.shapeId);
+    }
+
+    @Test
+    public void shapeLayersSurviveSaveAndEditsAcrossTagVersions() throws Exception {
+        SWF swf = new SWF();
+        swf.version = 1;
+        DefineShapeTag original = new DefineShapeTag(swf);
+        original.shapes.fillStyles.fillStyles = new FILLSTYLE[]{fill(Color.red).toShapeNum(1)};
+        original.shapes.shapeRecords.clear();
+        rectangle(original, 400, 500, 2000, 2000, 1, 0);
+        original.shapes.shapeRecords.add(new EndShapeRecord());
+        original.updateBounds();
+        original.createOriginalData();
+        addClean(original);
+
+        UndoManager history = new UndoManager();
+        ShapeTag withLayers = ShapeStyleChangeOperation.createShape(original, Arrays.asList(original.shapes,
+                SHAPEWITHSTYLE.createEmpty(1), SHAPEWITHSTYLE.createEmpty(1)));
+        history.doOperation(new ShapeStyleChangeOperation(original, withLayers, "Add layer", null), swf);
+        ShapeTag emptyLayers = roundTrip(current(original));
+        assertEquals(emptyLayers.getShapeNum(), 2);
+        assertEquals(emptyLayers.shapeBounds.getTopLeft(), original.shapeBounds.getTopLeft());
+        assertEquals(emptyLayers.shapeBounds.getBottomRight(), original.shapeBounds.getBottomRight());
+        List<SHAPEWITHSTYLE> layers = ShapeLayers.split(emptyLayers.getShapes(), emptyLayers.getShapeNum());
+        assertEquals(layers.size(), 3);
+        assertFalse(ShapeLayers.hasEdges(layers.get(1)));
+        assertFalse(ShapeLayers.hasEdges(layers.get(2)));
+
+        ShapeTag beforeDrawing = current(original);
+        ShapeSelection active = new ShapeSelection(beforeDrawing, layers.get(2));
+        ShapeSelection.BatchEdit drawing = active.drawShape(new Rectangle2D.Double(700, 800, 1000, 1000),
+                fill(new Color(0, 0, 255, 128)), null);
+        ShapeTag painted = ShapeStyleChangeOperation.createShape(beforeDrawing, layers, 2, drawing.model);
+        history.doOperation(new ShapeStyleChangeOperation(beforeDrawing, painted, "Draw shape", null), swf);
+        ShapeTag saved = roundTrip(current(original));
+        assertEquals(saved.getShapeNum(), 3);
+        List<SHAPEWITHSTYLE> savedLayers = ShapeLayers.split(saved.getShapes(), saved.getShapeNum());
+        assertEquals(savedLayers.size(), 3);
+        assertEquals(at(new ShapeSelection(saved, savedLayers.get(0)), 1000, 1000).fill.color.toColor(), Color.red);
+        assertFalse(ShapeLayers.hasEdges(savedLayers.get(1)));
+        assertEquals(at(new ShapeSelection(saved), 1000, 1000).fill.color.toColor(), new Color(0, 0, 255, 128));
+
+        ShapeTag beforeRemoval = current(original);
+        savedLayers.remove(0);
+        ShapeTag removed = ShapeStyleChangeOperation.createShape(beforeRemoval, savedLayers);
+        history.doOperation(new ShapeStyleChangeOperation(beforeRemoval, removed, "Remove layer", null), swf);
+        assertNull(at(new ShapeSelection(current(original)), 500, 600));
+        history.undo(swf);
+        assertSame(current(original), beforeRemoval);
+        history.undo(swf);
+        assertEquals(current(original).getShapeNum(), 2);
+        history.undo(swf);
+        assertSame(current(original), original);
+        assertEquals(swf.version, 1);
+        history.redo(swf);
+        history.redo(swf);
+        history.redo(swf);
+        ShapeTag reopened = roundTrip(current(original));
+        assertEquals(ShapeLayers.split(reopened.getShapes(), reopened.getShapeNum()).size(), 2);
+        assertEquals(at(new ShapeSelection(reopened), 1000, 1000).fill.color.toColor(), new Color(0, 0, 255, 128));
+    }
+
+    @Test
+    public void aBatchEditMovesSeveralLayersWithoutFlatteningThem() throws Exception {
+        DefineShape4Tag bottom = shape();
+        rectangle(bottom, 0, 0, 1000, 1000, 1, 0);
+        selection(bottom);
+        DefineShape4Tag middle = shape();
+        rectangle(middle, 2000, 0, 1000, 1000, 2, 0);
+        selection(middle);
+        DefineShape4Tag top = shape();
+        rectangle(top, 4000, 0, 1000, 1000, 1, 0);
+        selection(top);
+        ShapeTag original = ShapeStyleChangeOperation.createShape(bottom,
+                Arrays.asList(bottom.getShapes(), middle.getShapes(), top.getShapes()));
+        original.createOriginalData();
+        addClean(original);
+
+        List<SHAPEWITHSTYLE> layers = ShapeLayers.split(original.getShapes(), original.getShapeNum());
+        Map<Integer, ShapeSelection> edits = new LinkedHashMap<>();
+        for (int layer = 0; layer < 2; layer++) {
+            ShapeSelection model = new ShapeSelection(original, layers.get(layer));
+            ShapeSelection.RectangleSelection selected = model.selectRectangle(
+                    new Rectangle2D.Double(0, 0, 3000, 1000), new ArrayList<>(), false);
+            edits.put(layer, selected.model.moveFloatingSelection(selected.selected, 0, 1500).model);
+        }
+        ShapeTag moved = ShapeStyleChangeOperation.createShape(original, layers, edits);
+        UndoManager history = new UndoManager();
+        history.doOperation(new ShapeStyleChangeOperation(original, moved, "Move", null), original.getSwf());
+
+        ShapeTag saved = roundTrip(current(original));
+        List<SHAPEWITHSTYLE> savedLayers = ShapeLayers.split(saved.getShapes(), saved.getShapeNum());
+        assertEquals(savedLayers.size(), 3);
+        assertEquals(at(new ShapeSelection(saved, savedLayers.get(0)), 500, 2000).fill.color.toColor(), Color.red);
+        assertEquals(at(new ShapeSelection(saved, savedLayers.get(1)), 2500, 2000).fill.color.toColor(), Color.blue);
+        assertEquals(at(new ShapeSelection(saved, savedLayers.get(2)), 4500, 500).fill.color.toColor(), Color.red);
+        assertNull(at(new ShapeSelection(saved), 500, 500));
+        assertNull(at(new ShapeSelection(saved), 2500, 500));
+
+        history.undo(original.getSwf());
+        assertSame(current(original), original);
+        assertFalse(history.canUndo(original.getSwf()));
+        history.redo(original.getSwf());
+        assertEquals(current(original).getData(), saved.getData());
+    }
+
+    @Test
+    public void reorderingLayersChangesStackingAndPreservesTheirGeometryOnSave() throws Exception {
+        DefineShape4Tag bottom = shape();
+        rectangle(bottom, 0, 0, 2000, 2000, 1, 0);
+        selection(bottom);
+        DefineShape4Tag top = shape();
+        rectangle(top, 1000, 500, 2000, 2000, 2, 0);
+        selection(top);
+        ShapeTag original = ShapeStyleChangeOperation.createShape(bottom,
+                Arrays.asList(bottom.getShapes(), SHAPEWITHSTYLE.createEmpty(4), top.getShapes()));
+        original.createOriginalData();
+        addClean(original);
+        assertEquals(at(new ShapeSelection(original), 1500, 1000).fill.color.toColor(), Color.blue);
+
+        List<SHAPEWITHSTYLE> layers = ShapeLayers.split(original.getShapes(), original.getShapeNum());
+        layers.add(layers.remove(0));
+        ShapeTag reordered = ShapeStyleChangeOperation.createShape(original, layers);
+        UndoManager history = new UndoManager();
+        history.doOperation(new ShapeStyleChangeOperation(original, reordered, "Move layer", null), original.getSwf());
+
+        ShapeTag saved = roundTrip(current(original));
+        List<SHAPEWITHSTYLE> savedLayers = ShapeLayers.split(saved.getShapes(), saved.getShapeNum());
+        assertEquals(savedLayers.size(), 3);
+        assertFalse(ShapeLayers.hasEdges(savedLayers.get(0)));
+        ShapeSelection result = new ShapeSelection(saved);
+        assertEquals(at(result, 1500, 1000).fill.color.toColor(), Color.red);
+        assertEquals(at(result, 500, 500).fill.color.toColor(), Color.red);
+        assertEquals(at(result, 2500, 1000).fill.color.toColor(), Color.blue);
+        history.undo(original.getSwf());
+        assertSame(current(original), original);
+        history.redo(original.getSwf());
+        assertEquals(current(original).getData(), saved.getData());
     }
 
     @Test

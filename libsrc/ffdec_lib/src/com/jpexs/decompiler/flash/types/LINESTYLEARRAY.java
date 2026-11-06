@@ -108,7 +108,7 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
                 ls.getNeededCharacters(needed, neededClasses, swf);
             }
         }
-        if (lineStyles != null) {
+        if (lineStyles2 != null) {
             for (ILINESTYLE ls : lineStyles2) {
                 ls.getNeededCharacters(needed, neededClasses, swf);
             }

@@ -10,10 +10,12 @@ package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.gui.DisplayPoint;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +51,14 @@ public final class ShapePointEdit {
     }
 
     public ShapePointEdit(ShapeTag original) throws IOException, InterruptedException {
+        this(original, original.getShapes());
+    }
+
+    ShapePointEdit(ShapeTag original, SHAPEWITHSTYLE layer) throws IOException, InterruptedException {
         shape = (ShapeTag) original.cloneTag();
+        if (layer != original.getShapes()) {
+            shape.shapes = Helper.deepCopy(layer);
+        }
         // An omitted first move is an implicit move to (0, 0).
         StyleChangeRecord style = null;
         boolean moved = false;

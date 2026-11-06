@@ -51,15 +51,23 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
 
     private final List<FrameSelectionListener> listeners = new ArrayList<>();   
     
-    private final TimelineDepthPanel depthPanel;
+    private final boolean singleFrame;
 
     public TimelineTimePanel(TimelineDepthPanel depthPanel) {
+        this(false);
+    }
+
+    TimelineTimePanel(boolean singleFrame) {
+        this.singleFrame = singleFrame;
         Dimension dim = new Dimension(Integer.MAX_VALUE, TimelineBodyPanel.FRAME_HEIGHT);
         setSize(dim);
         setPreferredSize(dim);
         setMinimumSize(new Dimension(0, TimelineBodyPanel.FRAME_HEIGHT));
-        addMouseListener(this);
-        this.depthPanel = depthPanel;
+        if (singleFrame) {
+            selectedFrame = 0;
+        } else {
+            addMouseListener(this);
+        }
     }
 
     public void setTimeline(Timeline timeline) {
@@ -93,8 +101,8 @@ public class TimelineTimePanel extends JPanel implements MouseListener {
     protected void paintComponent(Graphics g) {
         Rectangle clip = g.getClipBounds();
         int frameWidth = TimelineBodyPanel.getFrameWidthForTimeline(timeline);
-        int start_f = (scrollOffset + clip.x) / frameWidth;
-        int end_f = (scrollOffset + clip.x + clip.width) / frameWidth;
+        int start_f = singleFrame ? 0 : (scrollOffset + clip.x) / frameWidth;
+        int end_f = singleFrame ? 0 : (scrollOffset + clip.x + clip.width) / frameWidth;
         g.setColor(TimelineBodyPanel.getBackgroundColor());
         g.fillRect(0, 0, getWidth(), getHeight());
         g.setColor(BORDER_COLOR);

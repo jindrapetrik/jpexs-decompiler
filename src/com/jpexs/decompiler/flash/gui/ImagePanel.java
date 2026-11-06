@@ -537,6 +537,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private Timelined shapePreview;
 
+    private Timelined shapeDisplay;
+
     private ShapeTag editedShape;
 
     private boolean inMoving = false;
@@ -791,6 +793,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public void setShapePreview(ShapeTag shape) {
         shapePreview = shape == null ? null : TimelinedMaker.makeTimelined(shape);
         displayObjectCache.clear();
+        redraw();
+    }
+
+    /** Sets the visible parts of the shape without changing its editing bounds. */
+    public void setShapeDisplay(ShapeTag shape) {
+        synchronized (lock) {
+            if (shape == null && shapeDisplay == null) {
+                return;
+            }
+            shapeDisplay = shape == null ? null : TimelinedMaker.makeTimelined(shape);
+            displayObjectCache.clear();
+        }
         redraw();
     }
 
@@ -6449,6 +6463,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.timelined = drawable;
             this.editedShape = null;
             this.shapePreview = null;
+            shapeDisplay = null;
             this.isolatedDepth = null;
             this.parentTimelineds.clear();
             this.parentFrames.clear();
@@ -6721,6 +6736,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         timelined = null;
         editedShape = null;
         shapePreview = null;
+        shapeDisplay = null;
         loaded = true;
         stillFrame = true;
         zoomAvailable = false;
@@ -6756,6 +6772,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         timelined = null;
         editedShape = null;
         shapePreview = null;
+        shapeDisplay = null;
         loaded = true;
         stillFrame = true;
         zoomAvailable = true;
@@ -7489,7 +7506,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     List<Integer> parentFramesSnapshot;
                     Matrix parentMatrixSnapshot;
                     synchronized (lock) {
-                        rendered = shapePreview == null ? timelined : shapePreview;
+                        rendered = shapePreview != null ? shapePreview : shapeDisplay != null ? shapeDisplay : timelined;
                         parentTimelinesSnapshot = new ArrayList<>(parentTimelineds);
                         parentDepthsSnapshot = new ArrayList<>(parentDepths);
                         parentFramesSnapshot = new ArrayList<>(parentFrames);
@@ -7814,6 +7831,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         timelined = null;
         editedShape = null;
         shapePreview = null;
+        shapeDisplay = null;
         swf = null;
         guidesSwf = null;
         lda = null;
@@ -8489,6 +8507,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             swf = shape.getSwf();
             editedShape = shape;
             shapePreview = null;
+            shapeDisplay = null;
             frame = 0;
             prevFrame = -1;
             parentTimelineds.clear();

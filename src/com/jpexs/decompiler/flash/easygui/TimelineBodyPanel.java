@@ -395,6 +395,16 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
     }
 
+    static void drawKeyMarker(Graphics g, int centerX, int rowY, boolean empty) {
+        int x = centerX - MARKER_SIZE / 2;
+        int y = rowY + FRAME_HEIGHT * 3 / 4 - MARKER_SIZE / 2;
+        if (empty) {
+            g.drawOval(x, y, MARKER_SIZE, MARKER_SIZE);
+        } else {
+            g.fillOval(x, y, MARKER_SIZE, MARKER_SIZE);
+        }
+    }
+
     private void drawBlock(Graphics2D g, Color backColor, int depth, int frame, int num_frames, BlockType blockType, int frameWidth) {
         int frameHeight = FRAME_HEIGHT;
 
@@ -439,11 +449,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         } else {
             g.setColor(KEY_COLOR);
         }
-        if (blockType == BlockType.EMPTY) {
-            g.drawOval(frame * frameWidth + frameWidth / 2 - MARKER_SIZE / 2, depth * frameHeight + frameHeight * 3 / 4 - MARKER_SIZE / 2, MARKER_SIZE, MARKER_SIZE);
-        } else {
-            g.fillOval(frame * frameWidth + frameWidth / 2 - MARKER_SIZE / 2, depth * frameHeight + frameHeight * 3 / 4 - MARKER_SIZE / 2, MARKER_SIZE, MARKER_SIZE);
-        }
+        drawKeyMarker(g, frame * frameWidth + frameWidth / 2, depth * frameHeight, blockType == BlockType.EMPTY);
 
         if (num_frames > 1) {
             int endFrame = frame + num_frames - 1;
