@@ -128,6 +128,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -812,8 +813,22 @@ public class EasySwfPanel extends JPanel {
         drawingShapesPropertiesPanel.setChangeListener(this::updateShapeTool);
         pencilPropertiesPanel = new ShapePropertiesPanel(true);
         penPropertiesPanel = ShapePropertiesPanel.createDrawingStyles();
-        penPropertiesPanel.add(new JLabel("<html><div style='width: 250px;'>" + EasyStrings.translate("drawing.pen.hint") + "</div></html>"),
-                BorderLayout.NORTH);
+        JLabel penHint = new JLabel("<html>" + EasyStrings.translate("drawing.pen.hint") + "</html>") {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension size = super.getPreferredSize();
+                javax.swing.text.View text = (javax.swing.text.View) getClientProperty(BasicHTML.propertyKey);
+                if (text != null && getWidth() > 0) {
+                    Insets insets = getInsets();
+                    text.setSize(Math.max(1, getWidth() - insets.left - insets.right), 0);
+                    size.height = (int) Math.ceil(text.getPreferredSpan(javax.swing.text.View.Y_AXIS)) + insets.top + insets.bottom;
+                }
+                // BorderLayout supplies the footer width, so only the wrapped height drives layout.
+                size.width = 0;
+                return size;
+            }
+        };
+        penPropertiesPanel.add(penHint, BorderLayout.SOUTH);
         penTool = new BezierPenTool(stagePanel, this::paintPen);
         paintPropertiesPanel = ShapePropertiesPanel.createFillSettings();
         inkPropertiesPanel = new ShapePropertiesPanel(true);
