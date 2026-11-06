@@ -10,10 +10,12 @@ package com.jpexs.decompiler.flash.easygui;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.easygui.TimelineFrameEdits.KeyEdit;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShapeTag;
@@ -25,8 +27,11 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
@@ -708,6 +713,51 @@ public class TimelineFrameEditsTest {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         swf.saveTo(bytes);
         return new SWF(new ByteArrayInputStream(bytes.toByteArray()), false);
+    }
+
+    @Test
+    public void blankBlocksHaveAHollowMarkerOnlyAtTheirStart() throws Exception {
+        SWF swf = new SWF();
+        int character = shape(swf);
+        endFrame(swf);
+        endFrame(swf);
+        endFrame(swf);
+        place(swf, 1, character, 0, false);
+        endFrame(swf);
+        remove(swf, 1);
+        endFrame(swf);
+        endFrame(swf);
+        endFrame(swf);
+        place(swf, 1, character, 0, false);
+        endFrame(swf);
+
+        SwingUtilities.invokeAndWait(() -> {
+            boolean ribbon = Configuration.useRibbonInterface.get();
+            Configuration.useRibbonInterface.set(false);
+            try {
+                TimelineBodyPanel body = new TimelineBodyPanel(null, new UndoManager());
+                body.setTimeline(swf.getTimeline());
+                BufferedImage image = new BufferedImage(body.getWidth(), body.getHeight(), BufferedImage.TYPE_INT_RGB);
+                Graphics2D graphics = image.createGraphics();
+                try {
+                    body.paint(graphics);
+                } finally {
+                    graphics.dispose();
+                }
+
+                int background = TimelineBodyPanel.getEmptyFrameColor().getRGB();
+                for (int frame : new int[]{0, 4}) {
+                    Rectangle cell = body.getFrameBounds(frame, 1);
+                    int x = cell.x + cell.width / 2;
+                    int y = cell.y + cell.height * 3 / 4;
+                    assertNotEquals(image.getRGB(x, y - 2), background, "Blank block should begin with a marker");
+                    assertEquals(image.getRGB(x, y), background, "The marker should be hollow");
+                    assertEquals(image.getRGB(x + cell.width, y - 2), background, "A held blank frame should have no marker");
+                }
+            } finally {
+                Configuration.useRibbonInterface.set(ribbon);
+            }
+        });
     }
 
     @Test

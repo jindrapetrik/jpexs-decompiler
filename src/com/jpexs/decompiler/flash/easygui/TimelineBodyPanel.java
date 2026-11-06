@@ -386,21 +386,6 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         g.setColor(BORDER_COLOR);
         g.drawRect(frame * frameWidth, rowY, num_frames * frameWidth, frameHeight);
 
-        //boolean selected = cursor != null && cursor.contains(cursor.x, depth);
-        /*if (cursor != null && cursor.contains(frame, depth) && !cursor.contains(frame + num_frames, depth)) {//frame <= cursor.x && (frame + num_frames) > cursor.x && depth == cursor.y) {
-            selected = true;
-        }*/
-        for (int n = frame + 1; n < frame + num_frames; n++) {
-            g.setColor(getSelectedColor());
-            if (cursor.contains(new Point(n, depth))) {
-                g.fillRect(n * frameWidth + 1, rowY + 1, frameWidth, frameHeight);
-            }
-        }
-
-        /*if (selected) {
-            g.setColor(getSelectedColor());
-            g.fillRect(cursor.x * frameWidth + 1, rowY + 1, (cursor.width * frameWidth) - 1, frameHeight - 1);
-        }*/
         boolean isTween = blockType == BlockType.MOTION_TWEEN || blockType == BlockType.SHAPE_TWEEN;
 
         g.setColor(KEY_COLOR);
@@ -415,8 +400,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         } else {
             g.setColor(KEY_COLOR);
         }
-        if (key) {
-            drawKeyMarker(g, frame * frameWidth + frameWidth / 2, rowY, blockType == BlockType.EMPTY);
+        boolean empty = blockType == BlockType.EMPTY;
+        if (key || empty) {
+            drawKeyMarker(g, frame * frameWidth + frameWidth / 2, rowY, empty);
         }
 
         if (num_frames > 1) {
