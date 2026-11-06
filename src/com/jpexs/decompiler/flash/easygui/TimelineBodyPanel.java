@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.easygui.TimelineFrameEdits.KeyEdit;
+import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -30,6 +31,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -41,6 +46,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -68,12 +74,19 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     private Timeline timeline;
     private int dropRow = -1;
+    private MaskSpan hoveredMask;
 
     private static final int FRAME_WIDTH = 8;
 
     private static final int BUTTON_FRAME_WIDTH = 40;
 
     private static final int MARKER_SIZE = 4;
+
+    private static final int MASK_STRIPE_HEIGHT = 3;
+
+    private static final Color MASK_STRIPE_COLOR = new Color(0x78, 0x3a, 0xb6);
+
+    private static final Color MASK_RANGE_COLOR = new Color(0x78, 0x3a, 0xb6, 0x55);
 
     public static final int FRAME_HEIGHT = 18;
 
@@ -202,6 +215,22 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     public TimelineBodyPanel(EasySwfPanel swfPanel, UndoManager undoManager) {
         refresh();
         addMouseListener(this);
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                MaskSpan mask = getMaskSpanAt(e);
+                if (hoveredMask != mask) {
+                    hoveredMask = mask;
+                    repaint();
+                }
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                clearMaskHover();
+            }
+        });
+        setToolTipText("");
         addKeyListener(this);
         setFocusable(true);
         this.swfPanel = swfPanel;
@@ -319,6 +348,15 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 drawBlock(g, color, depth, frame, next - frame, block, frameWidth, isKey(frame, depth, blanks));
                 frame = next;
             }
+            drawMaskStripes(g, row, depth, start_f, Math.min(end_f, Math.min(end, max_f)), frameWidth);
+        }
+
+        if (hoveredMask != null) {
+            Rectangle first = getFrameBounds(hoveredMask.firstFrame, hoveredMask.clipDepth);
+            Rectangle last = getFrameBounds(hoveredMask.lastFrame, hoveredMask.depth + 1);
+            Rectangle range = first.union(last);
+            g.setColor(MASK_RANGE_COLOR);
+            g.fillRect(range.x + 1, range.y + 1, range.width - 1, range.height - 1);
         }
 
         Point cursorFirst = cursor.isEmpty() ? null : cursor.iterator().next();
@@ -328,6 +366,96 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
         if (dropRow >= 0) {
             TimelineLayerDrag.paintDropLine(g, getWidth(), dropRow * frameHeight);
+        }
+    }
+
+    private void drawMaskStripes(Graphics g, int row, int depth, int firstFrame, int lastFrame, int frameWidth) {
+        g.setColor(MASK_STRIPE_COLOR);
+        int previousClipDepth = getMaskClipDepth(firstFrame - 1, depth);
+        for (int frame = firstFrame; frame <= lastFrame; frame++) {
+            int clipDepth = getMaskClipDepth(frame, depth);
+            if (clipDepth > depth) {
+                int gap = clipDepth == previousClipDepth ? 0 : 1;
+                g.fillRect(frame * frameWidth + gap, row * FRAME_HEIGHT + 1, frameWidth - gap, MASK_STRIPE_HEIGHT);
+            }
+            previousClipDepth = clipDepth;
+        }
+    }
+
+    private int getMaskClipDepth(int frame, int depth) {
+        DepthState state = timeline.getDepthState(frame, depth);
+        return TimelineFrameEdits.isPlaced(state) ? state.clipDepth : -1;
+    }
+
+    private MaskSpan getMaskSpanAt(MouseEvent e) {
+        int stripeY = e.getY() % FRAME_HEIGHT;
+        if (timeline == null || e.getX() < 0 || stripeY < 1 || stripeY > MASK_STRIPE_HEIGHT) {
+            return null;
+        }
+        int row = e.getY() / FRAME_HEIGHT;
+        int maxDepth = getDepthCount();
+        if (row <= 0 || row > maxDepth) {
+            return null;
+        }
+        int depth = flipLayerOrder(row, maxDepth);
+        int frame = e.getX() / getFrameWidth();
+        if (hoveredMask != null && hoveredMask.depth == depth && frame >= hoveredMask.firstFrame && frame <= hoveredMask.lastFrame) {
+            return hoveredMask;
+        }
+        return getMaskSpan(frame, depth);
+    }
+
+    private MaskSpan getMaskSpan(int frame, int depth) {
+        int clipDepth = getMaskClipDepth(frame, depth);
+        if (clipDepth <= depth) {
+            return null;
+        }
+        int first = frame;
+        int last = frame;
+        while (first > 0 && getMaskClipDepth(first - 1, depth) == clipDepth) {
+            first--;
+        }
+        while (getMaskClipDepth(last + 1, depth) == clipDepth) {
+            last++;
+        }
+        return new MaskSpan(depth, clipDepth, first, last);
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent e) {
+        MaskSpan mask = getMaskSpanAt(e);
+        if (mask == null) {
+            return null;
+        }
+        return EasyStrings.translate("timeline.mask.range")
+                .replace("%mask%", Integer.toString(mask.depth))
+                .replace("%layers%", formatRange(mask.depth + 1, mask.clipDepth))
+                .replace("%frames%", formatRange(mask.firstFrame + 1, mask.lastFrame + 1));
+    }
+
+    private static String formatRange(int first, int last) {
+        return first == last ? Integer.toString(first) : first + "\u2013" + last;
+    }
+
+    void clearMaskHover() {
+        if (hoveredMask != null) {
+            hoveredMask = null;
+            repaint();
+        }
+    }
+
+    private static final class MaskSpan {
+
+        private final int depth;
+        private final int clipDepth;
+        private final int firstFrame;
+        private final int lastFrame;
+
+        private MaskSpan(int depth, int clipDepth, int firstFrame, int lastFrame) {
+            this.depth = depth;
+            this.clipDepth = clipDepth;
+            this.firstFrame = firstFrame;
+            this.lastFrame = lastFrame;
         }
     }
 
@@ -514,20 +642,25 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
         boolean occupied = isFrameOccupied(frame, depth);
         if (occupied) {
-            int first = frame;
-            int lastSelected = frame;
-            while (first > 0 && cursor.contains(new Point(first - 1, depth))) {
-                first--;
-            }
-            int frameLimit = getFrameLimit();
-            while (lastSelected < frameLimit && cursor.contains(new Point(lastSelected + 1, depth))) {
-                lastSelected++;
-            }
-            if (first != lastSelected) {
-                return new FrameSpan(first, lastSelected);
+            FrameSpan selected = getContiguousSelection(frame, depth);
+            if (selected.first != selected.last) {
+                return selected;
             }
         }
         return getFrameBlock(frame, depth, occupied);
+    }
+
+    private FrameSpan getContiguousSelection(int frame, int depth) {
+        int first = frame;
+        int last = frame;
+        while (first > 0 && cursor.contains(new Point(first - 1, depth))) {
+            first--;
+        }
+        int limit = getFrameLimit();
+        while (last < limit && cursor.contains(new Point(last + 1, depth))) {
+            last++;
+        }
+        return new FrameSpan(first, last);
     }
 
     private FrameSpan getFrameBlock(int frame, int depth, boolean occupied) {
@@ -723,9 +856,38 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
             JPopupMenu popupMenu = createFrameMenu();
             if (popupMenu.getComponentCount() > 0) {
-                popupMenu.show(this, e.getX(), e.getY());
+                showFrameMenu(popupMenu, e.getLocationOnScreen());
             }
         }
+    }
+
+    private void showFrameMenu(JPopupMenu menu, Point anchor) {
+        GraphicsConfiguration screen = getGraphicsConfiguration();
+        if (!screen.getBounds().contains(anchor)) {
+            for (GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()) {
+                GraphicsConfiguration candidate = device.getDefaultConfiguration();
+                if (candidate.getBounds().contains(anchor)) {
+                    screen = candidate;
+                    break;
+                }
+            }
+        }
+        Rectangle bounds = screen.getBounds();
+        Insets insets = getToolkit().getScreenInsets(screen);
+        Rectangle workArea = new Rectangle(bounds.x + insets.left, bounds.y + insets.top,
+                bounds.width - insets.left - insets.right, bounds.height - insets.top - insets.bottom);
+        Point location = getFrameMenuLocation(anchor, menu.getPreferredSize(), workArea);
+        SwingUtilities.convertPointFromScreen(location, this);
+        menu.show(this, location.x, location.y);
+    }
+
+    static Point getFrameMenuLocation(Point anchor, Dimension menuSize, Rectangle workArea) {
+        int maxX = workArea.x + workArea.width - menuSize.width;
+        int maxY = workArea.y + workArea.height - menuSize.height;
+        int above = anchor.y - menuSize.height;
+        int y = anchor.y > maxY && above >= workArea.y ? above : anchor.y;
+        return new Point(Math.max(workArea.x, Math.min(anchor.x, maxX)),
+                Math.max(workArea.y, Math.min(y, maxY)));
     }
 
     JPopupMenu createFrameMenu() {
@@ -761,6 +923,45 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             }
         }
         return menu;
+    }
+
+    int getMaskClipDepthLimit() {
+        return timeline == null || timeline.timelined instanceof ButtonTag || timeline.timelined.getSwf().version < 3
+                ? 0 : getDepthCount();
+    }
+
+    void setMaskClipDepth(int frame, int depth, int clipDepth) {
+        int limit = getMaskClipDepthLimit();
+        if (depth <= 0 || depth > limit || (clipDepth != -1 && (clipDepth <= depth || clipDepth > limit))
+                || getLockedDepths().contains(depth) || getPlacedState(frame, depth) == null) {
+            return;
+        }
+        FrameSpan span = getMaskEditSpan(frame, depth);
+        TimelineFrameEdits edit = new TimelineFrameEdits(timeline, getBlankFrames());
+        edit.editMask(depth, span.first, span.last, clipDepth);
+        applyFrameEdit(edit, "action.editMask", cursor);
+    }
+
+    FrameSpan getMaskEditSpan(int frame, int depth) {
+        FrameSpan selected = getContiguousSelection(frame, depth);
+        int lastRealFrame = timeline.getFrameCount() - 1;
+        if (selected.first != selected.last) {
+            return new FrameSpan(selected.first, Math.min(selected.last, lastRealFrame));
+        }
+        MaskSpan mask = getMaskSpan(frame, depth);
+        if (mask != null) {
+            return new FrameSpan(mask.firstFrame, mask.lastFrame);
+        }
+        FrameSpan block = getFrameBlock(frame, depth, true);
+        int first = frame;
+        int last = frame;
+        while (first > block.first && getMaskClipDepth(first - 1, depth) <= depth) {
+            first--;
+        }
+        while (last < Math.min(block.last, lastRealFrame) && getMaskClipDepth(last + 1, depth) <= depth) {
+            last++;
+        }
+        return new FrameSpan(first, last);
     }
 
     private boolean canClearFrames(Set<Point> cells) {
@@ -1178,7 +1379,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        clearMaskHover();
     }
 
     @Override
@@ -1300,6 +1501,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     public void refresh() {
+        clearMaskHover();
         int frameCount = getDisplayedFrameCount();
         int maxDepth = getDepthCount();
         Dimension dim = new Dimension(getFrameWidth() * frameCount + 1, FRAME_HEIGHT * (maxDepth + 1 /*actions*/ + 1 /*one additional*/));

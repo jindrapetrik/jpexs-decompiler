@@ -156,6 +156,7 @@ public class TimelinePanel extends JPanel {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 timePanel.scroll(e.getValue());
+                timelineBodyPanel.clearMaskHover();
             }
         });
         timelineBodyScrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
@@ -163,6 +164,7 @@ public class TimelinePanel extends JPanel {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 depthPanel.scroll(e.getValue());
+                timelineBodyPanel.clearMaskHover();
             }
         });
 

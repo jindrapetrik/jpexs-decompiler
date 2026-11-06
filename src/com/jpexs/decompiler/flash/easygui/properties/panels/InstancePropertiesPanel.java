@@ -113,6 +113,9 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
     private final EasySwfPanel swfPanel;
     
     private final IntegerPropertyField ratioPropertyField = new IntegerPropertyField(-1, -1, 65535);
+    private final IntegerPropertyField clipDepthPropertyField = new IntegerPropertyField(0, 0, 65535);
+    private final JLabel clipDepthLabel = new JLabel();
+    private boolean maskingVisible;
     
 
     private final JPanel propertiesPanel;
@@ -559,6 +562,12 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             }
         });
 
+        JPanel maskingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 3));
+        clipDepthLabel.setText(formatPropertyName("masking.clipDepth"));
+        clipDepthLabel.setLabelFor(clipDepthPropertyField);
+        maskingPanel.add(clipDepthLabel);
+        maskingPanel.add(clipDepthPropertyField);
+
         propertiesPanel = new JPanel();
         propertiesPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         propertiesPanel.setLayout(new GridBagLayout());
@@ -570,14 +579,26 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         addCard(propertiesPanel, "positionSize", null, positionSizePanel, gbc, false);
         addCard(propertiesPanel, "colorEffect", null, colorEffectPanel, gbc, false);
         addCard(propertiesPanel, "display", null, displayPanel, gbc, false);
+        addCard(propertiesPanel, "masking", null, maskingPanel, gbc, false);
         addCard(propertiesPanel, "filters", null, filtersPanel, gbc, !withText);
         if (withText) {
             addCard(propertiesPanel, "text", null, textPanel, gbc, true);
         }
 
         setCardOpened("positionSize", true);
+        setCardVisible("masking", false);
 
         this.swfPanel = swfPanel;
+        clipDepthPropertyField.addValidation(value -> {
+            List<Integer> depths = swfPanel.getDepths();
+            return value == 0 || (depths.size() == 1 && value > depths.get(0) && value <= swfPanel.getMaskClipDepthLimit());
+        });
+        clipDepthPropertyField.addChangeListener(event -> {
+            if (!updating) {
+                int lastMaskedLayer = clipDepthPropertyField.getValue();
+                swfPanel.setMaskClipDepth(lastMaskedLayer == 0 ? -1 : lastMaskedLayer);
+            }
+        });
 
         alphaPercentPropertyField.addChangeListener(new ChangeListener() {
             @Override
@@ -910,6 +931,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
             return;
         }
         propertiesPanel.setVisible(true);
+        updateMasking(dss.size() == 1 ? dss.get(0) : null);
 
         if (dss.size() == 1) {
             EasyTagNameResolver resolver = new EasyTagNameResolver();
@@ -1083,6 +1105,24 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         textPanel.setText(text);
         updating = false;
         revalidate();
+    }
+
+    private void updateMasking(DepthState state) {
+        int limit = swfPanel.getMaskClipDepthLimit();
+        boolean visible = state != null && state.depth > 0 && state.depth <= limit;
+        if (visible != maskingVisible) {
+            setCardVisible("masking", visible);
+            if (visible) {
+                setCardOpened("masking", true);
+            }
+            maskingVisible = visible;
+        }
+        if (visible) {
+            clipDepthPropertyField.setValue(Math.max(0, state.clipDepth), true);
+            boolean editable = state.depth < limit || state.clipDepth >= 0;
+            clipDepthPropertyField.setEnabled(editable);
+            clipDepthLabel.setToolTipText(EasyStrings.translate(editable ? "property.instance.masking.clipDepth.help" : "timeline.mask.requiresHigherLayer"));
+        }
     }
 
     abstract class PlaceChangeDoableOperation extends PropertyChangeDoableOperation {

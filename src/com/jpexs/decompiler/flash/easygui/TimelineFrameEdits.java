@@ -18,6 +18,8 @@ package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.DefineBeforeUsageFixer;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
@@ -25,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
+import com.jpexs.decompiler.flash.tags.converters.PlaceObjectTypeConverter;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -82,6 +85,84 @@ final class TimelineFrameEdits {
             indices.put(tag, index++);
         }
         originalTagCount = index;
+    }
+
+    void editMask(int depth, int first, int last, int clipDepth) {
+        NavigableMap<Integer, List<Tag>> original = getCommands(depth);
+        NavigableMap<Integer, List<Tag>> edited = new TreeMap<>(original);
+        DepthState previous = placedAt(first - 1, depth);
+        int previousClip = previous == null ? -1 : previous.clipDepth;
+        for (int frame = first; frame <= last + 1 && frame < originalFrameCount; frame++) {
+            DepthState state = placedAt(frame, depth);
+            int desired = state == null ? -1 : frame <= last ? clipDepth : state.clipDepth;
+            if (state != null) {
+                List<Tag> commands = original.getOrDefault(frame, Collections.emptyList());
+                boolean sameInstance = previous != null && previous.instanceId == state.instanceId;
+                boolean inheritsClip = sameInstance
+                        && commands.stream().noneMatch(tag -> TimelineDepthMove.clipDepthOf(tag) >= 0);
+                int effective = inheritsClip ? previousClip : state.clipDepth;
+                if (desired != effective) {
+                    if (desired >= 0) {
+                        setMaskAtFrame(frame, depth, desired, state, commands);
+                    } else if (!sameInstance || previousClip < 0) {
+                        for (Tag command : commands) {
+                            if (TimelineDepthMove.clipDepthOf(command) >= 0) {
+                                replaceClipDepth((PlaceObjectTypeTag) command, -1);
+                            }
+                        }
+                    } else {
+                        // A Move with no clip depth inherits the mask. Re-place the current state to clear it.
+                        DepthState unmasked = new DepthState(state, state.frame, state.placeFrame, true);
+                        unmasked.clipDepth = -1;
+                        unmasked.hasImage = state.hasImage;
+                        writeState(edited, depth, frame, previous, unmasked);
+                    }
+                }
+            }
+            previous = state;
+            previousClip = desired;
+        }
+        recordChanges(original, edited);
+    }
+
+    private void setMaskAtFrame(int frame, int depth, int clipDepth, DepthState state, List<Tag> commands) {
+        PlaceObjectTypeTag place = state.placeObjectTag;
+        if (place == null || !commands.contains(place)) {
+            PlaceObjectTypeTag move;
+            if (state.isVisible) {
+                move = new PlaceObject2Tag(timelined.getSwf(), true, depth, -1, null, null, -1, null, clipDepth, null);
+            } else {
+                PlaceObject3Tag invisible = new PlaceObject3Tag(timelined.getSwf());
+                invisible.placeFlagMove = true;
+                invisible.depth = depth;
+                invisible.placeFlagHasClipDepth = true;
+                invisible.clipDepth = clipDepth;
+                invisible.placeFlagHasVisible = true;
+                invisible.visible = 0;
+                move = invisible;
+            }
+            move.setTimelined(timelined);
+            addToFrame(frame, move);
+            return;
+        }
+        replaceClipDepth(place, clipDepth);
+    }
+
+    private void replaceClipDepth(PlaceObjectTypeTag place, int clipDepth) {
+        PlaceObjectTypeTag replacement = new PlaceObjectTypeConverter().convertTagType(place, timelined.getSwf(), Math.max(2, place.getPlaceObjectNum()), false);
+        replacement.setTimelined(timelined);
+        TimelineDepthMove.setClipDepth(replacement, clipDepth);
+        boolean hasClipDepth = clipDepth >= 0;
+        if (replacement instanceof PlaceObject2Tag) {
+            ((PlaceObject2Tag) replacement).placeFlagHasClipDepth = hasClipDepth;
+        } else if (replacement instanceof PlaceObject3Tag) {
+            ((PlaceObject3Tag) replacement).placeFlagHasClipDepth = hasClipDepth;
+        } else {
+            ((PlaceObject4Tag) replacement).placeFlagHasClipDepth = hasClipDepth;
+        }
+        int index = indices.get(place);
+        removals.add(index);
+        insertions.computeIfAbsent(index, key -> new ArrayList<>()).add(replacement);
     }
 
     void insertFrames(Set<Point> cells) {
@@ -548,6 +629,7 @@ final class TimelineFrameEdits {
 
     static PlaceObjectTypeTag makePlacement(Timelined target, DepthState state, int depth, boolean move) {
         DepthState placement = new DepthState(state, state.frame, state.placeFrame, true);
+        placement.hasImage = state.hasImage;
         if (move) {
             placement.minPlaceObjectNum = Math.max(2, placement.minPlaceObjectNum);
         }

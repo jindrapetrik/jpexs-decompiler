@@ -2528,6 +2528,17 @@ public class EasySwfPanel extends JPanel {
         return timelinePanel.getTimelineBodyPanel().getFirstFrame();
     }
 
+    public int getMaskClipDepthLimit() {
+        return timelinePanel.getTimelineBodyPanel().getMaskClipDepthLimit();
+    }
+
+    public void setMaskClipDepth(int clipDepth) {
+        List<Integer> depths = getDepths();
+        if (depths.size() == 1) {
+            timelinePanel.getTimelineBodyPanel().setMaskClipDepth(getFrame(), depths.get(0), clipDepth);
+        }
+    }
+
     public ImagePanel getStagePanel() {
         return stagePanel;
     }

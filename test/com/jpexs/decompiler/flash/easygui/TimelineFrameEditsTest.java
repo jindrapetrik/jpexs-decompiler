@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -36,6 +37,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JMenuItem;
@@ -716,6 +718,16 @@ public class TimelineFrameEditsTest {
     }
 
     @Test
+    public void frameMenuOpensAboveTheCursorOrShiftsInsideTheMonitorWorkArea() {
+        Rectangle workArea = new Rectangle(-1600, 40, 1600, 860);
+        Dimension menu = new Dimension(280, 450);
+        assertEquals(TimelineBodyPanel.getFrameMenuLocation(new Point(-1500, 120), menu, workArea), new Point(-1500, 120));
+        assertEquals(TimelineBodyPanel.getFrameMenuLocation(new Point(-200, 700), menu, workArea), new Point(-280, 250));
+        assertEquals(TimelineBodyPanel.getFrameMenuLocation(new Point(-1500, 470), menu, workArea), new Point(-1500, 450));
+        assertEquals(TimelineBodyPanel.getFrameMenuLocation(new Point(-1500, 700), new Dimension(1700, 900), workArea), new Point(-1600, 40));
+    }
+
+    @Test
     public void blankBlocksHaveAHollowMarkerOnlyAtTheirStart() throws Exception {
         SWF swf = new SWF();
         int character = shape(swf);
@@ -737,13 +749,7 @@ public class TimelineFrameEditsTest {
             try {
                 TimelineBodyPanel body = new TimelineBodyPanel(null, new UndoManager());
                 body.setTimeline(swf.getTimeline());
-                BufferedImage image = new BufferedImage(body.getWidth(), body.getHeight(), BufferedImage.TYPE_INT_RGB);
-                Graphics2D graphics = image.createGraphics();
-                try {
-                    body.paint(graphics);
-                } finally {
-                    graphics.dispose();
-                }
+                BufferedImage image = paintTimeline(body);
 
                 int background = TimelineBodyPanel.getEmptyFrameColor().getRGB();
                 for (int frame : new int[]{0, 4}) {
@@ -758,6 +764,175 @@ public class TimelineFrameEditsTest {
                 Configuration.useRibbonInterface.set(ribbon);
             }
         });
+    }
+
+    @Test
+    public void maskStripesAndHoverFollowTheClipDepthInEachFrame() throws Exception {
+        SWF swf = new SWF();
+        int character = shape(swf);
+        place(swf, 2, character, 0, false);
+        place(swf, 4, character, 0, false);
+        place(swf, 6, character, 0, false);
+        endFrame(swf);
+        swf.addTag(new PlaceObject2Tag(swf, true, 2, -1, null, null, -1, null, 5, null));
+        endFrame(swf);
+        endFrame(swf);
+        swf.addTag(new PlaceObject2Tag(swf, true, 2, -1, null, null, -1, null, 4, null));
+        endFrame(swf);
+        remove(swf, 2);
+        place(swf, 2, character, 0, false);
+        endFrame(swf);
+
+        SwingUtilities.invokeAndWait(() -> {
+            boolean ribbon = Configuration.useRibbonInterface.get();
+            Configuration.useRibbonInterface.set(false);
+            try {
+                TimelineBodyPanel body = new TimelineBodyPanel(null, new UndoManager());
+                body.setTimeline(swf.getTimeline());
+                Rectangle normal = body.getFrameBounds(0, 2);
+                Rectangle start = body.getFrameBounds(1, 2);
+                Rectangle held = body.getFrameBounds(2, 2);
+                Rectangle changed = body.getFrameBounds(3, 2);
+                Rectangle after = body.getFrameBounds(4, 2);
+                BufferedImage idle = paintTimeline(body);
+                int stripe = idle.getRGB(start.x + 3, start.y + 2);
+                assertNotEquals(stripe, idle.getRGB(normal.x + 3, normal.y + 2));
+                assertEquals(idle.getRGB(held.x + 3, held.y + 2), stripe);
+                assertEquals(idle.getRGB(changed.x + 3, changed.y + 2), stripe);
+                assertNotEquals(idle.getRGB(changed.x, changed.y + 2), stripe, "A changed mask range begins a separate stripe");
+                assertEquals(idle.getRGB(after.x + 3, after.y + 2), idle.getRGB(normal.x + 3, normal.y + 2));
+
+                MouseEvent onMask = moveOver(body, held, 2);
+                String tooltip = body.getToolTipText(onMask);
+                assertTrue(tooltip.contains("3\u20135") && tooltip.contains("2\u20133"), tooltip);
+                Rectangle covered = body.getFrameBounds(1, 5);
+                Rectangle outsideDepths = body.getFrameBounds(1, 6);
+                Rectangle outsideFrames = body.getFrameBounds(3, 5);
+                BufferedImage hover = paintTimeline(body);
+                assertNotEquals(hover.getRGB(covered.x + 3, covered.y + 7), idle.getRGB(covered.x + 3, covered.y + 7));
+                assertEquals(hover.getRGB(outsideDepths.x + 3, outsideDepths.y + 7), idle.getRGB(outsideDepths.x + 3, outsideDepths.y + 7));
+                assertEquals(hover.getRGB(outsideFrames.x + 3, outsideFrames.y + 7), idle.getRGB(outsideFrames.x + 3, outsideFrames.y + 7));
+
+                assertNull(body.getToolTipText(moveOver(body, held, 7)));
+                assertEquals(paintTimeline(body).getRGB(covered.x + 3, covered.y + 7), idle.getRGB(covered.x + 3, covered.y + 7));
+                assertNull(body.getToolTipText(moveOver(body, after, 2)));
+
+                body.frameSelect(0, 2, false);
+                assertEquals(body.getMaskEditSpan(0, 2).last, 0, "The normal span stops before the mask-only move");
+                body.frameSelect(2, 2, false);
+                TimelineBodyPanel.FrameSpan mask = body.getMaskEditSpan(2, 2);
+                assertEquals(mask.first, 1);
+                assertEquals(mask.last, 2);
+                assertEquals(body.createFrameMenu().getComponentCount(), 11, "Masking is edited in Properties");
+                body.refreshAfterEdit(swf, new LinkedHashSet<>(Arrays.asList(new Point(2, 2), new Point(3, 2))));
+                TimelineBodyPanel.FrameSpan selected = body.getMaskEditSpan(2, 2);
+                assertEquals(selected.first, 2);
+                assertEquals(selected.last, 3);
+            } finally {
+                Configuration.useRibbonInterface.set(ribbon);
+            }
+        });
+    }
+
+    @Test
+    public void settingAndRemovingMasksPreservesMotionAndRestoresTheFollowingState() throws Exception {
+        SWF swf = new SWF();
+        int character = shape(swf);
+        place(swf, 2, character, 0, false);
+        place(swf, 4, character, 50, false);
+        endFrame(swf);
+        endFrame(swf);
+        place(swf, 2, -1, 100, true);
+        endFrame(swf);
+        endFrame(swf);
+        place(swf, 2, -1, 200, true);
+        endFrame(swf);
+        endFrame(swf);
+
+        TimelineFrameEdits set = new TimelineFrameEdits(swf.getTimeline());
+        set.editMask(2, 1, 3, 4);
+        set.apply();
+        SWF saved = reopen(swf);
+        assertMaskStates(saved, new int[]{-1, 4, 4, 4, -1, -1}, new int[]{0, 0, 100, 100, 200, 200});
+        assertEquals(saved.getTimeline().getDepthState(0, 2).instanceId, saved.getTimeline().getDepthState(3, 2).instanceId);
+        assertEquals(saved.getTimeline().getDepthState(3, 4).matrix.translateX, 50);
+
+        TimelineFrameEdits remove = new TimelineFrameEdits(saved.getTimeline());
+        remove.editMask(2, 2, 2, -1);
+        remove.apply();
+        assertMaskStates(reopen(saved), new int[]{-1, 4, -1, 4, -1, -1}, new int[]{0, 0, 100, 100, 200, 200});
+    }
+
+    @Test
+    public void editingAMaskUpdatesAnExistingPlacementAndSkipsBlankFrames() throws Exception {
+        SWF swf = new SWF();
+        int character = shape(swf);
+        swf.addTag(new PlaceObject2Tag(swf, false, 2, character, new MATRIX(), null, -1, "mask", 4, null));
+        endFrame(swf);
+        endFrame(swf);
+        remove(swf, 2);
+        endFrame(swf);
+        place(swf, 2, character, 25, false);
+        endFrame(swf);
+        endFrame(swf);
+
+        TimelineFrameEdits edit = new TimelineFrameEdits(swf.getTimeline());
+        edit.editMask(2, 0, 3, 5);
+        edit.apply();
+        SWF saved = reopen(swf);
+        assertEquals(saved.getTimeline().getDepthState(0, 2).instanceName, "mask");
+        assertTrue(saved.getTimeline().getDepthState(0, 2).key);
+        assertEquals(saved.getTimeline().getDepthState(0, 2).clipDepth, 5);
+        assertEquals(saved.getTimeline().getDepthState(1, 2).clipDepth, 5);
+        assertNull(saved.getTimeline().getDepthState(2, 2));
+        assertEquals(saved.getTimeline().getDepthState(3, 2).clipDepth, 5);
+        assertEquals(saved.getTimeline().getDepthState(4, 2).clipDepth, -1);
+    }
+
+    @Test
+    public void removingRepeatedMaskCommandsDoesNotRestartThePlacementOnEveryFrame() throws Exception {
+        SWF swf = new SWF();
+        int character = shape(swf);
+        swf.addTag(new PlaceObject2Tag(swf, false, 2, character, new MATRIX(), null, -1, null, 4, null));
+        endFrame(swf);
+        MATRIX moved = new MATRIX();
+        moved.translateX = 100;
+        swf.addTag(new PlaceObject2Tag(swf, true, 2, -1, moved, null, -1, null, 4, null));
+        endFrame(swf);
+        endFrame(swf);
+
+        TimelineFrameEdits edit = new TimelineFrameEdits(swf.getTimeline());
+        edit.editMask(2, 0, 1, -1);
+        edit.apply();
+        SWF saved = reopen(swf);
+        assertMaskStates(saved, new int[]{-1, -1, 4}, new int[]{0, 100, 100});
+        assertEquals(saved.getTimeline().getDepthState(0, 2).instanceId, saved.getTimeline().getDepthState(2, 2).instanceId);
+    }
+
+    private static void assertMaskStates(SWF swf, int[] clips, int[] positions) {
+        assertEquals(swf.getTimeline().getFrameCount(), clips.length);
+        for (int frame = 0; frame < clips.length; frame++) {
+            DepthState state = swf.getTimeline().getDepthState(frame, 2);
+            assertEquals(state.clipDepth, clips[frame], "Mask at frame " + (frame + 1));
+            assertEquals(state.matrix.translateX, positions[frame], "Position at frame " + (frame + 1));
+        }
+    }
+
+    private static MouseEvent moveOver(TimelineBodyPanel body, Rectangle cell, int offsetY) {
+        MouseEvent event = new MouseEvent(body, MouseEvent.MOUSE_MOVED, 0, 0, cell.x + 3, cell.y + offsetY, 0, false);
+        body.dispatchEvent(event);
+        return event;
+    }
+
+    private static BufferedImage paintTimeline(TimelineBodyPanel body) {
+        BufferedImage image = new BufferedImage(body.getWidth(), body.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = image.createGraphics();
+        try {
+            body.paint(graphics);
+        } finally {
+            graphics.dispose();
+        }
+        return image;
     }
 
     @Test
