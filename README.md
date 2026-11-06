@@ -6,32 +6,37 @@ English | [Português (Brasil)](README_pt_BR.md) | [简体中文](README_zh.md)
 
 Open-source Flash SWF decompiler and editor. Extract resources, convert SWF to FLA, edit ActionScript, and replace images, sounds, texts, and fonts. Works with Java on Windows, Linux, and macOS.
 
-## JPEXS AI Studio — first release
+## JPEXS AI Studio
 
-This initial release adds an integrated chat window with direct access to the official **OpenRouter** and **OpenCode Console** APIs. It does not run the OpenCode CLI and cannot yet edit or recompile SWF content using AI tools.
+This release adds an integrated chat window with access to the official **OpenRouter** and **OpenCode Console** APIs and with **OpenCode embedded** for the local OpenCode workflow.
 
 ### Available features
 
-- Choose between OpenRouter and OpenCode Models, including pay-as-you-go and Go plans.
+- Choose between OpenRouter, OpenCode Models, and OpenCode Embedded (CLI), including pay-as-you-go and Go plans for the API provider.
 - Dynamically load model catalogs. OpenRouter models can be filtered by free, paid, or all, with prices read from model metadata.
 - Test the connection and chat with streamed responses.
-- Limit context to structural metadata from the current SWF (name, version, FPS, dimensions, frames, and top-level tag count). The file, scripts, and resources are not uploaded automatically.
+- Limit context to structural metadata from the current SWF for the HTTP providers. In OpenCode Embedded mode, the SWF is copied to a temporary workspace and can be inspected and edited by the AI; the output must be `output.swf`.
+- Full editing through FFDec CLI: scripts, images, sounds, texts, shapes, sprites, and other resources can be exported, edited, and replaced. Before changing the original file, FFDec validates the result, checks that the SWF did not change in the editor during the run, and creates an `.ai-backup-*` backup.
 - No automatic model switching: a request is sent only after the user explicitly selects a model and clicks **Send**.
-- OpenCode models explicitly marked as free are excluded. The Console may also return HTTP 403 for free models that can only be used within OpenCode; JPEXS explains the restriction and does not attempt to bypass it.
+- OpenCode models explicitly marked as free are excluded from the HTTP providers. The Console may also return HTTP 403 for free models that can only be used within OpenCode; JPEXS explains the restriction and does not attempt to bypass it. In Embedded mode, OpenCode applies its own account policy and quota.
 
 ### Setup and usage
 
-Open **Settings → Artificial Intelligence**. Enter the provider's API key, choose a password of at least 12 characters for the credential store, and click **Save and test**. To reuse saved keys after restarting JPEXS, enter the password and click **Unlock**. OpenCode also requires selecting the correct pay-as-you-go or Go plan.
+OpenCode Embedded (CLI) requires no key in the FFDec credential store. It uses the OpenCode account and configuration already authenticated for the current user and now ships the official CLI with FFDec. Select **OpenCode Embedded (CLI)**, refresh the catalog, choose a model, and send a message.
+
+For the API providers (**OpenRouter** and **OpenCode Models**), open **Settings → Artificial Intelligence**. Enter the provider's API key, choose a password of at least 12 characters for the credential store, and click **Save and test**. To reuse saved keys after restarting JPEXS, enter the password and click **Unlock**. OpenCode also requires selecting the correct pay-as-you-go or Go plan.
 
 Keys are stored in an encrypted JCEKS file separate from the TOML configuration and are not written to logs. The credential-store password is not saved. If you forget it, the stored keys cannot be recovered.
 
 Then open **Tools → AI Studio**, refresh the catalog, explicitly choose a model, and send a message. Paid models may incur charges according to the provider's plan; check the price and modality before sending requests. The OpenRouter catalog can be browsed without a key, but chatting requires a valid key. For OpenCode, use a Console key and the plan that matches your account.
 
+In Embedded mode, explicitly request the desired change (for example, replacing a text, an image, or an ActionScript snippet). FFDec creates a temporary working copy of the SWF, allows only `ffdec-cli.exe` for binary operations, and blocks access to other directories. A valid result is applied to the current SWF with a backup; if the file changed in the editor while the AI was working, the result is saved separately.
+
 ### Limitations of this release
 
-This is only the first functional increment. AI editing tools, ActionScript execution, SWF creation, image generation, resource translation, and multi-SWF project management are not yet available. The chat is a separate resizable window, not a docked panel. The context sent contains only structural SWF metadata, not its contents.
+Embedded mode does not yet stream tokens to the interface, execute the Flash Player, generate images, translate resources, or manage multi-SWF projects. The chat is a separate resizable window, not a docked panel. HTTP providers still receive only SWF metadata. Embedded mode can send SWF contents to the selected OpenCode model because it needs to work on the real resources, but it restricts the agent to the temporary workspace and does not use the network.
 
-OpenCode restricts external use of free chat models. JPEXS does not bypass HTTP 403 or automatically switch to a paid model. OpenRouter free models may be selected when their metadata indicates zero cost for the applicable request.
+OpenCode restricts external use of free chat models. JPEXS does not bypass HTTP 403 or automatically switch to a paid model. OpenRouter free models may be selected when their metadata indicates zero cost for the applicable request. In Embedded mode, OpenCode's quota and policy still apply.
 
 See [CHANGELOG_AI.md](CHANGELOG_AI.md), [ARQUITETURA_IA.md](ARQUITETURA_IA.md), and [TESTES_IA.md](TESTES_IA.md) for details and validation status.
 
@@ -82,7 +87,13 @@ The source includes a NetBeans project. Open it in the [NetBeans IDE] to use the
 
 ### Building with Apache Ant
 
-Install Apache Ant and add it to your `PATH`. From the source directory, run:
+Install Apache Ant and add it to your `PATH`. On Windows, FFDec can bundle the official OpenCode CLI, which is not stored in Git. Before building, download the pinned binary with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\fetch-opencode.ps1
+```
+
+The script downloads the official `@opencode/cli-windows-x64` 2.2.5 package from npm and verifies its SHA-256 checksum. From the source directory, run:
 
 ```sh
 ant run
@@ -93,6 +104,8 @@ To build without running:
 ```sh
 ant build
 ```
+
+The release packages created by the maintainers include `opencode.exe`. If you only want to test the embedded provider, you can use the prebuilt release instead of the source build.
 
 ### Libraries
 

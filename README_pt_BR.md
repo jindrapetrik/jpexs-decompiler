@@ -6,32 +6,37 @@
 
 O JPEXS Free Flash Decompiler (FFDec) é um descompilador e editor de arquivos Flash SWF de código aberto. Ele permite extrair recursos, converter SWF para FLA, editar ActionScript e substituir imagens, sons, textos e fontes. Funciona com Java no Windows, Linux e macOS.
 
-## Estúdio de IA JPEXS — primeira entrega
+## Estúdio de IA JPEXS
 
-Esta versão inicial adiciona uma janela de conversa integrada ao JPEXS, com acesso direto às APIs oficiais do **OpenRouter** e do **OpenCode Console**. Ela não executa o OpenCode CLI e ainda não altera nem recompila conteúdo de SWF por meio de ferramentas de IA.
+Esta versão adiciona uma janela de conversa integrada ao JPEXS, com acesso às APIs oficiais do **OpenRouter** e do **OpenCode Console** e com o **OpenCode incorporado** ao aplicativo para o fluxo local do OpenCode.
 
 ### Recursos disponíveis
 
-- Seleção entre OpenRouter e OpenCode Models, incluindo as modalidades de pagamento por uso e Go.
+- Seleção entre OpenRouter, OpenCode Models e OpenCode Embedded (CLI), incluindo as modalidades de pagamento por uso e Go no provedor de API.
 - Carregamento dinâmico dos catálogos de modelos; no OpenRouter, filtro de modelos gratuitos, pagos e todos, com preços obtidos dos metadados.
 - Teste de conexão real e conversa com respostas em streaming.
-- Contexto limitado aos metadados estruturais do SWF atual (nome, versão, FPS, dimensões, quadros e número de tags de nível superior). O arquivo, scripts e recursos não são enviados automaticamente.
+- Contexto limitado aos metadados estruturais do SWF atual para os provedores HTTP. No modo OpenCode Embedded, o SWF é copiado para um workspace temporário e pode ser inspecionado e editado pela IA; a saída precisa ser `output.swf`.
+- Edição completa via FFDec CLI: scripts, imagens, sons, textos, shapes, sprites e outros recursos podem ser exportados, editados e substituídos. Antes de alterar o arquivo original, o FFDec valida o resultado, confere se o SWF não mudou no editor durante a execução e cria backup `.ai-backup-*`.
 - Nenhuma troca automática de modelo. A solicitação só é enviada depois de o usuário escolher um modelo e pressionar **Enviar**.
-- Modelos gratuitos do OpenCode explicitamente marcados como gratuitos são excluídos. O Console também pode responder HTTP 403 para modelos gratuitos que só podem ser usados dentro do OpenCode; nesse caso, o JPEXS informa a restrição e não tenta contorná-la.
+- Modelos gratuitos do OpenCode explicitamente marcados como gratuitos são excluídos dos provedores HTTP. O Console também pode responder HTTP 403 para modelos gratuitos que só podem ser usados dentro do OpenCode; nesse caso, o JPEXS informa a restrição e não tenta contorná-la. No modo Embedded, o OpenCode aplica a política e a cota da própria conta.
 
 ### Configuração e uso
 
-Abra **Configurações → Inteligência Artificial**. Informe a chave API do provedor, escolha uma senha de pelo menos 12 caracteres para o cofre de credenciais e use **Salvar e testar**. Para reusar chaves salvas depois de reiniciar o JPEXS, informe a senha e clique em **Desbloquear**. O OpenCode também exige a seleção correta entre pagamento por uso e Go.
+O modo **OpenCode Embedded (CLI)** não exige chave no cofre do FFDec. Ele usa a conta e a configuração OpenCode já autenticadas no perfil do usuário e agora também distribui o CLI oficial junto com o FFDec. Selecione **OpenCode Embedded (CLI)**, atualize o catálogo, escolha um modelo e envie uma mensagem.
+
+Para os provedores de API (**OpenRouter** e **OpenCode Models**), abra **Configurações → Inteligência Artificial**. Informe a chave API do provedor, escolha uma senha de pelo menos 12 caracteres para o cofre de credenciais e use **Salvar e testar**. Para reusar chaves salvas depois de reiniciar o JPEXS, informe a senha e clique em **Desbloquear**. O OpenCode também exige a seleção correta entre pagamento por uso e Go.
 
 As chaves são guardadas em um arquivo JCEKS criptografado separado da configuração TOML e não são registradas nos logs. A senha do cofre não é salva. Se esquecê-la, as chaves guardadas não poderão ser recuperadas.
 
 Depois, abra **Ferramentas → Estúdio de IA**, atualize o catálogo, escolha explicitamente um modelo e envie uma mensagem. Modelos pagos podem gerar custos conforme o plano do provedor; confira preço e modalidade antes de enviar solicitações. A lista do OpenRouter é pública e pode ser consultada sem chave, mas conversar requer uma chave válida. Para o OpenCode, use uma chave Console e a modalidade correspondente à sua conta.
 
+No modo Embedded, peça explicitamente a alteração desejada (por exemplo, trocar um texto, uma imagem ou um trecho de ActionScript). O FFDec faz uma cópia de trabalho do SWF em um diretório temporário, autoriza somente o `ffdec-cli.exe` para operações binárias e não permite acesso a outros diretórios. O resultado válido é aplicado ao SWF atual com backup; se o arquivo mudou no editor enquanto a IA estava trabalhando, o resultado é salvo separadamente.
+
 ### Limitações desta entrega
 
-Este é somente o primeiro incremento funcional. A IA ainda não tem ferramentas de edição, execução de ActionScript, criação de SWF, geração de imagens, tradução de recursos nem gestão de projetos com múltiplos SWFs. Também não é um painel acoplado lateralmente às telas do editor; ele abre em uma janela redimensionável. O contexto enviado contém somente metadados estruturais do SWF, não seu conteúdo.
+O modo Embedded ainda não oferece streaming de tokens na interface, execução do Flash Player, geração de imagens, tradução de recursos nem gestão de projetos com múltiplos SWFs. Também não é um painel acoplado lateralmente às telas do editor; ele abre em uma janela redimensionável. Os provedores HTTP continuam recebendo somente metadados do SWF. O modo Embedded pode enviar o conteúdo do SWF ao modelo escolhido dentro do OpenCode, porque precisa trabalhar nos recursos reais, mas restringe o agente ao workspace temporário e não usa a rede.
 
-O OpenCode restringe o uso externo de modelos gratuitos de chat. O JPEXS não tenta contornar HTTP 403 nem muda automaticamente para um modelo pago. É possível escolher modelos gratuitos do OpenRouter quando seus metadados indicarem custo zero para a solicitação aplicável.
+O OpenCode restringe o uso externo de modelos gratuitos de chat. O JPEXS não tenta contornar HTTP 403 nem muda automaticamente para um modelo pago. É possível escolher modelos gratuitos do OpenRouter quando seus metadados indicarem custo zero para a solicitação aplicável. No modo Embedded, a cota e a política do OpenCode continuam valendo.
 
 Consulte [CHANGELOG_AI.md](CHANGELOG_AI.md), [ARQUITETURA_IA.md](ARQUITETURA_IA.md) e [TESTES_IA.md](TESTES_IA.md) para detalhes desta etapa e seu estado de validação.
 
@@ -82,7 +87,13 @@ O código inclui um projeto NetBeans. Abra-o na [IDE NetBeans] para usar as aç�
 
 ### Compilar com Apache Ant
 
-Instale o Apache Ant e adicione-o ao `PATH`. No diretório do código-fonte, execute:
+Instale o Apache Ant e adicione-o ao `PATH`. No Windows, o FFDec pode incorporar o OpenCode CLI oficial, que não é armazenado no Git. Antes de compilar, baixe o binário fixado com:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\fetch-opencode.ps1
+```
+
+O script baixa o pacote oficial `@opencode/cli-windows-x64` 2.2.5 do npm e verifica o SHA-256. No diretório do código-fonte, execute:
 
 ```sh
 ant run
@@ -93,6 +104,8 @@ Para apenas compilar:
 ```sh
 ant build
 ```
+
+Os pacotes de release publicados pelos mantenedores incluem o `opencode.exe`. Se você só quer testar o provedor incorporado, pode usar o Release pré-compilado em vez de compilar do fonte.
 
 ### Bibliotecas
 

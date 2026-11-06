@@ -1,4 +1,8 @@
 *.orig
+# Local release package; attach it to GitHub Releases instead of committing it
+/FFDec-26.4.0-opencode-windows-x64.zip
+# The OpenCode binary is too large for Git; users/builds download it with scripts/fetch-opencode.ps1
+/resources/opencode/opencode.exe
 *.dcu
 *.ddp
 *.orig.*

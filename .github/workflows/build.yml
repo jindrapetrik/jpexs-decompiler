@@ -251,6 +251,10 @@ jobs:
       
       - name: Set up Ant
         run: choco install ant -y
+
+      - name: Fetch OpenCode CLI
+        shell: pwsh
+        run: .\scripts\fetch-opencode.ps1
       
       - name: Download version.properties artifact
         uses: actions/download-artifact@v8

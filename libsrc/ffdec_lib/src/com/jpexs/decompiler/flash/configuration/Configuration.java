@@ -90,6 +90,10 @@ public final class Configuration {
     @ConfigurationCategory("ai")
     public static ConfigurationItem<String> aiOpenCodePlan = null;
 
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("ai")
+    public static ConfigurationItem<String> aiOpenCodeCliModel = null;
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> decompile = null;

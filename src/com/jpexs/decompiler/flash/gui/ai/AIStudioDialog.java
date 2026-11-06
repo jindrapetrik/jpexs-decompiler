@@ -8,10 +8,13 @@
  */
 package com.jpexs.decompiler.flash.gui.ai;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -31,7 +34,8 @@ public class AIStudioDialog extends AppDialog {
 
     private final JComboBox<ProviderOption> providerCombo = new JComboBox<>(new ProviderOption[]{
         new ProviderOption(OpenRouterProvider.ID, "OpenRouter"),
-        new ProviderOption(OpenCodeModelsProvider.ID, "OpenCode Models")
+        new ProviderOption(OpenCodeModelsProvider.ID, "OpenCode Models"),
+        new ProviderOption(OpenCodeEmbeddedProvider.ID, text("provider.opencodeCli"))
     });
     private final JComboBox<OpenCodePlanOption> planCombo = new JComboBox<>(new OpenCodePlanOption[]{
         new OpenCodePlanOption(OpenCodeModelsProvider.PLAN_PAY_AS_YOU_GO, text("plan.payg")),
@@ -51,14 +55,17 @@ public class AIStudioDialog extends AppDialog {
     private final JButton sendButton = new JButton(text("button.send"));
     private final AIModelCatalog modelCatalog = new AIModelCatalog();
     private final AIChatService chatService = new AIChatService();
+    private final OpenCodeEmbeddedChatService embeddedChatService = new OpenCodeEmbeddedChatService();
     private final List<AIChatMessage> history = new ArrayList<>();
     private List<AIModel> allModels = new ArrayList<>();
     private final String context;
+    private final SWF swf;
     private final String sessionId = new AIChatService().newSessionId();
     private boolean initialized;
 
-    public AIStudioDialog(Window owner, String swfTitle, String swfContext) {
+    public AIStudioDialog(Window owner, SWF swf, String swfTitle, String swfContext) {
         super(owner);
+        this.swf = swf;
         setTitle(text("studio.title"));
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setModal(false);
@@ -76,6 +83,12 @@ public class AIStudioDialog extends AppDialog {
         if (!swfTitleEmpty(swfTitle)) {
             conversation.append(text("context.currentSwf") + ": " + swfContext + "\n\n");
         }
+    }
+
+    @Override
+    public void dispose() {
+        embeddedChatService.close();
+        super.dispose();
     }
 
     private void initComponents() {
@@ -129,7 +142,8 @@ public class AIStudioDialog extends AppDialog {
 
     private void loadConfiguration() {
         String providerId = Configuration.aiProvider.get();
-        providerCombo.setSelectedIndex(OpenCodeModelsProvider.ID.equals(providerId) ? 1 : 0);
+        providerCombo.setSelectedIndex(OpenCodeEmbeddedProvider.ID.equals(providerId) ? 2
+                : OpenCodeModelsProvider.ID.equals(providerId) ? 1 : 0);
         String plan = Configuration.aiOpenCodePlan.get();
         planCombo.setSelectedIndex(OpenCodeModelsProvider.PLAN_GO.equals(plan) ? 1 : 0);
         filterCombo.setSelectedIndex(0);
@@ -150,9 +164,11 @@ public class AIStudioDialog extends AppDialog {
             Configuration.saveConfig();
         }
         boolean openCode = OpenCodeModelsProvider.ID.equals(option.id);
+        boolean embedded = OpenCodeEmbeddedProvider.ID.equals(option.id);
         planCombo.setVisible(openCode);
-        filterCombo.setVisible(!openCode);
-        filterCombo.setEnabled(!openCode);
+        filterCombo.setVisible(!openCode && !embedded);
+        filterCombo.setEnabled(!openCode && !embedded);
+        settingsButton.setEnabled(!embedded);
         refreshModels();
     }
 
@@ -169,6 +185,8 @@ public class AIStudioDialog extends AppDialog {
         }
         if (OpenRouterProvider.ID.equals(provider.id)) {
             Configuration.aiOpenRouterModel.set(model.getId());
+        } else if (OpenCodeEmbeddedProvider.ID.equals(provider.id)) {
+            Configuration.aiOpenCodeCliModel.set(model.getId());
         } else {
             Configuration.aiOpenCodeModel.set(model.getId());
         }
@@ -210,9 +228,12 @@ public class AIStudioDialog extends AppDialog {
         AIModelCatalog.Filter filter = filterOption == null
                 ? AIModelCatalog.Filter.ALL : filterOption.filter;
         String providerId = getProviderId();
-        String savedModel = OpenCodeModelsProvider.ID.equals(providerId)
-                ? Configuration.aiOpenCodeModel.get() : Configuration.aiOpenRouterModel.get();
-        List<AIModel> models = OpenCodeModelsProvider.ID.equals(providerId)
+        boolean embedded = OpenCodeEmbeddedProvider.ID.equals(providerId);
+        String savedModel = OpenCodeEmbeddedProvider.ID.equals(providerId)
+                ? Configuration.aiOpenCodeCliModel.get()
+                : OpenCodeModelsProvider.ID.equals(providerId)
+                        ? Configuration.aiOpenCodeModel.get() : Configuration.aiOpenRouterModel.get();
+        List<AIModel> models = OpenCodeModelsProvider.ID.equals(providerId) || embedded
                 ? allModels : modelCatalog.filter(allModels, filter);
         modelCombo.removeAllItems();
         int selectedIndex = -1;
@@ -245,6 +266,27 @@ public class AIStudioDialog extends AppDialog {
         sendButton.setEnabled(false);
         refreshButton.setEnabled(false);
         statusLabel.setText(text("status.sending"));
+        if (OpenCodeEmbeddedProvider.ID.equals(providerId)) {
+            new javax.swing.SwingWorker<OpenCodeEmbeddedChatService.EmbeddedResult, Void>() {
+                @Override
+                protected OpenCodeEmbeddedChatService.EmbeddedResult doInBackground() throws Exception {
+                    return embeddedChatService.send(model.getId(), swf, userText);
+                }
+
+                @Override
+                protected void done() {
+                    finishSendButtons();
+                    try {
+                        OpenCodeEmbeddedChatService.EmbeddedResult result = get();
+                        String answer = result.text == null ? "" : result.text;
+                        appendAnswer(answer, applyNote(result), result.reloadList);
+                    } catch (Exception ex) {
+                        appendFailure(ex);
+                    }
+                }
+            }.execute();
+            return;
+        }
         new javax.swing.SwingWorker<String, Void>() {
             @Override
             protected String doInBackground() throws Exception {
@@ -255,24 +297,69 @@ public class AIStudioDialog extends AppDialog {
 
             @Override
             protected void done() {
-                sendButton.setEnabled(true);
-                refreshButton.setEnabled(true);
+                finishSendButtons();
                 try {
-                    String answer = get();
-                    if (answer.isEmpty()) {
-                        conversation.append("\n[" + text("status.emptyResponse") + "]");
-                    }
-                    conversation.append("\n\n");
-                    history.add(new AIChatMessage("assistant", answer));
-                    statusLabel.setText(text("status.ready"));
+                    appendAnswer(get(), null, null);
                 } catch (Exception ex) {
-                    Throwable cause = ex.getCause() == null ? ex : ex.getCause();
-                    conversation.append("\n[" + text("status.error") + ": "
-                            + cause.getMessage() + "]\n\n");
-                    statusLabel.setText(text("status.failed"));
+                    appendFailure(ex);
                 }
             }
         }.execute();
+    }
+
+    private void finishSendButtons() {
+        sendButton.setEnabled(true);
+        refreshButton.setEnabled(true);
+    }
+
+    private void appendAnswer(String answer, String note, OpenableList reloadList) {
+        if (answer == null || answer.isEmpty()) {
+            conversation.append("\n[" + text("status.emptyResponse") + "]");
+            answer = "";
+        }
+        conversation.append("\n\n");
+        if (note != null && !note.isEmpty()) {
+            conversation.append(note);
+            conversation.append("\n\n");
+        }
+        history.add(new AIChatMessage("assistant", answer));
+        if (reloadList != null) {
+            try {
+                Main.reloadFile(reloadList);
+            } catch (RuntimeException ex) {
+                conversation.append("[" + text("status.error") + ": " + ex.getMessage() + "]\n\n");
+            }
+        }
+        statusLabel.setText(text("status.ready"));
+    }
+
+    private void appendFailure(Exception ex) {
+        Throwable cause = ex.getCause() == null ? ex : ex.getCause();
+        conversation.append("\n[" + text("status.error") + ": "
+                + cause.getMessage() + "]\n\n");
+        statusLabel.setText(text("status.failed"));
+    }
+
+    private String applyNote(OpenCodeEmbeddedChatService.EmbeddedResult result) {
+        StringBuilder note = new StringBuilder();
+        switch (result.applyStatus) {
+            case REPLACED:
+                note.append(text("apply.applied"));
+                break;
+            case SAVED_SEPARATE:
+                note.append(text("apply.separate"));
+                break;
+            default:
+                note.append(text("apply.unchanged"));
+                break;
+        }
+        if (result.appliedFile != null && !result.appliedFile.isEmpty()) {
+            note.append("\n").append(result.appliedFile);
+        }
+        if (result.backupFile != null && !result.backupFile.isEmpty()) {
+            note.append("\n").append(result.backupFile);
+        }
+        return note.toString();
     }
 
     private String getProviderId() {

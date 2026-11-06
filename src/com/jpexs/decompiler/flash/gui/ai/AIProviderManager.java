@@ -23,6 +23,7 @@ public final class AIProviderManager {
     private AIProviderManager() {
         register(new OpenRouterProvider());
         register(new OpenCodeModelsProvider());
+        register(new OpenCodeEmbeddedProvider());
     }
 
     public static AIProviderManager getInstance() {

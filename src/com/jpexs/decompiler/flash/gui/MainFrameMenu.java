@@ -941,7 +941,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         SWF swf = mainFrame.getPanel().getCurrentSwf();
         String swfTitle = swf == null ? "" : swf.getTitleOrShortFileName();
         String swfContext = new AIContextManager().describe(swf);
-        new AIStudioDialog(mainFrame.getWindow(), swfTitle, swfContext).setVisible(true);
+        new AIStudioDialog(mainFrame.getWindow(), swf, swfTitle, swfContext).setVisible(true);
     }
 
     protected void solEditorActionPerformed(ActionEvent evt) {

@@ -20,6 +20,9 @@ public class AIModelCatalog {
     }
 
     public List<AIModel> load(String providerId, String plan) throws IOException {
+        if (OpenCodeEmbeddedProvider.ID.equals(providerId)) {
+            return new OpenCodeEmbeddedProvider().loadModels("", plan);
+        }
         AIProvider provider = AIProviderManager.getInstance().getProvider(providerId);
         String apiKey = "";
         if (AICredentialManager.isUnlocked()) {
