@@ -143,6 +143,10 @@ public class ShapeStyleChangeOperation implements DoableOperation {
     }
 
     private static SHAPEWITHSTYLE createShapeData(ShapeSelection model) {
+        SHAPEWITHSTYLE editedRecords = model.getEditedRecords();
+        if (editedRecords != null) {
+            return editedRecords;
+        }
         SHAPEWITHSTYLE data = SHAPEWITHSTYLE.createEmpty(4);
         data.shapeRecords.clear();
         List<FILLSTYLE> fills = new ArrayList<>();
@@ -201,7 +205,7 @@ public class ShapeStyleChangeOperation implements DoableOperation {
         return result;
     }
 
-    private static SHAPEWITHSTYLE convertLayer(SHAPEWITHSTYLE layer, int sourceShapeNum, int shapeNum) {
+    static SHAPEWITHSTYLE convertLayer(SHAPEWITHSTYLE layer, int sourceShapeNum, int shapeNum) {
         if (sourceShapeNum == shapeNum) {
             return layer;
         }

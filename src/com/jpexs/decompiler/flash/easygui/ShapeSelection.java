@@ -60,11 +60,27 @@ public class ShapeSelection {
     private int floatingStart = -1;
 
     private final List<Selection> parts = new ArrayList<>();
+    private final Map<Integer, FillLocation> fillLocations = new LinkedHashMap<>();
+    private final ShapeTag sourceShape;
+    private final SHAPEWITHSTYLE sourceLayer;
+    private final int sourceShapeNum;
+    private SHAPEWITHSTYLE editedRecords;
+
+    private static final class FillLocation {
+
+        private final int group;
+        private final int style;
+
+        private FillLocation(int group, int style) {
+            this.group = group;
+            this.style = style;
+        }
+    }
 
     private static class Paths extends PathExporter {
 
-        Paths(ShapeTag shape, SHAPEWITHSTYLE styles) {
-            super(shape.getWindingRule(), shape.getShapeNum(), shape.getSwf(), styles, null);
+        Paths(ShapeTag shape, SHAPEWITHSTYLE styles, int shapeNum) {
+            super(shape.getWindingRule(), shapeNum, shape.getSwf(), styles, null);
         }
 
         List<List<IEdge>> fills() {
@@ -108,15 +124,22 @@ public class ShapeSelection {
     }
 
     ShapeSelection(ShapeTag shape, SHAPEWITHSTYLE styles) {
-        Paths paths = new Paths(shape, styles);
+        this(shape, styles, shape.getShapeNum());
+    }
+
+    private ShapeSelection(ShapeTag shape, SHAPEWITHSTYLE styles, int shapeNum) {
+        sourceShape = shape;
+        sourceLayer = styles;
+        sourceShapeNum = shapeNum;
+        Paths paths = new Paths(shape, styles, shapeNum);
         List<FILLSTYLE> fills = new ArrayList<>(Arrays.asList(styles.fillStyles.fillStyles));
         List<ILINESTYLE> lines = new ArrayList<>();
-        addLineStyles(lines, styles.lineStyles, shape.getShapeNum());
+        addLineStyles(lines, styles.lineStyles, shapeNum);
         for (SHAPERECORD record : styles.shapeRecords) {
             if (record instanceof StyleChangeRecord && ((StyleChangeRecord) record).stateNewStyles) {
                 StyleChangeRecord change = (StyleChangeRecord) record;
                 fills.addAll(Arrays.asList(change.fillStyles.fillStyles));
-                addLineStyles(lines, change.lineStyles, shape.getShapeNum());
+                addLineStyles(lines, change.lineStyles, shapeNum);
             }
         }
         for (int group = 0; group < paths.fills().size(); group++) {
@@ -124,6 +147,7 @@ public class ShapeSelection {
                 int index = entry.getKey() - 1;
                 if (index >= 0 && index < fills.size()) {
                     Shape area = new Area(entry.getValue());
+                    fillLocations.put(parts.size(), new FillLocation(group, index + 1));
                     parts.add(new Selection(fills.get(index), null, area, null, area, false, parts.size()));
                 }
             }
@@ -147,6 +171,9 @@ public class ShapeSelection {
     }
 
     private ShapeSelection() {
+        sourceShape = null;
+        sourceLayer = null;
+        sourceShapeNum = 0;
     }
 
     public static class Edit {
@@ -388,7 +415,7 @@ public class ShapeSelection {
         return unique;
     }
 
-    private static double[][] edgePoints(Shape edge) {
+    static double[][] edgePoints(Shape edge) {
         PathIterator iterator = edge.getPathIterator(null);
         double[] coords = new double[6];
         iterator.currentSegment(coords);
@@ -518,7 +545,7 @@ public class ShapeSelection {
         return a.isDone() && b.isDone();
     }
 
-    private static FILLSTYLE normalizedFill(FILLSTYLE fill) {
+    static FILLSTYLE normalizedFill(FILLSTYLE fill) {
         if (fill == null) {
             return null;
         }
@@ -532,7 +559,7 @@ public class ShapeSelection {
         return result;
     }
 
-    private static boolean sameLine(ILINESTYLE first, ILINESTYLE second) {
+    static boolean sameLine(ILINESTYLE first, ILINESTYLE second) {
         if (first == second) {
             return true;
         }
@@ -1094,6 +1121,14 @@ public class ShapeSelection {
             return new BatchEdit(this, new ArrayList<>(), false);
         }
         if (region.index >= 0) {
+            SHAPEWITHSTYLE layer = originalStyleLayer(region);
+            if (layer != null) {
+                FillLocation location = fillLocations.get(region.index);
+                SHAPEWITHSTYLE edited = ShapeStyleRecords.applyPaint(layer, location.group, location.style, region.geometry, fill);
+                if (edited != null) {
+                    return styleRecordEdit(edited);
+                }
+            }
             BatchEdit edit = changeAll(Collections.singletonList(region), item -> fill, null);
             return new BatchEdit(edit.model.splitIntersections(), new ArrayList<>(), edit.changed);
         }
@@ -1168,6 +1203,10 @@ public class ShapeSelection {
         if (target == null && strokes.isEmpty()) {
             return new BatchEdit(this, new ArrayList<>(), false);
         }
+        BatchEdit shared = outlineFillRecords(region, target, coveredPaths);
+        if (shared != null) {
+            return shared;
+        }
         if (target == null) {
             BatchEdit cleared = divided.changeAll(strokes, null, item -> null);
             return new BatchEdit(cleared.changed ? cleared.model : this, new ArrayList<>(), cleared.changed);
@@ -1183,6 +1222,40 @@ public class ShapeSelection {
         // settings also apply at vertices shared by different original paths.
         BatchEdit outlined = cleared.model.drawStroke(joinBoundaryEdges(coveredPaths), target);
         return new BatchEdit(outlined.model, new ArrayList<>(), cleared.changed || outlined.changed);
+    }
+
+    private BatchEdit outlineFillRecords(Selection region, ILINESTYLE line, Shape coveredPaths) {
+        SHAPEWITHSTYLE layer = originalStyleLayer(region);
+        if (layer == null) {
+            return null;
+        }
+        FillLocation location = fillLocations.get(region.index);
+        SHAPEWITHSTYLE edited = ShapeStyleRecords.applyInk(layer, location.group, location.style, region.geometry, coveredPaths, line);
+        if (edited == null) {
+            return null;
+        }
+        if (edited == layer) {
+            return new BatchEdit(this, new ArrayList<>(), false);
+        }
+        return styleRecordEdit(edited);
+    }
+
+    private SHAPEWITHSTYLE originalStyleLayer(Selection region) {
+        if (sourceShape == null || !fillLocations.containsKey(region.index) || sourceLayer.shapeRecords.stream().anyMatch(record ->
+                record instanceof StyleChangeRecord && ((StyleChangeRecord) record).stateNewStyles)) {
+            return null;
+        }
+        return ShapeStyleChangeOperation.convertLayer(sourceLayer, sourceShapeNum, 4);
+    }
+
+    private BatchEdit styleRecordEdit(SHAPEWITHSTYLE edited) {
+        ShapeSelection result = new ShapeSelection(sourceShape, edited, 4);
+        result.editedRecords = edited;
+        return new BatchEdit(result, new ArrayList<>(), true);
+    }
+
+    SHAPEWITHSTYLE getEditedRecords() {
+        return editedRecords;
     }
 
     private static Path2D.Double joinBoundaryEdges(Shape boundary) {
@@ -1220,7 +1293,7 @@ public class ShapeSelection {
         return result;
     }
 
-    private static boolean followsBoundary(double[][] points, Shape boundary) {
+    static boolean followsBoundary(double[][] points, Shape boundary) {
         for (double t : new double[]{0, 0.25, 0.5, 0.75, 1}) {
             double[] point = curvePoint(points, t);
             if (!boundary.contains(point[0], point[1])) {
@@ -1640,7 +1713,7 @@ public class ShapeSelection {
         return false;
     }
 
-    private static List<Path2D.Double> strokeEdges(Shape path) {
+    static List<Path2D.Double> strokeEdges(Shape path) {
         List<Path2D.Double> edges = new ArrayList<>();
         double[] coords = new double[6];
         double x = 0;

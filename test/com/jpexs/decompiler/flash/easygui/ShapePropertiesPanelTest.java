@@ -32,6 +32,7 @@ import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Constructor;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -202,11 +203,15 @@ public class ShapePropertiesPanelTest {
         SwingUtilities.invokeAndWait(() -> {
             try {
                 ShapePropertiesPanel panel = new ShapePropertiesPanel();
-                panel.setShape(new DefineShape4Tag(new SWF()));
                 JComboBox<?> fillType = (JComboBox<?>) field(field(panel, "fillEditor"), "typeComboBox");
                 JComboBox<?> strokeType = (JComboBox<?>) field(field(panel, "strokeEditor"), "typeComboBox");
+                assertFalse(fillType.isEnabled());
+                assertFalse(strokeType.isEnabled());
+                panel.setShape(new DefineShape4Tag(new SWF()));
                 assertEquals(fillType.getSelectedIndex(), 0);
                 assertEquals(strokeType.getSelectedIndex(), 0);
+                assertFalse(fillType.isEnabled());
+                assertFalse(strokeType.isEnabled());
                 FILLSTYLE fill = new FILLSTYLE();
                 fill.fillStyleType = FILLSTYLE.RADIAL_GRADIENT;
                 fill.gradient = gradient();
@@ -249,11 +254,16 @@ public class ShapePropertiesPanelTest {
                 assertTrue(fillType.isEnabled());
                 assertFalse(strokeType.isEnabled());
                 assertEquals(strokeType.getSelectedIndex(), 0);
-                panel.setSelectedFill(null);
+                panel.setSelections(Collections.emptyList());
                 assertEquals(fillType.getSelectedIndex(), 0);
                 assertEquals(strokeType.getSelectedIndex(), 0);
+                assertFalse(fillType.isEnabled());
+                assertFalse(strokeType.isEnabled());
+                assertFalse(((JToggleButton) field(panel, "fillTab")).isEnabled());
+                assertFalse(((JToggleButton) field(panel, "strokeTab")).isEnabled());
+                assertFalse(((FloatPropertyField) field(panel, "widthEditor")).isEnabled());
+                panel.setSelectedFill(fill);
                 assertTrue(fillType.isEnabled());
-                assertTrue(strokeType.isEnabled());
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -292,6 +302,9 @@ public class ShapePropertiesPanelTest {
                 assertEquals(edits.get(), 1);
                 JComboBox<?> type = (JComboBox<?>) field(field(panel, "fillEditor"), "typeComboBox");
                 type.setSelectedIndex(2);
+                assertEquals(edits.get(), 1);
+                panel.setSelectedStyles(null, null, null, false);
+                type.setSelectedIndex(2);
                 assertEquals(edits.get(), 2);
                 FILLSTYLE fill = panel.getFillStyle();
                 assertEquals(fill.fillStyleType, FILLSTYLE.LINEAR_GRADIENT);
@@ -321,8 +334,12 @@ public class ShapePropertiesPanelTest {
                 for (String name : new String[]{"fillEditor", "strokeEditor"}) {
                     JComboBox<?> bitmaps = (JComboBox<?>) field(field(panel, name), "bitmapComboBox");
                     assertEquals(bitmaps.getItemCount(), 2);
-                    assertTrue(bitmaps.isEnabled());
+                    assertFalse(bitmaps.isEnabled());
                 }
+                panel.setSelectedStyles(null, null, null, false);
+                assertTrue(((JComboBox<?>) field(field(panel, "fillEditor"), "bitmapComboBox")).isEnabled());
+                panel.setSelectedStyles(null, null, null, true);
+                assertTrue(((JComboBox<?>) field(field(panel, "strokeEditor"), "bitmapComboBox")).isEnabled());
                 panel.setShape(new DefineShape4Tag(empty));
                 for (String name : new String[]{"fillEditor", "strokeEditor"}) {
                     JComboBox<?> bitmaps = (JComboBox<?>) field(field(panel, name), "bitmapComboBox");

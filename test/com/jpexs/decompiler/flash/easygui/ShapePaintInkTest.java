@@ -27,6 +27,10 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -43,6 +47,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -381,6 +386,36 @@ public class ShapePaintInkTest {
     }
 
     @Test
+    public void paintRecolorsOnlyTheSelectedSideOfAnExistingStrokedEdge() throws Exception {
+        DefineShape4Tag original = adjacentFills(1);
+        ShapeSelection model = selection(original);
+        original.getSwf().addTag(original);
+        byte[] before = original.getData();
+
+        ShapeSelection.BatchEdit edit = model.setRegionFill(model.fillRegionAt(point(1500, 500)), fill(Color.green));
+        assertTrue(edit.changed);
+        UndoManager undo = new UndoManager();
+        undo.doOperation(new ShapeStyleChangeOperation(original, edit.model, "Paint", null), original.getSwf());
+        ShapeTag painted = current(original);
+        assertEquals(edgeRecords(painted), edgeRecords(original));
+        ShapeSelection restored = saved(painted);
+        assertEquals(at(restored, 500, 500).fill.color.toColor(), Color.red);
+        assertEquals(at(restored, 1500, 500).fill.color.toColor(), Color.green);
+        assertEquals(at(restored, 1000, 500).line.getWidth(), 200);
+        assertEquals(at(restored, 1000, 500).line.getColor().toColor(), Color.black);
+        ShapeSelection cleared = restored.setRegionFill(restored.fillRegionAt(point(1500, 500)), null).model;
+        assertNull(at(cleared, 1500, 500));
+        assertEquals(at(cleared, 1000, 500).line.getWidth(), 200);
+        assertEquals(at(cleared, 500, 500).fill.color.toColor(), Color.red);
+
+        byte[] after = painted.getData();
+        undo.undo(original.getSwf());
+        assertEquals(current(original).getData(), before);
+        undo.redo(original.getSwf());
+        assertEquals(current(original).getData(), after);
+    }
+
+    @Test
     public void crossingStrokesDivideTheBucketIntoSeparateFaces() {
         DefineShape4Tag shape = shape();
         rectangle(shape, 0, 0, 2000, 2000, 0, 1);
@@ -473,6 +508,7 @@ public class ShapePaintInkTest {
         assertTrue(edit.changed);
         UndoManager undo = new UndoManager();
         undo.doOperation(new ShapeStyleChangeOperation(circle, edit.model, "Ink", null), swf);
+        assertEquals(edgeRecords(current(circle)), edgeRecords(circle));
         ShapeSelection restored = saved(current(circle));
         // The exact leftmost vertex also belongs to the rectangle's bottom
         // stroke, so sample the circle just below that shared junction.
@@ -547,7 +583,7 @@ public class ShapePaintInkTest {
     }
 
     @Test
-    public void inkCreatesAnOutlineWhereTheFilledRegionHasNoStroke() {
+    public void inkAppliesAStrokeToTheExistingFillEdges() throws Exception {
         DefineShape4Tag shape = shape();
         rectangle(shape, 0, 0, 1000, 1000, 1, 0);
         ShapeSelection model = selection(shape);
@@ -556,6 +592,21 @@ public class ShapePaintInkTest {
         style.color = new RGBA(Color.blue);
         ShapeSelection.BatchEdit edit = model.outlineRegion(model.fillRegionAt(point(500, 500)), style);
         assertTrue(edit.changed);
+        ShapeTag edited = ShapeStyleChangeOperation.createShape(shape, edit.model);
+        assertEquals(edgeRecords(edited), edgeRecords(shape));
+        int fillStyle = 0;
+        int lineStyle = 0;
+        for (SHAPERECORD record : edited.getShapes().shapeRecords) {
+            if (record instanceof StyleChangeRecord) {
+                StyleChangeRecord change = (StyleChangeRecord) record;
+                fillStyle = change.stateFillStyle1 ? change.fillStyle1 : fillStyle;
+                lineStyle = change.stateLineStyle ? change.lineStyle : lineStyle;
+            } else if (record instanceof StraightEdgeRecord) {
+                assertEquals(fillStyle, 1);
+                assertTrue(lineStyle > 0);
+                assertEquals(edited.getShapes().lineStyles.lineStyles2[lineStyle - 1].width, 40);
+            }
+        }
         assertEquals(at(edit.model, 500, 500).fill.color.toColor(), Color.red);
         for (Point2D point : new Point2D[]{point(0, 500), point(1000, 500), point(500, 0), point(500, 1000)}) {
             ShapeSelection.Selection border = edit.model.select(point, 0);
@@ -563,6 +614,55 @@ public class ShapePaintInkTest {
             assertEquals(border.line.getWidth(), 40);
             assertEquals(border.line.getColor().toColor(), Color.blue);
         }
+    }
+
+    private static List<SHAPERECORD> edgeRecords(ShapeTag shape) {
+        return shape.getShapes().shapeRecords.stream()
+                .filter(record -> record instanceof StraightEdgeRecord || record instanceof CurvedEdgeRecord)
+                .collect(Collectors.toList());
+    }
+
+    private static DefineShape4Tag adjacentFills(int leftLine) {
+        DefineShape4Tag original = shape();
+        List<SHAPERECORD> records = original.shapes.shapeRecords;
+        move(records, 0, 0, 1, leftLine);
+        edge(records, 1000, 0);
+        StyleChangeRecord shared = new StyleChangeRecord();
+        shared.stateFillStyle0 = true;
+        shared.fillStyle0 = 2;
+        records.add(shared);
+        edge(records, 0, 1000);
+        StyleChangeRecord left = new StyleChangeRecord();
+        left.stateFillStyle0 = true;
+        records.add(left);
+        edge(records, -1000, 0);
+        edge(records, 0, -1000);
+        move(records, 1000, 0, 2, 0);
+        edge(records, 1000, 0);
+        edge(records, 0, 1000);
+        edge(records, -1000, 0);
+        return original;
+    }
+
+    @Test
+    public void inkPreservesBothFillStylesOnASharedEdgeAndReusesItAfterReload() throws Exception {
+        DefineShape4Tag original = adjacentFills(0);
+        ShapeSelection model = selection(original);
+        original.getSwf().addTag(original);
+
+        LINESTYLE2 style = new LINESTYLE2();
+        style.width = 60;
+        style.color = new RGBA(Color.green);
+        ShapeSelection.BatchEdit edit = model.outlineRegion(model.fillRegionAt(point(500, 500)), style);
+        assertTrue(edit.changed);
+        new ShapeStyleChangeOperation(original, edit.model, "Ink", null).doOperation();
+        assertEquals(edgeRecords(current(original)), edgeRecords(original));
+        ShapeSelection reloaded = saved(current(original));
+        assertEquals(at(reloaded, 500, 500).fill.color.toColor(), Color.red);
+        assertEquals(at(reloaded, 1500, 500).fill.color.toColor(), Color.blue);
+        assertEquals(at(reloaded, 1000, 500).line.getWidth(), 60);
+        assertNull(at(reloaded, 1500, -1));
+        assertFalse(reloaded.outlineRegion(reloaded.fillRegionAt(point(500, 500)), style).changed);
     }
 
     @Test

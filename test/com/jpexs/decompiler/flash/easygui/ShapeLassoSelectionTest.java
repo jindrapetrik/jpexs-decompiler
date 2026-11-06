@@ -31,10 +31,12 @@ import com.jpexs.helpers.Helper;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
+import java.awt.Point;
 import java.awt.Shape;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -48,6 +50,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -169,6 +172,70 @@ public class ShapeLassoSelectionTest {
             mouse(canvas, MouseEvent.MOUSE_DRAGGED, screen(panel, coordinates[i], coordinates[i + 1]), shift);
         }
         mouse(canvas, MouseEvent.MOUSE_RELEASED, screen(panel, coordinates[coordinates.length - 2], coordinates[coordinates.length - 1]), shift);
+    }
+
+    @Test
+    public void clickingAnEdgeRefreshesTheMoveCursorWithoutMouseMotion() throws Exception {
+        if (GraphicsEnvironment.isHeadless()) {
+            throw new SkipException("ImagePanel requires a desktop graphics environment");
+        }
+        SwingUtilities.invokeAndWait(() -> {
+            AppStrings.setResourceClass(MainFrame.class);
+            ImagePanel panel = new ImagePanel();
+            try {
+                panel.setSize(800, 600);
+                panel.doLayout();
+                Component canvas = (Component) field(panel, "iconPanel");
+                Point click = SwingUtilities.convertPoint(canvas, canvas.getWidth() / 2, canvas.getHeight() / 2, panel);
+                AtomicBoolean selected = new AtomicBoolean();
+                panel.setRectangleSelectionListener((area, additive) -> { });
+                panel.setSelectionMoveListeners(point -> selected.get(), null);
+                panel.setShapeReshapeHitTest(point -> new ImagePanel.ShapeReshapeGesture() {
+                    @Override
+                    public boolean isAnchor() {
+                        return false;
+                    }
+
+                    @Override
+                    public Shape getOutline() {
+                        return null;
+                    }
+
+                    @Override
+                    public Point2D getAnchor() {
+                        return null;
+                    }
+
+                    @Override
+                    public void update(Point2D point, boolean finished) {
+                    }
+
+                    @Override
+                    public void cancel() {
+                    }
+                });
+                panel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (!e.isConsumed()) {
+                            selected.set(true);
+                        }
+                    }
+                });
+                panel.dispatchEvent(new MouseEvent(panel, MouseEvent.MOUSE_MOVED, 0, 0,
+                        click.x, click.y, 0, false, MouseEvent.NOBUTTON));
+                assertSame(canvas.getCursor(), field(panel, "reshapeEdgeCursor"));
+                for (int id : new int[]{MouseEvent.MOUSE_PRESSED, MouseEvent.MOUSE_RELEASED, MouseEvent.MOUSE_CLICKED}) {
+                    panel.dispatchEvent(new MouseEvent(panel, id, 0, 0, click.x, click.y, 1, false, MouseEvent.BUTTON1));
+                }
+                assertTrue(selected.get());
+                assertSame(canvas.getCursor(), field(panel, "moveCursor"));
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            } finally {
+                panel.clearAll();
+            }
+        });
     }
 
     @Test
