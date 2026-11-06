@@ -29,9 +29,11 @@ import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.PointUpdateListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
+import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
@@ -46,6 +48,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -83,6 +86,91 @@ public class ShapePointEditTest {
 
     private static ShapeTag current(ShapeTag original) {
         return (ShapeTag) original.getSwf().getCharacter(original.shapeId);
+    }
+
+    @Test
+    public void selectToolMovesClosedCornersAndBendsEdgesWithFixedEndpoints() throws Exception {
+        DefineShape4Tag original = rectangleShape();
+        AffineTransform transform = new AffineTransform(0.12, 0.04, 0.03, 0.10, 50, 20);
+        ShapePointEdit.OutlineHit corner = ShapePointEdit.findOutlineHit(original.shapes, 4, new Point2D.Double(20, -15), transform, 1);
+        assertTrue(corner.isAnchor());
+        ShapePointEdit anchorEdit = new ShapePointEdit(original);
+        assertTrue(anchorEdit.reshapeOutline(corner, 120, -80));
+        List<DisplayPoint> points = anchorEdit.getPoints();
+        point(points.get(0), 120, -80);
+        point(points.get(4), 120, -80);
+        point(points.get(1), 1000, 0);
+        PathIterator cornerOutline = ShapePointEdit.getOutline(anchorEdit.getShape().getShapes()).getPathIterator(null);
+        double[] coordinates = new double[6];
+        assertEquals(cornerOutline.currentSegment(coordinates), PathIterator.SEG_MOVETO);
+        assertEquals(coordinates[0], 120.0);
+        assertEquals(coordinates[1], -80.0);
+
+        ShapePointEdit.OutlineHit edge = ShapePointEdit.findOutlineHit(original.shapes, 4, new Point2D.Double(500, 1000), transform, 1);
+        assertFalse(edge.isAnchor());
+        ShapePointEdit edgeEdit = new ShapePointEdit(original);
+        assertTrue(edgeEdit.reshapeOutline(edge, 0, 150));
+        points = edgeEdit.getPoints();
+        point(points.get(2), 1000, 1000);
+        point(points.get(3), 500, 1300);
+        assertFalse(points.get(3).onPath);
+        point(points.get(4), 0, 1000);
+        PathIterator edgeOutline = ShapePointEdit.getOutline(edgeEdit.getShape().getShapes()).getPathIterator(null);
+        edgeOutline.next();
+        edgeOutline.next();
+        edgeOutline.next();
+        assertEquals(edgeOutline.currentSegment(coordinates), PathIterator.SEG_QUADTO);
+        assertEquals(coordinates[0], 500.0);
+        assertEquals(coordinates[1], 1300.0);
+        assertEquals(coordinates[2], 0.0);
+        assertEquals(coordinates[3], 1000.0);
+        assertTrue(edgeEdit.reshapeOutline(edge, 0, -50));
+        point(edgeEdit.getPoints().get(3), 500, 900);
+        assertFalse(new ShapePointEdit(original).isChanged());
+        assertEquals(edges(edgeEdit.getShape()), edges(original));
+    }
+
+    @Test
+    public void selectToolGrabsThickStrokesAtTheirOuterEdgesAndCorners() {
+        DefineShape4Tag shape = shape();
+        shape.shapes.lineStyles.lineStyles2[0].width = 600;
+        rectangle(shape, 0, 0, 1000, 1000, 1, 1);
+        rectangle(shape, 2000, 0, 1000, 1000, 1, 0);
+        AffineTransform placement = new AffineTransform();
+        for (double scale : new double[]{0.025, 0.05, 0.1}) {
+            Point2D corner = new Point2D.Double(-210, -210);
+            ShapePointEdit.OutlineHit anchor = ShapePointEdit.findOutlineHit(shape.shapes, 4, corner, placement, scale);
+            assertEquals(anchor.anchor, new Point2D.Double(0, 0));
+            for (int y : new int[]{-299, 299}) {
+                Point2D pointer = new Point2D.Double(500, y);
+                ShapePointEdit.OutlineHit hit = ShapePointEdit.findOutlineHit(shape.shapes, 4, pointer, placement, scale);
+                assertFalse(hit.isAnchor());
+                assertEquals(hit.edgeIndex, 0);
+            }
+            assertNull(ShapePointEdit.findOutlineHit(shape.shapes, 4, new Point2D.Double(500, -301), placement, scale));
+            assertNull(ShapePointEdit.findOutlineHit(shape.shapes, 4, new Point2D.Double(2500, -299), placement, scale));
+        }
+    }
+
+    @Test
+    public void selectToolUsesPlacementScaleOnlyForScalingStrokes() {
+        DefineShape4Tag shape = rectangleShape();
+        shape.shapes.lineStyles.lineStyles2[0].width = 600;
+        AffineTransform placement = AffineTransform.getScaleInstance(2, 2);
+        Point2D pointer = new Point2D.Double(500, -250);
+        assertFalse(ShapePointEdit.findOutlineHit(shape.shapes, 4, pointer, placement, 0.05).isAnchor());
+        shape.shapes.lineStyles.lineStyles2[0].noHScaleFlag = true;
+        shape.shapes.lineStyles.lineStyles2[0].noVScaleFlag = true;
+        assertNull(ShapePointEdit.findOutlineHit(shape.shapes, 4, pointer, placement, 0.05));
+        assertFalse(ShapePointEdit.findOutlineHit(shape.shapes, 4, new Point2D.Double(500, -149), placement, 0.05).isAnchor());
+
+        DefineShape3Tag legacy = new DefineShape3Tag(new SWF());
+        LINESTYLE line = new LINESTYLE();
+        line.width = 600;
+        legacy.shapes.lineStyles.lineStyles = new LINESTYLE[]{line};
+        legacy.shapes.shapeRecords.clear();
+        rectangle(legacy, 0, 0, 1000, 1000, 0, 1);
+        assertFalse(ShapePointEdit.findOutlineHit(legacy.shapes, 3, pointer, placement, 0.05).isAnchor());
     }
 
     @Test

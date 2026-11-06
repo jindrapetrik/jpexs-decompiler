@@ -9,13 +9,18 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.gui.DisplayPoint;
+import com.jpexs.decompiler.flash.math.BezierUtils;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +34,9 @@ import java.util.Set;
  * edges and embedded style arrays.
  */
 public final class ShapePointEdit {
+
+    private static final double OUTLINE_TOLERANCE = 5;
+    private static final BezierUtils BEZIER = new BezierUtils();
 
     private final ShapeTag shape;
     private final List<DisplayPoint> originalPoints;
@@ -87,6 +95,198 @@ public final class ShapePointEdit {
 
     private static boolean edge(SHAPERECORD record) {
         return record instanceof StraightEdgeRecord || record instanceof CurvedEdgeRecord;
+    }
+
+    static final class OutlineHit {
+
+        final Point2D anchor;
+        final int edgeIndex;
+        final Point2D control;
+        final double t;
+
+        private OutlineHit(Point2D anchor, int edgeIndex, Point2D control, double t) {
+            this.anchor = anchor;
+            this.edgeIndex = edgeIndex;
+            this.control = control;
+            this.t = t;
+        }
+
+        boolean isAnchor() {
+            return anchor != null;
+        }
+    }
+
+    static OutlineHit findOutlineHit(SHAPEWITHSTYLE layer, int shapeNum, Point2D pointer,
+            AffineTransform placement, double sceneScale) {
+        AffineTransform transform = AffineTransform.getScaleInstance(sceneScale, sceneScale);
+        transform.concatenate(placement);
+        Point2D screen = transform.transform(pointer, null);
+        double anchorDistance = Double.POSITIVE_INFINITY;
+        double edgeDistance = Double.POSITIVE_INFINITY;
+        ILINESTYLE[] lines = shapeNum < 4 ? layer.lineStyles.lineStyles : layer.lineStyles.lineStyles2;
+        Point2D anchor = null;
+        OutlineHit hit = null;
+        int x = 0;
+        int y = 0;
+        int fill0 = 0;
+        int fill1 = 0;
+        int line = 0;
+        double tolerance = OUTLINE_TOLERANCE;
+        int edgeIndex = 0;
+        for (SHAPERECORD record : layer.shapeRecords) {
+            int endX = record.changeX(x);
+            int endY = record.changeY(y);
+            if (record instanceof StyleChangeRecord) {
+                StyleChangeRecord style = (StyleChangeRecord) record;
+                fill0 = style.stateFillStyle0 ? style.fillStyle0 : fill0;
+                fill1 = style.stateFillStyle1 ? style.fillStyle1 : fill1;
+                if (style.stateLineStyle) {
+                    line = style.lineStyle;
+                    ILINESTYLE stroke = line > 0 && line <= lines.length ? lines[line - 1] : null;
+                    tolerance = Math.max(OUTLINE_TOLERANCE, ShapeSelection.strokeWidth(stroke, placement) * sceneScale / 2);
+                }
+            } else if (edge(record)) {
+                if (fill0 != fill1 || line != 0) {
+                    Point2D start = new Point2D.Double(x, y);
+                    Point2D end = new Point2D.Double(endX, endY);
+                    Point2D screenStart = transform.transform(start, null);
+                    Point2D screenEnd = transform.transform(end, null);
+                    double startDistance = screen.distanceSq(screenStart);
+                    double endDistance = screen.distanceSq(screenEnd);
+                    double nearest = Math.min(startDistance, endDistance);
+                    double toleranceSquared = tolerance * tolerance;
+                    if (nearest <= toleranceSquared && nearest <= anchorDistance) {
+                        anchor = startDistance <= endDistance ? start : end;
+                        anchorDistance = nearest;
+                    }
+                    if (anchor == null) {
+                        Point2D control = record instanceof CurvedEdgeRecord
+                                ? new Point2D.Double(x + ((CurvedEdgeRecord) record).controlDeltaX, y + ((CurvedEdgeRecord) record).controlDeltaY)
+                                : new Point2D.Double(x / 2.0 + endX / 2.0, y / 2.0 + endY / 2.0);
+                        Point2D screenControl = transform.transform(control, null);
+                        if (nearEdgeBounds(screen, screenStart, screenControl, screenEnd, tolerance)) {
+                            double t = record instanceof StraightEdgeRecord ? lineParameter(screen, screenStart, screenEnd)
+                                    : BEZIER.closestPointToBezier(screen, screenStart, screenControl, screenEnd);
+                            double distance = screen.distanceSq(BEZIER.pointAt(t, screenStart, screenControl, screenEnd));
+                            if (t > 0 && t < 1 && distance <= toleranceSquared && distance <= edgeDistance) {
+                                hit = new OutlineHit(null, edgeIndex, control, t);
+                                edgeDistance = distance;
+                            }
+                        }
+                    }
+                }
+                edgeIndex++;
+            }
+            x = endX;
+            y = endY;
+        }
+        return anchor == null ? hit : new OutlineHit(anchor, -1, null, 0);
+    }
+
+    private static boolean nearEdgeBounds(Point2D pointer, Point2D start, Point2D control, Point2D end, double tolerance) {
+        return pointer.getX() >= Math.min(start.getX(), Math.min(control.getX(), end.getX())) - tolerance
+                && pointer.getX() <= Math.max(start.getX(), Math.max(control.getX(), end.getX())) + tolerance
+                && pointer.getY() >= Math.min(start.getY(), Math.min(control.getY(), end.getY())) - tolerance
+                && pointer.getY() <= Math.max(start.getY(), Math.max(control.getY(), end.getY())) + tolerance;
+    }
+
+    private static double lineParameter(Point2D pointer, Point2D start, Point2D end) {
+        double dx = end.getX() - start.getX();
+        double dy = end.getY() - start.getY();
+        return ((pointer.getX() - start.getX()) * dx + (pointer.getY() - start.getY()) * dy) / (dx * dx + dy * dy);
+    }
+
+    static Path2D getOutline(SHAPEWITHSTYLE layer) {
+        Path2D outline = new Path2D.Double();
+        int x = 0;
+        int y = 0;
+        int fill0 = 0;
+        int fill1 = 0;
+        int line = 0;
+        boolean penDown = false;
+        for (SHAPERECORD record : layer.shapeRecords) {
+            int endX = record.changeX(x);
+            int endY = record.changeY(y);
+            if (record instanceof StyleChangeRecord) {
+                StyleChangeRecord style = (StyleChangeRecord) record;
+                fill0 = style.stateFillStyle0 ? style.fillStyle0 : fill0;
+                fill1 = style.stateFillStyle1 ? style.fillStyle1 : fill1;
+                line = style.stateLineStyle ? style.lineStyle : line;
+                if (style.stateMoveTo) {
+                    penDown = false;
+                }
+            } else if (edge(record)) {
+                if (fill0 != fill1 || line != 0) {
+                    if (!penDown) {
+                        outline.moveTo(x, y);
+                        penDown = true;
+                    }
+                    if (record instanceof CurvedEdgeRecord) {
+                        CurvedEdgeRecord curve = (CurvedEdgeRecord) record;
+                        outline.quadTo(x + curve.controlDeltaX, y + curve.controlDeltaY, endX, endY);
+                    } else {
+                        outline.lineTo(endX, endY);
+                    }
+                } else {
+                    penDown = false;
+                }
+            }
+            x = endX;
+            y = endY;
+        }
+        return outline;
+    }
+
+    boolean reshapeOutline(OutlineHit hit, int dx, int dy) {
+        if (hit.isAnchor()) {
+            List<DisplayPoint> moved = new ArrayList<>();
+            for (DisplayPoint original : originalPoints) {
+                DisplayPoint point = new DisplayPoint(original);
+                if (point.onPath && point.x == hit.anchor.getX() && point.y == hit.anchor.getY()) {
+                    long x = (long) point.x + dx;
+                    long y = (long) point.y + dy;
+                    if ((int) x != x || (int) y != y) {
+                        return false;
+                    }
+                    point.x = (int) x;
+                    point.y = (int) y;
+                }
+                moved.add(point);
+            }
+            updatePoints(moved);
+        } else if (!bendEdge(hit, dx, dy)) {
+            return false;
+        }
+        return shape.shapes.shapeRecords.stream().noneMatch(SHAPERECORD::isTooLarge);
+    }
+
+    private boolean bendEdge(OutlineHit hit, int dx, int dy) {
+        // In a quadratic curve the control point contributes 2t(1-t) to the grabbed point.
+        double influence = 2 * hit.t * (1 - hit.t);
+        long controlX = Math.round(hit.control.getX() + dx / influence);
+        long controlY = Math.round(hit.control.getY() + dy / influence);
+        List<SHAPERECORD> records = shape.shapes.shapeRecords;
+        int edgeIndex = 0;
+        int x = 0;
+        int y = 0;
+        for (int i = 0; i < records.size(); i++) {
+            SHAPERECORD record = records.get(i);
+            int endX = record.changeX(x);
+            int endY = record.changeY(y);
+            if (edge(record) && edgeIndex++ == hit.edgeIndex) {
+                if (Math.abs(controlX - x) > 65536 || Math.abs(controlX - endX) > 65536
+                        || Math.abs(controlY - y) > 65536 || Math.abs(controlY - endY) > 65536) {
+                    return false;
+                }
+                CurvedEdgeRecord curve = new CurvedEdgeRecord();
+                setEdge(curve, x, y, new DisplayPoint((int) controlX, (int) controlY), new DisplayPoint(endX, endY));
+                records.set(i, curve);
+                return true;
+            }
+            x = endX;
+            y = endY;
+        }
+        return false;
     }
 
     private List<Vertex> vertices() {

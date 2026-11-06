@@ -250,7 +250,7 @@ public class EasySwfPanel extends JPanel {
                 if (pointEdit != null) {
                     pointEdit.updatePoints(points);
                     try {
-                        previewShape(createShapeWithEditedLayer(pointEdit.getShape()));
+                        previewShape(createShapeWithEditedLayer(pointEdit.getShape(), activeShapeLayer));
                     } catch (IOException | InterruptedException ex) {
                         logShapeEditFailure(ex);
                     }
@@ -1255,6 +1255,7 @@ public class EasySwfPanel extends JPanel {
         }
         boolean selecting = shapeSelectionTool();
         stagePanel.setAreaSelectionListener(selecting ? this::selectShapeArea : null, shapeTool == ShapeTool.LASSO);
+        stagePanel.setShapeReshapeHitTest(selecting && shapeTool == ShapeTool.SELECT ? this::findShapeReshapeGesture : null);
         stagePanel.setSelectionMoveListeners(!selecting ? null
                 : this::shapeSelectionContains,
                 !selecting ? null : this::moveShapeSelection);
@@ -1408,7 +1409,7 @@ public class EasySwfPanel extends JPanel {
             return;
         }
         try {
-            applyShapeTagEdit(createShapeWithEditedLayer(edit.getShape()),
+            applyShapeTagEdit(createShapeWithEditedLayer(edit.getShape(), activeShapeLayer),
                     EasyStrings.translate("action.editShapePoints"), selected, activeShapeLayer);
         } catch (IOException | InterruptedException ex) {
             logShapeEditFailure(ex);
@@ -1416,12 +1417,12 @@ public class EasySwfPanel extends JPanel {
         }
     }
 
-    private ShapeTag createShapeWithEditedLayer(ShapeTag editedLayer) throws IOException, InterruptedException {
+    private ShapeTag createShapeWithEditedLayer(ShapeTag editedLayer, int layer) throws IOException, InterruptedException {
         if (shapeLayers.size() == 1) {
             return editedLayer;
         }
         List<SHAPEWITHSTYLE> layers = new ArrayList<>(shapeLayers);
-        layers.set(activeShapeLayer, editedLayer.getShapes());
+        layers.set(layer, editedLayer.getShapes());
         return ShapeStyleChangeOperation.createShape(editingShape, layers);
     }
 
@@ -1647,6 +1648,110 @@ public class EasySwfPanel extends JPanel {
 
     private ShapeSelection shapeModel(int layer) {
         return shapeModels.computeIfAbsent(layer, index -> new ShapeSelection(editingShape, shapeLayers.get(index)));
+    }
+
+    private ImagePanel.ShapeReshapeGesture findShapeReshapeGesture(Point2D point) {
+        AffineTransform placement = stagePanel.getParentMatrix().toTransform();
+        double sceneScale = stagePanel.getSceneScale();
+        for (int layer = shapeLayers.size() - 1; layer >= 0; layer--) {
+            if (shapeLayerEditable(layer)) {
+                ShapePointEdit.OutlineHit hit = ShapePointEdit.findOutlineHit(shapeLayers.get(layer), editingShape.getShapeNum(),
+                        point, placement, sceneScale);
+                if (hit != null) {
+                    return new OutlineReshapeGesture(editingShape, layer, hit, point);
+                }
+            }
+        }
+        return null;
+    }
+
+    private final class OutlineReshapeGesture implements ImagePanel.ShapeReshapeGesture {
+
+        private final ShapeTag source;
+        private final int layer;
+        private final ShapePointEdit.OutlineHit hit;
+        private final Point2D start;
+        private ShapePointEdit edit;
+        private Shape outline;
+        private Point2D anchor;
+        private boolean failed;
+
+        private OutlineReshapeGesture(ShapeTag source, int layer, ShapePointEdit.OutlineHit hit, Point2D start) {
+            this.source = source;
+            this.layer = layer;
+            this.hit = hit;
+            this.start = start;
+        }
+
+        @Override
+        public boolean isAnchor() {
+            return hit.isAnchor();
+        }
+
+        @Override
+        public Shape getOutline() {
+            return outline;
+        }
+
+        @Override
+        public Point2D getAnchor() {
+            return anchor;
+        }
+
+        @Override
+        public void update(Point2D point, boolean finished) {
+            if (failed || editingShape != source || !shapeLayerEditable(layer)) {
+                return;
+            }
+            long dx = Math.round(point.getX() - start.getX());
+            long dy = Math.round(point.getY() - start.getY());
+            if ((dx == 0 && dy == 0) || (int) dx != dx || (int) dy != dy) {
+                restoreOutline(finished);
+                return;
+            }
+            try {
+                if (edit == null) {
+                    edit = new ShapePointEdit(source, shapeLayers.get(layer));
+                }
+                if (!edit.reshapeOutline(hit, (int) dx, (int) dy)) {
+                    restoreOutline(finished);
+                    return;
+                }
+                ShapeTag editedLayer = edit.getShape();
+                ShapeTag reshaped = createShapeWithEditedLayer(editedLayer, layer);
+                if (finished) {
+                    clearShapePreview();
+                    applyShapeTagEdit(reshaped, EasyStrings.translate(hit.isAnchor() ? "action.editShapePoints" : "action.reshapeShapeEdge"),
+                            Collections.emptyList(), layer);
+                } else {
+                    previewShape(reshaped);
+                    updateOutline(editedLayer.getShapes(), dx, dy);
+                }
+            } catch (IOException | InterruptedException ex) {
+                failed = true;
+                cancel();
+                logShapeEditFailure(ex);
+            }
+        }
+
+        private void restoreOutline(boolean finished) {
+            clearShapePreview();
+            if (!finished) {
+                updateOutline(shapeLayers.get(layer), 0, 0);
+            }
+        }
+
+        private void updateOutline(SHAPEWITHSTYLE shapes, long dx, long dy) {
+            outline = ShapePointEdit.getOutline(shapes);
+            anchor = hit.isAnchor() ? new Point2D.Double(hit.anchor.getX() + dx, hit.anchor.getY() + dy) : null;
+        }
+
+        @Override
+        public void cancel() {
+            outline = null;
+            anchor = null;
+            clearShapePreview();
+        }
     }
 
     private void selectShapeAt(Point2D point, boolean additive) {
