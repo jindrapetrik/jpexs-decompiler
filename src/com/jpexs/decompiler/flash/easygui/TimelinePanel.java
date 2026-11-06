@@ -57,6 +57,7 @@ public class TimelinePanel extends JPanel {
     public static final int FRAME_HEIGHT = 18;
 
     private final JScrollPane timelineBodyScrollPane;
+    private final TimelineLayerDrag layerDrag;
 
     public TimelinePanel(EasySwfPanel swfPanel, UndoManager undoManager) {
         timelineBodyPanel = new TimelineBodyPanel(swfPanel, undoManager);
@@ -66,6 +67,8 @@ public class TimelinePanel extends JPanel {
         timelineBodyScrollPane = new FasterScrollPane(timelineBodyPanel);
 
         depthPanel = new TimelineDepthPanel(swfPanel);
+        layerDrag = new TimelineLayerDrag(depthPanel, timelineBodyScrollPane, 1,
+                timelineBodyPanel::setDropRow, timelineBodyPanel::moveLayer);
 
         timelineBodyPanel.addChangeListener(this::refresh);
 
@@ -167,6 +170,7 @@ public class TimelinePanel extends JPanel {
     }
 
     public void refresh() {
+        layerDrag.cancel();
         timeline = timelined == null ? null : timelined.getTimeline();
         timelineBodyPanel.setTimeline(timeline);
         depthPanel.setTimeline(timeline);

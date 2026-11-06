@@ -17,7 +17,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.dnd.DragSource;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -30,9 +29,7 @@ import java.util.function.IntConsumer;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
 /** One frame for each style bank, with the frontmost layer at the top. */
@@ -42,10 +39,7 @@ final class ShapeTimelinePanel extends JPanel {
     private static final int ROW_HEIGHT = TimelineBodyPanel.FRAME_HEIGHT;
 
     private final TimelineDepthPanel depths;
-    private final JScrollPane scroll;
-    private int dragLayer = -1;
-    private int dragStartY;
-    private boolean dragged;
+    private final TimelineLayerDrag layerDrag;
     private int dropRow = -1;
     private List<SHAPEWITHSTYLE> layers = Collections.emptyList();
     private int activeLayer;
@@ -77,27 +71,26 @@ final class ShapeTimelinePanel extends JPanel {
                 g.setColor(TimelineBodyPanel.SELECTED_BORDER_COLOR);
                 g.drawLine(FRAME_WIDTH / 2, clip.y, FRAME_WIDTH / 2, clip.y + clip.height);
             }
-            paintDropLine(g, getWidth());
+            if (dropRow >= 0) {
+                TimelineLayerDrag.paintDropLine(g, getWidth(), dropRow * ROW_HEIGHT);
+            }
         }
     };
 
     ShapeTimelinePanel(EasySwfPanel swfPanel, IntConsumer selectLayer, IntConsumer addLayer, IntConsumer removeLayer,
             BiConsumer<Integer, Integer> moveLayer) {
         super(new BorderLayout());
-        depths = new TimelineDepthPanel(swfPanel, true) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                paintDropLine(g, getWidth());
-            }
-        };
+        depths = new TimelineDepthPanel(swfPanel, true);
         TimelineTimePanel time = new TimelineTimePanel(true);
-        scroll = new FasterScrollPane(frames);
+        JScrollPane scroll = new FasterScrollPane(frames);
         scroll.setRowHeaderView(depths);
         scroll.setColumnHeaderView(time);
         scroll.setCorner(JScrollPane.UPPER_LEFT_CORNER, depths.getHeader());
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scroll, BorderLayout.CENTER);
+
+        layerDrag = new TimelineLayerDrag(depths, scroll, 0, this::setDropRow,
+                (source, destination) -> moveLayer.accept(source - 1, destination - 1));
 
         frames.setFocusable(true);
         frames.addKeyListener(new KeyAdapter() {
@@ -124,8 +117,8 @@ final class ShapeTimelinePanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent event) {
                 int layer = layerAt(event);
-                if (!dragged && SwingUtilities.isLeftMouseButton(event) && layer >= 0
-                        && (event.getSource() != depths || !depths.isOverControls(event))) {
+                if (SwingUtilities.isLeftMouseButton(event) && layer >= 0
+                        && (event.getSource() != depths || !layerDrag.wasDragged() && !depths.isOverControls(event))) {
                     frames.requestFocusInWindow();
                     swfPanel.selectShapeLayerContents(layer);
                 }
@@ -133,39 +126,11 @@ final class ShapeTimelinePanel extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent event) {
-                dragged = false;
-                dragLayer = -1;
-                if (event.getSource() == depths && SwingUtilities.isLeftMouseButton(event)
-                        && layers.size() > 1 && !depths.isOverControls(event)) {
-                    dragLayer = layerAt(event);
-                    dragStartY = event.getY();
-                }
                 showLayerMenu(event);
             }
 
             @Override
-            public void mouseDragged(MouseEvent event) {
-                if (dragLayer < 0 || (!dragged && Math.abs(event.getY() - dragStartY) < DragSource.getDragThreshold())) {
-                    return;
-                }
-                dragged = true;
-                setDropRow(insertionRow(scrollDuringDrag(event.getY())));
-            }
-
-            @Override
             public void mouseReleased(MouseEvent event) {
-                int source = dragLayer;
-                dragLayer = -1;
-                setDropRow(-1);
-                if (source >= 0 && dragged && SwingUtilities.isLeftMouseButton(event)
-                        && (isInsideDropArea(event, scroll.getRowHeader()) || isInsideDropArea(event, scroll.getViewport()))) {
-                    int sourceRow = layerAt(source);
-                    int row = insertionRow(event.getY());
-                    int destination = layerAt(row > sourceRow ? row - 1 : row);
-                    if (source != destination) {
-                        moveLayer.accept(source, destination);
-                    }
-                }
                 showLayerMenu(event);
             }
 
@@ -187,13 +152,10 @@ final class ShapeTimelinePanel extends JPanel {
         };
         frames.addMouseListener(layerMouse);
         depths.addMouseListener(layerMouse);
-        depths.addMouseMotionListener(layerMouse);
-        depths.setAutoscrolls(true);
     }
 
     void setLayers(List<SHAPEWITHSTYLE> layers, int activeLayer) {
-        dragLayer = -1;
-        setDropRow(-1);
+        layerDrag.cancel();
         this.layers = layers;
         depths.setDepthCount(layers.size());
         frames.setPreferredSize(new Dimension(FRAME_WIDTH + 1, layers.size() * ROW_HEIGHT + 1));
@@ -224,37 +186,8 @@ final class ShapeTimelinePanel extends JPanel {
     private void setDropRow(int row) {
         if (dropRow != row) {
             dropRow = row;
-            depths.repaint();
             frames.repaint();
         }
-    }
-
-    private void paintDropLine(Graphics g, int width) {
-        if (dropRow >= 0) {
-            g.setColor(TimelineBodyPanel.SELECTED_BORDER_COLOR);
-            g.fillRect(0, Math.max(0, dropRow * ROW_HEIGHT - 1), width, 2);
-        }
-    }
-
-    private int insertionRow(int y) {
-        return Math.max(0, Math.min(layers.size(), (y + ROW_HEIGHT / 2) / ROW_HEIGHT));
-    }
-
-    private int scrollDuringDrag(int y) {
-        JScrollBar bar = scroll.getVerticalScrollBar();
-        int before = bar.getValue();
-        int pointerY = y - before;
-        int height = scroll.getViewport().getExtentSize().height;
-        if (pointerY < ROW_HEIGHT / 2) {
-            bar.setValue(before - ROW_HEIGHT);
-        } else if (pointerY >= height - ROW_HEIGHT / 2) {
-            bar.setValue(before + ROW_HEIGHT);
-        }
-        return y + bar.getValue() - before;
-    }
-
-    private boolean isInsideDropArea(MouseEvent event, JViewport viewport) {
-        return viewport.contains(SwingUtilities.convertPoint(event.getComponent(), event.getPoint(), viewport));
     }
 
     private int layerAt(MouseEvent event) {

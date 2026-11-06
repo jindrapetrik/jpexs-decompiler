@@ -52,6 +52,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -67,6 +68,7 @@ import org.pushingpixels.substance.internal.utils.SubstanceColorUtilities;
 public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListener {
 
     private Timeline timeline;
+    private int dropRow = -1;
 
     private static final int FRAME_WIDTH = 8;
 
@@ -383,6 +385,16 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         if (cursorFirst != null && cursorFirst.x >= start_f && cursorFirst.x <= end_f) {
             g.setColor(SELECTED_BORDER_COLOR);
             g.drawLine(cursorFirst.x * frameWidth + frameWidth / 2, 0, cursorFirst.x * frameWidth + frameWidth / 2, getHeight());
+        }
+        if (dropRow >= 0) {
+            TimelineLayerDrag.paintDropLine(g, getWidth(), dropRow * frameHeight);
+        }
+    }
+
+    void setDropRow(int row) {
+        if (dropRow != row) {
+            dropRow = row;
+            repaint();
         }
     }
 
@@ -1038,6 +1050,52 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }, description, selectionAfterEdit);
     }
 
+    void moveLayer(int source, int destination) {
+        if (timeline == null || source == destination) {
+            return;
+        }
+        Timelined target = timeline.timelined;
+        TimelineDepthMove move = new TimelineDepthMove(source, destination);
+        TimelineDepthMove.Result result = move.check(target);
+        if (result == TimelineDepthMove.Result.MASK_CONFLICT) {
+            JOptionPane.showMessageDialog(this, EasyStrings.translate("timeline.depth.moveMaskConflict"),
+                    EasyStrings.translate("timeline.shape.moveLayer"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (result == TimelineDepthMove.Result.UNCHANGED) {
+            return;
+        }
+        Set<Point> before = new LinkedHashSet<>(cursor);
+        Set<Point> after = new LinkedHashSet<>();
+        for (Point cell : before) {
+            after.add(new Point(cell.x, move.mapDepth(cell.y)));
+        }
+        undoManager.doOperation(new DoableOperation() {
+            @Override
+            public void doOperation() {
+                apply(move, after);
+            }
+
+            @Override
+            public void undoOperation() {
+                apply(move.reversed(), before);
+            }
+
+            private void apply(TimelineDepthMove step, Set<Point> selection) {
+                swfPanel.setTimelined(target);
+                step.apply(target);
+                swfPanel.remapDepthInteraction(step);
+                refreshAfterEdit(target, selection);
+                swfPanel.refreshDepthInteraction();
+            }
+
+            @Override
+            public String getDescription() {
+                return EasyStrings.translate("timeline.shape.moveLayer");
+            }
+        }, target.getSwf());
+    }
+
     private void applyTimelineEdit(Runnable edit, String description, Set<Point> selectionAfterEdit) {
         Timelined timelined = timeline.timelined;
         Set<Point> originalSelection = new LinkedHashSet<>(cursor);
@@ -1048,24 +1106,14 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             public void doOperation() {
                 super.doOperation();
                 edit.run();
-                refreshAfterEdit(editedSelection);
+                refreshAfterEdit(timelined, editedSelection);
             }
 
             @Override
             public void undoOperation() {
                 super.undoOperation();
                 timelined.setFrameCount(originalFrameCount);
-                refreshAfterEdit(originalSelection);
-            }
-
-            private void refreshAfterEdit(Set<Point> selection) {
-                timeline = timelined.getTimeline();
-                timelined.getSwf().clearImageCache();
-                restoreSelection(selection);
-                refresh();
-                fireChanged();
-                fireFrameSelected(getFirstFrame(), getDepthsAtFirstFrame());
-                repaint();
+                refreshAfterEdit(timelined, originalSelection);
             }
 
             @Override
@@ -1073,6 +1121,16 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 return EasyStrings.translate(description);
             }
         }, timelined.getSwf());
+    }
+
+    private void refreshAfterEdit(Timelined target, Set<Point> selection) {
+        timeline = target.getTimeline();
+        target.getSwf().clearImageCache();
+        restoreSelection(selection);
+        refresh();
+        fireChanged();
+        fireFrameSelected(getFirstFrame(), getDepthsAtFirstFrame());
+        repaint();
     }
 
     @Override

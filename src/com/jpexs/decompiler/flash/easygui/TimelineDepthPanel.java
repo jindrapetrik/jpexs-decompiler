@@ -65,6 +65,7 @@ public class TimelineDepthPanel extends JPanel {
 
     private Timelined timelined;
     private int maxDepth;
+    private int dropRow = -1;
     private int visibilityX;
     private int lockX;
 
@@ -169,6 +170,17 @@ public class TimelineDepthPanel extends JPanel {
         repaint();
     }
 
+    int getDepthCount() {
+        return maxDepth;
+    }
+
+    void setDropRow(int row) {
+        if (dropRow != row) {
+            dropRow = row;
+            repaint();
+        }
+    }
+
     int getDepthAt(MouseEvent e) {
         int row = (scrollOffset + e.getY()) / TimelineBodyPanel.FRAME_HEIGHT;
         int depth = shapeTimeline ? maxDepth - row : TimelineBodyPanel.flipLayerOrder(row, maxDepth);
@@ -237,6 +249,9 @@ public class TimelineDepthPanel extends JPanel {
                 paintColumnIcon(g, visibility, visibilityX, showIcon.getIconWidth(), y, rowHeight);
                 paintColumnIcon(g, lock, lockX, lockIcon.getIconWidth(), y, rowHeight);
             }
+        }
+        if (dropRow >= 0) {
+            TimelineLayerDrag.paintDropLine(g, getWidth(), dropRow * rowHeight - scrollOffset);
         }
     }
 }

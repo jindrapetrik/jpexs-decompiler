@@ -2233,7 +2233,20 @@ public class EasySwfPanel extends JPanel {
         }
     }
 
-    private void refreshDepthInteraction() {
+    void remapDepthInteraction(TimelineDepthMove move) {
+        remapDepths(hiddenDepthsByTimeline, move);
+        remapDepths(lockedDepthsByTimeline, move);
+    }
+
+    private void remapDepths(Map<Timelined, Set<Integer>> depthsByTimeline, TimelineDepthMove move) {
+        Set<Integer> mapped = new HashSet<>();
+        for (int depth : depthsByTimeline.getOrDefault(timelined, Collections.emptySet())) {
+            mapped.add(move.mapDepth(depth));
+        }
+        setDepths(depthsByTimeline, mapped);
+    }
+
+    void refreshDepthInteraction() {
         stagePanel.refreshDepthInteraction();
         transformPanel.setVisible(!stagePanel.getSelectedDepths().isEmpty());
         updatePropertiesPanel();
