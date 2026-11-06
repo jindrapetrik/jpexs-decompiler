@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -159,8 +160,12 @@ public class TimelineDepthPanel extends JPanel {
         maxDepth = count;
         setFont(getFont().deriveFont(FONT_SIZE));
         int height = (maxDepth + (shapeTimeline ? 0 : 1)) * TimelineBodyPanel.FRAME_HEIGHT + 1;
-        int maxDepthW = getFontMetrics(getFont()).stringWidth(depthLabel(Math.max(1, maxDepth)));
-        visibilityX = maxDepthW + 2 * PADDING;
+        FontMetrics metrics = getFontMetrics(getFont());
+        int labelWidth = metrics.stringWidth(depthLabel(Math.max(1, maxDepth)));
+        if (!shapeTimeline) {
+            labelWidth = Math.max(labelWidth, metrics.stringWidth(depthLabel(0)));
+        }
+        visibilityX = labelWidth + 2 * PADDING;
         lockX = visibilityX + showIcon.getIconWidth() + PADDING;
         int width = lockX + lockIcon.getIconWidth() + PADDING;
         Dimension dim = new Dimension(width, height);
@@ -208,7 +213,7 @@ public class TimelineDepthPanel extends JPanel {
     }
 
     private String depthLabel(int depth) {
-        return depth == 0 ? "a"
+        return depth == 0 ? EasyStrings.translate("timeline.depth.scripts")
                 : EasyStrings.translate("timeline.shape.layerNumber").replace("%number%", Integer.toString(depth));
     }
 
