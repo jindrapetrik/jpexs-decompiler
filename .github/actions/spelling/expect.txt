@@ -244,6 +244,7 @@ AVISF
 avistreamheader
 AVIX
 avm
+AVMPLUS
 avmplus
 avt
 awidth
@@ -1191,6 +1192,7 @@ fctx
 Fdat
 FDE
 fdecompiled
+fdepth
 fdepths
 fdff
 fdformat
@@ -1268,6 +1270,7 @@ FIXEDPARAMETER
 fji
 fjump
 fla
+flacomdoc
 flagval
 flashdebugger
 flashdevelop
@@ -1743,6 +1746,7 @@ imagesfolder
 imax
 imdata
 IMDCT
+IME
 ime
 imgd
 implementsop
@@ -1800,6 +1804,7 @@ initscopedepth
 initthrow
 initx
 inity
+INITY
 injectas
 innerfunction
 innershadow
@@ -3983,6 +3988,7 @@ tuto
 TVar
 twalljava
 tweeked
+Tweener
 tweening
 tweenquality
 tweens
@@ -4292,6 +4298,7 @@ XFixed
 xfl
 XFloat
 Xfm
+XHalf
 XHeight
 xhtmlsyntaxkit
 xing
@@ -4373,6 +4380,7 @@ YEnd
 yestoall
 YFloat
 Ygohh
+YHalf
 YInstance
 YInteger
 ylen
@@ -4382,6 +4390,7 @@ ymouse
 YMove
 ynew
 YNM
+yof
 YOF
 yorig
 yourfile
