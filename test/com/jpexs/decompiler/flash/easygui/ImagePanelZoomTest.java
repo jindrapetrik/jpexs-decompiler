@@ -10,6 +10,7 @@ package com.jpexs.decompiler.flash.easygui;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -28,6 +29,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Field;
@@ -121,6 +123,59 @@ public class ImagePanelZoomTest {
         // Repeated render/layout passes must not change the viewport again.
         settle(panel, canvas);
         assertView(panel, canvas, local, cursor);
+    }
+
+    @Test
+    public void stageDropUsesTheZoomedNestedViewport() throws Exception {
+        if (GraphicsEnvironment.isHeadless()) {
+            throw new SkipException("ImagePanel requires a desktop graphics environment");
+        }
+        SwingUtilities.invokeAndWait(() -> {
+            AppStrings.setResourceClass(MainFrame.class);
+            boolean ribbon = Configuration.useRibbonInterface.get();
+            Configuration.useRibbonInterface.set(false);
+            ImagePanel panel = new ImagePanel();
+            try {
+                SWF swf = ShapeSceneEditTest.scene().getSwf();
+                panel.setSize(800, 600);
+                panel.setSelectionMode(true);
+                panel.setTimelined(swf, swf, 0, true, false, true, true, true, false, true, true, false);
+                panel.openDepth(0, 2);
+                Zoom zoom = new Zoom();
+                zoom.value = 1.37;
+                panel.zoom(zoom);
+                panel.setViewPosition(new Point2D.Double(-124.25, -257.5));
+                Component canvas = (Component) field(panel, "iconPanel");
+                settle(panel, canvas);
+
+                Point cursor = new Point(123, 174);
+                Point2D local = panel.toTimelinedPoint(cursor);
+                Point drop = SwingUtilities.convertPoint(canvas, cursor, panel);
+                Point2D dropPoint = panel.getStageDropPoint(drop);
+                assertEquals(dropPoint.getX(), local.getX(), 1e-6);
+                assertEquals(dropPoint.getY(), local.getY(), 1e-6);
+                assertNull(panel.getStageDropPoint(SwingUtilities.convertPoint(canvas, new Point(-1, 174), panel)));
+
+                Path2D.Double outline = new Path2D.Double();
+                outline.moveTo(-250, 0);
+                outline.lineTo(130, 750);
+                outline.lineTo(420, 85);
+                outline.closePath();
+                AffineTransform transform = panel.getTimelinedToPanelTransform();
+                Rectangle2D bounds = transform.createTransformedShape(outline).getBounds2D();
+                Point2D anchor = transform.inverseTransform(new Point2D.Double(bounds.getCenterX(), bounds.getCenterY()), null);
+                Point translation = EasySwfPanel.getStageDropTranslation(dropPoint, anchor);
+                transform.translate(translation.x, translation.y);
+                Rectangle2D placed = transform.createTransformedShape(outline).getBounds2D();
+                assertEquals(placed.getCenterX(), cursor.x, 0.5 * (Math.abs(transform.getScaleX()) + Math.abs(transform.getShearX())) + 1e-6);
+                assertEquals(placed.getCenterY(), cursor.y, 0.5 * (Math.abs(transform.getShearY()) + Math.abs(transform.getScaleY())) + 1e-6);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            } finally {
+                panel.clearAll();
+                Configuration.useRibbonInterface.set(ribbon);
+            }
+        });
     }
 
     @Test(dataProvider = "views")

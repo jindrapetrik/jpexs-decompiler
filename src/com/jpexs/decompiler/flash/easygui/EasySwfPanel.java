@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.easygui.properties.panels.InstancePropertiesPa
 import com.jpexs.decompiler.flash.easygui.properties.panels.ShapePointPropertiesPanel;
 import com.jpexs.decompiler.flash.easygui.properties.panels.ShapePropertiesPanel;
 import com.jpexs.decompiler.flash.easygui.properties.panels.ShapeStylePreviewPanel;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.DisplayPoint;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
@@ -52,8 +53,10 @@ import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -79,6 +82,10 @@ import java.awt.Point;
 import java.awt.Shape;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -98,6 +105,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TooManyListenersException;
 import java.util.WeakHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -432,10 +440,83 @@ public class EasySwfPanel extends JPanel {
 
         });
 
-        stagePanel.setTransferHandler(new TransferHandler() {
+        class StageTransferHandler extends TransferHandler {
+
+            private DrawableTag previewCharacter;
+            private Shape previewOutline;
+            private Point previewPosition;
+            private AffineTransform previewTransform;
+            private Point2D previewAnchor;
+
+            void clearPreview() {
+                previewCharacter = null;
+                previewOutline = null;
+                previewPosition = null;
+                previewTransform = null;
+                previewAnchor = null;
+                stagePanel.setStageDropOutline(null, null);
+            }
+
+            private Point2D getPreviewAnchor() {
+                AffineTransform transform = stagePanel.getTimelinedToPanelTransform();
+                if (!transform.equals(previewTransform)) {
+                    Rectangle2D bounds = transform.createTransformedShape(previewOutline).getBounds2D();
+                    previewAnchor = stagePanel.toTimelinedPoint(new Point2D.Double(bounds.getCenterX(), bounds.getCenterY()));
+                    previewTransform = transform;
+                }
+                return previewAnchor;
+            }
+
+            private DrawableTag getCharacter(Transferable transferable) throws UnsupportedFlavorException, IOException {
+                Object characterId = transferable.getTransferData(CharacterTagTransferable.CHARACTERTAG_FLAVOR);
+                if (!(characterId instanceof Integer)) {
+                    return null;
+                }
+                CharacterTag character = timelined.getSwf().getCharacter((Integer) characterId);
+                if (character instanceof DefineSpriteTag || character instanceof ShapeTag
+                        || character instanceof TextTag || character instanceof ButtonTag) {
+                    return (DrawableTag) character;
+                }
+                return null;
+            }
+
             @Override
             public boolean canImport(TransferHandler.TransferSupport support) {
-                return editingShape == null && timelined != null && support.isDataFlavorSupported(CharacterTagTransferable.CHARACTERTAG_FLAVOR);
+                boolean supported = editingShape == null && timelined != null && stagePanel.getTimelined() == timelined
+                        && support.isDataFlavorSupported(CharacterTagTransferable.CHARACTERTAG_FLAVOR);
+                if (!support.isDrop()) {
+                    return supported;
+                }
+                if (supported) {
+                    Point point = SwingUtilities.convertPoint(support.getComponent(), support.getDropLocation().getDropPoint(), stagePanel);
+                    Point2D cursor = stagePanel.getStageDropPoint(point);
+                    if (cursor != null) {
+                        try {
+                            DrawableTag character = getCharacter(support.getTransferable());
+                            if (character != null) {
+                                if (previewCharacter != character) {
+                                    ExportRectangle bounds = new ExportRectangle(character.getRect());
+                                    previewOutline = character.getOutline(false, 0, 0, 0, new RenderContext(), new Matrix(), true, bounds, 1);
+                                    if (previewOutline == null || previewOutline.getBounds2D().isEmpty()) {
+                                        previewOutline = new Rectangle2D.Double(bounds.xMin, bounds.yMin, bounds.getWidth(), bounds.getHeight());
+                                    }
+                                    previewCharacter = character;
+                                    previewTransform = null;
+                                }
+                                Point position = getStageDropTranslation(cursor, getPreviewAnchor());
+                                if (position != null) {
+                                    previewPosition = position;
+                                    stagePanel.setStageDropOutline(previewOutline, position);
+                                    return true;
+                                }
+                            }
+                        } catch (UnsupportedFlavorException | IOException ex) {
+                            Logger.getLogger(EasySwfPanel.class.getName()).log(Level.FINE, "Could not preview the library character", ex);
+                        }
+                    }
+                }
+                clearPreview();
+                return false;
             }
 
             @Override
@@ -444,13 +525,9 @@ public class EasySwfPanel extends JPanel {
                     return false;
                 }
                 try {
-                    Transferable transferable = support.getTransferable();
-                    Integer characterId = (Integer) transferable.getTransferData(CharacterTagTransferable.CHARACTERTAG_FLAVOR);
-                    CharacterTag tag = stagePanel.getTimelined().getSwf().getCharacter(characterId);
-                    if ((tag instanceof DefineSpriteTag)
-                            || (tag instanceof ShapeTag)
-                            || (tag instanceof TextTag)
-                            || (tag instanceof ButtonTag)) {
+                    DrawableTag character = support.isDrop() ? previewCharacter : getCharacter(support.getTransferable());
+                    Point position = support.isDrop() ? previewPosition : new Point();
+                    if (character != null) {
                         Timelined target = stagePanel.getTimelined();
                         int frame = getFrame();
                         if (frame < 0 || frame > TimelineFrameEdits.MAX_FRAME
@@ -484,7 +561,6 @@ public class EasySwfPanel extends JPanel {
                             @Override
                             public void doOperation() {
                                 super.doOperation();
-                                CharacterTag ch = (CharacterTag) tag;
 
                                 if (timelined.getSwf() != timelined) {
                                     swfTags = timelined.getSwf().getTags().toArrayList();
@@ -499,8 +575,10 @@ public class EasySwfPanel extends JPanel {
                                 PlaceObject2Tag place = new PlaceObject2Tag(timelined.getSwf());
                                 place.depth = depth;
                                 place.placeFlagHasCharacter = true;
-                                place.characterId = ch.getCharacterId();
+                                place.characterId = character.getCharacterId();
                                 place.matrix = new MATRIX();
+                                place.matrix.translateX = position.x;
+                                place.matrix.translateY = position.y;
                                 place.placeFlagHasMatrix = true;
                                 place.setTimelined(timelined);
 
@@ -578,11 +656,34 @@ public class EasySwfPanel extends JPanel {
                 } catch (UnsupportedFlavorException | IOException ex) {
                     ex.printStackTrace();
                     //ignored
+                } finally {
+                    clearPreview();
                 }
 
                 return false;
             }
-        });
+        }
+
+        StageTransferHandler stageTransferHandler = new StageTransferHandler();
+        stagePanel.setTransferHandler(stageTransferHandler);
+        DropTarget stageDropTarget = stagePanel.getDropTarget();
+        if (stageDropTarget != null) {
+            try {
+                stageDropTarget.addDropTargetListener(new DropTargetAdapter() {
+                    @Override
+                    public void dragExit(DropTargetEvent event) {
+                        stageTransferHandler.clearPreview();
+                    }
+
+                    @Override
+                    public void drop(DropTargetDropEvent event) {
+                        stageTransferHandler.clearPreview();
+                    }
+                });
+            } catch (TooManyListenersException ex) {
+                Logger.getLogger(EasySwfPanel.class.getName()).log(Level.FINE, "Could not observe stage drag exit", ex);
+            }
+        }
 
         undoManager = new UndoManager();
 
@@ -2241,6 +2342,16 @@ public class EasySwfPanel extends JPanel {
     private boolean isStagePlacementOccupied(Timelined owner, int frame, int depth) {
         return owner instanceof ButtonTag ? ((ButtonTag) owner).getButtonRecordAt(frame, depth, false) != null
                 : TimelineFrameEdits.isPlaced(owner.getTimeline().getDepthState(frame, depth));
+    }
+
+    static Point getStageDropTranslation(Point2D cursor, Point2D anchor) {
+        long x = Math.round(cursor.getX() - anchor.getX());
+        long y = Math.round(cursor.getY() - anchor.getY());
+        int limit = 1 << 30; // SWF MATRIX translations use at most 31 signed bits.
+        if (x < -limit || x >= limit || y < -limit || y >= limit) {
+            return null;
+        }
+        return new Point((int) x, (int) y);
     }
 
     private int depthForEmptyStagePlacement(Timelined owner, int selected, int count) {

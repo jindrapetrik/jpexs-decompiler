@@ -136,6 +136,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -489,6 +490,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private Point shapeDrawingPosition;
     private Shape shapeDrawingGuide;
     private boolean shapeDrawingGuideSolid;
+    private Shape stageDropOutline;
+    private Point stageDropPosition;
     private boolean shapeOriginVisible;
 
     /**
@@ -764,6 +767,41 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         shapeDrawingGuide = guide;
         shapeDrawingGuideSolid = solid;
         iconPanel.repaint();
+    }
+
+    /** Converts a drop in this component to the editable stage's local twip coordinates. */
+    public Point2D getStageDropPoint(Point point) {
+        Point viewportPoint = SwingUtilities.convertPoint(this, point, iconPanel);
+        if (!iconPanel.contains(viewportPoint)) {
+            return null;
+        }
+        try {
+            return getTimelinedToPanelTransform().inverseTransform(viewportPoint, new Point2D.Double());
+        } catch (NoninvertibleTransformException ex) {
+            return null;
+        }
+    }
+
+    public void setStageDropOutline(Shape outline, Point position) {
+        if (stageDropOutline == outline && Objects.equals(stageDropPosition, position)) {
+            return;
+        }
+        stageDropOutline = outline;
+        stageDropPosition = position;
+        iconPanel.repaint();
+    }
+
+    private static void paintStageOutline(Graphics2D graphics, Shape outline, boolean solid) {
+        Graphics2D guideGraphics = (Graphics2D) graphics.create();
+        guideGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        guideGraphics.setColor(Color.white);
+        guideGraphics.setStroke(new BasicStroke(3));
+        guideGraphics.draw(outline);
+        guideGraphics.setColor(Color.black);
+        guideGraphics.setStroke(solid ? new BasicStroke(1)
+                : new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10, new float[]{4, 4}, 0));
+        guideGraphics.draw(outline);
+        guideGraphics.dispose();
     }
 
     public void setShapeOriginVisible(boolean visible) {
@@ -5253,16 +5291,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             if (shapeDrawingGuide != null && timelined != null) {
                 Shape guide = getTimelinedToPanelTransform().createTransformedShape(shapeDrawingGuide);
-                Graphics2D guideGraphics = (Graphics2D) g2d.create();
-                guideGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                guideGraphics.setColor(Color.white);
-                guideGraphics.setStroke(new BasicStroke(3));
-                guideGraphics.draw(guide);
-                guideGraphics.setColor(Color.black);
-                guideGraphics.setStroke(shapeDrawingGuideSolid ? new BasicStroke(1)
-                        : new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10, new float[]{4, 4}, 0));
-                guideGraphics.draw(guide);
-                guideGraphics.dispose();
+                paintStageOutline(g2d, guide, shapeDrawingGuideSolid);
+            }
+
+            if (stageDropOutline != null && stageDropPosition != null && timelined != null) {
+                AffineTransform transform = getTimelinedToPanelTransform();
+                transform.translate(stageDropPosition.x, stageDropPosition.y);
+                paintStageOutline(g2d, transform.createTransformedShape(stageDropOutline), true);
             }
 
             if (shapeDrawingTip != null && shapeDrawingPosition != null && timelined != null) {
