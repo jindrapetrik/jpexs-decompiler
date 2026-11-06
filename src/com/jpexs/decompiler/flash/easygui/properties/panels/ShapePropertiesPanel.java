@@ -120,6 +120,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
     private final FloatPropertyField yField = new FloatPropertyField(0);
     private final FloatPropertyField wField = new FloatPropertyField(0);
     private final FloatPropertyField hField = new FloatPropertyField(0);
+    private final boolean drawing;
     private Rectangle2D selectionBounds;
     private Consumer<Rectangle2D> selectionBoundsListener;
     private boolean updating;
@@ -142,6 +143,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
 
     private ShapePropertiesPanel(boolean strokeOnly, boolean fillOnly, boolean drawing) {
         super("shape");
+        this.drawing = drawing;
         setLayout(new BorderLayout());
         if (!drawing) {
             JLabel title = new JLabel(EasyStrings.translate("properties.shape"));
@@ -223,8 +225,10 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             } else {
                 FILLSTYLE fill = new FILLSTYLE();
                 fill.color = new RGBA(Color.white);
-                setSelectedStyles(fill, line, null, (Boolean) null);
+                setSelectedStyles(fill, line, null, null, false);
             }
+        } else {
+            setSelectedFill(null);
         }
     }
 
@@ -331,8 +335,9 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
     }
 
     private void fireChange(boolean stroke, String property) {
-        (stroke ? strokeTab : fillTab).repaint();
-        if (!updating && (selectedStroke == null || selectedStroke == stroke)) {
+        JToggleButton tab = stroke ? strokeTab : fillTab;
+        tab.repaint();
+        if (!updating && tab.isEnabled()) {
             if (changeListener != null) {
                 changeListener.accept(stroke);
             }
@@ -629,7 +634,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         try {
             Boolean kind = fills.isEmpty() ? Boolean.TRUE : lines.isEmpty() ? Boolean.FALSE : null;
             setSelectedStyles(fills.isEmpty() ? null : fills.get(0), lines.isEmpty() ? null : lines.get(0),
-                    bounds, kind);
+                    bounds, kind, true);
             fillEditor.setFillStyles(fills);
             List<FILLSTYLE> paints = new ArrayList<>();
             for (ILINESTYLE line : lines) {
@@ -660,7 +665,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
                 noCloseCheckBox.setSelectionState(noClose == null ? 1 : noClose ? 2 : 0);
                 joinComboBox.setSelectedIndex(join == null ? -1 : join);
             }
-            updateStyleEnabled();
+            updateStyleEnabled(true);
         } finally {
             updating = wasUpdating;
         }
@@ -714,14 +719,15 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
     }
 
     public void setSelectedStyles(FILLSTYLE fill, ILINESTYLE line, Shape geometry) {
-        setSelectedStyles(fill, line, geometry, line != null ? Boolean.TRUE : fill != null ? Boolean.FALSE : null);
+        Boolean stroke = line != null ? Boolean.TRUE : fill != null ? Boolean.FALSE : null;
+        setSelectedStyles(fill, line, geometry, stroke, stroke != null);
     }
 
     public void setSelectedStyles(FILLSTYLE fill, ILINESTYLE line, Shape geometry, boolean stroke) {
-        setSelectedStyles(fill, line, geometry, Boolean.valueOf(stroke));
+        setSelectedStyles(fill, line, geometry, stroke, true);
     }
 
-    private void setSelectedStyles(FILLSTYLE fill, ILINESTYLE line, Shape geometry, Boolean stroke) {
+    private void setSelectedStyles(FILLSTYLE fill, ILINESTYLE line, Shape geometry, Boolean stroke, boolean hasSelection) {
         boolean wasUpdating = updating;
         updating = true;
         try {
@@ -731,15 +737,16 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             }
             fillEditor.setFillStyle(Boolean.TRUE.equals(stroke) ? null : fill);
             setLineStyle(Boolean.FALSE.equals(stroke) ? null : line);
-            updateStyleEnabled();
+            updateStyleEnabled(hasSelection);
         } finally {
             updating = wasUpdating;
         }
     }
 
-    private void updateStyleEnabled() {
-        boolean fillEnabled = !Boolean.TRUE.equals(selectedStroke);
-        boolean strokeEnabled = !Boolean.FALSE.equals(selectedStroke);
+    private void updateStyleEnabled(boolean hasSelection) {
+        boolean editable = drawing || hasSelection;
+        boolean fillEnabled = editable && !Boolean.TRUE.equals(selectedStroke);
+        boolean strokeEnabled = editable && !Boolean.FALSE.equals(selectedStroke);
         setEnabledRecursively(fillPanel, fillEnabled);
         setEnabledRecursively(strokePanel, strokeEnabled);
         setEnabledRecursively(fillEditor.paintOptions, fillEnabled);

@@ -1965,11 +1965,11 @@ public class EasySwfPanel extends JPanel {
         stagePanel.setShapeSelectionTransform(null, null);
         shapeTransformState = null;
         selectedShapeParts = highlightShapeSelections(this::shapeModel, shapeSelections);
+        shapePropertiesPanel.setSelections(selectedShapeParts);
         if (shapeTool == ShapeTool.EDIT_POINTS) {
             refreshShapePoints(Collections.emptyList());
             return;
         }
-        shapePropertiesPanel.setSelections(selectedShapeParts);
         updateFillTransformHandles();
         updateShapeSelectionTransform();
     }
