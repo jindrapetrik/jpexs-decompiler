@@ -147,6 +147,7 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -329,6 +330,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private RegistrationPointPosition registrationPointPosition = RegistrationPointPosition.CENTER;
 
     private DepthState depthStateUnderCursor = null;
+    private volatile boolean objectUnderCursor;
 
     private List<ActionListener> placeObjectSelectedListeners = new ArrayList<>();
 
@@ -1963,6 +1965,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return depthStateUnderCursor.placeObjectTag;
     }
 
+    public boolean hasObjectUnderCursor() {
+        return objectUnderCursor;
+    }
+
     public void removeBoundsChangeListener(BoundsChangeListener listener) {
         boundsChangeListeners.remove(listener);
     }
@@ -3162,6 +3168,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 Double guide = guidesX.get(d);
                                 int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getX());
                                 if (mousePoint.x == guideInPanel) {
+                                    e.consume();
                                     String newPositionStr = ViewMessages.showInputDialog(ImagePanel.this, AppStrings.translate("move_guide.position"), AppStrings.translate("move_guide"), View.getIcon("guidemovex32"), EcmaNumberToString.stringFor(guide));
                                     if (newPositionStr != null) {
                                         try {
@@ -3181,6 +3188,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 Double guide = guidesY.get(d);
                                 int guideInPanel = (int) Math.round(guide * getRealZoom() + offsetPoint.getY());
                                 if (mousePoint.y == guideInPanel) {
+                                    e.consume();
                                     String newPositionStr = ViewMessages.showInputDialog(ImagePanel.this, AppStrings.translate("move_guide.position"), AppStrings.translate("move_guide"), View.getIcon("guidemovey32"), EcmaNumberToString.stringFor(guide));
                                     if (newPositionStr != null) {
                                         try {
@@ -3202,6 +3210,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         DepthState ds = depthStateUnderCursor;
                         if (ds != null) {
+                            e.consume();
                             openDepth(frame, ds.depth);
                             //gotoFrame(1);
                         }
@@ -6556,6 +6565,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.muted = muted;
             this.mutable = mutable;
             depthStateUnderCursor = null;
+            objectUnderCursor = false;
             hilightedEdge = null;
             setHilightedFillInternal(null);
             setHilightedLineInternal(null);
@@ -7662,6 +7672,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             boolean doFreeTransform = this.doFreeTransform;
             synchronized (ImagePanel.this) {
                 if (timer == thisTimer) {
+                    objectUnderCursor = autoPlayed && !renderContext.stateUnderCursor.isEmpty();
                     depthStateUnderCursor = autoPlayed ? getSelectableHit(timelined, renderContext.stateUnderCursor) : null;
                     iconPanel.setImg(img);
                     lastMouseOverButton = iconPanel.mouseOverButton;
@@ -8563,6 +8574,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             transformUpdated = null;
             registrationPointUpdated = null;
             depthStateUnderCursor = null;
+            objectUnderCursor = false;
             displayObjectCache.clear();
         }
         setSelectionMode(false);
@@ -8587,20 +8599,42 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public boolean closeShapeEdit() {
+        return closeOpenedDepth(true);
+    }
+
+    public boolean hasParentTimeline() {
+        synchronized (lock) {
+            return timelined != null && !parentTimelineds.isEmpty();
+        }
+    }
+
+    public boolean closeOpenedDepth() {
+        return closeOpenedDepth(false);
+    }
+
+    private boolean closeOpenedDepth(boolean shapeOnly) {
         int parentFrame;
         synchronized (lock) {
-            if (editedShape == null || parentTimelineds.isEmpty()) {
+            if (timelined == null || parentTimelineds.isEmpty() || (shapeOnly && editedShape == null)) {
                 return false;
             }
             int last = parentTimelineds.size() - 1;
             timelined = parentTimelineds.remove(last);
             parentFrame = parentFrames.remove(last);
             int depth = parentDepths.remove(last);
+            if (editedShape == null) {
+                SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(timelined.getSwf());
+                conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS,
+                        parentDepths.stream().map(String::valueOf).collect(Collectors.toList()));
+                conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES,
+                        parentFrames.stream().map(String::valueOf).collect(Collectors.toList()));
+            }
             editedShape = null;
             selectedDepths.clear();
             selectedDepths.add(depth);
             removeUnavailableDepths(selectedDepths);
             depthStateUnderCursor = null;
+            objectUnderCursor = false;
             displayObjectCache.clear();
         }
         setRectangleSelectionListener(null);
@@ -8670,6 +8704,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     editedShape = cht instanceof ShapeTag ? (ShapeTag) cht : null;
                     timelined = editedShape == null ? (Timelined) cht : TimelinedMaker.makeTimelined(cht);
                     selectedDepths.clear();
+                    depthStateUnderCursor = null;
+                    objectUnderCursor = false;
 
                     if (editedShape != null) {
                         zoom = new Zoom();

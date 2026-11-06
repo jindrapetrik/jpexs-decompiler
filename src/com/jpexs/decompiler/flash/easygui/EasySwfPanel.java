@@ -293,11 +293,14 @@ public class EasySwfPanel extends JPanel {
         stagePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (editingShape == null || shapeTool != ShapeTool.SELECT || e.isConsumed() || e.getClickCount() != 1
-                        || !SwingUtilities.isLeftMouseButton(e) || e.isAltDown()) {
+                if (e.isConsumed() || !SwingUtilities.isLeftMouseButton(e) || e.isAltDown()) {
                     return;
                 }
-                selectShapeAt(stagePanel.toTimelinedPoint(e.getPoint()), e.isShiftDown());
+                if (e.getClickCount() == 2 && stagePanel.hasParentTimeline() && !stagePanel.hasObjectUnderCursor()) {
+                    closeTimeline();
+                } else if (e.getClickCount() == 1 && editingShape != null && shapeTool == ShapeTool.SELECT) {
+                    selectShapeAt(stagePanel.toTimelinedPoint(e.getPoint()), e.isShiftDown());
+                }
             }
         });
 
@@ -735,24 +738,7 @@ public class EasySwfPanel extends JPanel {
         closeTimelineButton.setMargin(new Insets(5, 5, 5, 5));
         leftToolbar.add(closeTimelineButton);
         closeTimelineButton.setToolTipText(EasyStrings.translate("timeline.item.cancel"));
-        closeTimelineButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                finishFloatingSelection();
-                if (editingShape != null && stagePanel.closeShapeEdit()) {
-                    return;
-                }
-                SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(timelined.getSwf());
-                conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, new ArrayList<>());
-                conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, new ArrayList<>());
-                
-                String firstParentFrame = conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FIRST_PARENT_FRAME, "1");
-                
-                conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, firstParentFrame);
-
-                setTimelined(timelined.getSwf());                
-            }
-        });
+        closeTimelineButton.addActionListener(e -> closeTimeline());
 
         toolbarPanel.add(leftToolbar, BorderLayout.WEST);
 
@@ -2091,6 +2077,20 @@ public class EasySwfPanel extends JPanel {
             logShapeEditFailure(ex);
             showLayerSelections(previous);
         }
+    }
+
+    private void closeTimeline() {
+        finishFloatingSelection();
+        if (stagePanel.closeOpenedDepth()) {
+            return;
+        }
+        SWF swf = timelined.getSwf();
+        SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf);
+        conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_DEPTHS, Collections.emptyList());
+        conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_PARENT_FRAMES, Collections.emptyList());
+        String firstParentFrame = conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FIRST_PARENT_FRAME, "1");
+        conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, firstParentFrame);
+        setTimelined(swf);
     }
 
     public void setTimelined(Timelined timelined) {
