@@ -5632,6 +5632,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 for (MouseListener l : iconPanel.mouseListeners) {
                     l.mouseClicked(converted);
                 }
+                if (rectangleSelectionListener != null && !converted.isConsumed()
+                        && SwingUtilities.isLeftMouseButton(converted) && !converted.isAltDown()) {
+                    Cursor transformCursor = getShapeTransformCursor(converted.getPoint(), converted.isShiftDown());
+                    iconPanel.setCursor(transformCursor == null
+                            ? getAreaSelectionCursor(converted.getPoint(), converted.isShiftDown()) : transformCursor);
+                }
             }
 
             @Override
