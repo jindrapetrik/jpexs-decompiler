@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -97,7 +98,6 @@ public class DrawingShapesPropertiesPanel extends AbstractPropertiesPanel {
         kindEditor.add(swatches, BorderLayout.CENTER);
         kindEditor.add(kindLabel, BorderLayout.SOUTH);
         // Keep the palette independent of the changing labels and fields below it.
-        paletteRow.add(new JLabel(formatPropertyName("drawingKind")));
         paletteRow.add(kindEditor);
         options.add(paletteRow, BorderLayout.NORTH);
         sidesEditor.setColumns(3);
@@ -120,7 +120,12 @@ public class DrawingShapesPropertiesPanel extends AbstractPropertiesPanel {
         parameterSection.add(parameterRow, BorderLayout.NORTH);
         parameterSection.add(hintRow, BorderLayout.CENTER);
         options.add(parameterSection, BorderLayout.CENTER);
-        add(options, BorderLayout.NORTH);
+        JPanel shapeCards = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = -1;
+        addCard(shapeCards, "shapes", null, options, gbc, false);
+        setCardOpened("shapes", true);
+        add(shapeCards, BorderLayout.NORTH);
         add(styles, BorderLayout.CENTER);
         sidesEditor.addChangeListener(event -> changed());
         anglesEditor.addChangeListener(event -> changed());

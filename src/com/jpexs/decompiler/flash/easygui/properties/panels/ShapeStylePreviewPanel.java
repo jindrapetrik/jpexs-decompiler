@@ -27,7 +27,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -53,9 +52,6 @@ public class ShapeStylePreviewPanel extends AbstractPropertiesPanel {
     public ShapeStylePreviewPanel() {
         super("shape");
         setLayout(new BorderLayout());
-        JLabel title = new JLabel(EasyStrings.translate("properties.shape"));
-        title.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        add(title, BorderLayout.NORTH);
         JPanel fill = new JPanel(new GridBagLayout());
         JPanel stroke = new JPanel(new GridBagLayout());
         addRow(fill, "type", fillPreview, 0);
@@ -76,8 +72,6 @@ public class ShapeStylePreviewPanel extends AbstractPropertiesPanel {
         gbc.gridy++;
         gbc.weighty = 1;
         cards.add(new JPanel(), gbc);
-        setCardOpened("fill", true);
-        setCardOpened("stroke", true);
         add(new FasterScrollPane(cards), BorderLayout.CENTER);
         setSample(null);
     }

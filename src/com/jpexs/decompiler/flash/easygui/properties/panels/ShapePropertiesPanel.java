@@ -66,6 +66,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -115,6 +116,12 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
     private final JPanel optionCards = new JPanel(new VisibleCardLayout());
     private final JToggleButton fillTab = styleTab("fill", "shapetoolpaint16", fillEditor);
     private final JToggleButton strokeTab = styleTab("stroke", "shapetoolpencil16", strokeEditor);
+    private final FloatPropertyField xField = new FloatPropertyField(0);
+    private final FloatPropertyField yField = new FloatPropertyField(0);
+    private final FloatPropertyField wField = new FloatPropertyField(0);
+    private final FloatPropertyField hField = new FloatPropertyField(0);
+    private Rectangle2D selectionBounds;
+    private Consumer<Rectangle2D> selectionBoundsListener;
     private boolean updating;
     private Boolean selectedStroke;
     private Consumer<Boolean> changeListener;
@@ -178,10 +185,19 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         showStyleTab(strokeOnly);
         JPanel contents = new JPanel(new GridBagLayout());
         GridBagConstraints sectionConstraints = new GridBagConstraints();
+        sectionConstraints.gridy = -1;
+        if (!drawing) {
+            addCard(contents, "positionSize", null, createPositionSizeControls(), sectionConstraints, false,
+                    EasyStrings.translate("properties.instance.header.positionSize"));
+            setCardOpened("positionSize", true);
+            setSelectionBounds(Collections.emptyList());
+        }
+        String styleCard = strokeOnly ? "stroke" : fillOnly ? "fill" : "fillAndStroke";
+        addCard(contents, styleCard, null, styleSection, sectionConstraints, false);
+        setCardOpened(styleCard, true);
+        sectionConstraints.gridy++;
         sectionConstraints.weighty = 1;
-        sectionConstraints.anchor = GridBagConstraints.NORTH;
-        sectionConstraints.insets = new Insets(3, 3, 3, 3);
-        contents.add(styleSection, sectionConstraints);
+        contents.add(new JPanel(), sectionConstraints);
         add(new FasterScrollPane(contents), BorderLayout.CENTER);
         fillEditor.changeListener = property -> fireChange(false, property);
         strokeEditor.changeListener = property -> fireChange(true, property);
@@ -224,7 +240,9 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         insetBody.setBorder(BorderFactory.createEmptyBorder(0, tabs.getPreferredSize().width / 2, 0, 0));
         insetBody.add(body, BorderLayout.CENTER);
         styleSection.add(insetBody, BorderLayout.EAST);
-        return styleSection;
+        JPanel cardContents = new JPanel(new GridBagLayout());
+        cardContents.add(styleSection);
+        return cardContents;
     }
 
     static JToggleButton styleTab(String name, String icon, FillEditor editor) {
@@ -534,7 +552,62 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
         return first;
     }
 
+    private JPanel createPositionSizeControls() {
+        GridBagLayout layout = new GridBagLayout();
+        JPanel fields = new JPanel(layout);
+        addBoundsField(fields, layout, xField, "x", true, false);
+        addBoundsField(fields, layout, yField, "y", false, false);
+        addBoundsField(fields, layout, wField, "width", true, true);
+        addBoundsField(fields, layout, hField, "height", false, true);
+        JPanel contents = new JPanel(new BorderLayout());
+        contents.add(fields, BorderLayout.WEST);
+        return contents;
+    }
+
+    private void addBoundsField(JPanel fields, GridBagLayout layout, FloatPropertyField field,
+            String name, boolean horizontal, boolean size) {
+        int column = horizontal ? 0 : 2;
+        int row = size ? 1 : 0;
+        String label = EasyStrings.translate("property.instance.positionSize." + name);
+        addToGrid(layout, fields, new JLabel(EasyStrings.translate("property.label").replace("%item%", label)), column, row);
+        addToGrid(layout, fields, field, column + 1, row);
+        field.setColumns(5);
+        field.addValidation(value -> Float.isFinite(value) && (!size || value * SWF.unitDivisor >= 1));
+        field.addChangeListener(event -> changeSelectionBounds(field.getValue(), horizontal, size));
+    }
+
+    public void setSelectionBoundsListener(Consumer<Rectangle2D> listener) {
+        selectionBoundsListener = listener;
+    }
+
+    private void changeSelectionBounds(Float value, boolean horizontal, boolean size) {
+        if (selectionBounds == null || value == null || !Float.isFinite(value) || selectionBoundsListener == null) {
+            return;
+        }
+        double twips = Math.round(value.doubleValue() * SWF.unitDivisor);
+        Rectangle2D bounds = selectionBounds;
+        if (!size || twips >= 1) {
+            selectionBoundsListener.accept(new Rectangle2D.Double(
+                    !size && horizontal ? twips : bounds.getX(), !size && !horizontal ? twips : bounds.getY(),
+                    size && horizontal ? twips : bounds.getWidth(), size && !horizontal ? twips : bounds.getHeight()));
+        }
+    }
+
+    public void setSelectionBounds(List<ShapeSelection.Selection> selections) {
+        selectionBounds = ShapeSelection.selectionBounds(selections);
+        updateBoundsField(xField, selectionBounds == null ? null : selectionBounds.getX(), true);
+        updateBoundsField(yField, selectionBounds == null ? null : selectionBounds.getY(), true);
+        updateBoundsField(wField, selectionBounds == null ? null : selectionBounds.getWidth(), false);
+        updateBoundsField(hField, selectionBounds == null ? null : selectionBounds.getHeight(), false);
+    }
+
+    private static void updateBoundsField(FloatPropertyField field, Double value, boolean position) {
+        field.setValue(value == null ? null : Math.round(value) / (float) SWF.unitDivisor, true);
+        field.setEnabled(value != null && (position || value > 0));
+    }
+
     public void setSelections(List<ShapeSelection.Selection> selections) {
+        setSelectionBounds(selections);
         if (selections.isEmpty()) {
             setSelectedFill(null);
             return;
@@ -606,6 +679,7 @@ public class ShapePropertiesPanel extends AbstractPropertiesPanel {
             fillEditor.setSwf(swf);
             strokeEditor.setSwf(swf);
             setSelectedFill(null);
+            setSelectionBounds(Collections.emptyList());
         } finally {
             updating = false;
         }

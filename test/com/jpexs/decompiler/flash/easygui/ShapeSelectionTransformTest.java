@@ -13,6 +13,7 @@ import static com.jpexs.decompiler.flash.easygui.ShapeSelectionTest.selection;
 import static com.jpexs.decompiler.flash.easygui.ShapeSelectionTest.shape;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
@@ -48,6 +49,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -104,6 +106,38 @@ public class ShapeSelectionTransformTest {
         assertEquals(((ShapeTag) original.getSwf().getCharacter(original.shapeId)).getData(), after);
         assertTrue(active[0].hasFloatingSelection());
         assertEquals(at(active[0].moveFloatingSelection(transformed.selected, 5000, 0).model, 2500, 500).fill.color.toColor(), Color.blue);
+    }
+
+    @Test
+    public void emptyHighlightsDoNotExtendTheSelectionBoundsToTheOrigin() {
+        DefineShape4Tag shape = shape();
+        rectangle(shape, 1600, 1600, 200, 200, 1, 0);
+        rectangle(shape, 1000, 1000, 1000, 1000, 2, 0);
+        ShapeSelection model = selection(shape);
+        List<ShapeSelection.Selection> selected = model.selectAll();
+        ShapeSelection.Selection covered = model.displaySelection(selected.get(0));
+        assertTrue(covered.area.getBounds2D().isEmpty());
+        assertEquals(ShapeSelection.selectionBounds(Arrays.asList(covered, selected.get(1))),
+                new Rectangle2D.Double(1000, 1000, 1000, 1000));
+    }
+
+    @Test
+    public void numericWidthAccountsForStrokeAndKeepsTheTopLeftCorner() {
+        DefineShape4Tag shape = shape();
+        shape.shapes.lineStyles.lineStyles2[0].width = 600;
+        rectangle(shape, 0, 0, 1000, 1000, 1, 1);
+        ShapeSelection model = selection(shape);
+        List<ShapeSelection.Selection> selected = model.selectAll();
+        Rectangle2D before = ShapeSelection.selectionBounds(selected);
+        double width = 2400;
+        Matrix transform = ShapeSelection.transformSelectionBounds(selected,
+                new Rectangle2D.Double(before.getX(), before.getY(), width, before.getHeight()));
+        assertNotNull(transform);
+        ShapeSelection.BatchEdit edit = model.transformFloatingSelection(selected, transform.toTransform());
+        Rectangle2D resized = ShapeSelection.selectionBounds(edit.selected);
+        assertEquals(resized.getWidth(), width, 0.5);
+        assertEquals(resized.getX(), before.getX(), 0.5);
+        assertEquals(resized.getY(), before.getY(), 0.5);
     }
 
     @Test

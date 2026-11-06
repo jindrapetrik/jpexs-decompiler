@@ -585,6 +585,84 @@ public class ShapeSelection {
         return transformSelection(selected, matrix, false);
     }
 
+    /** Returns the combined bounds of the visible selection, in shape-local twips. */
+    public static Rectangle2D selectionBounds(List<Selection> selected) {
+        Rectangle2D bounds = null;
+        for (Selection part : selected) {
+            Rectangle2D partBounds = part.area.getBounds2D();
+            if (!partBounds.isEmpty()) {
+                bounds = bounds == null ? partBounds : bounds.createUnion(partBounds);
+            }
+        }
+        return bounds;
+    }
+
+    /** Computes the local transform for an edit to one bounds field. */
+    static Matrix transformSelectionBounds(List<Selection> selected, Rectangle2D requested) {
+        Rectangle2D bounds = selectionBounds(selected);
+        if (bounds == null) {
+            return null;
+        }
+        boolean resizeWidth = requested.getWidth() != bounds.getWidth();
+        boolean resizeHeight = requested.getHeight() != bounds.getHeight();
+        if (!resizeWidth && !resizeHeight) {
+            return Matrix.getTranslateInstance(Math.round(requested.getX() - bounds.getX()),
+                    Math.round(requested.getY() - bounds.getY()));
+        }
+        double before = resizeWidth ? bounds.getWidth() : bounds.getHeight();
+        double target = resizeWidth ? requested.getWidth() : requested.getHeight();
+        if (target == Math.round(before)) {
+            return new Matrix();
+        }
+        if (before <= 0 || target < 1) {
+            return null;
+        }
+
+        // A SWF stroke still has a single width after scaling. Find the scale
+        // that gives the requested bounds with that new width, rather than
+        // treating the stroke outline itself as an affine-transformed fill.
+        double scale = target / before;
+        double low = 0;
+        double high = Double.POSITIVE_INFINITY;
+        for (int attempt = 0; attempt < 40 && scale > 0 && scale <= (1L << 31); attempt++) {
+            AffineTransform stretch = AffineTransform.getScaleInstance(resizeWidth ? scale : 1, resizeWidth ? 1 : scale);
+            Rectangle2D resized = scaledSelectionBounds(selected, stretch);
+            double actual = resizeWidth ? resized.getWidth() : resized.getHeight();
+            if (Math.abs(target - actual) <= 0.5) {
+                stretch.preConcatenate(AffineTransform.getTranslateInstance(
+                        bounds.getX() - resized.getX(), bounds.getY() - resized.getY()));
+                return new Matrix(stretch);
+            }
+            if (actual < target) {
+                low = scale;
+            } else {
+                high = scale;
+            }
+            scale = Double.isInfinite(high) ? scale * 2 : (low + high) / 2;
+        }
+        return null;
+    }
+
+    private static Rectangle2D scaledSelectionBounds(List<Selection> selected, AffineTransform scale) {
+        Rectangle2D bounds = null;
+        for (Selection part : selected) {
+            Rectangle2D areaBounds = part.area.getBounds2D();
+            if (areaBounds.isEmpty()) {
+                continue;
+            }
+            Rectangle2D partBounds;
+            if (part.stroke && part.line != null) {
+                Shape path = scale.createTransformedShape(part.geometry);
+                partBounds = new Area(createStroke(part.line, transformedLineWidth(part.line, scale))
+                        .createStrokedShape(path)).getBounds2D();
+            } else {
+                partBounds = scale.createTransformedShape(areaBounds).getBounds2D();
+            }
+            bounds = bounds == null ? partBounds : bounds.createUnion(partBounds);
+        }
+        return bounds;
+    }
+
     public boolean hasFloatingSelection() {
         if (floatingStart < 0) {
             return false;
@@ -737,17 +815,21 @@ public class ShapeSelection {
         if (result == null) {
             return null;
         }
+        result.setWidth(transformedLineWidth(line, transform));
+        if (result instanceof LINESTYLE2 && ((LINESTYLE2) result).hasFillFlag) {
+            ((LINESTYLE2) result).fillType = transformFill(((LINESTYLE2) result).fillType, transform);
+        }
+        return result;
+    }
+
+    private static int transformedLineWidth(ILINESTYLE line, AffineTransform transform) {
         double sx = Math.hypot(transform.getScaleX(), transform.getShearY());
         double sy = Math.hypot(transform.getShearX(), transform.getScaleY());
         LINESTYLE2 line2 = line instanceof LINESTYLE2 ? (LINESTYLE2) line : null;
         double scale = line2 != null && line2.noHScaleFlag && line2.noVScaleFlag ? 1
                 : line2 != null && line2.noHScaleFlag ? sy : line2 != null && line2.noVScaleFlag ? sx
                         : Math.hypot(sx, sy) / Math.sqrt(2);
-        result.setWidth((int) Math.max(0, Math.min(65535, Math.round(line.getWidth() * scale))));
-        if (result instanceof LINESTYLE2 && ((LINESTYLE2) result).hasFillFlag) {
-            ((LINESTYLE2) result).fillType = transformFill(((LINESTYLE2) result).fillType, transform);
-        }
-        return result;
+        return (int) Math.max(0, Math.min(65535, Math.round(line.getWidth() * scale)));
     }
 
     /**

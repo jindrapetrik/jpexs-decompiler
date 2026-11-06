@@ -803,6 +803,7 @@ public class EasySwfPanel extends JPanel {
         textInstancePropertiesPanel = new InstancePropertiesPanel(this, undoManager, true);
         shapePropertiesPanel = new ShapePropertiesPanel();
         shapePropertiesPanel.setPropertyChangeListener((stroke, property) -> changeShapeStyle(stroke, property));
+        shapePropertiesPanel.setSelectionBoundsListener(this::changeShapeSelectionBounds);
         brushPropertiesPanel = new BrushPropertiesPanel();
         brushPropertiesPanel.setChangeListener(this::updateShapeTool);
         eraserPropertiesPanel = new BrushPropertiesPanel(true);
@@ -2045,10 +2046,37 @@ public class EasySwfPanel extends JPanel {
         if (commit && !edits.isEmpty()) {
             clearShapePreview();
             ShapeSelectionTransform.State before = stagePanel.getShapeSelectionTransformState();
+            if (before == null) {
+                before = shapeTransformState;
+            }
             applyShapeEdits(edits, EasyStrings.translate("action.transform"), before, before == null ? null : before.transformed(matrix));
         } else {
             previewShapeSelections(edits);
         }
+    }
+
+    private void changeShapeSelectionBounds(Rectangle2D requested) {
+        if (!shapeSelectionTool() || selectedShapeParts.isEmpty()) {
+            return;
+        }
+        // SWF bounds and move records store coordinates in at most 31 signed bits.
+        double limit = (1 << 30) - 1;
+        if (fitsShapeBounds(requested, limit)) {
+            Matrix matrix = ShapeSelection.transformSelectionBounds(selectedShapeParts, requested);
+            if (matrix != null) {
+                AffineTransform transform = matrix.toTransform();
+                if (selectedShapeParts.stream().allMatch(item -> fitsShapeBounds(
+                        transform.createTransformedShape(item.geometry.getBounds2D()).getBounds2D(), limit))) {
+                    transformShapeSelection(matrix, true);
+                }
+            }
+        }
+        shapePropertiesPanel.setSelectionBounds(selectedShapeParts);
+    }
+
+    private static boolean fitsShapeBounds(Rectangle2D bounds, double limit) {
+        return bounds.getMinX() >= -limit && bounds.getMaxX() <= limit
+                && bounds.getMinY() >= -limit && bounds.getMaxY() <= limit;
     }
 
     void deleteShapeSelection() {
@@ -2106,14 +2134,15 @@ public class EasySwfPanel extends JPanel {
         if (!edits.isEmpty()) {
             try {
                 previewShape(createEditedShape(edits));
-                highlightShapeSelections(layer -> edits.containsKey(layer) ? edits.get(layer).model : shapeModel(layer), selectionsAfter(edits));
+                shapePropertiesPanel.setSelectionBounds(highlightShapeSelections(
+                        layer -> edits.containsKey(layer) ? edits.get(layer).model : shapeModel(layer), selectionsAfter(edits)));
                 return;
             } catch (IOException | InterruptedException ex) {
                 logShapeEditFailure(ex);
             }
         }
         clearShapePreview();
-        highlightShapeSelections(this::shapeModel, shapeSelections);
+        shapePropertiesPanel.setSelectionBounds(highlightShapeSelections(this::shapeModel, shapeSelections));
     }
 
     private void applyShapeEdit(ShapeSelection.BatchEdit edit, String description) {

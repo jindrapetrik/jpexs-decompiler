@@ -21,7 +21,6 @@ import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -69,10 +68,8 @@ public class BrushPropertiesPanel extends AbstractPropertiesPanel {
             group.add(fillTab);
             fillTab.setSelected(true);
             JPanel fillSection = ShapePropertiesPanel.createStyleSection(fillTab, fillEditor.paintOptions, fillEditor);
-            GridBagConstraints fillConstraints = new GridBagConstraints();
-            fillConstraints.gridy = ++gbc.gridy;
-            fillConstraints.insets = new Insets(3, 3, 3, 3);
-            cards.add(fillSection, fillConstraints);
+            addCard(cards, "fill", null, fillSection, gbc, false);
+            setCardOpened("fill", true);
         }
         JPanel brushPanel = new JPanel(new GridBagLayout());
         shapeEditor.setRenderer(new DefaultListCellRenderer() {

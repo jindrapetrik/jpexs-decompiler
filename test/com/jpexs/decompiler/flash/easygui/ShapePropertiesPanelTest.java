@@ -28,11 +28,13 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Constructor;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -85,6 +87,55 @@ public class ShapePropertiesPanelTest {
         end.color = new RGBA(0, 0, 255, 200);
         gradient.gradientRecords = new GRADRECORD[]{start, end};
         return gradient;
+    }
+
+    @Test
+    public void positionAndSizeFieldsEditTheWholeSelection() throws Exception {
+        DefineShape4Tag shape = ShapeSelectionTest.shape();
+        ShapeSelectionTest.rectangle(shape, 200, -400, 600, 1000, 1, 0);
+        ShapeSelectionTest.rectangle(shape, 1200, 0, 400, 600, 2, 0);
+        ShapeSelection model = ShapeSelectionTest.selection(shape);
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                ShapePropertiesPanel panel = new ShapePropertiesPanel();
+                FloatPropertyField x = (FloatPropertyField) field(panel, "xField");
+                FloatPropertyField y = (FloatPropertyField) field(panel, "yField");
+                FloatPropertyField w = (FloatPropertyField) field(panel, "wField");
+                FloatPropertyField h = (FloatPropertyField) field(panel, "hField");
+                assertFalse(x.isEnabled());
+                assertNull(x.getValue());
+
+                AtomicReference<List<ShapeSelection.Selection>> selected = new AtomicReference<>(model.selectAll());
+                AtomicReference<ShapeSelection> current = new AtomicReference<>(model);
+                panel.setSelections(selected.get());
+                panel.setSelectionBoundsListener(requested -> {
+                    ShapeSelection.BatchEdit edit = current.get().transformFloatingSelection(selected.get(),
+                            ShapeSelection.transformSelectionBounds(selected.get(), requested).toTransform());
+                    selected.set(edit.selected);
+                    current.set(edit.model);
+                    panel.setSelections(edit.selected);
+                });
+                assertEquals(ShapeSelection.selectionBounds(selected.get()), new Rectangle2D.Double(200, -400, 1400, 1000));
+                assertEquals(x.getValue(), Float.valueOf(10));
+                assertEquals(y.getValue(), Float.valueOf(-20));
+                assertEquals(w.getValue(), Float.valueOf(70));
+                assertEquals(h.getValue(), Float.valueOf(50));
+
+                editColorField(x, "-12.5");
+                editColorField(y, "7.25");
+                editColorField(w, "140");
+                editColorField(h, "25");
+                editColorField(w, "0");
+                assertEquals(ShapeSelection.selectionBounds(selected.get()), new Rectangle2D.Double(-250, 145, 2800, 500));
+                assertEquals(w.getValue(), Float.valueOf(140));
+                assertEquals(h.getValue(), Float.valueOf(25));
+                panel.setShape(shape);
+                assertFalse(x.isEnabled());
+                assertNull(x.getValue());
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     @Test

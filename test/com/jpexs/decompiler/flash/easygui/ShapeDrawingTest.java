@@ -257,10 +257,9 @@ public class ShapeDrawingTest {
                 JToggleButton firstSwatch = (JToggleButton) kinds.get(DrawingShape.LINE);
                 Point palettePosition = SwingUtilities.convertPoint(firstSwatch, 0, 0, panel);
                 Component palette = (Component) field(panel, "kindEditor");
-                Component paletteLabel = palette.getParent().getComponent(0);
-                int paletteLeft = SwingUtilities.convertPoint(paletteLabel, 0, 0, panel).x;
-                int paletteRight = SwingUtilities.convertPoint(palette, palette.getWidth(), 0, panel).x;
-                assertEquals((paletteLeft + paletteRight) / 2.0, panel.getWidth() / 2.0, 1.0);
+                assertEquals(palette.getParent().getComponentCount(), 1);
+                int paletteLeft = SwingUtilities.convertPoint(palette, 0, 0, panel).x;
+                assertEquals(paletteLeft + palette.getWidth() / 2.0, panel.getWidth() / 2.0, 1.0);
                 Component parameters = ((Component) field(panel, "sidesEditor")).getParent();
                 Point parameterPosition = SwingUtilities.convertPoint(parameters, 0, 0, panel);
                 assertEquals(parameterPosition.x + parameters.getWidth() / 2.0, panel.getWidth() / 2.0, 1.0);
