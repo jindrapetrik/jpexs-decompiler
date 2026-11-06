@@ -248,6 +248,7 @@ final class OpenCodeEmbeddedRuntime {
                 + "  \"model\": \"opencode/pulse-alpha-free\",\n"
                 + "  \"permissions\": [\n"
                 + "    { \"action\": \"*\", \"resource\": \"*\", \"effect\": \"deny\" },\n"
+                + "    { \"action\": \"execute\", \"resource\": \"*\", \"effect\": \"allow\" },\n"
                 + "    { \"action\": \"read\", \"resource\": \"*\", \"effect\": \"allow\" },\n"
                 + "    { \"action\": \"read\", \"resource\": \"*.env\", \"effect\": \"deny\" },\n"
                 + "    { \"action\": \"read\", \"resource\": \"*.env.*\", \"effect\": \"deny\" },\n"
