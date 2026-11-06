@@ -29,9 +29,14 @@ import java.awt.GridBagLayout;
 import java.awt.SystemColor;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -69,6 +74,51 @@ public class TimelinePanel extends JPanel {
         depthPanel = new TimelineDepthPanel(swfPanel);
         layerDrag = new TimelineLayerDrag(depthPanel, timelineBodyScrollPane, 1,
                 timelineBodyPanel::setDropRow, timelineBodyPanel::moveLayer);
+
+        depthPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event) {
+                if (SwingUtilities.isLeftMouseButton(event) && !event.isPopupTrigger()
+                        && !layerDrag.wasDragged() && !depthPanel.isOverControls(event)) {
+                    int depth = depthPanel.getDepthAt(event);
+                    if (depth > 0) {
+                        timelineBodyPanel.selectLayerFrames(depth);
+                    }
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent event) {
+                showLayerMenu(event);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent event) {
+                showLayerMenu(event);
+            }
+
+            private void showLayerMenu(MouseEvent event) {
+                if (!event.isPopupTrigger() || timelined == null || depthPanel.isOverControls(event)) {
+                    return;
+                }
+                int depth = depthPanel.getDepthAt(event);
+                if (depth == 0 && (depthPanel.getDepthCount() != 0 || !depthPanel.isActionsRowAt(event))) {
+                    return;
+                }
+                JPopupMenu menu = new JPopupMenu();
+                JMenuItem add = new JMenuItem(EasyStrings.translate("timeline.shape.addLayer"));
+                add.setEnabled(timelineBodyPanel.canAddLayer());
+                add.addActionListener(action -> timelineBodyPanel.addLayer(depth));
+                menu.add(add);
+                if (depth > 0) {
+                    JMenuItem remove = new JMenuItem(EasyStrings.translate("timeline.shape.removeLayer"));
+                    remove.setEnabled(timelineBodyPanel.canRemoveLayer(depth));
+                    remove.addActionListener(action -> timelineBodyPanel.removeLayer(depth));
+                    menu.add(remove);
+                }
+                menu.show(depthPanel, event.getX(), event.getY());
+            }
+        });
 
         timelineBodyPanel.addChangeListener(this::refresh);
 

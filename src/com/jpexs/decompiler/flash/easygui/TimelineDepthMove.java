@@ -135,7 +135,7 @@ final class TimelineDepthMove {
                 ? mappedLast : INVALID_CLIP_DEPTH;
     }
 
-    private static int depthOf(Tag tag) {
+    static int depthOf(Tag tag) {
         if (tag instanceof DepthTag) {
             return ((DepthTag) tag).getDepth();
         }
@@ -151,7 +151,7 @@ final class TimelineDepthMove {
         return 0;
     }
 
-    private static void setDepth(Tag tag, int depth) {
+    static void setDepth(Tag tag, int depth) {
         if (tag instanceof DepthTag) {
             ((DepthTag) tag).setDepth(depth);
         } else if (tag instanceof SetTabIndexTag) {
@@ -163,11 +163,11 @@ final class TimelineDepthMove {
         }
     }
 
-    private static int clipDepthOf(Tag tag) {
+    static int clipDepthOf(Tag tag) {
         return tag instanceof PlaceObjectTypeTag ? ((PlaceObjectTypeTag) tag).getClipDepth() : -1;
     }
 
-    private static void setClipDepth(Tag tag, int depth) {
+    static void setClipDepth(Tag tag, int depth) {
         if (tag instanceof PlaceObject2Tag) {
             ((PlaceObject2Tag) tag).clipDepth = depth;
         } else if (tag instanceof PlaceObject3Tag) {

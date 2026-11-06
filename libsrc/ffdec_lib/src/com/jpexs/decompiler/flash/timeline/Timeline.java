@@ -1629,11 +1629,11 @@ public class Timeline {
      * @param aaScale Antialias conflation reducing scale coefficient
      */
     public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, Matrix fullTransformation, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing, List<Integer> ignoreDepths, int aaScale) {
-        if (getFrameCount() <= frame) {
+        Frame frameObj = getFrame(frame);
+        if (frameObj == null) {
             return;
         }
 
-        Frame frameObj = getFrame(frame);
         Graphics2D g = (Graphics2D) image.getGraphics();
         Graphics2D fullG = (Graphics2D) fullImage.getGraphics();
         Shape prevClip = g.getClip();

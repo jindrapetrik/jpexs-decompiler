@@ -62,7 +62,7 @@ public class UndoManager {
         rememberSavedPosition(swf);
         if (savedPosMap.get(swf) > historyPos) {
             // The saved state belongs to the redo branch which is being dropped.
-            savedPosMap.put(swf, -1);
+            savedPosMap.put(swf, hasSwfChangesBetween(swf, historyPos, savedPosMap.get(swf)) ? -1 : historyPos);
         }
 
         List<DoableOperation> history = historyMap.get(swf);
@@ -88,12 +88,23 @@ public class UndoManager {
     }
 
     private void updateModifiedState(SWF swf) {
-        if (historyPosMap.get(swf).equals(savedPosMap.get(swf))) {
+        int saved = savedPosMap.get(swf);
+        if (saved >= 0 && !hasSwfChangesBetween(swf, saved, historyPosMap.get(swf))) {
             clearModifiedFlags(swf);
             swf.setHeaderModified(false);
         } else {
             swf.setModified(true);
         }
+    }
+
+    private boolean hasSwfChangesBetween(SWF swf, int first, int second) {
+        List<DoableOperation> history = historyMap.get(swf);
+        for (int i = Math.min(first, second); i < Math.max(first, second); i++) {
+            if (history.get(i).modifiesSwf()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void clearModifiedFlags(Timelined timelined) {

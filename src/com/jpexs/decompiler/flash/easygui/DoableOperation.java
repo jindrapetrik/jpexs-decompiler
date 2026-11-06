@@ -26,4 +26,8 @@ public interface DoableOperation {
     public void undoOperation();
     
     public String getDescription();
+
+    default boolean modifiesSwf() {
+        return true;
+    }
 }

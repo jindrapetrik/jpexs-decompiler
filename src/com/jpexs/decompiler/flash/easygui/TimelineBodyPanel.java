@@ -264,7 +264,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         int end_f = (clip.x + clip.width) / frameWidth;
         int lastRow = (clip.y + clip.height) / frameHeight;
 
-        int maxDepth = timeline.getMaxDepth();
+        int maxDepth = getDepthCount();
         int max_f = timeline.getFrameCount() - 1;
 
         // draw background
@@ -410,7 +410,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     private void drawBlock(Graphics2D g, Color backColor, int depth, int frame, int num_frames, BlockType blockType, int frameWidth) {
         int frameHeight = FRAME_HEIGHT;
-        int rowY = flipLayerOrder(depth, timeline.getMaxDepth()) * frameHeight;
+        int rowY = flipLayerOrder(depth, getDepthCount()) * frameHeight;
 
         for (int n = frame; n < frame + num_frames; n++) {
             if (cursor != null && cursor.contains(new Point(n, depth))) {
@@ -505,6 +505,24 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         frameSelect(getFirstFrame(), depths, true);
     }
 
+    void selectLayerFrames(int depth) {
+        if (timeline == null || getLockedDepths().contains(depth)) {
+            return;
+        }
+        int frameCount = timeline.getFrameCount();
+        int activeFrame = Math.max(0, Math.min(getFirstFrame(), frameCount - 1));
+        cursor.clear();
+        cursor.add(new Point(activeFrame, depth));
+        for (int frame = 0; frame < frameCount; frame++) {
+            if (frame != activeFrame) {
+                cursor.add(new Point(frame, depth));
+            }
+        }
+        repaint();
+        fireFrameSelected(activeFrame, Collections.singletonList(depth));
+        requestFocusInWindow();
+    }
+
     public int getFirstFrame() {
         if (cursor.isEmpty()) {
             return 0;
@@ -538,7 +556,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     private void rectSelect(int frame, int depth, int endFrame, int endDepth) {
         int x1 = Math.min(frame, endFrame);
         int x2 = Math.max(frame, endFrame);
-        int maxDepth = timeline.getMaxDepth();
+        int maxDepth = getDepthCount();
         int row = flipLayerOrder(depth, maxDepth);
         int endRow = flipLayerOrder(endDepth, maxDepth);
         Set<Integer> locked = getLockedDepths();
@@ -631,7 +649,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
         Point p = e.getPoint();
         p.x = p.x / getFrameWidth();
-        p.y = flipLayerOrder(p.y / FRAME_HEIGHT, timeline.getMaxDepth());
+        p.y = flipLayerOrder(p.y / FRAME_HEIGHT, getDepthCount());
         if (getLockedDepths().contains(p.y) && (!shiftDown || SwingUtilities.isRightMouseButton(e))) {
             return;
         }
@@ -1050,6 +1068,98 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }, description, selectionAfterEdit);
     }
 
+    boolean canAddLayer() {
+        return timeline != null && getDepthCount() < TimelineLayerEdit.MAX_DEPTH
+                && TimelineLayerEdit.canInsert(timeline.timelined);
+    }
+
+    void addLayer(int aboveDepth) {
+        if (canAddLayer()) {
+            editLayer(aboveDepth + 1, true);
+        }
+    }
+
+    boolean canRemoveLayer(int depth) {
+        if (depth <= 0 || depth > getDepthCount() || getLockedDepths().contains(depth)) {
+            return false;
+        }
+        if (timeline.timelined instanceof ButtonTag) {
+            List<BUTTONRECORD> records = ((ButtonTag) timeline.timelined).getRecords();
+            return records.isEmpty() || records.stream().anyMatch(record -> record.placeDepth != depth);
+        }
+        return true;
+    }
+
+    void removeLayer(int depth) {
+        if (canRemoveLayer(depth)) {
+            editLayer(depth, false);
+        }
+    }
+
+    private void editLayer(int depth, boolean inserting) {
+        Timelined target = timeline.timelined;
+        TimelineLayerEdit edit = new TimelineLayerEdit(target, depth, inserting);
+        int beforeCount = getDepthCount();
+        int afterCount = beforeCount + (inserting ? 1 : -1);
+        Set<Point> before = new LinkedHashSet<>(cursor);
+        Set<Point> after = new LinkedHashSet<>();
+        int frame = getFirstFrame();
+        if (inserting) {
+            after.add(new Point(frame, depth));
+        } else {
+            for (Point cell : before) {
+                if (cell.y != depth) {
+                    after.add(new Point(cell.x, TimelineLayerEdit.mapDepth(cell.y, depth, false)));
+                }
+            }
+            if (after.isEmpty()) {
+                after.add(new Point(frame, Math.min(afterCount, Math.max(1, depth - 1))));
+            }
+        }
+        undoManager.doOperation(new DoableOperation() {
+            private boolean hidden;
+            private boolean locked;
+
+            @Override
+            public void doOperation() {
+                apply(true);
+            }
+
+            @Override
+            public void undoOperation() {
+                apply(false);
+            }
+
+            private void apply(boolean forward) {
+                swfPanel.setTimelined(target);
+                boolean grows = forward == inserting;
+                if (!grows) {
+                    hidden = swfPanel.getHiddenDepths(target).contains(depth);
+                    locked = swfPanel.getLockedDepths(target).contains(depth);
+                }
+                edit.apply(forward);
+                swfPanel.setTimelineDepthCount(target, forward ? afterCount : beforeCount);
+                swfPanel.remapDepthInteraction(value -> TimelineLayerEdit.mapDepth(value, depth, grows));
+                if (grows) {
+                    swfPanel.restoreLayerFlags(depth, hidden, locked);
+                }
+                refreshAfterEdit(target, forward ? after : before);
+                swfPanel.refreshDepthInteraction();
+                scrollRectToVisible(getFrameBounds(getFirstFrame(), getFirstDepth()));
+            }
+
+            @Override
+            public String getDescription() {
+                return EasyStrings.translate(inserting ? "timeline.shape.addLayer" : "timeline.shape.removeLayer");
+            }
+
+            @Override
+            public boolean modifiesSwf() {
+                return edit.modifiesSwf();
+            }
+        }, target.getSwf());
+    }
+
     void moveLayer(int source, int destination) {
         if (timeline == null || source == destination) {
             return;
@@ -1065,6 +1175,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         if (result == TimelineDepthMove.Result.UNCHANGED) {
             return;
         }
+        int depthCount = getDepthCount();
         Set<Point> before = new LinkedHashSet<>(cursor);
         Set<Point> after = new LinkedHashSet<>();
         for (Point cell : before) {
@@ -1084,7 +1195,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             private void apply(TimelineDepthMove step, Set<Point> selection) {
                 swfPanel.setTimelined(target);
                 step.apply(target);
-                swfPanel.remapDepthInteraction(step);
+                swfPanel.setTimelineDepthCount(target, depthCount);
+                swfPanel.remapDepthInteraction(step::mapDepth);
                 refreshAfterEdit(target, selection);
                 swfPanel.refreshDepthInteraction();
             }
@@ -1180,7 +1292,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     private void selectNextUnlockedDepth(Point cell, int step) {
         Set<Integer> locked = getLockedDepths();
-        int maxDepth = timeline.getMaxDepth();
+        int maxDepth = getDepthCount();
         for (int row = flipLayerOrder(cell.y, maxDepth) + step; row >= 0 && row <= maxDepth; row += step) {
             int depth = flipLayerOrder(row, maxDepth);
             if (!locked.contains(depth)) {
@@ -1208,13 +1320,20 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         rect.width = getFrameWidth();
         rect.height = FRAME_HEIGHT;
         rect.x = frame * getFrameWidth();
-        rect.y = flipLayerOrder(depth, timeline == null ? 0 : timeline.getMaxDepth()) * FRAME_HEIGHT;
+        rect.y = flipLayerOrder(depth, getDepthCount()) * FRAME_HEIGHT;
         return rect;
+    }
+
+    private int getDepthCount() {
+        if (timeline == null) {
+            return 0;
+        }
+        return swfPanel == null ? timeline.getMaxDepth() : swfPanel.getTimelineDepthCount(timeline.timelined);
     }
 
     public void refresh() {
         int frameCount = timeline == null ? 0 : timeline.getFrameCount();
-        int maxDepth = timeline == null ? 0 : timeline.getMaxDepth();
+        int maxDepth = getDepthCount();
         Dimension dim = new Dimension(getFrameWidth() * frameCount + 1, FRAME_HEIGHT * (maxDepth + 1 /*actions*/ + 1 /*one additional*/));
         setSize(dim);
         setPreferredSize(dim);

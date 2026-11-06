@@ -145,7 +145,11 @@ public class TimelineDepthPanel extends JPanel {
 
     public void setTimeline(Timeline timeline) {
         timelined = timeline == null ? null : timeline.timelined;
-        setDepthCount(timeline == null ? 0 : timeline.getMaxDepth());
+        if (timeline == null) {
+            setDepthCount(0);
+        } else {
+            setDepthCount(swfPanel == null ? timeline.getMaxDepth() : swfPanel.getTimelineDepthCount(timelined));
+        }
     }
 
     void setDepthCount(int count) {
@@ -185,6 +189,11 @@ public class TimelineDepthPanel extends JPanel {
         int row = (scrollOffset + e.getY()) / TimelineBodyPanel.FRAME_HEIGHT;
         int depth = shapeTimeline ? maxDepth - row : TimelineBodyPanel.flipLayerOrder(row, maxDepth);
         return depth > 0 && depth <= maxDepth ? depth : 0;
+    }
+
+    boolean isActionsRowAt(MouseEvent event) {
+        int y = scrollOffset + event.getY();
+        return y >= 0 && y < TimelineBodyPanel.FRAME_HEIGHT;
     }
 
     boolean isOverControls(MouseEvent e) {
