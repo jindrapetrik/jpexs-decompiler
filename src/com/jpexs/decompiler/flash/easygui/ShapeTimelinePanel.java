@@ -24,7 +24,7 @@ import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -40,6 +40,7 @@ final class ShapeTimelinePanel extends JPanel {
 
     private final TimelineDepthPanel depths;
     private final TimelineLayerDrag layerDrag;
+    private final TimelineLayerSelection layerSelection = new TimelineLayerSelection();
     private int dropRow = -1;
     private List<SHAPEWITHSTYLE> layers = Collections.emptyList();
     private int activeLayer;
@@ -59,9 +60,10 @@ final class ShapeTimelinePanel extends JPanel {
                 int y = row * ROW_HEIGHT;
                 boolean empty = !ShapeLayers.hasEdges(layers.get(layer));
                 boolean selected = selectedLayers.isEmpty() ? layer == activeLayer : selectedLayers.contains(layer);
-                g.setColor(selected ? TimelineBodyPanel.getSelectedColor()
+                boolean rowSelected = layerSelection.get().depths.contains(layer + 1);
+                g.setColor(selected || rowSelected ? TimelineBodyPanel.getSelectedColor()
                         : empty ? TimelineBodyPanel.getEmptyFrameColor() : TimelineBodyPanel.getFrameColor());
-                g.fillRect(0, y, FRAME_WIDTH, ROW_HEIGHT);
+                g.fillRect(0, y, rowSelected ? getWidth() : FRAME_WIDTH, ROW_HEIGHT);
                 g.setColor(TimelineBodyPanel.BORDER_COLOR);
                 g.drawRect(0, y, FRAME_WIDTH, ROW_HEIGHT);
                 g.setColor(TimelineBodyPanel.KEY_COLOR);
@@ -77,10 +79,11 @@ final class ShapeTimelinePanel extends JPanel {
         }
     };
 
-    ShapeTimelinePanel(EasySwfPanel swfPanel, IntConsumer selectLayer, IntConsumer addLayer, IntConsumer removeLayer,
-            BiConsumer<Integer, Integer> moveLayer) {
+    ShapeTimelinePanel(EasySwfPanel swfPanel, IntConsumer selectLayer, IntConsumer addLayer, Consumer<Set<Integer>> removeLayers,
+            Consumer<TimelineDepthMove> moveLayers) {
         super(new BorderLayout());
-        depths = new TimelineDepthPanel(swfPanel, true);
+        depths = new TimelineDepthPanel(swfPanel, true, layerSelection);
+        layerSelection.addListener(frames::repaint);
         TimelineTimePanel time = new TimelineTimePanel(true);
         JScrollPane scroll = new FasterScrollPane(frames);
         scroll.setRowHeaderView(depths);
@@ -89,8 +92,7 @@ final class ShapeTimelinePanel extends JPanel {
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scroll, BorderLayout.CENTER);
 
-        layerDrag = new TimelineLayerDrag(depths, scroll, 0, this::setDropRow,
-                (source, destination) -> moveLayer.accept(source - 1, destination - 1));
+        layerDrag = new TimelineLayerDrag(depths, scroll, 0, this::setDropRow, moveLayers);
 
         frames.setFocusable(true);
         frames.addKeyListener(new KeyAdapter() {
@@ -107,6 +109,7 @@ final class ShapeTimelinePanel extends JPanel {
                 }
                 int layer = activeLayer + (key == KeyEvent.VK_UP ? 1 : -1);
                 if (layer >= 0 && layer < layers.size()) {
+                    layerSelection.clear();
                     selectLayer.accept(layer);
                 }
                 event.consume();
@@ -120,7 +123,16 @@ final class ShapeTimelinePanel extends JPanel {
                 if (SwingUtilities.isLeftMouseButton(event) && layer >= 0
                         && (event.getSource() != depths || !layerDrag.wasDragged() && !depths.isOverControls(event))) {
                     frames.requestFocusInWindow();
-                    swfPanel.selectShapeLayerContents(layer);
+                    if (event.getSource() == depths) {
+                        int depth = layer + 1;
+                        layerSelection.click(depth, event.isControlDown(), event.isShiftDown());
+                        TimelineLayerSelection.State selection = layerSelection.get();
+                        swfPanel.selectShapeLayerRows(selection.depths, depth);
+                        layerSelection.set(selection);
+                    } else {
+                        layerSelection.clear();
+                        swfPanel.selectShapeLayerContents(layer);
+                    }
                 }
             }
 
@@ -143,9 +155,10 @@ final class ShapeTimelinePanel extends JPanel {
                 JMenuItem add = new JMenuItem(EasyStrings.translate("timeline.shape.addLayer"));
                 add.addActionListener(action -> addLayer.accept(layer));
                 menu.add(add);
-                JMenuItem remove = new JMenuItem(EasyStrings.translate("timeline.shape.removeLayer"));
-                remove.setEnabled(layers.size() > 1 && !swfPanel.isShapeLayerLocked(layer));
-                remove.addActionListener(action -> removeLayer.accept(layer));
+                Set<Integer> selected = layerSelection.contextDepths(layer + 1);
+                JMenuItem remove = new JMenuItem(EasyStrings.translate(selected.size() == 1 ? "timeline.shape.removeLayer" : "timeline.shape.removeLayers"));
+                remove.setEnabled(swfPanel.canRemoveShapeLayers(selected));
+                remove.addActionListener(action -> removeLayers.accept(selected));
                 menu.add(remove);
                 menu.show(event.getComponent(), event.getX(), event.getY());
             }
@@ -156,6 +169,7 @@ final class ShapeTimelinePanel extends JPanel {
 
     void setLayers(List<SHAPEWITHSTYLE> layers, int activeLayer) {
         layerDrag.cancel();
+        layerSelection.clear();
         this.layers = layers;
         depths.setDepthCount(layers.size());
         frames.setPreferredSize(new Dimension(FRAME_WIDTH + 1, layers.size() * ROW_HEIGHT + 1));
@@ -165,6 +179,10 @@ final class ShapeTimelinePanel extends JPanel {
         if (!activeChanged) {
             scrollToLayer();
         }
+    }
+
+    TimelineLayerSelection getLayerSelection() {
+        return layerSelection;
     }
 
     void setSelection(int activeLayer, Set<Integer> selectedLayers) {

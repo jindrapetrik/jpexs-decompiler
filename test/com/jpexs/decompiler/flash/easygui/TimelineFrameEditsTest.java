@@ -439,7 +439,7 @@ public class TimelineFrameEditsTest {
             assertEquals(beyondLayer.last, 8);
 
             body.frameSelect(1, 1, false);
-            body.selectLayerFrames(1);
+            body.selectLayerFrames(1, false, false);
             TimelineBodyPanel.FrameSpan selection = body.getSelectedFrameSpan(1, 1);
             assertEquals(selection.first, 0);
             assertEquals(selection.last, 6);

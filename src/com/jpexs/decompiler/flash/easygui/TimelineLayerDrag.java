@@ -21,7 +21,9 @@ import java.awt.Point;
 import java.awt.dnd.DragSource;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.function.BiConsumer;
+import java.util.Collections;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -35,18 +37,18 @@ final class TimelineLayerDrag extends MouseAdapter {
     private final JScrollPane scroll;
     private final int firstRow;
     private final IntConsumer showFrameMarker;
-    private final BiConsumer<Integer, Integer> moveLayer;
-    private int sourceDepth;
+    private final Consumer<TimelineDepthMove> moveLayers;
+    private Set<Integer> moving = Collections.emptySet();
     private int startY;
     private boolean dragged;
 
     TimelineLayerDrag(TimelineDepthPanel depths, JScrollPane scroll, int firstRow, IntConsumer showFrameMarker,
-            BiConsumer<Integer, Integer> moveLayer) {
+            Consumer<TimelineDepthMove> moveLayers) {
         this.depths = depths;
         this.scroll = scroll;
         this.firstRow = firstRow;
         this.showFrameMarker = showFrameMarker;
-        this.moveLayer = moveLayer;
+        this.moveLayers = moveLayers;
         depths.addMouseListener(this);
         depths.addMouseMotionListener(this);
         depths.setAutoscrolls(true);
@@ -57,7 +59,7 @@ final class TimelineLayerDrag extends MouseAdapter {
     }
 
     void cancel() {
-        sourceDepth = 0;
+        moving = Collections.emptySet();
         depths.setDropRow(-1);
         showFrameMarker.accept(-1);
     }
@@ -67,15 +69,19 @@ final class TimelineLayerDrag extends MouseAdapter {
         cancel();
         dragged = false;
         if (SwingUtilities.isLeftMouseButton(event) && depths.getDepthCount() > 1 && !depths.isOverControls(event)) {
-            sourceDepth = depths.getDepthAt(event);
-            startY = viewportPoint(event).y;
+            int source = depths.getDepthAt(event);
+            if (source > 0) {
+                Set<Integer> selected = depths.getLayerSelection().get().depths;
+                moving = selected.contains(source) ? selected : Collections.singleton(source);
+                startY = viewportPoint(event).y;
+            }
         }
     }
 
     @Override
     public void mouseDragged(MouseEvent event) {
         int y = viewportPoint(event).y;
-        if (sourceDepth == 0 || (!dragged && Math.abs(y - startY) < DragSource.getDragThreshold())) {
+        if (moving.isEmpty() || (!dragged && Math.abs(y - startY) < DragSource.getDragThreshold())) {
             return;
         }
         dragged = true;
@@ -87,9 +93,9 @@ final class TimelineLayerDrag extends MouseAdapter {
 
     @Override
     public void mouseReleased(MouseEvent event) {
-        int source = sourceDepth;
+        Set<Integer> selected = moving;
         cancel();
-        if (source == 0 || !dragged || !SwingUtilities.isLeftMouseButton(event)) {
+        if (selected.isEmpty() || !dragged || !SwingUtilities.isLeftMouseButton(event)) {
             return;
         }
         Point point = viewportPoint(event);
@@ -98,12 +104,9 @@ final class TimelineLayerDrag extends MouseAdapter {
         if (!insideColumns || point.y < 0 || point.y >= scroll.getViewport().getHeight()) {
             return;
         }
-        int count = depths.getDepthCount();
-        int sourceRow = count - source;
-        int row = insertionRow(point.y);
-        int destination = count - (row > sourceRow ? row - 1 : row);
-        if (source != destination) {
-            moveLayer.accept(source, destination);
+        TimelineDepthMove move = TimelineDepthMove.forDrop(depths.getDepthCount(), selected, insertionRow(point.y));
+        if (!move.isIdentity()) {
+            moveLayers.accept(move);
         }
     }
 

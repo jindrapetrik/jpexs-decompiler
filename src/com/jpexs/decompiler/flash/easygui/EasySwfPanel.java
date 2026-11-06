@@ -101,6 +101,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -544,7 +545,7 @@ public class EasySwfPanel extends JPanel {
                                 && (depthCount == TimelineLayerEdit.MAX_DEPTH || !TimelineLayerEdit.canInsert(target)))) {
                             return false;
                         }
-                        TimelineLayerEdit insertedLayer = insertAbove ? new TimelineLayerEdit(target, depth, true) : null;
+                        TimelineLayerEdit insertedLayer = insertAbove ? new TimelineLayerEdit(target, depth) : null;
                         TimelineBodyPanel.FrameSpan span = body.getSelectedFrameSpan(frame, selectedDepth);
                         Set<Point> originalSelection = body.copySelection();
                         TimelineBlankFrames originalBlanks = getTimelineBlankFrames(target);
@@ -788,7 +789,7 @@ public class EasySwfPanel extends JPanel {
         });
 
         shapeTimelinePanel = new ShapeTimelinePanel(this, this::selectShapeLayer, this::addShapeLayer,
-                this::removeShapeLayer, this::moveShapeLayer);
+                this::removeShapeLayers, this::moveShapeLayers);
         timelineArea = new JPanel(new CardLayout());
         timelineArea.add(timelinePanel, "timeline");
         timelineArea.add(shapeTimelinePanel, "shape");
@@ -1621,6 +1622,16 @@ public class EasySwfPanel extends JPanel {
         selectShapeLayer(layer, shapeSelectionTool());
     }
 
+    void selectShapeLayerRows(Set<Integer> depths, int clickedDepth) {
+        Set<Integer> layers = new LinkedHashSet<>();
+        for (int depth : depths) {
+            layers.add(depth - 1);
+        }
+        int layer = depths.contains(clickedDepth) ? clickedDepth - 1
+                : layers.isEmpty() ? activeShapeLayer : layers.iterator().next();
+        selectShapeLayers(layer, shapeSelectionTool() ? layers : Collections.emptySet());
+    }
+
     private void selectShapeLayer(int layer) {
         selectShapeLayer(layer, false);
     }
@@ -1629,12 +1640,22 @@ public class EasySwfPanel extends JPanel {
         if (!selectContents && layer == activeShapeLayer && shapeSelections.isEmpty()) {
             return;
         }
+        selectShapeLayers(layer, selectContents ? Collections.singleton(layer) : Collections.emptySet());
+    }
+
+    private void selectShapeLayers(int layer, Set<Integer> contents) {
         prepareShapeTransfer();
         activeShapeLayer = layer;
         shapeModels.clear();
         eyedropperSample = null;
         eyedropperPropertiesPanel.setSample(null);
-        showShapeSelections(selectContents && shapeLayerEditable() ? shapeModel(layer).selectAll() : Collections.emptyList());
+        Map<Integer, List<ShapeSelection.Selection>> selected = new LinkedHashMap<>();
+        for (int index : contents) {
+            if (shapeLayerEditable(index)) {
+                selected.put(index, shapeModel(index).selectAll());
+            }
+        }
+        showLayerSelections(selected);
         updateShapeTool();
         updatePropertiesPanel();
     }
@@ -1707,6 +1728,7 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void showStageSelection(Map<Integer, List<ShapeSelection.Selection>> selected) {
+        shapeTimelinePanel.getLayerSelection().clear();
         showLayerSelections(selected);
         if (rightTabbedPane.getSelectedIndex() != 2) {
             rightTabbedPane.setSelectedIndex(0);
@@ -1715,39 +1737,62 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void addShapeLayer(int layer) {
+        TimelineLayerSelection rowSelection = shapeTimelinePanel.getLayerSelection();
+        TimelineLayerSelection.State originalRows = rowSelection.get();
         prepareShapeTransfer();
         List<SHAPEWITHSTYLE> layers = new ArrayList<>(shapeLayers);
         int inserted = layer + 1;
         layers.add(inserted, SHAPEWITHSTYLE.createEmpty(editingShape.getShapeNum()));
         List<ShapeLayerState> states = new ArrayList<>(shapeLayerStates);
         states.add(inserted, new ShapeLayerState());
-        applyShapeLayers(layers, states, inserted, "timeline.shape.addLayer");
+        TimelineLayerSelection.State insertedRow = TimelineLayerSelection.State.single(inserted + 1);
+        applyShapeLayers(layers, states, inserted, "timeline.shape.addLayer", forward -> rowSelection.set(forward ? insertedRow : originalRows));
     }
 
-    private void removeShapeLayer(int layer) {
-        if (shapeLayers.size() <= 1 || isShapeLayerLocked(layer)) {
+    boolean canRemoveShapeLayers(Set<Integer> depths) {
+        return !depths.isEmpty() && depths.size() < shapeLayers.size()
+                && depths.stream().allMatch(depth -> depth > 0 && depth <= shapeLayers.size());
+    }
+
+    private void removeShapeLayers(Set<Integer> depths) {
+        if (!canRemoveShapeLayers(depths)) {
             return;
         }
+        TimelineLayerSelection rowSelection = shapeTimelinePanel.getLayerSelection();
+        TimelineLayerSelection.State originalRows = rowSelection.get();
         prepareShapeTransfer();
-        List<SHAPEWITHSTYLE> layers = new ArrayList<>(shapeLayers);
-        layers.remove(layer);
-        List<ShapeLayerState> states = new ArrayList<>(shapeLayerStates);
-        states.remove(layer);
-        // Keep the active layer if it survives. Otherwise prefer the layer below.
-        int next = activeShapeLayer < layer ? activeShapeLayer : Math.max(0, activeShapeLayer - 1);
-        applyShapeLayers(layers, states, next, "timeline.shape.removeLayer");
+        List<SHAPEWITHSTYLE> layers = new ArrayList<>();
+        List<ShapeLayerState> states = new ArrayList<>();
+        for (int index = 0; index < shapeLayers.size(); index++) {
+            if (!depths.contains(index + 1)) {
+                layers.add(shapeLayers.get(index));
+                states.add(shapeLayerStates.get(index));
+            }
+        }
+        TimelineLayerEdit.Removal removal = new TimelineLayerEdit.Removal(depths);
+        TimelineLayerSelection.State remainingRows = originalRows.remap(removal::mapDepth);
+        // A removed active layer selects the nearest surviving layer below it, when available.
+        int next = Math.max(0, removal.mapClipDepth(activeShapeLayer + 1) - 1);
+        String action = depths.size() == 1 ? "timeline.shape.removeLayer" : "timeline.shape.removeLayers";
+        applyShapeLayers(layers, states, next, action, forward -> rowSelection.set(forward ? remainingRows : originalRows));
     }
 
-    private void moveShapeLayer(int source, int destination) {
-        if (source == destination) {
+    private void moveShapeLayers(TimelineDepthMove move) {
+        if (move.isIdentity()) {
             return;
         }
+        TimelineLayerSelection rowSelection = shapeTimelinePanel.getLayerSelection();
+        TimelineLayerSelection.State originalRows = rowSelection.get();
+        TimelineLayerSelection.State movedRows = originalRows.remap(move::mapDepth);
         finishPendingShapeEdit();
         List<SHAPEWITHSTYLE> layers = new ArrayList<>(shapeLayers);
-        layers.add(destination, layers.remove(source));
         List<ShapeLayerState> states = new ArrayList<>(shapeLayerStates);
-        states.add(destination, states.remove(source));
-        int nextLayer = movedShapeLayerIndex(activeShapeLayer, source, destination);
+        for (int index = 0; index < shapeLayers.size(); index++) {
+            int moved = move.mapDepth(index + 1) - 1;
+            layers.set(moved, shapeLayers.get(index));
+            states.set(moved, shapeLayerStates.get(index));
+        }
+        int nextLayer = move.mapDepth(activeShapeLayer + 1) - 1;
 
         Map<Integer, List<ShapeSelection.Selection>> previous = shapeSelections;
         Map<Integer, ShapeSelection> previousModels = new HashMap<>();
@@ -1761,14 +1806,15 @@ public class EasySwfPanel extends JPanel {
             ShapeTag edited = ShapeStyleChangeOperation.createShape(editingShape, layers);
             applyShapeTagEdit(edited, EasyStrings.translate("timeline.shape.moveLayer"),
                     stagePanel.getSelectedPointIndices(), nextLayer, states, forward -> {
+                        rowSelection.set(forward ? movedRows : originalRows);
                         Map<Integer, List<ShapeSelection.Selection>> selection = new LinkedHashMap<>();
                         previousModels.forEach((index, model) -> {
-                            int moved = forward ? movedShapeLayerIndex(index, source, destination) : index;
+                            int moved = forward ? move.mapDepth(index + 1) - 1 : index;
                             if (shapeLayerEditable(moved)) {
                                 shapeModels.put(moved, model);
                             }
                         });
-                        previous.forEach((index, parts) -> selection.put(forward ? movedShapeLayerIndex(index, source, destination) : index, parts));
+                        previous.forEach((index, parts) -> selection.put(forward ? move.mapDepth(index + 1) - 1 : index, parts));
                         if (!selection.isEmpty()) {
                             showLayerSelections(selection);
                             if (!selectedShapeParts.isEmpty()) {
@@ -1782,23 +1828,11 @@ public class EasySwfPanel extends JPanel {
         }
     }
 
-    private static int movedShapeLayerIndex(int index, int source, int destination) {
-        if (index == source) {
-            return destination;
-        }
-        if (source < index && index <= destination) {
-            return index - 1;
-        }
-        if (destination <= index && index < source) {
-            return index + 1;
-        }
-        return index;
-    }
-
-    private void applyShapeLayers(List<SHAPEWITHSTYLE> layers, List<ShapeLayerState> states, int activeLayer, String action) {
+    private void applyShapeLayers(List<SHAPEWITHSTYLE> layers, List<ShapeLayerState> states, int activeLayer, String action,
+            Consumer<Boolean> restoreSelection) {
         try {
             ShapeTag edited = ShapeStyleChangeOperation.createShape(editingShape, layers);
-            applyShapeTagEdit(edited, EasyStrings.translate(action), Collections.emptyList(), activeLayer, states);
+            applyShapeTagEdit(edited, EasyStrings.translate(action), Collections.emptyList(), activeLayer, states, restoreSelection);
         } catch (IOException | InterruptedException ex) {
             logShapeEditFailure(ex);
         }

@@ -22,9 +22,12 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.function.IntUnaryOperator;
 
-/** Inserts or removes one display-list depth, keeping the commands of other layers in order. */
+/** Inserts or removes display-list depths, keeping the commands of other layers in order. */
 final class TimelineLayerEdit {
 
     static final int MAX_DEPTH = 0xffff;
@@ -38,15 +41,24 @@ final class TimelineLayerEdit {
     private final List<BUTTONRECORD> afterRecords = new ArrayList<>();
     private boolean changedRecords;
 
-    TimelineLayerEdit(Timelined target, int depth, boolean inserting) {
+    TimelineLayerEdit(Timelined target, int insertedDepth) {
+        this(target, value -> mapDepth(value, insertedDepth, true),
+                value -> value < insertedDepth ? value : value + 1);
+    }
+
+    TimelineLayerEdit(Timelined target, Removal removal) {
+        this(target, removal::mapDepth, removal::mapClipDepth);
+    }
+
+    private TimelineLayerEdit(Timelined target, IntUnaryOperator mapDepth, IntUnaryOperator mapClipDepth) {
         this.target = target;
         frameCount = target.getTimeline().getFrameCount();
         if (target instanceof ButtonTag) {
             for (BUTTONRECORD record : ((ButtonTag) target).getRecords()) {
                 beforeRecords.add(new BUTTONRECORD(record));
-                int mapped = mapDepth(record.placeDepth, depth, inserting);
+                int mapped = mapDepth.applyAsInt(record.placeDepth);
                 changedRecords |= mapped != record.placeDepth;
-                if (inserting || record.placeDepth != depth) {
+                if (mapped != 0 || record.placeDepth == 0) {
                     BUTTONRECORD copy = new BUTTONRECORD(record);
                     copy.placeDepth = mapped;
                     afterRecords.add(copy);
@@ -56,19 +68,54 @@ final class TimelineLayerEdit {
             int index = 0;
             for (Tag tag : target.getTags()) {
                 int oldDepth = TimelineDepthMove.depthOf(tag);
-                if (!inserting && oldDepth == depth) {
+                int newDepth = mapDepth.applyAsInt(oldDepth);
+                if (oldDepth > 0 && newDepth == 0) {
                     removedIndices.add(index);
                     removedTags.add(tag);
                 } else {
                     int oldClip = TimelineDepthMove.clipDepthOf(tag);
-                    int newDepth = mapDepth(oldDepth, depth, inserting);
-                    int newClip = oldClip < depth ? oldClip : oldClip + (inserting ? 1 : -1);
+                    int newClip = mapClipDepth.applyAsInt(oldClip);
                     if (newDepth != oldDepth || newClip != oldClip) {
                         changedTags.add(new TagChange(tag, oldDepth, newDepth, oldClip, newClip));
                     }
                 }
                 index++;
             }
+        }
+    }
+
+    static final class Removal {
+
+        private final int[] depths;
+
+        Removal(Set<Integer> depths) {
+            this.depths = depths.stream().mapToInt(Integer::intValue).sorted().toArray();
+        }
+
+        int mapDepth(int depth) {
+            int index = Arrays.binarySearch(depths, depth);
+            return index >= 0 ? 0 : depth + index + 1;
+        }
+
+        int mapClipDepth(int depth) {
+            int index = Arrays.binarySearch(depths, depth);
+            int removedThroughDepth = index >= 0 ? index + 1 : -index - 1;
+            return depth - removedThroughDepth;
+        }
+
+        int restoreDepth(int depth) {
+            // Removed rows at or below this compacted depth must be skipped.
+            int first = 0;
+            int last = depths.length;
+            while (first < last) {
+                int middle = (first + last) / 2;
+                if (depths[middle] - middle <= depth) {
+                    first = middle + 1;
+                } else {
+                    last = middle;
+                }
+            }
+            return depth + first;
         }
     }
 

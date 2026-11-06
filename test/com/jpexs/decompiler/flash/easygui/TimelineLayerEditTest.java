@@ -25,6 +25,9 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import org.testng.annotations.Test;
 
 public class TimelineLayerEditTest {
@@ -40,7 +43,7 @@ public class TimelineLayerEditTest {
         swf.addTag(tab);
         swf.addTag(new ShowFrameTag(swf));
 
-        TimelineLayerEdit edit = new TimelineLayerEdit(swf, 3, true);
+        TimelineLayerEdit edit = new TimelineLayerEdit(swf, 3);
         edit.apply(true);
         assertEquals(mask.getClipDepth(), 4);
         assertEquals(front.getDepth(), 4);
@@ -68,7 +71,7 @@ public class TimelineLayerEditTest {
         int removalIndex = swf.indexOfTag(removal);
         int placementIndex = swf.indexOfTag(removed);
 
-        TimelineLayerEdit edit = new TimelineLayerEdit(swf, 2, false);
+        TimelineLayerEdit edit = new TimelineLayerEdit(swf, new TimelineLayerEdit.Removal(Collections.singleton(2)));
         edit.apply(true);
         assertEquals(swf.indexOfTag(removed), -1);
         assertEquals(swf.indexOfTag(removal), -1);
@@ -97,7 +100,7 @@ public class TimelineLayerEditTest {
         button.getButtonRecordAt(ButtonTag.FRAME_UP, 1, true).characterId = character;
         button.getButtonRecordAt(ButtonTag.FRAME_OVER, 1, true).characterId = character;
         button.getButtonRecordAt(ButtonTag.FRAME_DOWN, 2, true).characterId = character;
-        TimelineLayerEdit edit = new TimelineLayerEdit(button, 1, false);
+        TimelineLayerEdit edit = new TimelineLayerEdit(button, new TimelineLayerEdit.Removal(Collections.singleton(1)));
         edit.apply(true);
         assertEquals(button.getRecords().size(), 1);
         assertEquals(button.getRecords().get(0).placeDepth, 1);
@@ -115,17 +118,61 @@ public class TimelineLayerEditTest {
         swf.addTag(new ShowFrameTag(swf));
         swf.clearModified();
         UndoManager history = new UndoManager();
-        history.doOperation(operation(new TimelineLayerEdit(swf, 2, true)), swf);
+        history.doOperation(operation(new TimelineLayerEdit(swf, 2)), swf);
         assertTrue(history.canUndo(swf));
         assertFalse(swf.isModified());
         history.undo(swf);
         assertFalse(swf.isModified());
         history.redo(swf);
         assertFalse(swf.isModified());
-        history.doOperation(operation(new TimelineLayerEdit(swf, 1, false)), swf);
+        history.doOperation(operation(new TimelineLayerEdit(swf, new TimelineLayerEdit.Removal(Collections.singleton(1)))), swf);
         assertTrue(swf.isModified());
         history.undo(swf);
         assertFalse(swf.isModified());
+    }
+
+    @Test
+    public void removingNonAdjacentLayersCompactsDepthsAndRestoresTheOriginalTags() throws Exception {
+        SWF swf = new SWF();
+        int character = shape(swf);
+        PlaceObject2Tag mask = place(swf, character, 1, 6);
+        PlaceObject2Tag removedFirst = place(swf, character, 2, -1);
+        PlaceObject2Tag between = place(swf, character, 3, -1);
+        PlaceObject2Tag removedSecond = place(swf, character, 4, -1);
+        PlaceObject2Tag above = place(swf, character, 7, -1);
+        SetTabIndexTag tab = new SetTabIndexTag(swf);
+        tab.depth = 7;
+        swf.addTag(tab);
+        swf.addTag(new ShowFrameTag(swf));
+        RemoveObject2Tag implicit = new RemoveObject2Tag(swf);
+        implicit.setDepth(4);
+        swf.addTag(implicit);
+
+        TimelineLayerEdit.Removal removal = new TimelineLayerEdit.Removal(new HashSet<>(Arrays.asList(2, 4, 6)));
+        TimelineLayerEdit edit = new TimelineLayerEdit(swf, removal);
+        edit.apply(true);
+        assertEquals(mask.getClipDepth(), 3);
+        assertEquals(between.getDepth(), 2);
+        assertEquals(above.getDepth(), 4);
+        assertEquals(tab.depth, 4);
+        assertEquals(swf.indexOfTag(removedFirst), -1);
+        assertEquals(swf.indexOfTag(removedSecond), -1);
+        assertEquals(swf.indexOfTag(implicit), -1);
+        assertEquals(roundTrip(swf).getTimeline().getFrameCount(), 2);
+        for (int depth : new int[]{0, 1, 3, 5, 7, 8}) {
+            assertEquals(removal.restoreDepth(removal.mapDepth(depth)), depth);
+        }
+
+        swf.clearModified();
+        edit.apply(false);
+        assertEquals(mask.getClipDepth(), 6);
+        assertEquals(between.getDepth(), 3);
+        assertEquals(above.getDepth(), 7);
+        assertEquals(tab.depth, 7);
+        assertSame(swf.getTags().get(2), removedFirst);
+        assertSame(swf.getTags().get(4), removedSecond);
+        assertSame(swf.getTags().get(swf.getTags().size() - 1), implicit);
+        assertNull(roundTrip(swf).getTimeline().getFrame(1).showFrameTag);
     }
 
     private static DoableOperation operation(TimelineLayerEdit edit) {

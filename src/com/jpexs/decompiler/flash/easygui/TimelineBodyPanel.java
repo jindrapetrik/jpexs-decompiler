@@ -48,6 +48,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntUnaryOperator;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -108,6 +109,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     private final List<Runnable> changeListeners = new ArrayList<>();
 
     private final Set<Point> cursor = new LinkedHashSet<>();
+    private final TimelineLayerSelection layerSelection = new TimelineLayerSelection();
     private final EasySwfPanel swfPanel;
 
     /*private int frame = 0;
@@ -203,6 +205,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         setFocusable(true);
         this.swfPanel = swfPanel;
         this.undoManager = undoManager;
+        layerSelection.addListener(this::repaint);
 
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyEventDispatcher() {
@@ -263,8 +266,12 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         for (int f = start_f; f <= end_f; f++) {
             g.setColor((f + 1) % 5 == 0 ? getEmptyFrameSecondColor() : getEmptyFrameColor());
             g.fillRect(f * frameWidth, firstRow * frameHeight, frameWidth, (lastRow - firstRow + 1) * frameHeight);
-            g.setColor(EMPTY_BORDER_COLOR);
             for (int row = firstRow; row <= lastRow; row++) {
+                if (layerSelection.get().depths.contains(flipLayerOrder(row, maxDepth))) {
+                    g.setColor(getSelectedColor());
+                    g.fillRect(f * frameWidth, row * frameHeight, frameWidth, frameHeight);
+                }
+                g.setColor(EMPTY_BORDER_COLOR);
                 g.drawRect(f * frameWidth, row * frameHeight, frameWidth, frameHeight);
             }
         }
@@ -354,9 +361,10 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     private void drawBlock(Graphics2D g, Color backColor, int depth, int frame, int num_frames, BlockType blockType, int frameWidth, boolean key) {
         int frameHeight = FRAME_HEIGHT;
         int rowY = flipLayerOrder(depth, getDepthCount()) * frameHeight;
+        boolean rowSelected = layerSelection.get().depths.contains(depth);
 
         for (int n = frame; n < frame + num_frames; n++) {
-            if (cursor != null && cursor.contains(new Point(n, depth))) {
+            if (rowSelected || cursor != null && cursor.contains(new Point(n, depth))) {
                 g.setColor(getSelectedColor());
             } else {
                 g.setColor(backColor);
@@ -450,21 +458,38 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         frameSelect(getFirstFrame(), depths, true);
     }
 
-    void selectLayerFrames(int depth) {
-        if (timeline == null || getLockedDepths().contains(depth)) {
+    TimelineLayerSelection getLayerSelection() {
+        return layerSelection;
+    }
+
+    void selectLayerFrames(int depth, boolean toggle, boolean extend) {
+        if (timeline == null) {
             return;
+        }
+        layerSelection.click(depth, toggle, extend);
+        List<Integer> editable = new ArrayList<>(layerSelection.get().depths);
+        editable.removeAll(getLockedDepths());
+        if (editable.remove(Integer.valueOf(depth))) {
+            editable.add(0, depth);
         }
         int frameCount = getDisplayedFrameCount();
         int activeFrame = Math.max(0, Math.min(getFirstFrame(), frameCount - 1));
         cursor.clear();
-        cursor.add(new Point(activeFrame, depth));
-        for (int frame = 0; frame < frameCount; frame++) {
-            if (frame != activeFrame) {
-                cursor.add(new Point(frame, depth));
+        for (int selected : editable) {
+            cursor.add(new Point(activeFrame, selected));
+        }
+        if (editable.isEmpty()) {
+            cursor.add(new Point(activeFrame, 0));
+        }
+        for (int selected : editable) {
+            for (int frame = 0; frame < frameCount; frame++) {
+                if (frame != activeFrame) {
+                    cursor.add(new Point(frame, selected));
+                }
             }
         }
         repaint();
-        fireFrameSelected(activeFrame, Collections.singletonList(depth));
+        fireFrameSelected(activeFrame, editable);
         requestFocusInWindow();
     }
 
@@ -610,6 +635,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     public void frameSelect(int frame, List<Integer> depths, boolean notify) {
+        layerSelection.clear();
         /*if (cursor != null && cursor.width == 1 && cursor.height == 1 && (cursor.contains(frame, depth) || (depth == -1 && cursor.contains(frame, cursor.y)))) {
             return;
         }
@@ -659,6 +685,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     public void mousePressed(MouseEvent e) {
         if (timeline == null) {
             return;
+        }
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            layerSelection.clear();
         }
         Point p = e.getPoint();
         p.x = p.x / getFrameWidth();
@@ -918,52 +947,62 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     void addLayer(int aboveDepth) {
         if (canAddLayer()) {
-            editLayer(aboveDepth + 1, true);
+            editLayers(aboveDepth + 1, Collections.emptySet());
         }
     }
 
-    boolean canRemoveLayer(int depth) {
-        if (depth <= 0 || depth > getDepthCount() || getLockedDepths().contains(depth)) {
+    boolean canRemoveLayers(Set<Integer> depths) {
+        int depthCount = getDepthCount();
+        if (depths.isEmpty() || depths.stream().anyMatch(depth -> depth <= 0 || depth > depthCount)) {
             return false;
         }
         if (timeline.timelined instanceof ButtonTag) {
             List<BUTTONRECORD> records = ((ButtonTag) timeline.timelined).getRecords();
-            return records.isEmpty() || records.stream().anyMatch(record -> record.placeDepth != depth);
+            return records.isEmpty() || records.stream().anyMatch(record -> !depths.contains(record.placeDepth));
         }
         return true;
     }
 
-    void removeLayer(int depth) {
-        if (canRemoveLayer(depth)) {
-            editLayer(depth, false);
+    void removeLayers(Set<Integer> depths) {
+        if (canRemoveLayers(depths)) {
+            editLayers(0, depths);
         }
     }
 
-    private void editLayer(int depth, boolean inserting) {
+    private void editLayers(int insertedDepth, Set<Integer> removedDepths) {
         Timelined target = timeline.timelined;
-        TimelineLayerEdit edit = new TimelineLayerEdit(target, depth, inserting);
+        boolean inserting = insertedDepth > 0;
+        Set<Integer> affectedDepths = inserting ? Collections.singleton(insertedDepth) : removedDepths;
+        TimelineLayerEdit.Removal removal = inserting ? null : new TimelineLayerEdit.Removal(removedDepths);
+        TimelineLayerEdit edit = inserting ? new TimelineLayerEdit(target, insertedDepth) : new TimelineLayerEdit(target, removal);
+        IntUnaryOperator forwardDepth = inserting ? depth -> TimelineLayerEdit.mapDepth(depth, insertedDepth, true) : removal::mapDepth;
+        IntUnaryOperator reverseDepth = inserting ? depth -> TimelineLayerEdit.mapDepth(depth, insertedDepth, false) : removal::restoreDepth;
         TimelineBlankFrames originalBlanks = getBlankFrames();
-        TimelineBlankFrames movedBlanks = originalBlanks.remap(value -> TimelineLayerEdit.mapDepth(value, depth, inserting));
+        TimelineBlankFrames movedBlanks = originalBlanks.remap(forwardDepth);
+        TimelineLayerSelection.State originalRows = layerSelection.get();
+        TimelineLayerSelection.State editedRows = inserting ? TimelineLayerSelection.State.single(insertedDepth) : originalRows.remap(forwardDepth);
         int beforeCount = getDepthCount();
-        int afterCount = beforeCount + (inserting ? 1 : -1);
+        int afterCount = beforeCount + (inserting ? 1 : -removedDepths.size());
         Set<Point> before = new LinkedHashSet<>(cursor);
         Set<Point> after = new LinkedHashSet<>();
         int frame = getFirstFrame();
         if (inserting) {
-            after.add(new Point(frame, depth));
+            after.add(new Point(frame, insertedDepth));
         } else {
             for (Point cell : before) {
-                if (cell.y != depth) {
-                    after.add(new Point(cell.x, TimelineLayerEdit.mapDepth(cell.y, depth, false)));
+                if (!removedDepths.contains(cell.y)) {
+                    after.add(new Point(cell.x, forwardDepth.applyAsInt(cell.y)));
                 }
             }
             if (after.isEmpty()) {
-                after.add(new Point(frame, Math.min(afterCount, Math.max(1, depth - 1))));
+                int depth = removedDepths.contains(getFirstDepth()) ? getFirstDepth() : Collections.min(removedDepths);
+                int depthBelow = removal.mapClipDepth(depth);
+                after.add(new Point(frame, Math.min(afterCount, Math.max(1, depthBelow))));
             }
         }
         undoManager.doOperation(new DoableOperation() {
-            private boolean hidden;
-            private boolean locked;
+            private Set<Integer> hidden = Collections.emptySet();
+            private Set<Integer> locked = Collections.emptySet();
 
             @Override
             public void doOperation() {
@@ -979,15 +1018,20 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 swfPanel.setTimelined(target);
                 boolean grows = forward == inserting;
                 if (!grows) {
-                    hidden = swfPanel.getHiddenDepths(target).contains(depth);
-                    locked = swfPanel.getLockedDepths(target).contains(depth);
+                    hidden = new LinkedHashSet<>(affectedDepths);
+                    hidden.retainAll(swfPanel.getHiddenDepths(target));
+                    locked = new LinkedHashSet<>(affectedDepths);
+                    locked.retainAll(swfPanel.getLockedDepths(target));
                 }
                 edit.apply(forward);
                 swfPanel.setTimelineDepthCount(target, forward ? afterCount : beforeCount);
                 swfPanel.setTimelineBlankFrames(target, forward ? movedBlanks : originalBlanks);
-                swfPanel.remapDepthInteraction(value -> TimelineLayerEdit.mapDepth(value, depth, grows));
+                layerSelection.set(forward ? editedRows : originalRows);
+                swfPanel.remapDepthInteraction(forward ? forwardDepth : reverseDepth);
                 if (grows) {
-                    swfPanel.restoreLayerFlags(depth, hidden, locked);
+                    for (int depth : affectedDepths) {
+                        swfPanel.restoreLayerFlags(depth, hidden.contains(depth), locked.contains(depth));
+                    }
                 }
                 refreshAfterEdit(target, forward ? after : before);
                 swfPanel.refreshDepthInteraction();
@@ -996,7 +1040,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
             @Override
             public String getDescription() {
-                return EasyStrings.translate(inserting ? "timeline.shape.addLayer" : "timeline.shape.removeLayer");
+                return EasyStrings.translate(inserting ? "timeline.shape.addLayer"
+                        : removedDepths.size() == 1 ? "timeline.shape.removeLayer" : "timeline.shape.removeLayers");
             }
 
             @Override
@@ -1006,12 +1051,11 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }, target.getSwf());
     }
 
-    void moveLayer(int source, int destination) {
-        if (timeline == null || source == destination) {
+    void moveLayers(TimelineDepthMove move) {
+        if (timeline == null || move.isIdentity()) {
             return;
         }
         Timelined target = timeline.timelined;
-        TimelineDepthMove move = new TimelineDepthMove(source, destination);
         TimelineDepthMove.Result result = move.check(target);
         if (result == TimelineDepthMove.Result.MASK_CONFLICT) {
             JOptionPane.showMessageDialog(this, EasyStrings.translate("timeline.depth.moveMaskConflict"),
@@ -1020,9 +1064,9 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         }
         TimelineBlankFrames originalBlanks = getBlankFrames();
         TimelineBlankFrames movedBlanks = originalBlanks.remap(move::mapDepth);
-        if (result == TimelineDepthMove.Result.UNCHANGED && originalBlanks.equals(movedBlanks)) {
-            return;
-        }
+        TimelineLayerSelection.State originalRows = layerSelection.get();
+        TimelineLayerSelection.State movedRows = originalRows.remap(move::mapDepth);
+        TimelineDepthMove reverse = move.reversed();
         int depthCount = getDepthCount();
         Set<Point> before = new LinkedHashSet<>(cursor);
         Set<Point> after = new LinkedHashSet<>();
@@ -1032,19 +1076,20 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         undoManager.doOperation(new DoableOperation() {
             @Override
             public void doOperation() {
-                apply(move, movedBlanks, after);
+                apply(move, movedBlanks, movedRows, after);
             }
 
             @Override
             public void undoOperation() {
-                apply(move.reversed(), originalBlanks, before);
+                apply(reverse, originalBlanks, originalRows, before);
             }
 
-            private void apply(TimelineDepthMove step, TimelineBlankFrames frames, Set<Point> selection) {
+            private void apply(TimelineDepthMove step, TimelineBlankFrames frames, TimelineLayerSelection.State rows, Set<Point> selection) {
                 swfPanel.setTimelined(target);
                 step.apply(target);
                 swfPanel.setTimelineDepthCount(target, depthCount);
                 swfPanel.setTimelineBlankFrames(target, frames);
+                layerSelection.set(rows);
                 swfPanel.remapDepthInteraction(step::mapDepth);
                 refreshAfterEdit(target, selection);
                 swfPanel.refreshDepthInteraction();

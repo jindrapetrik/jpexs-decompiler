@@ -10,6 +10,7 @@ package com.jpexs.decompiler.flash.easygui;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -31,6 +32,9 @@ import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import org.testng.annotations.Test;
 
 public class TimelineDepthMoveTest {
@@ -80,7 +84,7 @@ public class TimelineDepthMoveTest {
         swf.addTag(oldRemoval);
         swf.addTag(new ShowFrameTag(swf));
 
-        TimelineDepthMove move = new TimelineDepthMove(2, 4);
+        TimelineDepthMove move = singleMove(2, 4);
         assertEquals(move.check(swf), TimelineDepthMove.Result.VALID);
         move.apply(swf);
         assertEquals(placed.getDepth(), 4);
@@ -126,16 +130,16 @@ public class TimelineDepthMoveTest {
         PlaceObjectTag outside = new PlaceObjectTag(swf, character, 6, new MATRIX(), null);
         swf.addTag(outside);
 
-        TimelineDepthMove conflict = new TimelineDepthMove(4, 1);
+        TimelineDepthMove conflict = singleMove(4, 1);
         assertEquals(conflict.check(swf), TimelineDepthMove.Result.MASK_CONFLICT);
         conflict.apply(swf);
         assertEquals(covered.getDepth(), 4);
         assertEquals(mask.getClipDepth(), 5);
-        assertEquals(new TimelineDepthMove(4, 3).check(swf), TimelineDepthMove.Result.VALID);
-        assertEquals(new TimelineDepthMove(5, 3).check(swf), TimelineDepthMove.Result.MASK_CONFLICT,
+        assertEquals(singleMove(4, 3).check(swf), TimelineDepthMove.Result.VALID);
+        assertEquals(singleMove(5, 3).check(swf), TimelineDepthMove.Result.MASK_CONFLICT,
                 "A later update can have a shorter masking range");
 
-        TimelineDepthMove valid = new TimelineDepthMove(6, 1);
+        TimelineDepthMove valid = singleMove(6, 1);
         valid.apply(swf);
         assertEquals(mask.getDepth(), 3);
         assertEquals(mask.getClipDepth(), 6);
@@ -155,7 +159,7 @@ public class TimelineDepthMoveTest {
             shared.buttonStateDown = true;
             BUTTONRECORD over = button.getButtonRecordAt(ButtonTag.FRAME_OVER, 1, true);
             BUTTONRECORD hit = button.getButtonRecordAt(ButtonTag.FRAME_HITTEST, 3, true);
-            TimelineDepthMove move = new TimelineDepthMove(1, 3);
+            TimelineDepthMove move = singleMove(1, 3);
             move.apply(button);
             assertEquals(shared.placeDepth, 3);
             assertEquals(over.placeDepth, 3);
@@ -165,6 +169,59 @@ public class TimelineDepthMoveTest {
             assertEquals(over.placeDepth, 1);
             assertEquals(hit.placeDepth, 3);
         }
+    }
+
+    @Test
+    public void selectedRowsMoveAsAGroupInEitherDirection() {
+        TimelineLayerSelection selection = new TimelineLayerSelection();
+        selection.click(2, false, false);
+        selection.click(5, true, false);
+        assertEquals(selection.get().depths, new HashSet<>(Arrays.asList(2, 5)));
+
+        TimelineDepthMove up = TimelineDepthMove.forDrop(6, selection.get().depths, 0);
+        assertEquals(up.mapDepth(5), 6);
+        assertEquals(up.mapDepth(2), 5);
+        assertEquals(up.mapDepth(6), 4);
+        TimelineDepthMove down = TimelineDepthMove.forDrop(6, selection.get().depths, 6);
+        assertEquals(down.mapDepth(5), 2);
+        assertEquals(down.mapDepth(2), 1);
+        for (int depth = 1; depth <= 6; depth++) {
+            assertEquals(up.reversed().mapDepth(up.mapDepth(depth)), depth);
+            assertEquals(down.reversed().mapDepth(down.mapDepth(depth)), depth);
+        }
+
+        selection.click(3, false, true);
+        assertEquals(selection.get().depths, new HashSet<>(Arrays.asList(2, 3, 4, 5)));
+        assertTrue(TimelineDepthMove.forDrop(6, selection.get().depths, 3).isIdentity());
+        selection.click(3, true, false);
+        assertEquals(selection.get().depths, new HashSet<>(Arrays.asList(2, 4, 5)));
+    }
+
+    @Test
+    public void groupMovesValidateTheFinalMaskRange() {
+        SWF swf = new SWF();
+        PlaceObject2Tag mask = new PlaceObject2Tag(swf, false, 2, shape(swf), new MATRIX(), null, -1, null, 4, null);
+        swf.addTag(mask);
+
+        TimelineDepthMove invalid = TimelineDepthMove.forDrop(6, new HashSet<>(Arrays.asList(3, 6)), 0);
+        assertEquals(invalid.check(swf), TimelineDepthMove.Result.MASK_CONFLICT);
+        invalid.apply(swf);
+        assertEquals(mask.getDepth(), 2);
+
+        TimelineDepthMove valid = TimelineDepthMove.forDrop(6, new HashSet<>(Arrays.asList(2, 3, 4)), 0);
+        assertEquals(valid.check(swf), TimelineDepthMove.Result.VALID);
+        valid.apply(swf);
+        assertEquals(mask.getDepth(), 4);
+        assertEquals(mask.getClipDepth(), 6);
+        valid.reversed().apply(swf);
+        assertEquals(mask.getDepth(), 2);
+        assertEquals(mask.getClipDepth(), 4);
+    }
+
+    private static TimelineDepthMove singleMove(int source, int destination) {
+        int count = Math.max(source, destination);
+        int insertionRow = count - destination + (destination < source ? 1 : 0);
+        return TimelineDepthMove.forDrop(count, Collections.singleton(source), insertionRow);
     }
 
     private static int shape(SWF swf) {

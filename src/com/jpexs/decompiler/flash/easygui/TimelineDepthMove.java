@@ -28,8 +28,12 @@ import com.jpexs.decompiler.flash.tags.base.DepthTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+import java.util.Set;
 
-/** Moves a layer and shifts the depths of the layers between its old and new positions. */
+/** Reorders layers without changing the relative order of either group of layers. */
 final class TimelineDepthMove {
 
     enum Result {
@@ -37,29 +41,62 @@ final class TimelineDepthMove {
     }
 
     private static final int INVALID_CLIP_DEPTH = -2;
-    private final int source;
-    private final int destination;
+    private final int[] mappedDepths;
+    private final BitSet moving;
 
-    TimelineDepthMove(int source, int destination) {
-        this.source = source;
-        this.destination = destination;
+    private TimelineDepthMove(int[] mappedDepths, BitSet moving) {
+        this.mappedDepths = mappedDepths;
+        this.moving = moving;
+    }
+
+    static TimelineDepthMove forDrop(int count, Set<Integer> depths, int insertionRow) {
+        List<Integer> ordered = new ArrayList<>(count);
+        List<Integer> dragged = new ArrayList<>(depths.size());
+        BitSet moving = new BitSet(count + 1);
+        int insertion = 0;
+        for (int depth = count; depth > 0; depth--) {
+            if (depths.contains(depth)) {
+                dragged.add(depth);
+                moving.set(depth);
+            } else {
+                ordered.add(depth);
+                if (count - depth < insertionRow) {
+                    insertion++;
+                }
+            }
+        }
+        ordered.addAll(insertion, dragged);
+        int[] mapped = new int[count + 1];
+        for (int row = 0; row < count; row++) {
+            mapped[ordered.get(row)] = count - row;
+        }
+        return new TimelineDepthMove(mapped, moving);
     }
 
     TimelineDepthMove reversed() {
-        return new TimelineDepthMove(destination, source);
+        int[] reversed = new int[mappedDepths.length];
+        BitSet reversedMoving = new BitSet(mappedDepths.length);
+        for (int depth = 1; depth < mappedDepths.length; depth++) {
+            int mapped = mappedDepths[depth];
+            reversed[mapped] = depth;
+            if (moving.get(depth)) {
+                reversedMoving.set(mapped);
+            }
+        }
+        return new TimelineDepthMove(reversed, reversedMoving);
     }
 
     int mapDepth(int depth) {
-        if (depth == source) {
-            return destination;
+        return depth > 0 && depth < mappedDepths.length ? mappedDepths[depth] : depth;
+    }
+
+    boolean isIdentity() {
+        for (int depth = 1; depth < mappedDepths.length; depth++) {
+            if (mappedDepths[depth] != depth) {
+                return false;
+            }
         }
-        if (source < depth && depth <= destination) {
-            return depth - 1;
-        }
-        if (destination <= depth && depth < source) {
-            return depth + 1;
-        }
-        return depth;
+        return true;
     }
 
     Result check(Timelined target) {
@@ -122,13 +159,19 @@ final class TimelineDepthMove {
             return mappedClip <= mappedMask ? mappedClip : INVALID_CLIP_DEPTH;
         }
 
-        // All depths except the one being moved retain their relative order.
+        // Both subsequences retain their order, so their endpoints bound the mapped interval.
         int first = maskDepth + 1;
-        int mappedFirst = mapDepth(first == source && first < clipDepth ? first + 1 : first);
-        int mappedLast = mapDepth(clipDepth == source && first < clipDepth ? clipDepth - 1 : clipDepth);
-        if (source >= first && source <= clipDepth) {
-            mappedFirst = Math.min(mappedFirst, destination);
-            mappedLast = Math.max(mappedLast, destination);
+        int mappedFirst = Integer.MAX_VALUE;
+        int mappedLast = Integer.MIN_VALUE;
+        int firstStationary = moving.nextClearBit(first);
+        if (firstStationary <= clipDepth) {
+            mappedFirst = mapDepth(firstStationary);
+            mappedLast = mapDepth(moving.previousClearBit(clipDepth));
+        }
+        int firstMoving = moving.nextSetBit(first);
+        if (firstMoving >= 0 && firstMoving <= clipDepth) {
+            mappedFirst = Math.min(mappedFirst, mapDepth(firstMoving));
+            mappedLast = Math.max(mappedLast, mapDepth(moving.previousSetBit(clipDepth)));
         }
         // SWF can only encode a single contiguous interval immediately above the mask.
         return mappedFirst == mappedMask + 1 && mappedLast - mappedFirst == clipDepth - first

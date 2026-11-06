@@ -40,6 +40,7 @@ public class TimelineDepthPanel extends JPanel {
     private final Icon bulletIcon = View.getIcon("bullet16");
     private final EasySwfPanel swfPanel;
     private final boolean shapeTimeline;
+    private final TimelineLayerSelection layerSelection;
     private final JPanel header = new JPanel() {
         @Override
         public String getToolTipText(MouseEvent e) {
@@ -80,12 +81,14 @@ public class TimelineDepthPanel extends JPanel {
     public static final Color FONT_COLOR = Color.black;
 
     public TimelineDepthPanel(EasySwfPanel swfPanel) {
-        this(swfPanel, false);
+        this(swfPanel, false, new TimelineLayerSelection());
     }
 
-    TimelineDepthPanel(EasySwfPanel swfPanel, boolean shapeTimeline) {
+    TimelineDepthPanel(EasySwfPanel swfPanel, boolean shapeTimeline, TimelineLayerSelection layerSelection) {
         this.swfPanel = swfPanel;
         this.shapeTimeline = shapeTimeline;
+        this.layerSelection = layerSelection;
+        layerSelection.addListener(this::repaint);
         Dimension headerSize = new Dimension(0, TimelineBodyPanel.FRAME_HEIGHT);
         header.setPreferredSize(headerSize);
         header.setMinimumSize(headerSize);
@@ -178,6 +181,10 @@ public class TimelineDepthPanel extends JPanel {
         return maxDepth;
     }
 
+    TimelineLayerSelection getLayerSelection() {
+        return layerSelection;
+    }
+
     void setDropRow(int row) {
         if (dropRow != row) {
             dropRow = row;
@@ -248,9 +255,14 @@ public class TimelineDepthPanel extends JPanel {
         for (int row = firstRow; row <= lastRow; row++) {
             int depth = shapeTimeline ? maxDepth - row : TimelineBodyPanel.flipLayerOrder(row, maxDepth);
             int y = row * rowHeight - scrollOffset;
+            boolean selected = layerSelection.get().depths.contains(depth);
+            if (selected) {
+                g.setColor(TimelineBodyPanel.getSelectedColor());
+                g.fillRect(0, y, getWidth(), rowHeight);
+            }
             g.setColor(BORDER_COLOR);
             g.drawLine(0, y + rowHeight, getWidth(), y + rowHeight);
-            g.setColor(FONT_COLOR);
+            g.setColor(selected ? TimelineBodyPanel.getSelectedColorText() : FONT_COLOR);
             g.drawString(depthLabel(depth), PADDING, y + rowHeight - PADDING);
             if (depth > 0) {
                 Icon visibility = isHidden(depth) ? crossIcon : bulletIcon;

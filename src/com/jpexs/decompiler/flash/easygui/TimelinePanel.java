@@ -32,6 +32,7 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -71,9 +72,9 @@ public class TimelinePanel extends JPanel {
 
         timelineBodyScrollPane = new FasterScrollPane(timelineBodyPanel);
 
-        depthPanel = new TimelineDepthPanel(swfPanel);
+        depthPanel = new TimelineDepthPanel(swfPanel, false, timelineBodyPanel.getLayerSelection());
         layerDrag = new TimelineLayerDrag(depthPanel, timelineBodyScrollPane, 1,
-                timelineBodyPanel::setDropRow, timelineBodyPanel::moveLayer);
+                timelineBodyPanel::setDropRow, timelineBodyPanel::moveLayers);
 
         depthPanel.addMouseListener(new MouseAdapter() {
             @Override
@@ -82,7 +83,7 @@ public class TimelinePanel extends JPanel {
                         && !layerDrag.wasDragged() && !depthPanel.isOverControls(event)) {
                     int depth = depthPanel.getDepthAt(event);
                     if (depth > 0) {
-                        timelineBodyPanel.selectLayerFrames(depth);
+                        timelineBodyPanel.selectLayerFrames(depth, event.isControlDown(), event.isShiftDown());
                     }
                 }
             }
@@ -111,9 +112,10 @@ public class TimelinePanel extends JPanel {
                 add.addActionListener(action -> timelineBodyPanel.addLayer(depth));
                 menu.add(add);
                 if (depth > 0) {
-                    JMenuItem remove = new JMenuItem(EasyStrings.translate("timeline.shape.removeLayer"));
-                    remove.setEnabled(timelineBodyPanel.canRemoveLayer(depth));
-                    remove.addActionListener(action -> timelineBodyPanel.removeLayer(depth));
+                    Set<Integer> depths = depthPanel.getLayerSelection().contextDepths(depth);
+                    JMenuItem remove = new JMenuItem(EasyStrings.translate(depths.size() == 1 ? "timeline.shape.removeLayer" : "timeline.shape.removeLayers"));
+                    remove.setEnabled(timelineBodyPanel.canRemoveLayers(depths));
+                    remove.addActionListener(action -> timelineBodyPanel.removeLayers(depths));
                     menu.add(remove);
                 }
                 menu.show(depthPanel, event.getX(), event.getY());
