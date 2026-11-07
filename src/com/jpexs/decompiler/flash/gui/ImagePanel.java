@@ -118,6 +118,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -606,6 +607,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private SWF guidesSwf = null;
 
     private int guidesCharacterId = -1;
+
+    private BiConsumer<CharacterTag, RECT> scalingGridChangeListener;
+    private CharacterTag scalingGridDragCharacter;
+    private RECT scalingGridDragStart;
+    private RECT scalingGridPreview;
+    private Point2D scalingGridDragPoint;
+    private int scalingGridDragLine = -1;
 
     private Rectangle2D textSelectionStartGlyphRect = null;
     private Double textSelectionStartGlyphXPosition = null;
@@ -3017,6 +3025,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE && scalingGridDragLine >= 0) {
+                        cancelScalingGridDrag();
+                        suppressPointClick = true;
+                        e.consume();
+                        repaint();
+                        return;
+                    }
                     if (e.getKeyCode() == KeyEvent.VK_ESCAPE && shapeSelectionTransform != null && shapeSelectionTransform.cancel()) {
                         updateShapeTransformBounds();
                         e.consume();
@@ -3335,6 +3350,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     suppressPointClick = false;
+                    if (startScalingGridDrag(e)) {
+                        requestFocusInWindow();
+                        e.consume();
+                        return;
+                    }
                     if (shapeSelectionTransform != null && SwingUtilities.isLeftMouseButton(e) && !e.isShiftDown() && !e.isAltDown()
                             && shapeSelectionTransform.press(e.getPoint(), getTimelinedToPanelTransform())) {
                         requestFocusInWindow();
@@ -3585,6 +3605,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
+                    if (scalingGridDragLine >= 0 && SwingUtilities.isLeftMouseButton(e)) {
+                        dragScalingGrid(e.getPoint());
+                        CharacterTag character = scalingGridDragCharacter;
+                        RECT before = scalingGridDragStart;
+                        RECT after = scalingGridPreview;
+                        cancelScalingGridDrag();
+                        suppressPointClick = true;
+                        if (before.Xmin != after.Xmin || before.Xmax != after.Xmax
+                                || before.Ymin != after.Ymin || before.Ymax != after.Ymax) {
+                            scalingGridChangeListener.accept(character, after);
+                        }
+                        e.consume();
+                        repaint();
+                        return;
+                    }
                     if (shapeSelectionTransform != null && SwingUtilities.isLeftMouseButton(e) && shapeSelectionTransform.release()) {
                         suppressPointClick = true;
                         updateShapeTransformBounds();
@@ -3796,6 +3831,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
+                    if (scalingGridDragLine >= 0) {
+                        dragScalingGrid(e.getPoint());
+                        e.consume();
+                        return;
+                    }
                     if (shapeSelectionTransform != null && shapeSelectionTransform.drag(e.getPoint(), getTimelinedToPanelTransform(), e.isShiftDown())) {
                         updateShapeTransformBounds();
                         repaint();
@@ -4868,6 +4908,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
+                    Cursor scalingCursor = getScalingGridCursor(e.getPoint());
+                    if (scalingCursor != null && !e.isAltDown()) {
+                        setCursor(scalingCursor);
+                        return;
+                    }
                     if (updateGradientTransformCursor(e)) {
                         return;
                     }
@@ -5437,6 +5482,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
+            paintScalingGrid(g2d);
+
             if (Configuration._debugMode.get()) {
                 g2d.setColor(Color.red);
                 DecimalFormat df = new DecimalFormat();
@@ -5654,7 +5701,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                 }
 
-                if (c != iconPanel && !iconPanel.rectangleSelectionGesture && !shapeDrawingGesture && pointEditOriginalPoints == null) {
+                if (c != iconPanel && !iconPanel.rectangleSelectionGesture && !shapeDrawingGesture
+                        && pointEditOriginalPoints == null && scalingGridDragLine < 0) {
                     return;
                 }
                 for (MouseMotionListener l : iconPanel.mouseMotionListeners) {
@@ -5751,7 +5799,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 topRuler.setCursor(defaultCursor);
                 leftRuler.setCursor(defaultCursor);
 
-                if (c != iconPanel && !iconPanel.rectangleSelectionGesture && !shapeDrawingGesture && pointEditOriginalPoints == null) {
+                if (c != iconPanel && !iconPanel.rectangleSelectionGesture && !shapeDrawingGesture
+                        && pointEditOriginalPoints == null && scalingGridDragLine < 0) {
                     finishGradientTransformDrag();
                     return;
                 }
@@ -6527,6 +6576,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private Timer setTimelinedTimer = null;
 
     public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowZoom, boolean frozenButtons, boolean canHaveRuler) {
+        cancelScalingGridDrag();
         Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
@@ -6721,6 +6771,142 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
      */
     public void setAltSelectionEnabled(boolean altSelectionEnabled) {
         this.altSelectionEnabled = altSelectionEnabled;
+    }
+
+    /**
+     * Enables scaling-grid guides and commits a completed drag in local twips.
+     * @param listener Grid change handler, or null to disable the guides
+     */
+    public void setScalingGridChangeListener(BiConsumer<CharacterTag, RECT> listener) {
+        cancelScalingGridDrag();
+        scalingGridChangeListener = listener;
+        iconPanel.repaint();
+    }
+
+    private CharacterTag getScalingGridCharacter() {
+        if (scalingGridChangeListener == null) {
+            return null;
+        }
+        CharacterTag character = editedShape != null ? editedShape : timelined == null ? null
+                : timelined instanceof CharacterTag ? (CharacterTag) timelined
+                : timelined.getSwf().getCharacter(timelined.getTimeline().id);
+        return character != null && character.getScalingGridTag() != null ? character : null;
+    }
+
+    private Line2D[] getScalingGridLines() {
+        CharacterTag character = getScalingGridCharacter();
+        if (character == null) {
+            return new Line2D[0];
+        }
+        RECT splitter = scalingGridPreview == null ? character.getScalingGridTag().splitter : scalingGridPreview;
+        Rectangle2D view = toTimelinedArea(new Rectangle2D.Double(0, 0, iconPanel.getWidth(), iconPanel.getHeight())).getBounds2D();
+        AffineTransform transform = getTimelinedToPanelTransform();
+        Line2D[] lines = new Line2D[4];
+        for (int i = 0; i < lines.length; i++) {
+            double value = i == 0 ? splitter.Xmin : i == 1 ? splitter.Xmax : i == 2 ? splitter.Ymin : splitter.Ymax;
+            Point2D start = i < 2 ? new Point2D.Double(value, view.getMinY()) : new Point2D.Double(view.getMinX(), value);
+            Point2D end = i < 2 ? new Point2D.Double(value, view.getMaxY()) : new Point2D.Double(view.getMaxX(), value);
+            lines[i] = new Line2D.Double(transform.transform(start, null), transform.transform(end, null));
+        }
+        return lines;
+    }
+
+    private int findScalingGridLine(Point2D point) {
+        if (point == null) {
+            return -1;
+        }
+        Line2D[] lines = getScalingGridLines();
+        int nearest = -1;
+        double distance = 5;
+        for (int i = 0; i < lines.length; i++) {
+            double current = lines[i].ptSegDist(point);
+            if (current < distance) {
+                nearest = i;
+                distance = current;
+            }
+        }
+        return nearest;
+    }
+
+    private Cursor getScalingGridCursor(Point2D point) {
+        int line = scalingGridDragLine < 0 ? findScalingGridLine(point) : scalingGridDragLine;
+        if (line < 0) {
+            return null;
+        }
+        Line2D[] lines = getScalingGridLines();
+        if (line >= lines.length) {
+            return null;
+        }
+        Line2D axis = lines[line];
+        return Math.abs(axis.getY2() - axis.getY1()) >= Math.abs(axis.getX2() - axis.getX1())
+                ? guideXCursor : guideYCursor;
+    }
+
+    private boolean startScalingGridDrag(MouseEvent event) {
+        if (!SwingUtilities.isLeftMouseButton(event) || event.isAltDown()) {
+            return false;
+        }
+        int line = findScalingGridLine(event.getPoint());
+        if (line < 0) {
+            return false;
+        }
+        scalingGridDragCharacter = getScalingGridCharacter();
+        scalingGridDragLine = line;
+        scalingGridDragStart = new RECT(scalingGridDragCharacter.getScalingGridTag().splitter);
+        scalingGridPreview = new RECT(scalingGridDragStart);
+        scalingGridDragPoint = toTimelinedPoint(event.getPoint());
+        iconPanel.setCursor(getScalingGridCursor(event.getPoint()));
+        return true;
+    }
+
+    private void dragScalingGrid(Point2D point) {
+        Point2D local = toTimelinedPoint(point);
+        RECT bounds = ((BoundedTag) scalingGridDragCharacter).getRect();
+        int dx = (int) Math.round(local.getX() - scalingGridDragPoint.getX());
+        int dy = (int) Math.round(local.getY() - scalingGridDragPoint.getY());
+        switch (scalingGridDragLine) {
+            case 0:
+                scalingGridPreview.Xmin = Math.max(bounds.Xmin, Math.min(scalingGridDragStart.Xmax - 1, scalingGridDragStart.Xmin + dx));
+                break;
+            case 1:
+                scalingGridPreview.Xmax = Math.min(bounds.Xmax, Math.max(scalingGridDragStart.Xmin + 1, scalingGridDragStart.Xmax + dx));
+                break;
+            case 2:
+                scalingGridPreview.Ymin = Math.max(bounds.Ymin, Math.min(scalingGridDragStart.Ymax - 1, scalingGridDragStart.Ymin + dy));
+                break;
+            case 3:
+                scalingGridPreview.Ymax = Math.min(bounds.Ymax, Math.max(scalingGridDragStart.Ymin + 1, scalingGridDragStart.Ymax + dy));
+                break;
+        }
+        iconPanel.repaint();
+    }
+
+    private void cancelScalingGridDrag() {
+        scalingGridDragLine = -1;
+        scalingGridDragCharacter = null;
+        scalingGridPreview = null;
+        scalingGridDragStart = null;
+        scalingGridDragPoint = null;
+    }
+
+    private void paintScalingGrid(Graphics2D graphics) {
+        Line2D[] lines = getScalingGridLines();
+        if (lines.length == 0) {
+            return;
+        }
+        Graphics2D gridGraphics = (Graphics2D) graphics.create();
+        gridGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        gridGraphics.setStroke(new BasicStroke(1));
+        gridGraphics.setColor(Color.white);
+        for (Line2D line : lines) {
+            gridGraphics.draw(line);
+        }
+        gridGraphics.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[]{4, 4}, 0));
+        gridGraphics.setColor(Color.black);
+        for (Line2D line : lines) {
+            gridGraphics.draw(line);
+        }
+        gridGraphics.dispose();
     }
 
     @Override
@@ -7779,6 +7965,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 debugLabel.setText(ret.toString());
                             }
                             MouseEvent mouseEvent = ImagePanel.this.lastMouseEvent;
+                            Cursor scalingCursor = getScalingGridCursor(mouseEvent == null ? null : mouseEvent.getPoint());
+                            if (scalingCursor != null && !iconPanel.altDown) {
+                                iconPanel.setCursor(scalingCursor);
+                                return;
+                            }
                             Cursor gradientCursor = getGradientTransformCursor(mouseEvent == null ? null : mouseEvent.getPoint());
                             if (gradientCursor != null) {
                                 if (iconPanel.getCursor() != gradientCursor) {
@@ -7958,6 +8149,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public synchronized void clearAll() {
+        cancelScalingGridDrag();
         shapeSelectionTransform = null;
         stopInternal();
         clearImagePanel();

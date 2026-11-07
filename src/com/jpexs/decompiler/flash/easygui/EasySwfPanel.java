@@ -69,6 +69,7 @@ import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.ShapeLayers;
 import java.awt.BasicStroke;
@@ -234,6 +235,7 @@ public class EasySwfPanel extends JPanel {
         setLayout(new BorderLayout());
 
         stagePanel = new ImagePanel(this::getStageHiddenDepths, this::getLockedDepths);
+        stagePanel.setScalingGridChangeListener(this::changeScalingGrid);
         stagePanel.setTagNameResolver(new EasyTagNameResolver());
         stagePanel.setShowAllDepthLevelsInfo(false);
         stagePanel.setSelectionMode(true);
@@ -2690,6 +2692,14 @@ public class EasySwfPanel extends JPanel {
 
     public ImagePanel getStagePanel() {
         return stagePanel;
+    }
+
+    void changeScalingGrid(CharacterTag character, RECT splitter) {
+        undoManager.doOperation(new ScalingGridOperation(character, splitter, () -> {
+            mainPanel.refreshTree(character.getSwf());
+            stagePanel.gotoFrame(stagePanel.getFrame() + 1);
+            libraryPreviewPanel.gotoFrame(libraryPreviewPanel.getFrame() + 1);
+        }), character.getSwf());
     }
 
     public SWF getSwf() {

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -45,7 +46,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -124,6 +127,39 @@ public class LibraryTreeTable extends JTreeTable {
         this.easySwfPanel = easySwfPanel;
 
         addMouseListener(new MouseAdapter() {
+            private void showPopup(MouseEvent e) {
+                if (!e.isPopupTrigger()) {
+                    return;
+                }
+                int row = rowAtPoint(e.getPoint());
+                if (row < 0) {
+                    return;
+                }
+                changeSelection(row, 0, false, false);
+                Object object = ((DefaultMutableTreeNode) getValueAt(row, 0)).getUserObject();
+                if (!(object instanceof DefineSpriteTag || object instanceof ShapeTag || object instanceof ButtonTag)) {
+                    return;
+                }
+                CharacterTag character = (CharacterTag) object;
+                JCheckBoxMenuItem scaling = new JCheckBoxMenuItem(EasyStrings.translate("library.enable9SliceScaling"),
+                        character.getScalingGridTag() != null);
+                scaling.addActionListener(event -> easySwfPanel.changeScalingGrid(character,
+                        scaling.isSelected() ? ScalingGridOperation.initialSplitter((BoundedTag) character) : null));
+                JPopupMenu menu = new JPopupMenu();
+                menu.add(scaling);
+                menu.show(LibraryTreeTable.this, e.getX(), e.getY());
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                showPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                showPopup(e);
+            }
+
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
