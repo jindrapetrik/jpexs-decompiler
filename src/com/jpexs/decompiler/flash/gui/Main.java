@@ -2292,6 +2292,7 @@ public class Main {
 
             //select first frame
             mainFrame.getPanel().setTagTreeSelectedNode(mainFrame.getPanel().getCurrentTree(), swf.getTimeline().getFrame(0));
+            mainFrame.getPanel().getEasyPanel().setSwf(swf);
         }
     }
 
