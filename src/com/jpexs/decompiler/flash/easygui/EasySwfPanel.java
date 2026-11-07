@@ -1170,7 +1170,8 @@ public class EasySwfPanel extends JPanel {
         stagePanel.setSelectionMoveListeners(!selecting ? null
                 : this::shapeSelectionContains,
                 !selecting ? null : this::moveShapeSelection);
-        stagePanel.setSelectionDeleteListener(!selecting ? null : this::deleteShapeSelection);
+        stagePanel.setSelectionDeleteListener(editingShape == null ? this::deleteStageSelection
+                : selecting ? this::deleteShapeSelection : null);
         boolean drawing = editable && (shapeTool == ShapeTool.ANCHOR_POINT ? anchorEditable : drawingToolSelected());
         stagePanel.setShapeDrawingTool(!drawing || clickToolSelected() || shapeTool == ShapeTool.ANCHOR_POINT || shapeTool == ShapeTool.PEN
                 ? null : this::drawingCursor,
@@ -1987,6 +1988,17 @@ public class EasySwfPanel extends JPanel {
     private static boolean fitsShapeBounds(Rectangle2D bounds, double limit) {
         return bounds.getMinX() >= -limit && bounds.getMaxX() <= limit
                 && bounds.getMinY() >= -limit && bounds.getMaxY() <= limit;
+    }
+
+    private void deleteStageSelection() {
+        if (editingShape != null || timelined == null || stagePanel.getTimelined() != timelined) {
+            return;
+        }
+        List<Integer> depths = stagePanel.getSelectedDepths();
+        if (!depths.isEmpty()) {
+            timelinePanel.setStageSelection(stagePanel.getFrame(), depths);
+            timelinePanel.getTimelineBodyPanel().deleteSelection();
+        }
     }
 
     void deleteShapeSelection() {

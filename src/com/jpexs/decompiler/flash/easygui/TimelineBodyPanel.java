@@ -1390,6 +1390,12 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     public void keyTyped(KeyEvent e) {
     }
 
+    void deleteSelection() {
+        if (timeline != null) {
+            clearFrames(getSelectedBlockCells());
+        }
+    }
+
     @Override
     public void keyPressed(KeyEvent e) {
         if (timeline == null) {
@@ -1399,7 +1405,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         switch (e.getKeyCode()) {
             case KeyEvent.VK_DELETE:
                 if (e.getModifiersEx() == 0) {
-                    clearFrames(getSelectedBlockCells());
+                    deleteSelection();
                     requestFocusInWindow();
                     e.consume();
                 }

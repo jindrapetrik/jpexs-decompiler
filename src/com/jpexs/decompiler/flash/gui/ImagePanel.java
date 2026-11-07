@@ -3071,7 +3071,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         e.consume();
                         return;
                     }
-                    if (e.getKeyCode() == KeyEvent.VK_DELETE && rectangleSelectionListener != null && selectionDeleteListener != null) {
+                    if (e.getKeyCode() == KeyEvent.VK_DELETE && selectionDeleteListener != null
+                            && (rectangleSelectionListener != null || selectionMode && e.getModifiersEx() == 0)) {
                         e.consume();
                         selectionDeleteListener.run();
                         return;
