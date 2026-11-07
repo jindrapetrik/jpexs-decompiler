@@ -530,6 +530,9 @@ public class Timeline {
         depthMaxFrame.clear();
         Set<Integer> fullDepths = new HashSet<>();
         for (Tag t : tagList) {
+            if (t == null) {
+                continue;
+            }
             newFrameNeeded = true;
             boolean isNested = ShowFrameTag.isNestedTagType(t.getId());
             if (isNested) {
