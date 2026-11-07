@@ -167,6 +167,133 @@ public class BitmapExporter extends ShapeExporterBase {
         }
     }
 
+    protected static double getAlignedStrokeWidth(double width, boolean pixelHinting) {
+        double rasterWidth = roundToQuarterPixel(width);
+        if (pixelHinting) {
+            return Math.max(1, Math.floor(rasterWidth));
+        }
+        // Zero indicates that the original width is used and there is no axis alignment.
+        return rasterWidth == Math.floor(rasterWidth) ? rasterWidth : 0;
+    }
+
+    private static double roundToQuarterPixel(double value) {
+        return Math.floor(value * 4 + 0.5) / 4;
+    }
+
+    private static double snapStrokeCoordinate(double coordinate, double pixelWidth) {
+        // Odd widths are centered between pixel boundaries; even widths are centered on them.
+        double offset = pixelWidth % 2 / 2;
+        return Math.floor(roundToQuarterPixel(coordinate) - offset + 0.5) + offset;
+    }
+
+    protected static final class StrokePoint {
+
+        public final int segment;
+        public final double[] coordinates;
+        private final int anchor;
+        private boolean alignX;
+        private boolean alignY;
+
+        public StrokePoint(int segment, double... coordinates) {
+            this.segment = segment;
+            this.coordinates = coordinates;
+            anchor = segment == PathIterator.SEG_QUADTO ? 2 : segment == PathIterator.SEG_CUBICTO ? 4 : 0;
+        }
+
+        public double alignedX(double width, boolean pixelHinting) {
+            return pixelHinting || alignX ? snapStrokeCoordinate(coordinates[anchor], width) : roundToQuarterPixel(coordinates[anchor]);
+        }
+
+        public double alignedY(double width, boolean pixelHinting) {
+            return pixelHinting || alignY ? snapStrokeCoordinate(coordinates[anchor + 1], width) : roundToQuarterPixel(coordinates[anchor + 1]);
+        }
+    }
+
+    private static void alignStrokeSegment(StrokePoint from, StrokePoint to) {
+        boolean sameX = from.coordinates[from.anchor] == to.coordinates[to.anchor];
+        boolean sameY = from.coordinates[from.anchor + 1] == to.coordinates[to.anchor + 1];
+        if (sameX && !sameY) {
+            from.alignX = to.alignX = true;
+        } else if (sameY && !sameX) {
+            from.alignY = to.alignY = true;
+        }
+    }
+
+    protected static void markStrokeAxes(List<StrokePoint> points, boolean close, double width, boolean pixelHinting) {
+        if (pixelHinting || width <= 0 || points.size() < 2) {
+            return;
+        }
+        // An integral-width stroke aligns perpendicular to its straight, axis-aligned segments.
+        for (int i = 1; i < points.size(); i++) {
+            StrokePoint point = points.get(i);
+            if (point.segment == PathIterator.SEG_LINETO) {
+                alignStrokeSegment(points.get(i - 1), point);
+            }
+        }
+        StrokePoint first = points.get(0);
+        StrokePoint last = points.get(points.size() - 1);
+        if (first.coordinates[0] == last.coordinates[last.anchor]
+                && first.coordinates[1] == last.coordinates[last.anchor + 1]) {
+            first.alignX = last.alignX = first.alignX || last.alignX;
+            first.alignY = last.alignY = first.alignY || last.alignY;
+        } else if (close) {
+            alignStrokeSegment(last, first);
+        }
+    }
+
+    private static Shape snapStrokePath(Shape shape, double pixelWidth, boolean pixelHinting) {
+        PathIterator iterator = shape.getPathIterator(null);
+        Path2D.Double snapped = new Path2D.Double(iterator.getWindingRule());
+        List<StrokePoint> points = new ArrayList<>();
+        Point2D closedStart = null;
+        while (!iterator.isDone()) {
+            double[] coords = new double[6];
+            int segment = iterator.currentSegment(coords);
+            if (segment == PathIterator.SEG_MOVETO || segment == PathIterator.SEG_CLOSE) {
+                appendStrokeSubpath(snapped, points, segment == PathIterator.SEG_CLOSE, pixelWidth, pixelHinting);
+                points.clear();
+                closedStart = segment == PathIterator.SEG_CLOSE ? snapped.getCurrentPoint() : null;
+            }
+            if (segment != PathIterator.SEG_CLOSE) {
+                if (closedStart != null) {
+                    points.add(new StrokePoint(PathIterator.SEG_MOVETO, closedStart.getX(), closedStart.getY()));
+                    closedStart = null;
+                }
+                points.add(new StrokePoint(segment, coords));
+            }
+            iterator.next();
+        }
+        appendStrokeSubpath(snapped, points, false, pixelWidth, pixelHinting);
+        return snapped;
+    }
+
+    private static void appendStrokeSubpath(Path2D.Double path, List<StrokePoint> points, boolean close,
+            double width, boolean pixelHinting) {
+        markStrokeAxes(points, close, width, pixelHinting);
+        for (StrokePoint point : points) {
+            double x = point.alignedX(width, pixelHinting);
+            double y = point.alignedY(width, pixelHinting);
+            double[] coords = point.coordinates;
+            switch (point.segment) {
+                case PathIterator.SEG_MOVETO:
+                    path.moveTo(x, y);
+                    break;
+                case PathIterator.SEG_LINETO:
+                    path.lineTo(x, y);
+                    break;
+                case PathIterator.SEG_QUADTO:
+                    path.quadTo(coords[0], coords[1], x, y);
+                    break;
+                case PathIterator.SEG_CUBICTO:
+                    path.curveTo(coords[0], coords[1], coords[2], coords[3], x, y);
+                    break;
+            }
+        }
+        if (close) {
+            path.closePath();
+        }
+    }
+
     /**
      * Exports a shape to a bitmap.
      *
@@ -391,11 +518,7 @@ public class BitmapExporter extends ShapeExporterBase {
         linePaint = null;
         lineTransform = null;
 
-        if (thickness == 0) {
-            lineColor = null;
-            return;
-        }
-
+        boolean hairline = thickness == 0;
         lineColor = color == null ? null : color.toColor();
         int capStyle = BasicStroke.CAP_ROUND;
         if (startCaps == endCaps) {
@@ -442,16 +565,17 @@ public class BitmapExporter extends ShapeExporterBase {
             }
         }
 
-        if (Configuration.useMinimumStrokeWidth1Px.get()) {
-            //display minimum stroke of 1 pixel, no matter how zoomed it is
-            if (thickness * unzoom / aaScale < 1 * SWF.unitDivisor) {
-                thickness = 1 * SWF.unitDivisor / (unzoom / aaScale);
-            }
+        double pixelsPerTwip = unzoom / SWF.unitDivisor;
+        double widthPx = thickness * pixelsPerTwip;
+        if (hairline || Configuration.useMinimumStrokeWidth1Px.get()) {
+            widthPx = Math.max(1, widthPx);
         }
-
-        float fThickness = (float) thickness;
+        AffineTransform deviceTransform = graphics.getTransform();
+        boolean strokeInPixels = deviceTransform.getDeterminant() != 0;
+        double alignedWidth = getAlignedStrokeWidth(widthPx, pixelHinting);
+        float fThickness = (float) (strokeInPixels ? (alignedWidth > 0 ? alignedWidth : widthPx) : thickness);
         if (joinStyle == BasicStroke.JOIN_MITER) {
-            lineStroke = new ExtendedBasicStroke((float) thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit) {
+            lineStroke = new ExtendedBasicStroke(fThickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit) {
                 @Override
                 public Shape createStrokedShape(Shape s) {
                     Shape ret = super.createStrokedShape(s);
@@ -459,7 +583,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 }
             };
         } else {
-            lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle) {
+            lineStroke = new BasicStroke(fThickness, capStyle, joinStyle) {
                 @Override
                 public Shape createStrokedShape(Shape s) {
                     Shape ret = super.createStrokedShape(s);
@@ -468,10 +592,15 @@ public class BitmapExporter extends ShapeExporterBase {
             };
         }
 
-        // Do not scale strokes automatically:
+        // Align the centerline before creating the outline in device pixels.
         try {
-            AffineTransform t = (AffineTransform) strokeTransformation.toTransform().clone();
-            lineStroke = new TransformedStroke(lineStroke, t);
+            if (strokeInPixels) {
+                Stroke stroke = lineStroke;
+                lineStroke = new TransformedStroke(
+                        s -> stroke.createStrokedShape(snapStrokePath(s, alignedWidth, pixelHinting)), deviceTransform);
+            } else {
+                lineStroke = new TransformedStroke(lineStroke, strokeTransformation.toTransform());
+            }
         } catch (NoninvertibleTransformException net) {
             // ignore
         }

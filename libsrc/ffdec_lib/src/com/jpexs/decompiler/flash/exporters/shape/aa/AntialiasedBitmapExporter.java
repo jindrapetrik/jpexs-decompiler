@@ -22,6 +22,7 @@ import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
@@ -37,16 +38,21 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
 
     private final List<List<Vec2>> contours = new ArrayList<>();
 
+    private final List<List<StrokePoint>> strokePaths = new ArrayList<>();
+
     private AntialiasTools.SceneRasterizerMSAA rz;
 
     private Vec2 lastPos = null;
 
     private Matrix vecTrans;
-    private Matrix vecTransLines;
 
     private boolean inLines = false;
 
     private boolean closeLine = false;
+
+    private boolean pixelHinting;
+
+    private double alignedStrokeWidth;
 
     private double curveFlatness = 1.0;
 
@@ -141,7 +147,6 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
         for (int y = 0; y < cy; y++) {
             for (int x = 0; x < cx; x++) {
                 vecTrans = vecTransBase.preConcatenate(Matrix.getTranslateInstance(-tileSize * x, -tileSize * y));
-                vecTransLines = vecTrans.preConcatenate(Matrix.getTranslateInstance(-0.5, -0.5));
 
                 int subWidth = tileSize;
                 int subHeight = tileSize;
@@ -233,48 +238,72 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
     @Override
     public void endLines(boolean close) {
         closeLine = close;
-        /*if (close) {            
-            //path.closePath();
-        }*/
-
         finalizePath();
-
         inLines = false;
+    }
+
+    private Vec2 transformPathPoint(double x, double y) {
+        com.jpexs.decompiler.flash.exporters.commonshape.Point point = vecTrans.transform(x, y);
+        return new Vec2(point.x, point.y);
     }
 
     @Override
     public void moveTo(double x, double y) {
-        Point2D src = new Point2D.Double(x, y);
-        Point2D dst = new Point2D.Double();
-        dst = (inLines ? vecTransLines : vecTrans).transform(src);
-        contours.add(new ArrayList<>());
-        lastPos = new Vec2(dst.getX(), dst.getY());
-        contours.get(contours.size() - 1).add(lastPos);
+        if (inLines) {
+            List<StrokePoint> points = new ArrayList<>();
+            Vec2 anchor = transformPathPoint(x, y);
+            points.add(new StrokePoint(PathIterator.SEG_MOVETO, anchor.x, anchor.y));
+            strokePaths.add(points);
+        } else {
+            contours.add(new ArrayList<>());
+            lineTo(x, y);
+        }
     }
 
     @Override
     public void lineTo(double x, double y) {
-        Point2D src = new Point2D.Double(x, y);
-        Point2D dst = new Point2D.Double();
-        dst = (inLines ? vecTransLines : vecTrans).transform(src);
-
-        lastPos = new Vec2(dst.getX(), dst.getY());
-        contours.get(contours.size() - 1).add(lastPos);
+        Vec2 anchor = transformPathPoint(x, y);
+        if (inLines) {
+            strokePaths.get(strokePaths.size() - 1).add(new StrokePoint(PathIterator.SEG_LINETO, anchor.x, anchor.y));
+        } else {
+            contours.get(contours.size() - 1).add(anchor);
+            lastPos = anchor;
+        }
     }
 
     @Override
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
-        Point2D src = new Point2D.Double(controlX, controlY);
-        Point2D dst = new Point2D.Double();
-        dst = (inLines ? vecTransLines : vecTrans).transform(src);
-        Vec2 controlVec2 = new Vec2(dst.getX(), dst.getY());
-        src = new Point2D.Double(anchorX, anchorY);
-        dst = (inLines ? vecTransLines : vecTrans).transform(src);
-        Vec2 anchorVec2 = new Vec2(dst.getX(), dst.getY());
+        Vec2 control = transformPathPoint(controlX, controlY);
+        Vec2 anchor = transformPathPoint(anchorX, anchorY);
+        if (inLines) {
+            strokePaths.get(strokePaths.size() - 1).add(new StrokePoint(PathIterator.SEG_QUADTO, control.x, control.y, anchor.x, anchor.y));
+        } else {
+            List<Vec2> contour = contours.get(contours.size() - 1);
+            AntialiasTools.append(contour, AntialiasTools.flattenQuadraticBezier(lastPos, control, anchor, curveFlatness), true);
+            lastPos = anchor;
+        }
+    }
 
-        List<Vec2> contour = contours.get(contours.size() - 1);
-        AntialiasTools.append(contour, AntialiasTools.flattenQuadraticBezier(lastPos, controlVec2, anchorVec2, curveFlatness), true);
-        lastPos = anchorVec2;
+    private Shape createStrokePath() {
+        List<List<Vec2>> strokeContours = new ArrayList<>(strokePaths.size());
+        for (int i = 0; i < strokePaths.size(); i++) {
+            List<StrokePoint> points = strokePaths.get(i);
+            markStrokeAxes(points, closeLine && i == strokePaths.size() - 1, alignedStrokeWidth, pixelHinting);
+            List<Vec2> contour = new ArrayList<>(points.size());
+            Vec2 previous = null;
+            for (StrokePoint point : points) {
+                Vec2 anchor = new Vec2(point.alignedX(alignedStrokeWidth, pixelHinting), point.alignedY(alignedStrokeWidth, pixelHinting));
+                if (point.segment == PathIterator.SEG_QUADTO) {
+                    Vec2 control = new Vec2(point.coordinates[0], point.coordinates[1]);
+                    AntialiasTools.append(contour, AntialiasTools.flattenQuadraticBezier(previous, control, anchor, curveFlatness), true);
+                } else {
+                    contour.add(anchor);
+                }
+                previous = anchor;
+            }
+            strokeContours.add(contour);
+        }
+        return AntialiasTools.contoursToShape(strokeContours, Path2D.WIND_EVEN_ODD, closeLine, true);
     }
 
     private void drawImage(BufferedImage image, int dx, int dy, int dx2, int dy2, int sx, int sy, int sx2, int sy2, ImageObserver obs, boolean smooth) {
@@ -343,7 +372,7 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
 
         if ((linePaint != null && lineStroke != null) || lineColor != null) {
             Stroke stroke = lineStroke == null ? defaultStroke : lineStroke;
-            Shape shape = AntialiasTools.contoursToShape(contours, Path2D.WIND_EVEN_ODD, closeLine, true);
+            Shape shape = createStrokePath();
             Shape strokedShape = stroke.createStrokedShape(shape);
             List<List<Vec2>> strokeContours = AntialiasTools.shapeToContours(strokedShape, curveFlatness);
 
@@ -363,6 +392,8 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
         }
 
         contours.clear();
+        strokePaths.clear();
+        closeLine = false;
         lineStroke = null;
         lineColor = null;
         fillPaint = null;
@@ -373,12 +404,9 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
         finalizePath();
         linePaint = null;
         lineTransform = null;
+        this.pixelHinting = pixelHinting;
 
-        if (thickness == 0) {
-            lineColor = null;
-            return;
-        }
-
+        boolean hairline = thickness == 0;
         lineColor = color == null ? null : color.toColor();
         int capStyle = BasicStroke.CAP_ROUND;
         switch (startCaps) {
@@ -422,11 +450,13 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
 
         thickness *= unzoom / SWF.unitDivisor;
 
-        if (Configuration.useMinimumStrokeWidth1Px.get()) {
-            //display minimum stroke of 1 pixel, no matter how zoomed it is
-            if (thickness < 1) {
-                thickness = 1;
-            }
+        if (hairline || Configuration.useMinimumStrokeWidth1Px.get()) {
+            thickness = Math.max(1, thickness);
+        }
+
+        alignedStrokeWidth = getAlignedStrokeWidth(thickness, pixelHinting);
+        if (alignedStrokeWidth > 0) {
+            thickness = alignedStrokeWidth;
         }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
