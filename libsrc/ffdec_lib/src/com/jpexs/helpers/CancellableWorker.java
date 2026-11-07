@@ -230,11 +230,17 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     @Override
     public final boolean isCancelled() {
+        if (future == null) {
+            return false;
+        }
         return future.isCancelled();
     }
 
     @Override
     public final boolean isDone() {
+        if (future == null) {
+            return true;
+        }
         return future.isDone();
     }
 
