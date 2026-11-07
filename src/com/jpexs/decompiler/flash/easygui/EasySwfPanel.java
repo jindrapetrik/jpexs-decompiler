@@ -155,6 +155,7 @@ public class EasySwfPanel extends JPanel {
     private JButton newShapeButton;
     private JButton newMovieClipButton;
     private JButton newButtonButton;
+    private JButton editObjectButton;
     private UndoManager undoManager;
     private JTabbedPane rightTabbedPane;
     private TransformPanel transformPanel;
@@ -624,7 +625,11 @@ public class EasySwfPanel extends JPanel {
         leftToolbar.add(newShapeButton);
         leftToolbar.add(newMovieClipButton);
         leftToolbar.add(newButtonButton);
-        updateNewCharacterButtons();
+        leftToolbar.add(Box.createHorizontalStrut(10));
+        editObjectButton = createSymbolButton("edit16", this::editSelectedObject);
+        editObjectButton.setToolTipText(EasyStrings.translate("action.editObject"));
+        leftToolbar.add(editObjectButton);
+        updateObjectButtons();
         leftToolbar.add(Box.createHorizontalStrut(10));
         timelineLabel = new JLabel("");
         leftToolbar.add(timelineLabel);
@@ -828,7 +833,7 @@ public class EasySwfPanel extends JPanel {
     }   
     
     private void updatePropertiesPanel() {
-        updateNewCharacterButtons();
+        updateObjectButtons();
         CardLayout cl = (CardLayout) propertiesPanel.getLayout();
         if (editingShape != null) {
             cl.show(propertiesPanel, shapeTool == ShapeTool.BRUSH ? PROPERTIES_BRUSH
@@ -2156,7 +2161,24 @@ public class EasySwfPanel extends JPanel {
         return selected;
     }
 
-    private void updateNewCharacterButtons() {
+    private DepthState selectedEditableObject() {
+        Map<Integer, DepthState> selected = selectedStageObjects();
+        if (selected.size() != 1) {
+            return null;
+        }
+        DepthState state = selected.values().iterator().next();
+        CharacterTag character = state.getCharacter();
+        return character instanceof ShapeTag || character instanceof DefineSpriteTag || character instanceof ButtonTag ? state : null;
+    }
+
+    private void editSelectedObject() {
+        DepthState state = selectedEditableObject();
+        if (state != null) {
+            openStageObject(getFrame(), state.depth);
+        }
+    }
+
+    private void updateObjectButtons() {
         if (newShapeButton == null) {
             return;
         }
@@ -2165,6 +2187,7 @@ public class EasySwfPanel extends JPanel {
         newShapeButton.setEnabled(enabled);
         newMovieClipButton.setEnabled(enabled);
         newButtonButton.setEnabled(enabled);
+        editObjectButton.setEnabled(enabled && selectedEditableObject() != null);
         newShapeButton.setToolTipText(EasyStrings.translate("action.newShape"));
         newMovieClipButton.setToolTipText(EasyStrings.translate(selected ? "action.newMovieClipFromSelection" : "action.newMovieClip"));
         newButtonButton.setToolTipText(EasyStrings.translate(selected ? "action.newButtonFromSelection" : "action.newButton"));
@@ -2215,7 +2238,7 @@ public class EasySwfPanel extends JPanel {
         mainPanel.refreshTree(swf);
     }
 
-    private void openCreatedCharacter(int frame, int depth) {
+    private void openStageObject(int frame, int depth) {
         stagePanel.openDepth(frame, depth);
         setTimelined(stagePanel.getTimelined(), false, stagePanel.getEditedShape());
         timelinePanel.setFrame(stagePanel.getFrame(), stagePanel.getSelectedDepths());
@@ -2376,7 +2399,7 @@ public class EasySwfPanel extends JPanel {
                 body.refreshAfterEdit(target, Collections.singleton(new Point(frame, depth)));
                 if (newCharacter) {
                     refreshCharacters(character.getSwf());
-                    openCreatedCharacter(frame, depth);
+                    openStageObject(frame, depth);
                 }
             }
 
