@@ -26,8 +26,10 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelListener;
 import javax.swing.Icon;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -146,6 +148,15 @@ public class TimelineDepthPanel extends JPanel {
 
     JPanel getHeader() {
         return header;
+    }
+
+    void forwardMouseWheelTo(JScrollPane scrollPane) {
+        MouseWheelListener listener = event -> {
+            scrollPane.dispatchEvent(SwingUtilities.convertMouseEvent(event.getComponent(), event, scrollPane));
+            event.consume();
+        };
+        addMouseWheelListener(listener);
+        header.addMouseWheelListener(listener);
     }
 
     public void setTimeline(Timeline timeline) {

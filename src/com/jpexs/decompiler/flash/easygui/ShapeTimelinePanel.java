@@ -86,6 +86,7 @@ final class ShapeTimelinePanel extends JPanel {
         layerSelection.addListener(frames::repaint);
         TimelineTimePanel time = new TimelineTimePanel(FRAME_WIDTH);
         JScrollPane scroll = new FasterScrollPane(frames);
+        depths.forwardMouseWheelTo(scroll);
         scroll.setRowHeaderView(depths);
         scroll.setColumnHeaderView(time);
         scroll.setCorner(JScrollPane.UPPER_LEFT_CORNER, depths.getHeader());

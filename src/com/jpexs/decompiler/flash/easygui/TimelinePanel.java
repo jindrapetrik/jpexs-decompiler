@@ -74,6 +74,7 @@ public class TimelinePanel extends JPanel {
         timelineBodyScrollPane = new FasterScrollPane(timelineBodyPanel);
 
         depthPanel = new TimelineDepthPanel(swfPanel, false, timelineBodyPanel.getLayerSelection());
+        depthPanel.forwardMouseWheelTo(timelineBodyScrollPane);
         layerDrag = new TimelineLayerDrag(depthPanel, timelineBodyScrollPane, 1,
                 timelineBodyPanel::setDropRow, timelineBodyPanel::moveLayers);
 
