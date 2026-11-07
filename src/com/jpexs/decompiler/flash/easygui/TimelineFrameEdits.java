@@ -440,6 +440,19 @@ final class TimelineFrameEdits {
         return replacement.containsKey(occupiedEnd);
     }
 
+    void replaceSpan(int depth, int first, int last, DepthState state) {
+        NavigableMap<Integer, DepthState> replacement = new TreeMap<>();
+        for (int frame = first; frame <= last; frame++) {
+            replacement.put(frame, state);
+            blankFrames.clearKey(depth, frame);
+        }
+        if (state == null) {
+            blankFrames.addKey(depth, first);
+            blankFrames.extend(depth, last);
+        }
+        rewriteSpans(depth, replacement, timeline.getDepthMaxFrame().getOrDefault(depth, -1));
+    }
+
     private void rewriteSpans(int depth, NavigableMap<Integer, DepthState> replacement, int layerEnd) {
         if (replacement.isEmpty()) {
             return;

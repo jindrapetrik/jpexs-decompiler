@@ -171,6 +171,17 @@ final class TimelineButtonFrameEdits {
         }
     }
 
+    void replaceSpan(int depth, int first, int last, BUTTONRECORD record) {
+        BUTTONRECORD[] original = getStates(depth);
+        BUTTONRECORD[] states = original.clone();
+        Arrays.fill(states, first, last + 1, record);
+        updateRecords(depth, original, states);
+        if (record == null) {
+            blankFrames.addKey(depth, first);
+            blankFrames.extend(depth, last);
+        }
+    }
+
     private BUTTONRECORD[] getStates(int depth) {
         BUTTONRECORD[] states = new BUTTONRECORD[LAST + 1];
         for (BUTTONRECORD record : records) {

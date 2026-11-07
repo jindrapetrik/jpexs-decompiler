@@ -47,6 +47,10 @@ import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.ZoomPanel;
+import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
+import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
@@ -148,6 +152,9 @@ public class EasySwfPanel extends JPanel {
     private JPanel timelineArea;
     private JButton undoButton;
     private JButton redoButton;
+    private JButton newShapeButton;
+    private JButton newMovieClipButton;
+    private JButton newButtonButton;
     private UndoManager undoManager;
     private JTabbedPane rightTabbedPane;
     private TransformPanel transformPanel;
@@ -534,130 +541,7 @@ public class EasySwfPanel extends JPanel {
                     DrawableTag character = support.isDrop() ? previewCharacter : getCharacter(support.getTransferable());
                     Point position = support.isDrop() ? previewPosition : new Point();
                     if (character != null) {
-                        Timelined target = stagePanel.getTimelined();
-                        int frame = getFrame();
-                        if (frame < 0 || frame > TimelineFrameEdits.MAX_FRAME
-                                || (target instanceof ButtonTag && frame > ButtonTag.FRAME_HITTEST)) {
-                            return false;
-                        }
-                        TimelineBodyPanel body = timelinePanel.getTimelineBodyPanel();
-                        int selectedDepth = body.getFirstDepth();
-                        int depthCount = getTimelineDepthCount(target);
-                        boolean insertAbove = selectedDepth > 0 && selectedDepth <= depthCount
-                                && isStagePlacementOccupied(target, frame, selectedDepth);
-                        int depth = insertAbove ? selectedDepth + 1 : depthForEmptyStagePlacement(target, selectedDepth, depthCount);
-                        if (depth > TimelineLayerEdit.MAX_DEPTH || (insertAbove
-                                && (depthCount == TimelineLayerEdit.MAX_DEPTH || !TimelineLayerEdit.canInsert(target)))) {
-                            return false;
-                        }
-                        TimelineLayerEdit insertedLayer = insertAbove ? new TimelineLayerEdit(target, depth) : null;
-                        TimelineBodyPanel.FrameSpan span = body.getSelectedFrameSpan(frame, selectedDepth);
-                        Set<Point> originalSelection = body.copySelection();
-                        TimelineBlankFrames originalBlanks = getTimelineBlankFrames(target);
-                        TimelineBlankFrames placedBlanks = insertAbove
-                                ? originalBlanks.remap(value -> TimelineLayerEdit.mapDepth(value, depth, true)) : originalBlanks.copy();
-                        placedBlanks.clearKey(depth, span.first);
-
-                        undoManager.doOperation(new TimelinedTagListDoableOperation(EasySwfPanel.this, target) {
-
-                            private List<Tag> swfTags;
-                            private boolean hidden;
-                            private boolean locked;
-
-                            @Override
-                            public void doOperation() {
-                                super.doOperation();
-
-                                if (timelined.getSwf() != timelined) {
-                                    swfTags = timelined.getSwf().getTags().toArrayList();
-                                }
-                                if (insertedLayer != null) {
-                                    insertedLayer.apply(true);
-                                    setTimelineDepthCount(target, depthCount + 1);
-                                    remapDepthInteraction(value -> TimelineLayerEdit.mapDepth(value, depth, true));
-                                    restoreLayerFlags(depth, hidden, locked);
-                                }
-
-                                PlaceObject2Tag place = new PlaceObject2Tag(timelined.getSwf());
-                                place.depth = depth;
-                                place.placeFlagHasCharacter = true;
-                                place.characterId = character.getCharacterId();
-                                place.matrix = new MATRIX();
-                                place.matrix.translateX = position.x;
-                                place.matrix.translateY = position.y;
-                                place.placeFlagHasMatrix = true;
-                                place.setTimelined(timelined);
-
-                                if (timelined instanceof ButtonTag) {
-                                    ButtonTag button = (ButtonTag) timelined;
-                                    BUTTONRECORD record = button.getButtonRecordAt(span.first, depth, true);
-                                    record.fromPlaceObject(place);
-                                    for (int state = span.first + 1; state <= span.last; state++) {
-                                        record.setFrame(state, true);
-                                    }
-                                } else {
-                                    Timeline timeline = timelined.getTimeline();
-                                    TimelineFrameEdits edits = new TimelineFrameEdits(timeline);
-                                    edits.extendTo(span.last);
-                                    edits.addToFrame(span.first, place);
-                                    if (span.last + 1 < timeline.getFrameCount()) {
-                                        RemoveObject2Tag remove = new RemoveObject2Tag(timelined.getSwf());
-                                        remove.depth = depth;
-                                        remove.setTimelined(timelined);
-                                        edits.endPlacementBeforeFrame(span.last + 1, remove);
-                                    }
-                                    edits.apply();
-                                }
-
-                                DefineBeforeUsageFixer fixer = new DefineBeforeUsageFixer();
-                                boolean tagOrderChanged = fixer.fixDefineBeforeUsage(timelined.getSwf());
-                                if (!tagOrderChanged) {
-                                    swfTags = null;
-                                }
-
-                                timelined.resetTimeline();
-                                setTimelineBlankFrames(timelined, placedBlanks);
-                                body.refreshAfterEdit(timelined, Collections.singleton(new Point(frame, depth)));
-                            }
-
-                            @Override
-                            public void undoOperation() {
-                                super.undoOperation();
-                                timelined.resetTimeline();
-
-                                //Tag order changed, put the original tags back
-                                if (swfTags != null) {
-                                    SWF swf = timelined.getSwf();
-                                    ReadOnlyTagList newTags = swf.getTags();
-                                    int size = newTags.size();
-                                    for (int i = 0; i < size; i++) {
-                                        swf.removeTag(0);
-                                    }
-                                    for (int i = 0; i < swfTags.size(); i++) {
-                                        swf.addTag(swfTags.get(i));
-                                    }
-                                    swf.resetTimeline();
-                                }
-                                if (insertedLayer != null) {
-                                    // The restored tag list still refers to the shifted tag objects.
-                                    insertedLayer.apply(false);
-                                    hidden = getHiddenDepths(target).contains(depth);
-                                    locked = getLockedDepths(target).contains(depth);
-                                    setTimelineDepthCount(target, depthCount);
-                                    remapDepthInteraction(value -> TimelineLayerEdit.mapDepth(value, depth, false));
-                                }
-                                setTimelineBlankFrames(timelined, originalBlanks);
-                                body.refreshAfterEdit(timelined, originalSelection);
-                            }
-
-                            @Override
-                            public String getDescription() {
-                                return EasyStrings.translate("action.addToStage");
-                            }
-
-                        }, timelined.getSwf());
-
-                        return true;
+                        return placeCharacter(character, position, false);
                     }
                 } catch (UnsupportedFlavorException | IOException ex) {
                     ex.printStackTrace();
@@ -733,6 +617,14 @@ public class EasySwfPanel extends JPanel {
         JPanel leftToolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         leftToolbar.add(undoButton);
         leftToolbar.add(redoButton);
+        leftToolbar.add(Box.createHorizontalStrut(10));
+        newShapeButton = createSymbolButton("shapeadd16", () -> createCharacter(true, false));
+        newMovieClipButton = createSymbolButton("spriteadd16", () -> createCharacter(false, false));
+        newButtonButton = createSymbolButton("buttonadd16", () -> createCharacter(false, true));
+        leftToolbar.add(newShapeButton);
+        leftToolbar.add(newMovieClipButton);
+        leftToolbar.add(newButtonButton);
+        updateNewCharacterButtons();
         leftToolbar.add(Box.createHorizontalStrut(10));
         timelineLabel = new JLabel("");
         leftToolbar.add(timelineLabel);
@@ -936,6 +828,7 @@ public class EasySwfPanel extends JPanel {
     }   
     
     private void updatePropertiesPanel() {
+        updateNewCharacterButtons();
         CardLayout cl = (CardLayout) propertiesPanel.getLayout();
         if (editingShape != null) {
             cl.show(propertiesPanel, shapeTool == ShapeTool.BRUSH ? PROPERTIES_BRUSH
@@ -2230,9 +2123,306 @@ public class EasySwfPanel extends JPanel {
         }
     }
 
+    private JButton createSymbolButton(String icon, Runnable action) {
+        JButton button = new JButton(View.getIcon(icon));
+        button.setMargin(new Insets(5, 5, 5, 5));
+        button.setEnabled(false);
+        button.addActionListener(e -> action.run());
+        return button;
+    }
+
+    private Map<Integer, DepthState> selectedStageObjects() {
+        Map<Integer, DepthState> selected = new LinkedHashMap<>();
+        if (timelined != null && editingShape == null && stagePanel.getTimelined() == timelined) {
+            for (int depth : stagePanel.getSelectedDepths()) {
+                DepthState state = timelined.getTimeline().getDepthState(getFrame(), depth);
+                if (TimelineFrameEdits.isPlaced(state) && !getLockedDepths(timelined).contains(depth)) {
+                    selected.put(depth, state);
+                }
+            }
+        }
+        return selected;
+    }
+
+    private void updateNewCharacterButtons() {
+        if (newShapeButton == null) {
+            return;
+        }
+        boolean enabled = timelined != null && editingShape == null && stagePanel.getTimelined() == timelined;
+        boolean selected = enabled && !selectedStageObjects().isEmpty();
+        newShapeButton.setEnabled(enabled);
+        newMovieClipButton.setEnabled(enabled);
+        newButtonButton.setEnabled(enabled);
+        newShapeButton.setToolTipText(EasyStrings.translate("action.newShape"));
+        newMovieClipButton.setToolTipText(EasyStrings.translate(selected ? "action.newMovieClipFromSelection" : "action.newMovieClip"));
+        newButtonButton.setToolTipText(EasyStrings.translate(selected ? "action.newButtonFromSelection" : "action.newButton"));
+    }
+
+    private static String newCharacterKey(CharacterTag character, boolean selection) {
+        return character instanceof ShapeTag ? "action.newShape"
+                : character instanceof ButtonTag ? selection ? "action.newButtonFromSelection" : "action.newButton"
+                        : selection ? "action.newMovieClipFromSelection" : "action.newMovieClip";
+    }
+
+    private void createCharacter(boolean shape, boolean button) {
+        if (timelined == null || editingShape != null || stagePanel.getTimelined() != timelined) {
+            return;
+        }
+        SWF swf = timelined.getSwf();
+        if (swf.getNextCharacterId() > 0xffff) {
+            return;
+        }
+        Map<Integer, DepthState> selected = shape ? Collections.emptyMap() : selectedStageObjects();
+        CharacterTag character;
+        if (shape) {
+            character = swf.version >= 8 ? new DefineShape4Tag(swf)
+                    : swf.version >= 3 ? new DefineShape3Tag(swf)
+                            : swf.version >= 2 ? new DefineShape2Tag(swf) : new DefineShapeTag(swf);
+        } else {
+            character = SelectionToSymbol.create(swf, button, selected);
+            setTimelineDepthCount((Timelined) character, Math.max(1, selected.size()));
+            if (selected.isEmpty()) {
+                TimelineBlankFrames blanks = new TimelineBlankFrames();
+                blanks.addKey(1, 0);
+                blanks.extend(1, button ? ButtonTag.FRAME_HITTEST : 0);
+                setTimelineBlankFrames((Timelined) character, blanks);
+            }
+        }
+        if (selected.isEmpty()) {
+            placeCharacter((DrawableTag) character, new Point(), true);
+        } else {
+            createCharacterFromSelection(character, selected);
+        }
+    }
+
+    private void refreshCharacters(SWF swf) {
+        swf.updateCharacters();
+        swf.clearImageCache();
+        libraryTreeTable.setSwf(null);
+        libraryTreeTable.setSwf(swf);
+        mainPanel.refreshTree(swf);
+    }
+
+    private void openCreatedCharacter(int frame, int depth) {
+        stagePanel.openDepth(frame, depth);
+        setTimelined(stagePanel.getTimelined(), false, stagePanel.getEditedShape());
+        timelinePanel.setFrame(stagePanel.getFrame(), stagePanel.getSelectedDepths());
+    }
+
+    private void closeCreatedCharacter(CharacterTag character) {
+        if (stagePanel.getTimelined() == character || stagePanel.getEditedShape() == character) {
+            stagePanel.closeOpenedDepth();
+            setTimelined(stagePanel.getTimelined(), false, stagePanel.getEditedShape());
+        }
+    }
+
+    private void createCharacterFromSelection(CharacterTag character, Map<Integer, DepthState> selected) {
+        Timelined target = timelined;
+        SWF swf = target.getSwf();
+        int frame = getFrame();
+        int depthCount = getTimelineDepthCount(target);
+        int topDepth = Collections.max(selected.keySet());
+        TimelineBodyPanel body = timelinePanel.getTimelineBodyPanel();
+        Map<Integer, TimelineBodyPanel.FrameSpan> spans = new LinkedHashMap<>();
+        selected.keySet().forEach(depth -> spans.put(depth, body.getCurrentFrameSpan(frame, depth)));
+        Set<Point> originalSelection = body.copySelection();
+        TimelineBlankFrames originalBlanks = getTimelineBlankFrames(target);
+        undoManager.doOperation(new TimelinedTagListDoableOperation(this, target) {
+            private List<Tag> swfTags;
+
+            @Override
+            public void doOperation() {
+                super.doOperation();
+                swfTags = swf.getTags().toArrayList();
+                // Edit using the original timeline before adding the definition to the root tag list.
+                TimelineBlankFrames blanks = SelectionToSymbol.replace(target, character, spans, originalBlanks);
+                swf.addTag(character);
+                new DefineBeforeUsageFixer().fixDefineBeforeUsage(swf);
+                target.resetTimeline();
+                setTimelineDepthCount(target, depthCount);
+                setTimelineBlankFrames(target, blanks);
+                refreshCharacters(swf);
+                body.refreshAfterEdit(target, Collections.singleton(new Point(frame, topDepth)));
+            }
+
+            @Override
+            public void undoOperation() {
+                super.undoOperation();
+                restoreSwfTags(swf, swfTags);
+                target.resetTimeline();
+                setTimelineDepthCount(target, depthCount);
+                setTimelineBlankFrames(target, originalBlanks);
+                refreshCharacters(swf);
+                body.refreshAfterEdit(target, originalSelection);
+            }
+
+            @Override
+            public String getDescription() {
+                return EasyStrings.translate(newCharacterKey(character, true));
+            }
+        }, swf);
+    }
+
+    private static void restoreSwfTags(SWF swf, List<Tag> tags) {
+        while (!swf.getTags().isEmpty()) {
+            swf.removeTag(0);
+        }
+        for (Tag tag : tags) {
+            swf.addTag(tag);
+        }
+        swf.resetTimeline();
+    }
+
+    private boolean placeCharacter(DrawableTag character, Point position, boolean newCharacter) {
+        Timelined target = stagePanel.getTimelined();
+        int frame = getFrame();
+        if (frame < 0 || frame > TimelineFrameEdits.MAX_FRAME
+                || (target instanceof ButtonTag && frame > ButtonTag.FRAME_HITTEST)) {
+            return false;
+        }
+        TimelineBodyPanel body = timelinePanel.getTimelineBodyPanel();
+        int selectedDepth = body.getFirstDepth();
+        int depthCount = getTimelineDepthCount(target);
+        boolean insertAbove = selectedDepth > 0 && selectedDepth <= depthCount
+                && isStagePlacementOccupied(target, frame, selectedDepth);
+        int depth = insertAbove ? selectedDepth + 1 : depthForEmptyStagePlacement(target, selectedDepth, depthCount);
+        if (depth > TimelineLayerEdit.MAX_DEPTH || (insertAbove
+                && (depthCount == TimelineLayerEdit.MAX_DEPTH || !TimelineLayerEdit.canInsert(target)))) {
+            return false;
+        }
+        TimelineLayerEdit insertedLayer = insertAbove ? new TimelineLayerEdit(target, depth) : null;
+        TimelineBodyPanel.FrameSpan span = body.getSelectedFrameSpan(frame, selectedDepth);
+        Set<Point> originalSelection = body.copySelection();
+        TimelineBlankFrames originalBlanks = getTimelineBlankFrames(target);
+        TimelineBlankFrames placedBlanks = insertAbove
+                ? originalBlanks.remap(value -> TimelineLayerEdit.mapDepth(value, depth, true)) : originalBlanks.copy();
+        placedBlanks.clearKey(depth, span.first);
+
+        undoManager.doOperation(new TimelinedTagListDoableOperation(EasySwfPanel.this, target) {
+
+            private List<Tag> swfTags;
+            private boolean hidden;
+            private boolean locked;
+
+            @Override
+            public void doOperation() {
+                super.doOperation();
+
+                if (newCharacter || target.getSwf() != target) {
+                    swfTags = target.getSwf().getTags().toArrayList();
+                }
+                if (newCharacter) {
+                    target.getSwf().addTag(character);
+                    character.setModified(true);
+                }
+                if (insertedLayer != null) {
+                    insertedLayer.apply(true);
+                    setTimelineDepthCount(target, depthCount + 1);
+                    remapDepthInteraction(value -> TimelineLayerEdit.mapDepth(value, depth, true));
+                    restoreLayerFlags(depth, hidden, locked);
+                }
+
+                PlaceObject2Tag place = new PlaceObject2Tag(target.getSwf());
+                place.depth = depth;
+                place.placeFlagHasCharacter = true;
+                place.characterId = character.getCharacterId();
+                place.matrix = new MATRIX();
+                place.matrix.translateX = position.x;
+                place.matrix.translateY = position.y;
+                place.placeFlagHasMatrix = true;
+                place.setTimelined(target);
+
+                if (target instanceof ButtonTag) {
+                    ButtonTag button = (ButtonTag) target;
+                    BUTTONRECORD record = button.getButtonRecordAt(span.first, depth, true);
+                    record.fromPlaceObject(place);
+                    for (int state = span.first + 1; state <= span.last; state++) {
+                        record.setFrame(state, true);
+                    }
+                } else {
+                    Timeline timeline = target.getTimeline();
+                    TimelineFrameEdits edits = new TimelineFrameEdits(timeline);
+                    edits.extendTo(span.last);
+                    edits.addToFrame(span.first, place);
+                    if (span.last + 1 < timeline.getFrameCount()) {
+                        RemoveObject2Tag remove = new RemoveObject2Tag(target.getSwf());
+                        remove.depth = depth;
+                        remove.setTimelined(target);
+                        edits.endPlacementBeforeFrame(span.last + 1, remove);
+                    }
+                    edits.apply();
+                }
+
+                DefineBeforeUsageFixer fixer = new DefineBeforeUsageFixer();
+                boolean tagOrderChanged = fixer.fixDefineBeforeUsage(target.getSwf());
+                if (!newCharacter && !tagOrderChanged) {
+                    swfTags = null;
+                }
+
+                target.resetTimeline();
+                setTimelineBlankFrames(target, placedBlanks);
+                body.refreshAfterEdit(target, Collections.singleton(new Point(frame, depth)));
+                if (newCharacter) {
+                    refreshCharacters(character.getSwf());
+                    openCreatedCharacter(frame, depth);
+                }
+            }
+
+            @Override
+            public void undoOperation() {
+                if (newCharacter) {
+                    closeCreatedCharacter(character);
+                }
+                super.undoOperation();
+                target.resetTimeline();
+
+                //Tag order changed, put the original tags back
+                if (swfTags != null) {
+                    SWF swf = target.getSwf();
+                    ReadOnlyTagList newTags = swf.getTags();
+                    int size = newTags.size();
+                    for (int i = 0; i < size; i++) {
+                        swf.removeTag(0);
+                    }
+                    for (int i = 0; i < swfTags.size(); i++) {
+                        swf.addTag(swfTags.get(i));
+                    }
+                    swf.resetTimeline();
+                }
+                if (insertedLayer != null) {
+                    // The restored tag list still refers to the shifted tag objects.
+                    insertedLayer.apply(false);
+                    hidden = getHiddenDepths(target).contains(depth);
+                    locked = getLockedDepths(target).contains(depth);
+                    setTimelineDepthCount(target, depthCount);
+                    remapDepthInteraction(value -> TimelineLayerEdit.mapDepth(value, depth, false));
+                }
+                setTimelineBlankFrames(target, originalBlanks);
+                body.refreshAfterEdit(target, originalSelection);
+                if (newCharacter) {
+                    refreshCharacters(character.getSwf());
+                }
+            }
+
+            @Override
+            public String getDescription() {
+                return EasyStrings.translate(newCharacter ? newCharacterKey(character, false) : "action.addToStage");
+            }
+
+        }, target.getSwf());
+
+        return true;
+    }
+
     private void closeTimeline() {
         finishFloatingSelection();
+        ShapeTag shape = editingShape;
+        ImagePanel.ShapeEditContext context = stagePanel.getShapeEditContext();
         if (stagePanel.closeOpenedDepth()) {
+            setTimelined(stagePanel.getTimelined(), false, stagePanel.getEditedShape());
+            if (shape != null && RemoveEmptyShapeOperation.isEmpty(shape)) {
+                removeEmptyShape(shape, context);
+            }
             return;
         }
         SWF swf = timelined.getSwf();
@@ -2242,6 +2432,68 @@ public class EasySwfPanel extends JPanel {
         String firstParentFrame = conf.getCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FIRST_PARENT_FRAME, "1");
         conf.setCustomData(CustomConfigurationKeys.KEY_EASY_LAST_SELECTED_FRAME, firstParentFrame);
         setTimelined(swf);
+    }
+
+    private void removeEmptyShape(ShapeTag shape, ImagePanel.ShapeEditContext context) {
+        Timelined parent = timelined;
+        Set<Point> selection = timelinePanel.getTimelineBodyPanel().copySelection();
+        Map<Timelined, Integer> depthCounts = new HashMap<>();
+        Map<Timelined, TimelineBlankFrames> beforeBlanks = new HashMap<>();
+        Map<Timelined, TimelineBlankFrames> afterBlanks = new HashMap<>();
+        try {
+            RemoveEmptyShapeOperation removal = new RemoveEmptyShapeOperation(shape, forward -> {
+                depthCounts.forEach(this::setTimelineDepthCount);
+                (forward ? afterBlanks : beforeBlanks).forEach(this::setTimelineBlankFrames);
+                refreshCharacters(shape.getSwf());
+                timelinePanel.getTimelineBodyPanel().refreshAfterEdit(parent, selection);
+            });
+            for (Timelined owner : removal.getTimelines()) {
+                depthCounts.put(owner, getTimelineDepthCount(owner));
+                TimelineBlankFrames blanks = getTimelineBlankFrames(owner);
+                beforeBlanks.put(owner, blanks);
+                TimelineBlankFrames removedBlanks = blanks.copy();
+                for (Frame frame : owner.getTimeline().getFrames()) {
+                    for (DepthState state : frame.layers.values()) {
+                        if (state.characterId == shape.getCharacterId()) {
+                            DepthState previous = owner.getTimeline().getDepthState(frame.frame - 1, state.depth);
+                            if (state.key || previous == null || previous.characterId != state.characterId) {
+                                removedBlanks.addKey(state.depth, frame.frame);
+                            }
+                            removedBlanks.extend(state.depth, frame.frame);
+                        }
+                    }
+                }
+                afterBlanks.put(owner, removedBlanks);
+            }
+            undoManager.doOperation(new DoableOperation() {
+                private void showParent() {
+                    if (stagePanel.getTimelined() != parent) {
+                        stagePanel.restoreShapeEditContext(shape, context);
+                        stagePanel.closeShapeEdit();
+                    }
+                    setTimelined(parent, false);
+                }
+
+                @Override
+                public void doOperation() {
+                    showParent();
+                    removal.doOperation();
+                }
+
+                @Override
+                public void undoOperation() {
+                    showParent();
+                    removal.undoOperation();
+                }
+
+                @Override
+                public String getDescription() {
+                    return removal.getDescription();
+                }
+            }, shape.getSwf());
+        } catch (IOException | InterruptedException ex) {
+            logShapeEditFailure(ex);
+        }
     }
 
     public void setTimelined(Timelined timelined) {

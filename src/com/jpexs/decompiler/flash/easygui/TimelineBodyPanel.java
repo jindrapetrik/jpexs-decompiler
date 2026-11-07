@@ -663,6 +663,10 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         return new FrameSpan(first, last);
     }
 
+    FrameSpan getCurrentFrameSpan(int frame, int depth) {
+        return getFrameBlock(frame, depth, isFrameOccupied(frame, depth));
+    }
+
     private FrameSpan getFrameBlock(int frame, int depth, boolean occupied) {
         TimelineBlankFrames blanks = getBlankFrames();
         int first = frame;
