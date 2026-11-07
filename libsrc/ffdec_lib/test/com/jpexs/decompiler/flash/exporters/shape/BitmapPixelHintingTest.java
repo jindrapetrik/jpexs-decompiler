@@ -79,6 +79,23 @@ public class BitmapPixelHintingTest {
         }
     }
 
+    @Test
+    public void preservesDifferentCapsOnPixelHintedStrokes() {
+        for (int aaScale : new int[]{1, 4}) {
+            // The 8 px wide stroke runs from (8, 8) to (18, 8).
+            BufferedImage image = render(640, 0.25, aaScale, false, true, 0,
+                    LINESTYLE2.SQUARE_CAP, LINESTYLE2.ROUND_CAP);
+            Assert.assertEquals(image.getRGB(4, 4) >>> 24, 255);
+            Assert.assertEquals(image.getRGB(20, 8) >>> 24, 255);
+            Assert.assertEquals(image.getRGB(21, 4) >>> 24, 0);
+
+            image = render(640, 0.25, aaScale, false, true, 0,
+                    LINESTYLE2.NO_CAP, LINESTYLE2.SQUARE_CAP);
+            Assert.assertEquals(image.getRGB(7, 8) >>> 24, 0);
+            Assert.assertEquals(image.getRGB(21, 4) >>> 24, 255);
+        }
+    }
+
     private static void assertCoverage(BufferedImage image, boolean vertical, int first, int width) {
         for (int i = first - 1; i <= first + width; i++) {
             Assert.assertEquals(sampleAlpha(image, vertical, i), i >= first && i < first + width ? 255 : 0,
@@ -91,12 +108,16 @@ public class BitmapPixelHintingTest {
     }
 
     private static BufferedImage render(int width, double zoom, int aaScale, boolean vertical, boolean pixelHinting, double phase) {
+        return render(width, zoom, aaScale, vertical, pixelHinting, phase, LINESTYLE2.NO_CAP, LINESTYLE2.NO_CAP);
+    }
+
+    private static BufferedImage render(int width, double zoom, int aaScale, boolean vertical, boolean pixelHinting, double phase, int startCap, int endCap) {
         LINESTYLE2 line = new LINESTYLE2();
         line.width = width;
         line.color = new RGBA(0, 0, 0, 255);
         line.pixelHintingFlag = pixelHinting;
-        line.startCapStyle = LINESTYLE2.NO_CAP;
-        line.endCapStyle = LINESTYLE2.NO_CAP;
+        line.startCapStyle = startCap;
+        line.endCapStyle = endCap;
 
         SHAPEWITHSTYLE shape = new SHAPEWITHSTYLE();
         shape.fillStyles = new FILLSTYLEARRAY();

@@ -267,7 +267,7 @@ public class BitmapExporter extends ShapeExporterBase {
         return snapped;
     }
 
-    private static void appendStrokeSubpath(Path2D.Double path, List<StrokePoint> points, boolean close,
+    protected static void appendStrokeSubpath(Path2D.Double path, List<StrokePoint> points, boolean close,
             double width, boolean pixelHinting) {
         markStrokeAxes(points, close, width, pixelHinting);
         for (StrokePoint point : points) {
@@ -520,35 +520,6 @@ public class BitmapExporter extends ShapeExporterBase {
 
         boolean hairline = thickness == 0;
         lineColor = color == null ? null : color.toColor();
-        int capStyle = BasicStroke.CAP_ROUND;
-        if (startCaps == endCaps) {
-            switch (startCaps) {
-                case LINESTYLE2.NO_CAP:
-                    capStyle = BasicStroke.CAP_BUTT;
-                    break;
-                case LINESTYLE2.ROUND_CAP:
-                    capStyle = BasicStroke.CAP_ROUND;
-                    break;
-                case LINESTYLE2.SQUARE_CAP:
-                    capStyle = BasicStroke.CAP_SQUARE;
-                    break;
-            }
-        } else {
-            capStyle = BasicStroke.CAP_BUTT;
-        }
-
-        int joinStyle = BasicStroke.JOIN_ROUND;
-        switch (joints) {
-            case LINESTYLE2.BEVEL_JOIN:
-                joinStyle = BasicStroke.JOIN_BEVEL;
-                break;
-            case LINESTYLE2.MITER_JOIN:
-                joinStyle = BasicStroke.JOIN_MITER;
-                break;
-            case LINESTYLE2.ROUND_JOIN:
-                joinStyle = BasicStroke.JOIN_ROUND;
-                break;
-        }
         if (scaleStrokes) {
             switch (scaleMode) {
                 case "VERTICAL":
@@ -574,23 +545,7 @@ public class BitmapExporter extends ShapeExporterBase {
         boolean strokeInPixels = deviceTransform.getDeterminant() != 0;
         double alignedWidth = getAlignedStrokeWidth(widthPx, pixelHinting);
         float fThickness = (float) (strokeInPixels ? (alignedWidth > 0 ? alignedWidth : widthPx) : thickness);
-        if (joinStyle == BasicStroke.JOIN_MITER) {
-            lineStroke = new ExtendedBasicStroke(fThickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit) {
-                @Override
-                public Shape createStrokedShape(Shape s) {
-                    Shape ret = super.createStrokedShape(s);
-                    return applyStartEndCaps((AffineTransform) strokeTransformation.toTransform().clone(), s, ret, startCaps, endCaps, fThickness, noClose);
-                }
-            };
-        } else {
-            lineStroke = new BasicStroke(fThickness, capStyle, joinStyle) {
-                @Override
-                public Shape createStrokedShape(Shape s) {
-                    Shape ret = super.createStrokedShape(s);
-                    return applyStartEndCaps((AffineTransform) strokeTransformation.toTransform().clone(), s, ret, startCaps, endCaps, fThickness, noClose);
-                }
-            };
-        }
+        lineStroke = createLineStroke(fThickness, startCaps, endCaps, joints, miterLimit, noClose);
 
         // Align the centerline before creating the outline in device pixels.
         try {
@@ -604,6 +559,40 @@ public class BitmapExporter extends ShapeExporterBase {
         } catch (NoninvertibleTransformException net) {
             // ignore
         }
+    }
+
+    protected static Stroke createLineStroke(float thickness, int startCaps, int endCaps, int joints, float miterLimit, boolean noClose) {
+        int capStyle = BasicStroke.CAP_BUTT;
+        if (startCaps == endCaps) {
+            switch (startCaps) {
+                case LINESTYLE2.NO_CAP:
+                    break;
+                case LINESTYLE2.SQUARE_CAP:
+                    capStyle = BasicStroke.CAP_SQUARE;
+                    break;
+                default:
+                    capStyle = BasicStroke.CAP_ROUND;
+                    break;
+            }
+        }
+
+        Stroke stroke;
+        switch (joints) {
+            case LINESTYLE2.MITER_JOIN:
+                stroke = new ExtendedBasicStroke(thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit);
+                break;
+            case LINESTYLE2.BEVEL_JOIN:
+                stroke = new BasicStroke(thickness, capStyle, BasicStroke.JOIN_BEVEL);
+                break;
+            default:
+                stroke = new BasicStroke(thickness, capStyle, BasicStroke.JOIN_ROUND);
+                break;
+        }
+
+        if (startCaps == endCaps) {
+            return stroke;
+        }
+        return path -> applyStartEndCaps(path, stroke.createStrokedShape(path), startCaps, endCaps, thickness, noClose);
     }
 
     private static Shape drawSquareCap(
@@ -644,13 +633,13 @@ public class BitmapExporter extends ShapeExporterBase {
         return cap;
     }
 
-    private void finishCaps(
+    private static void finishCaps(
             Double startX, Double startY, Double startX2, Double startY2,
             Double endX, Double endY, Double endX2, Double endY2,
-            Area area, float thickness, int startCaps, int endCaps, boolean noClose) {
+            Area area, float thickness, int startCaps, int endCaps, boolean closed) {
         double halfThickness = thickness / 2.0;
         if (startX != null && endX != null) {
-            if (noClose || startX != endX || startY != endY) {
+            if (!closed) {
                 Shape startCapShape = null;
                 switch (startCaps) {
                     case LINESTYLE2.ROUND_CAP:
@@ -680,12 +669,8 @@ public class BitmapExporter extends ShapeExporterBase {
         }
     }
 
-    private Shape applyStartEndCaps(AffineTransform trans, Shape original, Shape stroked, int startCaps, int endCaps, float thickness, boolean noClose) {
-        if (startCaps == endCaps) {
-            return stroked;
-        }
-
-        Area area = new Area(new Area(stroked));
+    private static Shape applyStartEndCaps(Shape original, Shape stroked, int startCaps, int endCaps, float thickness, boolean noClose) {
+        Area area = new Area(stroked);
 
         Double startX = null;
         Double startY = null;
@@ -698,6 +683,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
         Double x = null;
         Double y = null;
+        boolean closed = false;
 
         PathIterator iterator = original.getPathIterator(null);
         while (!iterator.isDone()) {
@@ -705,7 +691,7 @@ public class BitmapExporter extends ShapeExporterBase {
             int type = iterator.currentSegment(coords);
             switch (type) {
                 case PathIterator.SEG_MOVETO:
-                    finishCaps(startX, startY, startX2, startY2, endX, endY, endX2, endY2, area, thickness, startCaps, endCaps, noClose);
+                    finishCaps(startX, startY, startX2, startY2, endX, endY, endX2, endY2, area, thickness, startCaps, endCaps, closed);
 
                     startX = x = coords[0];
                     startY = y = coords[1];
@@ -713,6 +699,7 @@ public class BitmapExporter extends ShapeExporterBase {
                     startY2 = null;
                     endX = null;
                     endY = null;
+                    closed = false;
                     break;
                 case PathIterator.SEG_LINETO:
                     endX2 = x;
@@ -746,6 +733,7 @@ public class BitmapExporter extends ShapeExporterBase {
                     }
                     break;
                 case PathIterator.SEG_CLOSE:
+                    closed = !noClose;
                     endX2 = x;
                     endY2 = y;
                     endX = x = startX;
@@ -758,7 +746,7 @@ public class BitmapExporter extends ShapeExporterBase {
             }
             iterator.next();
         }
-        finishCaps(startX, startY, startX2, startY2, endX, endY, endX2, endY2, area, thickness, startCaps, endCaps, noClose);
+        finishCaps(startX, startY, startX2, startY2, endX, endY, endX2, endY2, area, thickness, startCaps, endCaps, closed);
         return area;
     }
 

@@ -6,14 +6,11 @@ import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.types.ColorTransform;
-import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
-import com.jpexs.graphics.ExtendedBasicStroke;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.MultipleGradientPaint;
@@ -285,25 +282,13 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
     }
 
     private Shape createStrokePath() {
-        List<List<Vec2>> strokeContours = new ArrayList<>(strokePaths.size());
+        // Keep Bézier tangents for stroke joins and caps. Flatten the outline for MSAA.
+        Path2D.Double path = new Path2D.Double(Path2D.WIND_EVEN_ODD);
         for (int i = 0; i < strokePaths.size(); i++) {
-            List<StrokePoint> points = strokePaths.get(i);
-            markStrokeAxes(points, closeLine && i == strokePaths.size() - 1, alignedStrokeWidth, pixelHinting);
-            List<Vec2> contour = new ArrayList<>(points.size());
-            Vec2 previous = null;
-            for (StrokePoint point : points) {
-                Vec2 anchor = new Vec2(point.alignedX(alignedStrokeWidth, pixelHinting), point.alignedY(alignedStrokeWidth, pixelHinting));
-                if (point.segment == PathIterator.SEG_QUADTO) {
-                    Vec2 control = new Vec2(point.coordinates[0], point.coordinates[1]);
-                    AntialiasTools.append(contour, AntialiasTools.flattenQuadraticBezier(previous, control, anchor, curveFlatness), true);
-                } else {
-                    contour.add(anchor);
-                }
-                previous = anchor;
-            }
-            strokeContours.add(contour);
+            appendStrokeSubpath(path, strokePaths.get(i), closeLine && i == strokePaths.size() - 1,
+                    alignedStrokeWidth, pixelHinting);
         }
-        return AntialiasTools.contoursToShape(strokeContours, Path2D.WIND_EVEN_ODD, closeLine, true);
+        return path;
     }
 
     private void drawImage(BufferedImage image, int dx, int dy, int dx2, int dy2, int sx, int sy, int sx2, int sy2, ImageObserver obs, boolean smooth) {
@@ -408,30 +393,6 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
 
         boolean hairline = thickness == 0;
         lineColor = color == null ? null : color.toColor();
-        int capStyle = BasicStroke.CAP_ROUND;
-        switch (startCaps) {
-            case LINESTYLE2.NO_CAP:
-                capStyle = BasicStroke.CAP_BUTT;
-                break;
-            case LINESTYLE2.ROUND_CAP:
-                capStyle = BasicStroke.CAP_ROUND;
-                break;
-            case LINESTYLE2.SQUARE_CAP:
-                capStyle = BasicStroke.CAP_SQUARE;
-                break;
-        }
-        int joinStyle = BasicStroke.JOIN_ROUND;
-        switch (joints) {
-            case LINESTYLE2.BEVEL_JOIN:
-                joinStyle = BasicStroke.JOIN_BEVEL;
-                break;
-            case LINESTYLE2.MITER_JOIN:
-                joinStyle = BasicStroke.JOIN_MITER;
-                break;
-            case LINESTYLE2.ROUND_JOIN:
-                joinStyle = BasicStroke.JOIN_ROUND;
-                break;
-        }
         if (scaleStrokes) {
             switch (scaleMode) {
                 case "VERTICAL":
@@ -459,10 +420,6 @@ public class AntialiasedBitmapExporter extends BitmapExporter {
             thickness = alignedStrokeWidth;
         }
 
-        if (joinStyle == BasicStroke.JOIN_MITER) {
-            lineStroke = new ExtendedBasicStroke((float) thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit);
-        } else {
-            lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
-        }
+        lineStroke = createLineStroke((float) thickness, startCaps, endCaps, joints, miterLimit, noClose);
     }
 }
