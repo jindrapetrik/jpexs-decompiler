@@ -631,16 +631,21 @@ public class EasySwfPanel extends JPanel {
         leftToolbar.add(editObjectButton);
         updateObjectButtons();
         leftToolbar.add(Box.createHorizontalStrut(10));
+        
+        toolbarPanel.add(leftToolbar, BorderLayout.WEST);
+        
+        JPanel centralToolbar = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        
         timelineLabel = new JLabel("");
-        leftToolbar.add(timelineLabel);
-        leftToolbar.add(Box.createHorizontalStrut(5));
+        centralToolbar.add(timelineLabel);
+        centralToolbar.add(Box.createHorizontalStrut(5));
         closeTimelineButton = new JButton(View.getIcon("cancel16"));
         closeTimelineButton.setMargin(new Insets(5, 5, 5, 5));
-        leftToolbar.add(closeTimelineButton);
+        centralToolbar.add(closeTimelineButton);
         closeTimelineButton.setToolTipText(EasyStrings.translate("timeline.item.cancel"));
         closeTimelineButton.addActionListener(e -> closeTimeline());
 
-        toolbarPanel.add(leftToolbar, BorderLayout.WEST);
+        toolbarPanel.add(centralToolbar, BorderLayout.CENTER);
 
         ZoomPanel zoomPanel = new ZoomPanel(stagePanel);
         toolbarPanel.add(zoomPanel, BorderLayout.EAST);
