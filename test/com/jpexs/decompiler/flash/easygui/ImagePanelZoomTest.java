@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.gui.ImagePanel;
 import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.types.RECT;
 import java.awt.Component;
 import java.awt.Container;
@@ -141,6 +142,7 @@ public class ImagePanelZoomTest {
                 panel.setSelectionMode(true);
                 panel.setTimelined(swf, swf, 0, true, false, true, true, true, false, true, true, false);
                 panel.openDepth(0, 2);
+                assertTrue(panel.getTimelined() instanceof DefineSpriteTag);
                 Zoom zoom = new Zoom();
                 zoom.value = 1.37;
                 panel.zoom(zoom);
