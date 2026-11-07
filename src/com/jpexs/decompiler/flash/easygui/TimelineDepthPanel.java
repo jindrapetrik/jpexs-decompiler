@@ -38,6 +38,7 @@ import javax.swing.SwingUtilities;
 public class TimelineDepthPanel extends JPanel {
 
     private final Icon layerIcon = View.getIcon("layer16");
+    private final Icon scriptsIcon = View.getIcon("as16");
     private final Icon showIcon = View.getIcon("show16");
     private final Icon crossIcon = View.getIcon("cross16");
     private final Icon lockIcon = View.getIcon("lock16");
@@ -175,7 +176,7 @@ public class TimelineDepthPanel extends JPanel {
         FontMetrics metrics = getFontMetrics(getFont());
         int labelWidth = layerIcon.getIconWidth() + PADDING + metrics.stringWidth(depthLabel(Math.max(1, maxDepth)));
         if (!shapeTimeline) {
-            labelWidth = Math.max(labelWidth, metrics.stringWidth(depthLabel(0)));
+            labelWidth = Math.max(labelWidth, scriptsIcon.getIconWidth() + PADDING + metrics.stringWidth(depthLabel(0)));
         }
         visibilityX = labelWidth + 2 * PADDING;
         lockX = visibilityX + showIcon.getIconWidth() + PADDING;
@@ -280,10 +281,11 @@ public class TimelineDepthPanel extends JPanel {
             g.setColor(BORDER_COLOR);
             g.drawLine(0, y + rowHeight, getWidth(), y + rowHeight);
             g.setColor(selected ? TimelineBodyPanel.getSelectedColorText() : FONT_COLOR);
-            int labelX = depth > 0 ? PADDING + layerIcon.getIconWidth() + PADDING : PADDING;
+            Icon icon = depth > 0 ? layerIcon : scriptsIcon;
+            int labelX = PADDING + icon.getIconWidth() + PADDING;
             g.drawString(depthLabel(depth), labelX, y + rowHeight - PADDING);
+            paintColumnIcon(g, icon, PADDING, icon.getIconWidth(), y, rowHeight);
             if (depth > 0) {
-                paintColumnIcon(g, layerIcon, PADDING, layerIcon.getIconWidth(), y, rowHeight);
                 Icon visibility = isHidden(depth) ? crossIcon : bulletIcon;
                 Icon lock = isLocked(depth) ? lockIcon : bulletIcon;
                 paintColumnIcon(g, visibility, visibilityX, showIcon.getIconWidth(), y, rowHeight);
