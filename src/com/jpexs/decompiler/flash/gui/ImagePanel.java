@@ -218,6 +218,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private final List<SoundTagPlayer> soundPlayers = new ArrayList<>();
 
+    private final SoundStreamPlayer soundStreamPlayer = new SoundStreamPlayer();
+
     private final Cache<DisplayObjectCacheKey, SerializableImage> displayObjectCache = Cache.getInstance(false, false, "displayObject", true);
 
     private final IconPanel iconPanel;
@@ -242,7 +244,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private boolean altSelectionEnabled = true;
 
-    private int msPerFrame;
+    private double msPerFrame;
 
     private final boolean lowQuality = false;
 
@@ -6636,6 +6638,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         lda = new LocalDataArea(stage);
         synchronized (ImagePanel.this) {
             stopInternal();
+            soundStreamPlayer.reset();
             if (drawable instanceof ButtonTag) {
                 frame = ButtonTag.FRAME_UP;
             }
@@ -7171,6 +7174,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private synchronized void stopAllSounds() {
+        soundStreamPlayer.stop();
         for (int i = soundPlayers.size() - 1; i >= 0; i--) {
             SoundTagPlayer pl = soundPlayers.get(i);
             pl.close();
@@ -7199,13 +7203,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 int oldFrame = frame;
                 for (int i = 0; i < cnt; i++) {
-                    if (!stillFrame && frameCount > 0) {
-                        frame = (frame + 1) % frameCount;
-                    }
-
                     if (!stillFrame && frame == frameCount - 1 && !loop) {
                         stopInternal();
                         return;
+                    }
+                    if (!stillFrame && frameCount > 0) {
+                        frame = (frame + 1) % frameCount;
                     }
 
                     if (i < cnt - 1) {                 //skip not displayed frames, do not display, only play sounds, etc.
@@ -7862,6 +7865,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
 
             if (autoPlayed) { //!shownAgain
+                synchronized (ImagePanel.this) {
+                    if (!muted && !frozen && playing && timer != null && timer == thisTimer) {
+                        soundStreamPlayer.update(timeline, frame, time, !stillFrame,
+                                renderContext.mouseOverButton, mouseButton);
+                    }
+                }
                 if (!muted) {
                     List<Integer> sounds = new ArrayList<>();
                     List<String> soundClasses = new ArrayList<>();
@@ -8154,6 +8163,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         shapeSelectionTransform = null;
         stopInternal();
         clearImagePanel();
+        soundStreamPlayer.reset();
         timelined = null;
         editedShape = null;
         shapePreview = null;
@@ -8166,6 +8176,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private synchronized void stopInternal() {
+        playing = false;
         clear();
         stopAllSounds();
     }
@@ -8185,11 +8196,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
-    private synchronized void setMsPerFrame(int val) {
+    private synchronized void setMsPerFrame(double val) {
         this.msPerFrame = val;
     }
 
-    private synchronized int getMsPerFrame() {
+    private synchronized double getMsPerFrame() {
         return this.msPerFrame;
     }
 
@@ -8252,7 +8263,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                     }
                     int curFrame = frame;
-                    long delay = getMsPerFrame();
+                    long delay = Math.max(1, Math.round(getMsPerFrame()));
                     if (isSingleFrame) {
                         // Shape selection is an overlay on a stopped scene. Pointer
                         // changes and edits request their own redraw; a periodic full
@@ -8270,7 +8281,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             return;
                         }
                         //How many ticks (= times where frame should be displayed in framerate) are there from hitting play button
-                        int ticksFromStart = (int) Math.floor((frameTimeMsIs - startRun) / (double) getMsPerFrame());
+                        int ticksFromStart = (int) Math.floor((frameTimeMsIs - startRun) / getMsPerFrame());
 
                         //How many frames are there between last displayed frame and now. For perfect display(=no framedrop), value should be 1
                         int skipFrames;
@@ -8313,7 +8324,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         int nextFrameOverMax = frameOverMaxShouldBeNow;
                         while (delay < 0) { //while the frame time already passed
                             nextFrameOverMax++;
-                            long nextFrameOverMaxTimeMsShouldBe = startRun + getMsPerFrame() * nextFrameOverMax;
+                            long nextFrameOverMaxTimeMsShouldBe = startRun + Math.round(getMsPerFrame() * nextFrameOverMax);
                             delay = nextFrameOverMaxTimeMsShouldBe - afterDrawFrameTimeMsIs;
                         }
                     }
@@ -8343,7 +8354,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         startRun = System.currentTimeMillis();
         startFrame = frame;
         float frameRate = timeline.frameRate;
-        setMsPerFrame(frameRate == 0 ? 1000 : (int) (1000.0 / frameRate));
+        // Keep fractional milliseconds so animation does not gradually outrun
+        // streamed audio (e.g. 24 fps is 41.666... ms, not 41 ms per frame).
+        setMsPerFrame(frameRate == 0 ? 1000 : 1000.0 / frameRate);
         final boolean singleFrame = !playing
                 || (stillFrame && timeline.isSingleFrame(frame))
                 || (!stillFrame && timeline.getRealFrameCount() <= 1 && timeline.isSingleFrame());

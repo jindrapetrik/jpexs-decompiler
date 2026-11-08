@@ -58,6 +58,12 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private final SoundTag tag;
 
+    interface LineFactory {
+        SourceDataLine create(AudioFormat format) throws LineUnavailableException;
+    }
+
+    private final LineFactory lineFactory;
+
     private final Timer timer;
 
     private final List<MediaDisplayListener> listeners = new CopyOnWriteArrayList<>();
@@ -165,8 +171,20 @@ public class SoundTagPlayer implements MediaDisplay {
     private static final int FRAME_DIVISOR = 8000;
 
     public SoundTagPlayer(final SOUNDINFO soundInfo, final SoundTag tag, int loops, boolean async) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+        this(soundInfo, tag, loops, async, 0);
+    }
+
+    SoundTagPlayer(final SOUNDINFO soundInfo, final SoundTag tag, int loops, boolean async, long startMicrosec) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+        this(soundInfo, tag, loops, async, startMicrosec,
+                format -> (SourceDataLine) AudioSystem.getLine(new DataLine.Info(SourceDataLine.class, format)));
+    }
+
+    SoundTagPlayer(final SOUNDINFO soundInfo, final SoundTag tag, int loops, boolean async, long startMicrosec, LineFactory lineFactory) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
         this.tag = tag;
+        this.lineFactory = lineFactory;
         this.loopCount = loops;
+        positionMicrosec = Math.max(0, startMicrosec);
+        newPositionMicrosec = startMicrosec > 0 ? startMicrosec : null;
 
         timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -191,21 +209,30 @@ public class SoundTagPlayer implements MediaDisplay {
             public void run() {
                 try {
                     openSound(soundInfo, tag);
-                } catch (IOException | LineUnavailableException | UnsupportedAudioFileException ex) {
-                    Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                synchronized (playLock) {
-                    if (!paused) {
-                        play();
+                    if (getClosedFlag()) {
+                        return;
                     }
-                }
-                this.setPriority(MIN_PRIORITY);
-                try {
+                    this.setPriority(MIN_PRIORITY);
                     playLoop();
-                } catch (LineUnavailableException ex) {
-                    Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (Exception ex) {
                     Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    synchronized (playLock) {
+                        closed = true;
+                        active = false;
+                        if (sourceLine != null) {
+                            sourceLine.stop();
+                            sourceLine.close();
+                        }
+                        if (audioStream != null) {
+                            try {
+                                audioStream.close();
+                            } catch (IOException ex) {
+                                Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.FINE, null, ex);
+                            }
+                        }
+                    }
+                    timer.cancel();
                 }
             }
         };
@@ -231,13 +258,23 @@ public class SoundTagPlayer implements MediaDisplay {
 
     @Override
     public int getCurrentFrame() {
+        return (int) (getPositionMicrosec() / FRAME_DIVISOR);
+    }
+
+    long getPositionMicrosec() {
         synchronized (playLock) {
             double currentPosition = positionMicrosec;
             if (newPositionMicrosec == null && sourceLine != null) {
                 currentPosition = playbackStartMicrosec + sourceLine.getMicrosecondPosition();
                 currentPosition = Math.min(lengthInMicroSec, currentPosition);
             }
-            return (int) (currentPosition / FRAME_DIVISOR);
+            return (long) currentPosition;
+        }
+    }
+
+    boolean isSoundReady() {
+        synchronized (playLock) {
+            return sourceLine != null;
         }
     }
 
@@ -274,6 +311,11 @@ public class SoundTagPlayer implements MediaDisplay {
         timer.cancel();
         synchronized (playLock) {
             closed = true;
+            if (sourceLine != null) {
+                sourceLine.stop();
+                sourceLine.flush();
+                sourceLine.close();
+            }
         }
         synchronized (thread) {
             thread.notifyAll();
@@ -295,6 +337,9 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private void reloadAudioStream(long startMicrosec) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         synchronized (playLock) {
+            if (closed) {
+                return;
+            }
             audioStream = createPlaybackStream(wavData);
             AudioFormat format = audioStream.getFormat();
             microsecPerByte = 1000000d / (format.getFrameRate() * format.getFrameSize());
@@ -305,12 +350,15 @@ public class SoundTagPlayer implements MediaDisplay {
                 sourceLine.flush();
                 sourceLine.close();
             }
-            DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioStream.getFormat());
-            sourceLine = (SourceDataLine) AudioSystem.getLine(info);
+            sourceLine = lineFactory.create(audioStream.getFormat());
             sourceLine.open(audioStream.getFormat());
-            sourceLine.start();
+            if (!paused && !closed) {
+                sourceLine.start();
+            }
             playbackStartMicrosec = startMicrosec;
-            positionMicrosec = startMicrosec;
+            if (newPositionMicrosec == null) {
+                positionMicrosec = startMicrosec;
+            }
         }
     }
 
@@ -523,9 +571,13 @@ public class SoundTagPlayer implements MediaDisplay {
 
     @Override
     public void gotoFrame(int frame) {
+        seekMicrosec((long) frame * FRAME_DIVISOR);
+    }
+
+    void seekMicrosec(long position) {
         synchronized (playLock) {
             playbackFinished = false;
-            newPositionMicrosec = (long) (frame * FRAME_DIVISOR);
+            newPositionMicrosec = Math.max(0, position);
             positionMicrosec = newPositionMicrosec;
         }
 

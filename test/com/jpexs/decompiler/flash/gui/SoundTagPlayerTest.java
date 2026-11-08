@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.SOUNDENVELOPE;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
@@ -23,15 +25,119 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.SourceDataLine;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 public class SoundTagPlayerTest {
+
+    @Test
+    public void playbackStartsAtExactPositionAndCloseReleasesTheLineAndWorker() throws Exception {
+        DefineSoundTag tag = new DefineSoundTag(new SWF());
+        tag.soundFormat = 3;
+        tag.soundRate = 3;
+        tag.soundSize = true;
+        byte[] pcm = new byte[20000];
+        for (int i = 0; i < pcm.length; i++) {
+            pcm[i] = (byte) i;
+        }
+        tag.soundData = new ByteArrayRange(pcm);
+        AtomicInteger openLines = new AtomicInteger();
+        CompletableFuture<byte[]> firstWrite = new CompletableFuture<>();
+        CompletableFuture<Thread> worker = new CompletableFuture<>();
+        SoundTagPlayer player = new SoundTagPlayer(null, tag, 1, true, 100000, format -> {
+            AtomicBoolean open = new AtomicBoolean();
+            CountDownLatch released = new CountDownLatch(1);
+            return (SourceDataLine) Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{SourceDataLine.class}, (proxy, method, args) -> {
+                switch (method.getName()) {
+                    case "open":
+                        if (open.compareAndSet(false, true)) {
+                            openLines.incrementAndGet();
+                        }
+                        return null;
+                    case "close":
+                        if (open.compareAndSet(true, false)) {
+                            openLines.decrementAndGet();
+                        }
+                        released.countDown();
+                        return null;
+                    case "write":
+                        firstWrite.complete(Arrays.copyOfRange((byte[]) args[0], (int) args[1], (int) args[1] + (int) args[2]));
+                        worker.complete(Thread.currentThread());
+                        released.await(10, TimeUnit.SECONDS);
+                        return (int) args[2];
+                    default:
+                        if (method.getReturnType() == boolean.class) {
+                            return false;
+                        }
+                        if (method.getReturnType() == long.class) {
+                            return 0L;
+                        }
+                        return null;
+                }
+            });
+        });
+        try {
+            byte[] actual = firstWrite.get(5, TimeUnit.SECONDS);
+            assertEquals(actual, Arrays.copyOfRange(pcm, 8820, 8820 + actual.length));
+        } finally {
+            player.close();
+        }
+        Thread playbackThread = worker.get(5, TimeUnit.SECONDS);
+        playbackThread.join(3000);
+        assertFalse(playbackThread.isAlive());
+        assertEquals(openLines.get(), 0);
+    }
+
+    @Test
+    public void closingWhileDecodingDoesNotOpenAnAudioDevice() throws Exception {
+        CountDownLatch decoding = new CountDownLatch(1);
+        CountDownLatch finishDecoding = new CountDownLatch(1);
+        AtomicReference<Thread> worker = new AtomicReference<>();
+        DefineSoundTag tag = new DefineSoundTag(new SWF()) {
+            @Override
+            public List<ByteArrayRange> getRawSoundData() {
+                worker.set(Thread.currentThread());
+                decoding.countDown();
+                try {
+                    finishDecoding.await(10, TimeUnit.SECONDS);
+                } catch (InterruptedException ex) {
+                    throw new AssertionError(ex);
+                }
+                return Collections.singletonList(new ByteArrayRange(new byte[100]));
+            }
+        };
+        tag.soundFormat = 3;
+        tag.soundRate = 3;
+        tag.soundSize = true;
+        AtomicInteger opened = new AtomicInteger();
+        SoundTagPlayer player = new SoundTagPlayer(null, tag, 1, true, 0, format -> {
+            opened.incrementAndGet();
+            throw new AssertionError("Closed playback must not open a line");
+        });
+        try {
+            assertTrue(decoding.await(5, TimeUnit.SECONDS));
+        } finally {
+            player.close();
+            finishDecoding.countDown();
+        }
+        worker.get().join(3000);
+        assertFalse(worker.get().isAlive());
+        assertEquals(opened.get(), 0);
+    }
 
     @Test
     public void unsignedPcm8PlaybackPreservesAmplitudeChannelsAndDuration() throws Exception {
