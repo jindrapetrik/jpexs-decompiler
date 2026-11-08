@@ -106,6 +106,7 @@ final class ReplaceTimelineContentDialog {
         JScrollPane treePane = new JScrollPane(tree);
         treePane.setPreferredSize(new Dimension(250, 230));
         ImagePanel preview = new ImagePanel();
+        preview.setTagNameResolver(new EasyTagNameResolver());
         preview.setTopPanelVisible(false);
         preview.setPreferredSize(new Dimension(240, 230));
 

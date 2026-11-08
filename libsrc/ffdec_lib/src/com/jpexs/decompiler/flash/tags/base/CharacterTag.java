@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.NameCharacterTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -108,6 +109,12 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
                 escapedList.add(DottedChain.parseNoSuffix(className).toPrintableString(new LinkedHashSet<>(), getSwf(), true));
             }
             ret.put("cls", String.join(", ", escapedList));
+        }
+        if (swf != null && chid > -1) {
+            NameCharacterTag nameTag = (NameCharacterTag) swf.getCharacterIdTag(chid, NameCharacterTag.ID);
+            if (nameTag != null) {
+                ret.put("nm", nameTag.name);
+            }
         }
         return ret;
     }

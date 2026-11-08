@@ -696,6 +696,7 @@ public class EasySwfPanel extends JPanel {
         libraryPanel.add(libraryScrollPane, BorderLayout.CENTER);
 
         libraryPreviewPanel = new ImagePanel();
+        libraryPreviewPanel.setTagNameResolver(new EasyTagNameResolver());
         libraryPreviewPanel.setTopPanelVisible(false);
 
         libraryPanel.add(libraryPreviewPanel, BorderLayout.NORTH);
@@ -2644,15 +2645,7 @@ public class EasySwfPanel extends JPanel {
             documentPropertiesPanel.setSwf(swf);
             libraryTreeTable.setSwf(swf);
             libraryPreviewPanel.clearAll();
-            if (timelined instanceof SWF) {
-                timelineLabel.setText(EasyStrings.translate("timeline.main"));
-                closeTimelineButton.setVisible(false);
-            } else {
-                EasyTagNameResolver nameResolver = new EasyTagNameResolver();
-                timelineLabel.setText(EasyStrings.translate(editingShape == null ? "timeline.item" : "shape.edit")
-                        .replace("%item%", nameResolver.getTagName(editingShape == null ? (Tag) timelined : editingShape)));
-                closeTimelineButton.setVisible(true);
-            }
+            updateTimelineLabel();
             timelinePanel.setTimelined(editingShape == null ? timelined : null);
             
             if (updateStage) {
@@ -3007,6 +3000,36 @@ public class EasySwfPanel extends JPanel {
 
     public ImagePanel getStagePanel() {
         return stagePanel;
+    }
+
+    private void updateTimelineLabel() {
+        if (editingShape == null && timelined instanceof SWF) {
+            timelineLabel.setText(EasyStrings.translate("timeline.main"));
+            closeTimelineButton.setVisible(false);
+        } else {
+            EasyTagNameResolver nameResolver = new EasyTagNameResolver();
+            timelineLabel.setText(EasyStrings.translate(editingShape == null ? "timeline.item" : "shape.edit")
+                    .replace("%item%", nameResolver.getTagName(editingShape == null ? (Tag) timelined : editingShape)));
+            closeTimelineButton.setVisible(true);
+        }
+    }
+
+    void renameCharacter(CharacterTag character, String name) {
+        if (name.equals(EasyTagNameResolver.getCustomName(character))) {
+            return;
+        }
+        undoManager.doOperation(new RenameCharacterOperation(character, name, () -> {
+            libraryTreeTable.refreshCharacterName(character);
+            updateTimelineLabel();
+            instancePropertiesPanel.update();
+            textInstancePropertiesPanel.update();
+            shapePropertiesPanel.setDrawingSwf(editingShape == null ? null : editingShape.getSwf());
+            shapePropertiesPanel.setSelections(selectedShapeParts);
+            eyedropperPropertiesPanel.setShape(editingShape);
+            eyedropperPropertiesPanel.setSample(eyedropperSample);
+            stagePanel.repaint();
+            mainPanel.refreshTree(character.getSwf());
+        }), character.getSwf());
     }
 
     void changeScalingGrid(CharacterTag character, RECT splitter) {

@@ -19,8 +19,10 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.gui.TagNameResolverInterface;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
+import com.jpexs.decompiler.flash.tags.NameCharacterTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -36,6 +38,23 @@ public class EasyTagNameResolver implements TagNameResolverInterface {
 
     @Override
     public String getTagName(Tag tag) {
+        String generatedName = getGeneratedTagName(tag);
+        if (tag instanceof CharacterTag) {
+            String name = getCustomName((CharacterTag) tag);
+            if (!name.isEmpty()) {
+                return name + " (" + generatedName + ")";
+            }
+        }
+        return generatedName;
+    }
+
+    static String getCustomName(CharacterTag character) {
+        NameCharacterTag nameTag = (NameCharacterTag) character.getSwf().getCharacterIdTag(
+                character.getCharacterId(), NameCharacterTag.ID);
+        return nameTag == null ? "" : nameTag.name;
+    }
+
+    private String getGeneratedTagName(Tag tag) {
         if (tag instanceof ImageTag) {
             ImageTag it = (ImageTag) tag;                                      
             return EasyStrings.translate("item.image") + " " + it.getCharacterId() + it.getImageFormat().getExtension();

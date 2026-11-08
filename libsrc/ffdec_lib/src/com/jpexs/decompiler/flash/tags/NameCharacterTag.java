@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -108,4 +109,12 @@ public class NameCharacterTag extends Tag implements CharacterModifier {
     public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         needed.add(characterId);
     }
+
+    @Override
+    public Map<String, String> getNameProperties() {
+        Map<String, String> ret = super.getNameProperties();
+        ret.put("chid", "" + characterId);
+        ret.put("nm", "" + name);
+        return ret;
+    }        
 }

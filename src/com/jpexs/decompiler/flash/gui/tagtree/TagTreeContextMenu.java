@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
+import com.jpexs.decompiler.flash.easygui.RenameCharacterOperation;
 import com.jpexs.decompiler.flash.exporters.PreviewExporter;
 import com.jpexs.decompiler.flash.exporters.script.MxmlExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
@@ -97,6 +98,7 @@ import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.FreeCharacterTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.NameCharacterTag;
 import com.jpexs.decompiler.flash.tags.PlaceImagePrivateTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
@@ -225,6 +227,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem configurePathResolvingMenuItem;
 
     private JMenuItem setAsLinkageMenuItem;
+
+    private JMenuItem nameCharacterMenuItem;
 
     private JMenuItem setAs3ClassLinkageMenuItem;
 
@@ -824,6 +828,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         setAsLinkageMenuItem.addActionListener(this::setAsLinkageActionPerformed);
         setAsLinkageMenuItem.setIcon(View.getIcon("asclasslink16"));
         add(setAsLinkageMenuItem);
+
+        nameCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.nameCharacter"));
+        nameCharacterMenuItem.addActionListener(this::nameCharacterActionPerformed);
+        nameCharacterMenuItem.setIcon(View.getIcon("namecharacter16"));
+        add(nameCharacterMenuItem);
 
         setAs3ClassLinkageMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setAs3ClassLinkage") + " (ALT+A)");
         setAs3ClassLinkageMenuItem.addActionListener(this::setAs3ClassLinkageActionPerformed);
@@ -1532,6 +1541,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         prepareDebugSwdPCode.setVisible(false);
         gotoDocumentClassMenuItem.setVisible(false);
         setAsLinkageMenuItem.setVisible(false);
+        nameCharacterMenuItem.setVisible(false);
         setAs3ClassLinkageMenuItem.setVisible(false);
         expandRecursiveMenuItem.setVisible(false);
         collapseRecursiveMenuItem.setVisible(false);
@@ -1807,6 +1817,9 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (firstItem instanceof CharacterTag) {
                 CharacterTag ct = (CharacterTag) firstItem;
+                nameCharacterMenuItem.setVisible(ct.getCharacterId() >= 0 && !ct.isReadOnly()
+                        && (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES || mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST)
+                        && (ct instanceof ShapeTag || ct instanceof DefineSpriteTag || ct instanceof ButtonTag || ct instanceof SoundTag));
                 if (ct.getCharacterId() != -1) {
                     replaceWithTagMenuItem.setVisible(true);
                     replaceRefsWithTagMenuItem.setVisible(true);
@@ -3834,6 +3847,21 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         }
         return null;
+    }
+
+    private void nameCharacterActionPerformed(ActionEvent evt) {
+        CharacterTag character = (CharacterTag) getCurrentItem();
+        SWF swf = character.getSwf();
+        NameCharacterTag nameTag = (NameCharacterTag) swf.getCharacterIdTag(character.getCharacterId(), NameCharacterTag.ID);
+        String oldName = nameTag == null ? "" : nameTag.name;
+        String name = ViewMessages.showInputDialog(mainPanel, mainPanel.translate("nameCharacter.prompt"),
+                mainPanel.translate("contextmenu.nameCharacter"), oldName);
+        if (name == null || name.equals(oldName)) {
+            return;
+        }
+        new RenameCharacterOperation(character, name, null).doOperation();
+        mainPanel.refreshTree(swf);
+        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), character);
     }
 
     /*

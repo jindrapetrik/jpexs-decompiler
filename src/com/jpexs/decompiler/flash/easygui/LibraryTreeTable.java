@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -48,14 +49,15 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -77,6 +79,11 @@ public class LibraryTreeTable extends JTreeTable {
             public void keyPressed(KeyEvent e) {
                 int selectedRow = getSelectedRow();
                 JTree tree = getTree();
+
+                if (e.getKeyCode() == KeyEvent.VK_F2) {
+                    renameSelectedCharacter();
+                    e.consume();
+                }
 
                 if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     TreePath path = tree.getPathForRow(selectedRow);
@@ -137,16 +144,21 @@ public class LibraryTreeTable extends JTreeTable {
                 }
                 changeSelection(row, 0, false, false);
                 Object object = ((DefaultMutableTreeNode) getValueAt(row, 0)).getUserObject();
-                if (!(object instanceof DefineSpriteTag || object instanceof ShapeTag || object instanceof ButtonTag)) {
+                if (!canRename(object)) {
                     return;
                 }
                 CharacterTag character = (CharacterTag) object;
-                JCheckBoxMenuItem scaling = new JCheckBoxMenuItem(EasyStrings.translate("library.enable9SliceScaling"),
-                        character.getScalingGridTag() != null);
-                scaling.addActionListener(event -> easySwfPanel.changeScalingGrid(character,
-                        scaling.isSelected() ? ScalingGridOperation.initialSplitter((BoundedTag) character) : null));
                 JPopupMenu menu = new JPopupMenu();
-                menu.add(scaling);
+                JMenuItem rename = new JMenuItem(EasyStrings.translate("library.rename"));
+                rename.addActionListener(event -> renameSelectedCharacter());
+                menu.add(rename);
+                if (!(character instanceof ImageTag)) {
+                    JCheckBoxMenuItem scaling = new JCheckBoxMenuItem(EasyStrings.translate("library.enable9SliceScaling"),
+                            character.getScalingGridTag() != null);
+                    scaling.addActionListener(event -> easySwfPanel.changeScalingGrid(character,
+                            scaling.isSelected() ? ScalingGridOperation.initialSplitter((BoundedTag) character) : null));
+                    menu.add(scaling);
+                }
                 menu.show(LibraryTreeTable.this, e.getX(), e.getY());
             }
 
@@ -180,12 +192,57 @@ public class LibraryTreeTable extends JTreeTable {
 
     }
 
+    private static boolean canRename(Object object) {
+        return object instanceof ImageTag || object instanceof ShapeTag
+                || object instanceof DefineSpriteTag || object instanceof ButtonTag;
+    }
+
+    private void renameSelectedCharacter() {
+        int row = getSelectedRow();
+        if (row < 0) {
+            return;
+        }
+        Object object = ((DefaultMutableTreeNode) getValueAt(row, 0)).getUserObject();
+        if (!canRename(object)) {
+            return;
+        }
+        CharacterTag character = (CharacterTag) object;
+        String name = ViewMessages.showInputDialog(easySwfPanel.getMainPanel(), EasyStrings.translate("library.rename.prompt"),
+                EasyStrings.translate("library.rename"), EasyTagNameResolver.getCustomName(character));
+        if (name != null) {
+            easySwfPanel.renameCharacter(character, name);
+        }
+    }
+
     public void setSwf(SWF swf) {
         if (swf == this.swf) {
             return;
         }
         this.swf = swf;
         setTreeTableModel(new LibraryTreeTableModel(swf));
+    }
+
+    void refreshCharacterName(CharacterTag character) {
+        LibraryTreeTableModel model = (LibraryTreeTableModel) getTree().getModel();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+        for (int folderIndex = 0; folderIndex < root.getChildCount(); folderIndex++) {
+            DefaultMutableTreeNode folder = (DefaultMutableTreeNode) root.getChildAt(folderIndex);
+            for (int index = 0; index < folder.getChildCount(); index++) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) folder.getChildAt(index);
+                if (node.getUserObject() == character) {
+                    int selectedRow = getSelectedRow();
+                    model.nodeChanged(node);
+                    if (selectedRow >= 0) {
+                        SwingUtilities.invokeLater(() -> {
+                            if (getTree().getModel() == model) {
+                                changeSelection(selectedRow, 0, false, false);
+                            }
+                        });
+                    }
+                    return;
+                }
+            }
+        }
     }
 
     private static class LibraryTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -380,12 +437,13 @@ public class LibraryTreeTable extends JTreeTable {
         return root;
     }
 
-    private static class LibraryTreeTableModel implements TreeTableModel {
+    private static class LibraryTreeTableModel extends DefaultTreeModel implements TreeTableModel {
 
         private final DefaultMutableTreeNode root;
 
         public LibraryTreeTableModel(SWF swf) {
-            root = createLibraryRoot(swf == null ? ReadOnlyTagList.EMPTY : swf.getTags());
+            super(createLibraryRoot(swf == null ? ReadOnlyTagList.EMPTY : swf.getTags()));
+            root = (DefaultMutableTreeNode) super.getRoot();
         }
 
         @Override
@@ -486,14 +544,6 @@ public class LibraryTreeTable extends JTreeTable {
         @Override
         public int getIndexOfChild(Object parent, Object child) {
             return ((DefaultMutableTreeNode) parent).getIndex((DefaultMutableTreeNode) child);
-        }
-
-        @Override
-        public void addTreeModelListener(TreeModelListener l) {
-        }
-
-        @Override
-        public void removeTreeModelListener(TreeModelListener l) {
         }
 
     }
