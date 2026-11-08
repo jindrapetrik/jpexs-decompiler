@@ -488,7 +488,7 @@ public class EasySwfPanel extends JPanel {
                 }
                 CharacterTag character = timelined.getSwf().getCharacter((Integer) characterId);
                 if (character instanceof DefineSpriteTag || character instanceof ShapeTag
-                        || character instanceof TextTag || character instanceof ButtonTag) {
+                        || character instanceof TextTag || character instanceof ButtonTag || character instanceof ImageTag) {
                     return (DrawableTag) character;
                 }
                 return null;
@@ -541,6 +541,10 @@ public class EasySwfPanel extends JPanel {
                 try {
                     DrawableTag character = support.isDrop() ? previewCharacter : getCharacter(support.getTransferable());
                     Point position = support.isDrop() ? previewPosition : new Point();
+                    if (character instanceof ImageTag) {
+                        ShapeTag shape = createImageShape((ImageTag) character);
+                        return shape != null && placeCharacter(shape, position, true, false);
+                    }
                     if (character != null) {
                         return placeCharacter(character, position, false);
                     }
@@ -2313,7 +2317,24 @@ public class EasySwfPanel extends JPanel {
         swf.resetTimeline();
     }
 
+    static ShapeTag createImageShape(ImageTag image) {
+        SWF swf = image.getSwf();
+        if (swf.getNextCharacterId() > 0xffff) {
+            return null;
+        }
+        ShapeTag shape = swf.version >= 8 ? new DefineShape4Tag(swf)
+                : swf.version >= 3 ? new DefineShape3Tag(swf)
+                        : swf.version >= 2 ? new DefineShape2Tag(swf) : new DefineShapeTag(swf);
+        shape.shapes = image.getShape(image.getRect(), false, shape.getShapeNum());
+        shape.updateBounds();
+        return shape;
+    }
+
     private boolean placeCharacter(DrawableTag character, Point position, boolean newCharacter) {
+        return placeCharacter(character, position, newCharacter, newCharacter);
+    }
+
+    private boolean placeCharacter(DrawableTag character, Point position, boolean newCharacter, boolean openCharacter) {
         Timelined target = stagePanel.getTimelined();
         int frame = getFrame();
         if (frame < 0 || frame > TimelineFrameEdits.MAX_FRAME
@@ -2404,6 +2425,8 @@ public class EasySwfPanel extends JPanel {
                 body.refreshAfterEdit(target, Collections.singleton(new Point(frame, depth)));
                 if (newCharacter) {
                     refreshCharacters(character.getSwf());
+                }
+                if (openCharacter) {
                     openStageObject(frame, depth);
                 }
             }
