@@ -1390,48 +1390,50 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     }
 
     private void saveAction(boolean refreshTree) {
-        try {
-            String text = editor.getText();
-            String trimmed = text.trim();
-            if (trimmed.startsWith(Helper.hexData)) {
-                src.setActionBytes(Helper.getBytesFromHexaText(text));
-            } else if (trimmed.startsWith(Helper.constants)) {
-                List<List<String>> constantPools = Helper.getConstantPoolsFromText(text);
-                try {
-                    Action.setConstantPools(src, constantPools, true);
-                } catch (ConstantPoolTooBigException ex) {
-                    ViewMessages.showMessageDialog(this, AppStrings.translate("error.constantPoolTooBig").replace("%index%", Integer.toString(ex.index)).replace("%size%", Integer.toString(ex.size)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                    return;
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.script", src.getSwf())) {
+            try {
+                String text = editor.getText();
+                String trimmed = text.trim();
+                if (trimmed.startsWith(Helper.hexData)) {
+                    src.setActionBytes(Helper.getBytesFromHexaText(text));
+                } else if (trimmed.startsWith(Helper.constants)) {
+                    List<List<String>> constantPools = Helper.getConstantPoolsFromText(text);
+                    try {
+                        Action.setConstantPools(src, constantPools, true);
+                    } catch (ConstantPoolTooBigException ex) {
+                        ViewMessages.showMessageDialog(this, AppStrings.translate("error.constantPoolTooBig").replace("%index%", Integer.toString(ex.index)).replace("%size%", Integer.toString(ex.size)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } else {
+                    src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, true, src.getSwf().getCharset(), src.getSwf().getSwfProfile()));
                 }
-            } else {
-                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, true, src.getSwf().getCharset(), src.getSwf().getSwfProfile()));                
-            }
 
-            SWF.uncache(src);
-            src.setModified();
-            setSource(this.src, false);
-            if (refreshTree) {
-                ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+                SWF.uncache(src);
+                src.setModified();
+                setSource(this.src, false);
+                if (refreshTree) {
+                    ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+                }
+                saveButton.setVisible(false);
+                cancelButton.setVisible(false);
+                editButton.setVisible(true);
+                editor.setEditable(false);
+                editMode = false;
+                mainPanel.clearEditingStatus();
+                if (refreshTree) {
+                    mainPanel.refreshTree(src.getSwf());
+                }
+            } catch (IOException ex) {
+                //ignored
+            } catch (ActionParseException ex) {
+                editor.gotoLine((int) ex.line);
+                editor.markError();
+                ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            } catch (ValueTooLargeException vl) {
+                ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save.valueTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            } catch (Throwable ex) {
+                logger.log(Level.SEVERE, null, ex);
             }
-            saveButton.setVisible(false);
-            cancelButton.setVisible(false);
-            editButton.setVisible(true);
-            editor.setEditable(false);
-            editMode = false;
-            mainPanel.clearEditingStatus();
-            if (refreshTree) {
-                mainPanel.refreshTree(src.getSwf());
-            }
-        } catch (IOException ex) {
-            //ignored
-        } catch (ActionParseException ex) {
-            editor.gotoLine((int) ex.line);
-            editor.markError();
-            ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-        } catch (ValueTooLargeException vl) {
-            ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save.valueTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);                    
-        } catch (Throwable ex) {
-            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1450,36 +1452,38 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     }
 
     private void saveDecompiled(boolean refreshTree) {
-        try {
-            ActionScript2Parser par = new ActionScript2Parser(mainPanel.getCurrentSwf(), src);
-            src.setActions(par.actionsFromString(decompiledEditor.getText(), src.getSwf().getCharset()));
-            SWF.uncache(src);
-            src.setModified();
-            setSource(src, false);
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.script", src.getSwf())) {
+            try {
+                ActionScript2Parser par = new ActionScript2Parser(mainPanel.getCurrentSwf(), src);
+                src.setActions(par.actionsFromString(decompiledEditor.getText(), src.getSwf().getCharset()));
+                SWF.uncache(src);
+                src.setModified();
+                setSource(src, false);
 
-            if (refreshTree) {
-                ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+                if (refreshTree) {
+                    ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+                }
+                setDecompiledEditMode(false);
+                mainPanel.clearEditingStatus();
+                if (refreshTree) {
+                    mainPanel.refreshTree(src.getSwf());
+                }
+            } catch (ValueTooLargeException ex) {
+                logger.log(Level.SEVERE, "Cannot save", ex);
+                ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save.valueTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "IOException during action compiling", ex);
+            } catch (ActionParseException ex) {
+                decompiledEditor.gotoLine((int) ex.line);
+                decompiledEditor.markError();
+                ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            } catch (CompilationException ex) {
+                decompiledEditor.gotoLine((int) ex.line);
+                decompiledEditor.markError();
+                ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            } catch (Throwable ex) {
+                logger.log(Level.SEVERE, null, ex);
             }
-            setDecompiledEditMode(false);
-            mainPanel.clearEditingStatus();
-            if (refreshTree) {
-                mainPanel.refreshTree(src.getSwf());
-            }
-        } catch (ValueTooLargeException ex) {
-            logger.log(Level.SEVERE, "Cannot save", ex);
-            ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save.valueTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, "IOException during action compiling", ex);
-        } catch (ActionParseException ex) {
-            decompiledEditor.gotoLine((int) ex.line);
-            decompiledEditor.markError();
-            ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-        } catch (CompilationException ex) {
-            decompiledEditor.gotoLine((int) ex.line);
-            decompiledEditor.markError();
-            ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-        } catch (Throwable ex) {
-            logger.log(Level.SEVERE, null, ex);
         }
     }
 

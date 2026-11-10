@@ -2388,72 +2388,74 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     private void saveDecompiled(boolean refreshTree) {
-        final ABC localAbc = abc;
-        int oldIndex = pack.scriptIndex;
-        SWF.uncache(pack);
-        try {
-            String oldSp = pack.getClassPath().toRawString();
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.script", abc)) {
+            final ABC localAbc = abc;
+            int oldIndex = pack.scriptIndex;
+            SWF.uncache(pack);
+            try {
+                String oldSp = pack.getClassPath().toRawString();
 
-            TreeItem scriptNode = getScriptNodeForPack(pack);
+                TreeItem scriptNode = getScriptNodeForPack(pack);
 
-            String as = decompiledTextArea.getText();
+                String as = decompiledTextArea.getText();
 
-            localAbc.replaceScriptPack(scriptReplacer, pack, as, Main.getDependencies(pack.abc.getSwf()));
-            scriptReplacer.deinitReplacement(pack);
-            lastDecompiled = as;
-            setDecompiledEditMode(false);
-            mainPanel.updateClassesList();
+                localAbc.replaceScriptPack(scriptReplacer, pack, as, Main.getDependencies(pack.abc.getSwf()));
+                scriptReplacer.deinitReplacement(pack);
+                lastDecompiled = as;
+                setDecompiledEditMode(false);
+                mainPanel.updateClassesList();
 
-            if (oldSp != null) {
-                hilightScript(localAbc.getOpenable(), oldSp, scriptNode);
-                TreeItem sel = mainPanel.getCurrentTree().getCurrentTreeItem();
-                if ((sel instanceof ScriptPack) && (sel != pack)) {
-                    mainPanel.replaceItemPin(pack, sel);
+                if (oldSp != null) {
+                    hilightScript(localAbc.getOpenable(), oldSp, scriptNode);
+                    TreeItem sel = mainPanel.getCurrentTree().getCurrentTreeItem();
+                    if ((sel instanceof ScriptPack) && (sel != pack)) {
+                        mainPanel.replaceItemPin(pack, sel);
+                    }
                 }
-            }
-            reload();
-            mainPanel.clearEditingStatus();
-            if (refreshTree) {
-                ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
-            }
-        } catch (As3ScriptReplaceException asre) {
-            StringBuilder sb = new StringBuilder();
-            int firstErrorLine = As3ScriptReplaceExceptionItem.LINE_UNKNOWN;
-            int firstErrorCol = As3ScriptReplaceExceptionItem.COL_UNKNOWN;
-            String firstErrorText = null;
-            abc.script_info.get(oldIndex).delete(abc, false);
+                reload();
+                mainPanel.clearEditingStatus();
+                if (refreshTree) {
+                    ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+                }
+            } catch (As3ScriptReplaceException asre) {
+                StringBuilder sb = new StringBuilder();
+                int firstErrorLine = As3ScriptReplaceExceptionItem.LINE_UNKNOWN;
+                int firstErrorCol = As3ScriptReplaceExceptionItem.COL_UNKNOWN;
+                String firstErrorText = null;
+                abc.script_info.get(oldIndex).delete(abc, false);
 
-            for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
-                if (firstErrorLine == As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
-                    firstErrorLine = item.getLine();
-                    firstErrorCol = item.getCol();
+                for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
+                    if (firstErrorLine == As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
+                        firstErrorLine = item.getLine();
+                        firstErrorCol = item.getCol();
+                    }
+                    if (firstErrorText == null) {
+                        firstErrorText = item.getMessage();
+                    }
+                    sb.append(item.getFile()).append(":").append(item.getLine()).append(" (column ").append(item.getCol()).append(")").append(":").append("\n");
+                    sb.append("  ").append(item.getMessage());
+                    sb.append("\n");
+                    sb.append("\n");
                 }
-                if (firstErrorText == null) {
-                    firstErrorText = item.getMessage();
+                if (firstErrorLine != As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
+                    if (firstErrorCol != As3ScriptReplaceExceptionItem.COL_UNKNOWN) {
+                        decompiledTextArea.gotoLineCol(firstErrorLine, firstErrorCol);
+                    } else {
+                        decompiledTextArea.gotoLine(firstErrorLine);
+                    }
+                    decompiledTextArea.markError();
                 }
-                sb.append(item.getFile()).append(":").append(item.getLine()).append(" (column ").append(item.getCol()).append(")").append(":").append("\n");
-                sb.append("  ").append(item.getMessage());
-                sb.append("\n");
-                sb.append("\n");
-            }
-            if (firstErrorLine != As3ScriptReplaceExceptionItem.LINE_UNKNOWN) {
-                if (firstErrorCol != As3ScriptReplaceExceptionItem.COL_UNKNOWN) {
-                    decompiledTextArea.gotoLineCol(firstErrorLine, firstErrorCol);
+
+                if (scriptReplacer instanceof FFDecAs3ScriptReplacer) { //oldStyle error display - single error, no column
+                    ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", firstErrorText).replace("%line%", Long.toString(firstErrorLine)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 } else {
-                    decompiledTextArea.gotoLine(firstErrorLine);
+                    ViewMessages.showMessageDialog(this, sb.toString(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
-                decompiledTextArea.markError();
-            }
+                decompiledTextArea.requestFocus();
 
-            if (scriptReplacer instanceof FFDecAs3ScriptReplacer) { //oldStyle error display - single error, no column
-                ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", firstErrorText).replace("%line%", Long.toString(firstErrorLine)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            } else {
-                ViewMessages.showMessageDialog(this, sb.toString(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            } catch (Throwable ex) {
+                Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
-            decompiledTextArea.requestFocus();
-
-        } catch (Throwable ex) {
-            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -2546,80 +2548,82 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     private void removeTraitButtonActionPerformed(ActionEvent evt) {
-        int classIndex = decompiledTextArea.getClassIndex();
-        //int scriptIndex = decompiledTextArea.getScriptLeaf().scriptIndex;
-        int traitId = decompiledTextArea.lastTraitIndex;
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("button.removetrait", abc)) {
+            int classIndex = decompiledTextArea.getClassIndex();
+            //int scriptIndex = decompiledTextArea.getScriptLeaf().scriptIndex;
+            int traitId = decompiledTextArea.lastTraitIndex;
 
-        if ((traitId == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)
-                || (traitId == GraphTextWriter.TRAIT_CLASS_INITIALIZER)
-                || (traitId == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER)) {
-            return;
-        }
-
-        boolean scriptTraitsUsed = false;
-        Traits traits = null;
-        int traitIndex = -1;
-        if (traitId == GraphTextWriter.TRAIT_UNKNOWN && classIndex >= 0) {
-            traits = abc.script_info.get(decompiledTextArea.getScriptLeaf().scriptIndex).traits;
-            for (int i = 0; i < traits.traits.size(); i++) {
-                if (traits.traits.get(i) instanceof TraitClass) {
-                    TraitClass tc = (TraitClass) traits.traits.get(i);
-                    if (tc.class_info == classIndex) {
-                        traitIndex = i;
-                        break;
-                    }
-                }
+            if ((traitId == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)
+                    || (traitId == GraphTextWriter.TRAIT_CLASS_INITIALIZER)
+                    || (traitId == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER)) {
+                return;
             }
-            scriptTraitsUsed = true;
-        } else if (classIndex < 0) {
-            traits = abc.script_info.get(decompiledTextArea.getScriptLeaf().scriptIndex).traits;
-            traitIndex = traitId;
-            scriptTraitsUsed = true;
-        } else {
-            Traits staticTraits = abc.class_info.get(classIndex).static_traits;
-            Traits instanceTraits = abc.instance_info.get(classIndex).instance_traits;
-            if (traitId >= 0 && traitId < abc.class_info.get(classIndex).static_traits.traits.size()) {
-                traitIndex = traitId;
-                traits = staticTraits;
-            } else {
-                if (traitId >= 0 && traitId < staticTraits.traits.size() + instanceTraits.traits.size()) {
-                    traitIndex = traitId - staticTraits.traits.size();
-                    traits = instanceTraits;
-                } else {
-                    traits = null;
-                }
-            }
-        }
 
-        if (traits == null || traitIndex < 0) {
-            return;
-        }
-
-        if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.confirm.removetrait"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
-            navigator.setModel(new DefaultListModel<>());
-            if (scriptTraitsUsed) {
-                final int fTraitIndex = traitIndex;
-                final Traits fTraits = traits;
-                Main.getMainFrame().getPanel().treeOperation(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((Tag) abc.parentTag).getSwf().clearScriptCache();
-                        fTraits.traits.remove(fTraitIndex);
-                        if (fTraits.traits.isEmpty()) {
-                            abc.script_info.get(decompiledTextArea.getScriptLeaf().scriptIndex).delete(abc, true);
-                            abc.pack();
+            boolean scriptTraitsUsed = false;
+            Traits traits = null;
+            int traitIndex = -1;
+            if (traitId == GraphTextWriter.TRAIT_UNKNOWN && classIndex >= 0) {
+                traits = abc.script_info.get(decompiledTextArea.getScriptLeaf().scriptIndex).traits;
+                for (int i = 0; i < traits.traits.size(); i++) {
+                    if (traits.traits.get(i) instanceof TraitClass) {
+                        TraitClass tc = (TraitClass) traits.traits.get(i);
+                        if (tc.class_info == classIndex) {
+                            traitIndex = i;
+                            break;
                         }
-                        ((Tag) abc.parentTag).setModified(true);
-                        abc.fireChanged();
                     }
-                });
+                }
+                scriptTraitsUsed = true;
+            } else if (classIndex < 0) {
+                traits = abc.script_info.get(decompiledTextArea.getScriptLeaf().scriptIndex).traits;
+                traitIndex = traitId;
+                scriptTraitsUsed = true;
             } else {
-                traits.traits.remove(traitIndex);
-                ((Tag) abc.parentTag).setModified(true);
-                reload();
-                abc.fireChanged();
+                Traits staticTraits = abc.class_info.get(classIndex).static_traits;
+                Traits instanceTraits = abc.instance_info.get(classIndex).instance_traits;
+                if (traitId >= 0 && traitId < abc.class_info.get(classIndex).static_traits.traits.size()) {
+                    traitIndex = traitId;
+                    traits = staticTraits;
+                } else {
+                    if (traitId >= 0 && traitId < staticTraits.traits.size() + instanceTraits.traits.size()) {
+                        traitIndex = traitId - staticTraits.traits.size();
+                        traits = instanceTraits;
+                    } else {
+                        traits = null;
+                    }
+                }
             }
 
+            if (traits == null || traitIndex < 0) {
+                return;
+            }
+
+            if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.confirm.removetrait"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                navigator.setModel(new DefaultListModel<>());
+                if (scriptTraitsUsed) {
+                    final int fTraitIndex = traitIndex;
+                    final Traits fTraits = traits;
+                    Main.getMainFrame().getPanel().treeOperation(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((Tag) abc.parentTag).getSwf().clearScriptCache();
+                            fTraits.traits.remove(fTraitIndex);
+                            if (fTraits.traits.isEmpty()) {
+                                abc.script_info.get(decompiledTextArea.getScriptLeaf().scriptIndex).delete(abc, true);
+                                abc.pack();
+                            }
+                            ((Tag) abc.parentTag).setModified(true);
+                            abc.fireChanged();
+                        }
+                    });
+                } else {
+                    traits.traits.remove(traitIndex);
+                    ((Tag) abc.parentTag).setModified(true);
+                    reload();
+                    abc.fireChanged();
+                }
+
+            }
         }
     }
 
@@ -2628,115 +2632,117 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     private void addTraitButtonActionPerformed(ActionEvent evt) {
-        int class_index = decompiledTextArea.getClassIndex();
-        if (class_index < 0) {
-            return;
-        }
-        if (newTraitDialog == null) {
-            newTraitDialog = new NewTraitDialog(Main.getDefaultDialogsOwner());
-        }
-        int void_type = abc.constants.getPublicQnameId("void", true);
-        int int_type = abc.constants.getPublicQnameId("int", true);
-
-        Trait t = null;
-        int kind;
-        int nskind;
-        String name = null;
-        boolean isStatic;
-        Multiname m;
-
-        boolean again = false;
-        loopm:
-        do {
-            if (again) {
-                ViewMessages.showMessageDialog(this, AppStrings.translate("error.trait.exists").replace("%name%", name), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            }
-            again = false;
-            if (newTraitDialog.showDialog() != AppDialog.OK_OPTION) {
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("button.addtrait", abc)) {
+            int class_index = decompiledTextArea.getClassIndex();
+            if (class_index < 0) {
                 return;
             }
-            kind = newTraitDialog.getTraitType();
-            nskind = newTraitDialog.getNamespaceKind();
-            name = newTraitDialog.getTraitName();
-            isStatic = newTraitDialog.getStatic();
-            m = Multiname.createQName(false, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(nskind, "", 0, true));
-            int mid = abc.constants.getMultinameId(m, false);
-            if (mid <= 0) {
-                break;
+            if (newTraitDialog == null) {
+                newTraitDialog = new NewTraitDialog(Main.getDefaultDialogsOwner());
             }
-            for (Trait tr : abc.class_info.get(class_index).static_traits.traits) {
-                if (tr.name_index == mid) {
-                    again = true;
-                    break;
-                }
-            }
+            int void_type = abc.constants.getPublicQnameId("void", true);
+            int int_type = abc.constants.getPublicQnameId("int", true);
 
-            for (Trait tr : abc.instance_info.get(class_index).instance_traits.traits) {
-                if (tr.name_index == mid) {
-                    again = true;
+            Trait t = null;
+            int kind;
+            int nskind;
+            String name = null;
+            boolean isStatic;
+            Multiname m;
+
+            boolean again = false;
+            loopm:
+            do {
+                if (again) {
+                    ViewMessages.showMessageDialog(this, AppStrings.translate("error.trait.exists").replace("%name%", name), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                }
+                again = false;
+                if (newTraitDialog.showDialog() != AppDialog.OK_OPTION) {
+                    return;
+                }
+                kind = newTraitDialog.getTraitType();
+                nskind = newTraitDialog.getNamespaceKind();
+                name = newTraitDialog.getTraitName();
+                isStatic = newTraitDialog.getStatic();
+                m = Multiname.createQName(false, abc.constants.getStringId(name, true), abc.constants.getNamespaceId(nskind, "", 0, true));
+                int mid = abc.constants.getMultinameId(m, false);
+                if (mid <= 0) {
                     break;
                 }
-            }
-        } while (again);
-        navigator.setModel(new DefaultListModel<>());
-        switch (kind) {
-            case Trait.TRAIT_GETTER:
-            case Trait.TRAIT_SETTER:
-            case Trait.TRAIT_METHOD:
-                TraitMethodGetterSetter tm = new TraitMethodGetterSetter();
-                MethodInfo mi = new MethodInfo(new int[0], void_type, abc.constants.getStringId(name, true), 0, new ValueKind[0], new int[0]);
-                int method_info = abc.addMethodInfo(mi);
-                tm.method_info = method_info;
-                MethodBody body = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
-                body.method_info = method_info;
-                body.init_scope_depth = 1;
-                body.max_regs = 1;
-                body.max_scope_depth = 1;
-                body.max_stack = 1;
-                body.exceptions = new ABCException[0];
-                AVM2Code code = new AVM2Code();
-                code.code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
-                code.code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));
-                code.code.add(new AVM2Instruction(0, AVM2Instructions.ReturnVoid, null));
-                body.setCode(code);
-                Traits traits = new Traits();
-                traits.traits = new ArrayList<>();
-                body.traits = traits;
-                abc.addMethodBody(body);
-                t = tm;
-                break;
-            case Trait.TRAIT_SLOT:
-            case Trait.TRAIT_CONST:
-                TraitSlotConst ts = new TraitSlotConst();
-                ts.type_index = int_type;
-                ts.value_kind = ValueKind.CONSTANT_Int;
-                ts.value_index = abc.constants.getIntId(0, true);
-                t = ts;
-                break;
-        }
-        if (t != null) {
-            t.kindType = kind;
-            t.name_index = abc.constants.getMultinameId(m, true);
-            int traitId;
-            if (isStatic) {
-                traitId = abc.class_info.get(class_index).static_traits.addTrait(t);
-            } else {
-                traitId = abc.class_info.get(class_index).static_traits.traits.size() + abc.instance_info.get(class_index).instance_traits.addTrait(t);
-            }
-            int scriptIndex = decompiledTextArea.getScriptLeaf().scriptIndex;
-            if (scriptIndex >= 0 && scriptIndex < abc.script_info.size()) {
-                abc.script_info.get(scriptIndex).setModified(true);
-            }
-            ((Tag) abc.parentTag).setModified(true);
-            decompiledTextArea.addScriptListener(new Runnable() {
-                @Override
-                public void run() {
-                    decompiledTextArea.gotoTrait(traitId);
-                    decompiledTextArea.removeScriptListener(this);
+                for (Trait tr : abc.class_info.get(class_index).static_traits.traits) {
+                    if (tr.name_index == mid) {
+                        again = true;
+                        break;
+                    }
                 }
-            });
-            reload();
-            abc.fireChanged();
+
+                for (Trait tr : abc.instance_info.get(class_index).instance_traits.traits) {
+                    if (tr.name_index == mid) {
+                        again = true;
+                        break;
+                    }
+                }
+            } while (again);
+            navigator.setModel(new DefaultListModel<>());
+            switch (kind) {
+                case Trait.TRAIT_GETTER:
+                case Trait.TRAIT_SETTER:
+                case Trait.TRAIT_METHOD:
+                    TraitMethodGetterSetter tm = new TraitMethodGetterSetter();
+                    MethodInfo mi = new MethodInfo(new int[0], void_type, abc.constants.getStringId(name, true), 0, new ValueKind[0], new int[0]);
+                    int method_info = abc.addMethodInfo(mi);
+                    tm.method_info = method_info;
+                    MethodBody body = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
+                    body.method_info = method_info;
+                    body.init_scope_depth = 1;
+                    body.max_regs = 1;
+                    body.max_scope_depth = 1;
+                    body.max_stack = 1;
+                    body.exceptions = new ABCException[0];
+                    AVM2Code code = new AVM2Code();
+                    code.code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
+                    code.code.add(new AVM2Instruction(0, AVM2Instructions.PushScope, null));
+                    code.code.add(new AVM2Instruction(0, AVM2Instructions.ReturnVoid, null));
+                    body.setCode(code);
+                    Traits traits = new Traits();
+                    traits.traits = new ArrayList<>();
+                    body.traits = traits;
+                    abc.addMethodBody(body);
+                    t = tm;
+                    break;
+                case Trait.TRAIT_SLOT:
+                case Trait.TRAIT_CONST:
+                    TraitSlotConst ts = new TraitSlotConst();
+                    ts.type_index = int_type;
+                    ts.value_kind = ValueKind.CONSTANT_Int;
+                    ts.value_index = abc.constants.getIntId(0, true);
+                    t = ts;
+                    break;
+            }
+            if (t != null) {
+                t.kindType = kind;
+                t.name_index = abc.constants.getMultinameId(m, true);
+                int traitId;
+                if (isStatic) {
+                    traitId = abc.class_info.get(class_index).static_traits.addTrait(t);
+                } else {
+                    traitId = abc.class_info.get(class_index).static_traits.traits.size() + abc.instance_info.get(class_index).instance_traits.addTrait(t);
+                }
+                int scriptIndex = decompiledTextArea.getScriptLeaf().scriptIndex;
+                if (scriptIndex >= 0 && scriptIndex < abc.script_info.size()) {
+                    abc.script_info.get(scriptIndex).setModified(true);
+                }
+                ((Tag) abc.parentTag).setModified(true);
+                decompiledTextArea.addScriptListener(new Runnable() {
+                    @Override
+                    public void run() {
+                        decompiledTextArea.gotoTrait(traitId);
+                        decompiledTextArea.removeScriptListener(this);
+                    }
+                });
+                reload();
+                abc.fireChanged();
+            }
         }
     }
 

@@ -425,6 +425,17 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
         super.setModified(value);
     }
 
+    /**
+     * Replaces the timeline's tag list and invalidates its cached views.
+     * @param tags Tags in timeline order
+     */
+    public synchronized void replaceTags(List<Tag> tags) {
+        this.subTags = new ArrayList<>(tags);
+        readOnlyTags = null;
+        setModified(true);
+        resetTimeline();
+    }
+
     @Override
     public synchronized ReadOnlyTagList getTags() {
         if (readOnlyTags == null) {

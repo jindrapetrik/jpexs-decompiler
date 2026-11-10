@@ -312,26 +312,28 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     }
 
     private void saveButtonActionPerformed(ActionEvent evt) {
-        swf.compression = getCompression();
-        swf.version = getVersionNumber();
-        swf.gfx = gfxCheckBox.isSelected();
-        swf.encrypted = encryptedCheckBox.isSelected() && !gfxCheckBox.isSelected();
-        swf.frameRate = ((Number) (frameRateEditor.getModel().getValue())).floatValue();
-        swf.frameCount = ((Number) (frameCountEditor.getModel().getValue())).intValue();
-        double multiplier = 1.0;
-        if (unit == UNIT_PIXELS) {
-            multiplier = 20.0;
-        }
-        swf.displayRect.Xmin = (int) (multiplier * (double) xMinEditor.getModel().getValue());
-        swf.displayRect.Xmax = (int) (multiplier * (double) xMaxEditor.getModel().getValue());
-        swf.displayRect.Ymin = (int) (multiplier * (double) yMinEditor.getModel().getValue());
-        swf.displayRect.Ymax = (int) (multiplier * (double) yMaxEditor.getModel().getValue());
-        swf.setHeaderModified(true);
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.header", swf)) {
+            swf.compression = getCompression();
+            swf.version = getVersionNumber();
+            swf.gfx = gfxCheckBox.isSelected();
+            swf.encrypted = encryptedCheckBox.isSelected() && !gfxCheckBox.isSelected();
+            swf.frameRate = ((Number) (frameRateEditor.getModel().getValue())).floatValue();
+            swf.frameCount = ((Number) (frameCountEditor.getModel().getValue())).intValue();
+            double multiplier = 1.0;
+            if (unit == UNIT_PIXELS) {
+                multiplier = 20.0;
+            }
+            swf.displayRect.Xmin = (int) (multiplier * (double) xMinEditor.getModel().getValue());
+            swf.displayRect.Xmax = (int) (multiplier * (double) xMaxEditor.getModel().getValue());
+            swf.displayRect.Ymin = (int) (multiplier * (double) yMinEditor.getModel().getValue());
+            swf.displayRect.Ymax = (int) (multiplier * (double) yMaxEditor.getModel().getValue());
+            swf.setHeaderModified(true);
 
-        load(swf);
-        mainPanel.repaintTree();
-        setEditMode(false);
-        mainPanel.clearEditingStatus();
+            load(swf);
+            mainPanel.repaintTree();
+            setEditMode(false);
+            mainPanel.clearEditingStatus();
+        }
     }
 
     private void cancelButtonActionPerformed(ActionEvent evt) {

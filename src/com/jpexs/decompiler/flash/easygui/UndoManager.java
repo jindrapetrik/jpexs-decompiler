@@ -17,170 +17,309 @@
 package com.jpexs.decompiler.flash.easygui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
- *
- * @author JPEXS
+ * Edit history for the open movies, including edits that affect several movies.
  */
 public class UndoManager {
 
-    private final Map<SWF, Integer> historyPosMap = new WeakHashMap<>();
-    private final Map<SWF, List<DoableOperation>> historyMap = new WeakHashMap<>();
-    private final Map<SWF, Integer> savedPosMap = new WeakHashMap<>();
+    private static class History {
 
+        final List<Entry> entries = new ArrayList<>();
+        final SWF swf;
+        int position;
+        int saved = -1;
+
+        History(SWF swf) {
+            this.swf = swf;
+        }
+
+        boolean hasChangesBetween(int first, int second) {
+            for (int i = Math.min(first, second); i < Math.max(first, second); i++) {
+                if (entries.get(i).operation.modifiesSwf(swf)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private static class Entry {
+
+        final DoableOperation operation;
+        final List<SWF> movies;
+
+        Entry(DoableOperation operation, Collection<SWF> movies) {
+            this.operation = operation;
+            this.movies = new ArrayList<>(movies);
+        }
+    }
+
+    public static final class ReplayPlan {
+
+        private final SWF movie;
+        private final boolean redo;
+        private final List<Entry> entries = new ArrayList<>();
+
+        private ReplayPlan(SWF movie, boolean redo) {
+            this.movie = movie;
+            this.redo = redo;
+        }
+
+        public SWF getMovie() {
+            return movie;
+        }
+
+        public int size() {
+            return entries.size();
+        }
+
+        public DoableOperation getOperation(int index) {
+            return entries.get(index).operation;
+        }
+    }
+
+    private final Map<SWF, History> histories = new HashMap<>();
     private final List<Runnable> changeListeners = new ArrayList<>();
 
-    public void addChangeListener(Runnable listener) {
+    public synchronized void addChangeListener(Runnable listener) {
         changeListeners.add(listener);
     }
 
-    public void removeChangeListener(Runnable listener) {
+    public synchronized void removeChangeListener(Runnable listener) {
         changeListeners.remove(listener);
     }
 
     private void fireChange() {
-        for (Runnable listener : changeListeners) {
+        for (Runnable listener : new ArrayList<>(changeListeners)) {
             listener.run();
         }
     }
 
-    public void doOperation(DoableOperation doableOperation, SWF swf) {
-        if (!historyMap.containsKey(swf)) {
-            historyMap.put(swf, new ArrayList<>());
-        }
-        if (!historyPosMap.containsKey(swf)) {
-            historyPosMap.put(swf, 0);
-        }
-
-        int historyPos = historyPosMap.get(swf);
+    public synchronized void doOperation(DoableOperation operation, SWF swf) {
         rememberSavedPosition(swf);
-        if (savedPosMap.get(swf) > historyPos) {
-            // The saved state belongs to the redo branch which is being dropped.
-            savedPosMap.put(swf, hasSwfChangesBetween(swf, historyPos, savedPosMap.get(swf)) ? -1 : historyPos);
+        operation.doOperation();
+        recordOperation(operation, Collections.singleton(swf));
+    }
+
+    public synchronized void rememberSavedPosition(SWF swf) {
+        if (!swf.isModified()) {
+            History history = histories.computeIfAbsent(swf, History::new);
+            history.saved = history.position;
         }
+    }
 
-        List<DoableOperation> history = historyMap.get(swf);
-
-        //drop redos
-        while (history.size() > historyPos) {
-            history.remove(historyPos);
+    /**
+     * Adds an operation that has already been performed.
+     */
+    public synchronized void recordOperation(DoableOperation operation, Collection<SWF> movies) {
+        Entry entry = new Entry(operation, movies);
+        for (SWF swf : entry.movies) {
+            History history = histories.computeIfAbsent(swf, History::new);
+            discardRedo(history, history.position);
         }
-
-        historyMap.get(swf).add(doableOperation);
-        historyPosMap.put(swf, historyPosMap.get(swf) + 1);
-        doableOperation.doOperation();
-        updateModifiedState(swf);
+        for (SWF swf : entry.movies) {
+            History history = histories.get(swf);
+            history.entries.add(entry);
+            history.position++;
+            updateModifiedState(swf, history);
+        }
         fireChange();
     }
 
-    private void rememberSavedPosition(SWF swf) {
-        if (!swf.isModified()) {
-            savedPosMap.put(swf, historyPosMap.get(swf));
-        } else if (!savedPosMap.containsKey(swf)) {
-            savedPosMap.put(swf, -1);
+    private void discardRedo(History history, int from) {
+        while (history.entries.size() > from) {
+            int last = history.entries.size() - 1;
+            if (history.saved > last) {
+                history.saved = history.hasChangesBetween(last, history.saved) ? -1 : last;
+            }
+            Entry removed = history.entries.remove(last);
+            for (SWF swf : removed.movies) {
+                History other = histories.get(swf);
+                int index = other.entries.indexOf(removed);
+                if (index >= 0) {
+                    discardRedo(other, index);
+                }
+            }
         }
     }
 
-    private void updateModifiedState(SWF swf) {
-        int saved = savedPosMap.get(swf);
-        if (saved >= 0 && !hasSwfChangesBetween(swf, saved, historyPosMap.get(swf))) {
+    private void updateModifiedState(SWF swf, History history) {
+        if (history.saved >= 0 && !history.hasChangesBetween(history.saved, history.position)) {
             clearModifiedFlags(swf);
+            swf.setModified(false);
             swf.setHeaderModified(false);
         } else {
             swf.setModified(true);
         }
     }
 
-    private boolean hasSwfChangesBetween(SWF swf, int first, int second) {
-        List<DoableOperation> history = historyMap.get(swf);
-        for (int i = Math.min(first, second); i < Math.max(first, second); i++) {
-            if (history.get(i).modifiesSwf()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void clearModifiedFlags(Timelined timelined) {
         for (Tag tag : timelined.getTags()) {
-            if (tag instanceof Timelined) {
-                clearModifiedFlags((Timelined) tag);
+            if (tag.isModified()) {
+                if (tag instanceof DefineSpriteTag) {
+                    clearModifiedFlags((Timelined) tag);
+                }
+                tag.createOriginalData();
+                tag.setModified(false);
             }
-            tag.setModified(false);
         }
-        timelined.setModified(false);
     }
 
-    public boolean canUndo(SWF swf) {
-        if (!historyPosMap.containsKey(swf)) {
-            return false;
-        }
-        return historyPosMap.get(swf) > 0;
-    }
-
-    public String getUndoName(SWF swf) {
-        if (!canUndo(swf)) {
+    private Entry entryAt(History history, boolean redo, Map<SWF, Integer> positions) {
+        if (history == null) {
             return null;
         }
-        return historyMap.get(swf).get(historyPosMap.get(swf) - 1).getDescription();
+        int position = positions.getOrDefault(history.swf, history.position);
+        int index = redo ? position : position - 1;
+        return index >= 0 && index < history.entries.size() ? history.entries.get(index) : null;
     }
 
-    public void undo(SWF swf) {
-        if (!canUndo(swf)) {
-            return;
+    private Entry availableEntry(SWF swf, boolean redo) {
+        return availableEntry(swf, redo, Collections.emptyMap());
+    }
+
+    private Entry availableEntry(SWF swf, boolean redo, Map<SWF, Integer> positions) {
+        Entry entry = entryAt(histories.get(swf), redo, positions);
+        if (entry != null) {
+            for (SWF movie : entry.movies) {
+                if (entryAt(histories.get(movie), redo, positions) != entry) {
+                    return null;
+                }
+            }
         }
-        rememberSavedPosition(swf);
-        historyPosMap.put(swf, historyPosMap.get(swf) - 1);
-        historyMap.get(swf).get(historyPosMap.get(swf)).undoOperation();
-        updateModifiedState(swf);
-        fireChange();
+        return entry;
     }
 
-    public void redo(SWF swf) {
-        if (!canRedo(swf)) {
-            return;
+    /** Returns the steps in replay order, stopping at the first blocked entry. */
+    public synchronized ReplayPlan planReplay(SWF swf, boolean redo, int maxSteps) {
+        ReplayPlan plan = new ReplayPlan(swf, redo);
+        Map<SWF, Integer> positions = new HashMap<>();
+        for (int step = 0; step < maxSteps; step++) {
+            Entry entry = availableEntry(swf, redo, positions);
+            if (entry == null) {
+                break;
+            }
+            plan.entries.add(entry);
+            for (SWF movie : entry.movies) {
+                positions.put(movie, positions.getOrDefault(movie, histories.get(movie).position) + (redo ? 1 : -1));
+            }
         }
-        rememberSavedPosition(swf);
-        historyMap.get(swf).get(historyPosMap.get(swf)).doOperation();
-        historyPosMap.put(swf, historyPosMap.get(swf) + 1);
-        updateModifiedState(swf);
-        fireChange();
+        return plan;
     }
 
-    public String getRedoName(SWF swf) {
-        if (!canRedo(swf)) {
-            return null;
-        }
-        return historyMap.get(swf).get(historyPosMap.get(swf)).getDescription();
+    public synchronized boolean canReplay(ReplayPlan plan, int steps) {
+        return steps > 0 && steps <= plan.size()
+                && planReplay(plan.movie, plan.redo, steps).entries.equals(plan.entries.subList(0, steps));
     }
 
-    public boolean canRedo(SWF swf) {
-        if (!historyMap.containsKey(swf)) {
+    public synchronized boolean replayStep(ReplayPlan plan, int index) {
+        Entry entry = plan.entries.get(index);
+        if (availableEntry(plan.movie, plan.redo) != entry) {
             return false;
         }
-        return historyMap.get(swf).size() > historyPosMap.get(swf);
+        replay(entry, plan.redo);
+        return true;
     }
 
-    public void clear() {
-        historyMap.clear();
-        historyPosMap.clear();
-        savedPosMap.clear();
-        fireChange();
+    public synchronized boolean canUndo(SWF swf) {
+        return availableEntry(swf, false) != null;
     }
 
-    public void clear(SWF swf) {
-        if (!historyMap.containsKey(swf)) {
+    public synchronized boolean canRedo(SWF swf) {
+        return availableEntry(swf, true) != null;
+    }
+
+    public synchronized String getUndoName(SWF swf) {
+        Entry entry = availableEntry(swf, false);
+        return entry == null ? null : entry.operation.getDescription();
+    }
+
+    public synchronized String getRedoName(SWF swf) {
+        Entry entry = availableEntry(swf, true);
+        return entry == null ? null : entry.operation.getDescription();
+    }
+
+    public synchronized void undo(SWF swf) {
+        replay(availableEntry(swf, false), false);
+    }
+
+    public synchronized void redo(SWF swf) {
+        replay(availableEntry(swf, true), true);
+    }
+
+    private void replay(Entry entry, boolean redo) {
+        if (entry == null) {
             return;
         }
-        historyMap.get(swf).clear();
-        historyPosMap.put(swf, 0);
-        savedPosMap.remove(swf);
+        for (SWF movie : entry.movies) {
+            rememberSavedPosition(movie);
+        }
+        if (redo) {
+            entry.operation.doOperation();
+        } else {
+            entry.operation.undoOperation();
+        }
+        for (SWF movie : entry.movies) {
+            History history = histories.get(movie);
+            history.position += redo ? 1 : -1;
+            updateModifiedState(movie, history);
+        }
         fireChange();
+    }
+
+    public synchronized void clear() {
+        histories.clear();
+        fireChange();
+    }
+
+    public synchronized void clear(SWF swf) {
+        History history = histories.get(swf);
+        if (history == null) {
+            return;
+        }
+        discardRedo(history, history.position);
+        histories.remove(swf);
+        for (Entry entry : history.entries) {
+            for (SWF movie : entry.movies) {
+                History other = histories.get(movie);
+                if (other != null) {
+                    // Once a participant closes, edits preceding the shared change
+                    // cannot safely be replayed in the remaining movie.
+                    int end = other.entries.indexOf(entry) + 1;
+                    if (end > 0) {
+                        forgetPrefix(other, end);
+                    }
+                }
+            }
+        }
+        fireChange();
+    }
+
+    private void forgetPrefix(History history, int end) {
+        List<Entry> removed = new ArrayList<>(history.entries.subList(0, end));
+        history.entries.subList(0, end).clear();
+        history.position -= end;
+        history.saved = history.saved < end ? -1 : history.saved - end;
+        for (Entry entry : removed) {
+            for (SWF swf : entry.movies) {
+                History other = histories.get(swf);
+                if (other != null) {
+                    int index = other.entries.indexOf(entry);
+                    if (index >= 0) {
+                        forgetPrefix(other, index + 1);
+                    }
+                }
+            }
+        }
     }
 }

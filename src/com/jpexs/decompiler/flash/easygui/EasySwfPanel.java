@@ -150,13 +150,11 @@ public class EasySwfPanel extends JPanel {
     private TimelinePanel timelinePanel;
     private ShapeTimelinePanel shapeTimelinePanel;
     private JPanel timelineArea;
-    private JButton undoButton;
-    private JButton redoButton;
     private JButton newShapeButton;
     private JButton newMovieClipButton;
     private JButton newButtonButton;
     private JButton editObjectButton;
-    private UndoManager undoManager;
+    private final UndoManager undoManager;
     private JTabbedPane rightTabbedPane;
     private TransformPanel transformPanel;
     private ShapeSelectionTransform.State shapeTransformState;
@@ -580,49 +578,11 @@ public class EasySwfPanel extends JPanel {
             }
         }
 
-        undoManager = new UndoManager();
+        undoManager = mainPanel.getUndoManager();
 
         JPanel topPanel = new JPanel(new BorderLayout());
-
-        undoButton = new JButton(View.getIcon("undo16"));
-        //undoButton.setToolTipText("Undo");
-        undoButton.setMargin(new Insets(5, 5, 5, 5));
-        undoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                undoManager.undo(timelined.getSwf());
-            }
-        });
-
-        redoButton = new JButton(View.getIcon("redo16"));
-        //redoButton.setToolTipText("Redo");
-        redoButton.setMargin(new Insets(5, 5, 5, 5));
-        redoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                undoManager.redo(timelined.getSwf());
-            }
-        });
-
-        undoButton.setEnabled(false);
-        redoButton.setEnabled(false);
-        undoButton.setToolTipText(EasyStrings.translate("undo.cannot"));
-        redoButton.setToolTipText(EasyStrings.translate("redo.cannot"));
-
-        Runnable undoChangeListener = new Runnable() {
-            @Override
-            public void run() {
-                updateUndos();
-            }
-        };
-
-        undoManager.addChangeListener(undoChangeListener);
-
         JPanel toolbarPanel = new JPanel(new BorderLayout());
         JPanel leftToolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        leftToolbar.add(undoButton);
-        leftToolbar.add(redoButton);
-        leftToolbar.add(Box.createHorizontalStrut(10));
         newShapeButton = createSymbolButton("shapeadd16", () -> createCharacter(true, false));
         newMovieClipButton = createSymbolButton("spriteadd16", () -> createCharacter(false, false));
         newButtonButton = createSymbolButton("buttonadd16", () -> createCharacter(false, true));
@@ -2580,7 +2540,7 @@ public class EasySwfPanel extends JPanel {
                 || shape.getCharacterId() != editingShape.getCharacterId())) {
             finishFloatingSelection();
         }
-        if (mainPanel.getCurrentView() != MainPanel.VIEW_EASY) {
+        if (mainPanel.getCurrentView() != MainPanel.VIEW_EASY && !mainPanel.isReplayingEasyEdit()) {
             timelined = null;
             shape = null;
         }
@@ -2670,7 +2630,9 @@ public class EasySwfPanel extends JPanel {
         }
         refreshShapeDisplay();
         updatePropertiesPanel();
-        updateUndos();
+        if (mainPanel.getCurrentView() == MainPanel.VIEW_EASY) {
+            mainPanel.updateUiWithCurrentOpenable();
+        }
         refreshShapePoints(Collections.emptyList());
     }
 
@@ -2678,28 +2640,36 @@ public class EasySwfPanel extends JPanel {
         return timelined.getSwf();
     }
 
-    public void clearUndos() {
-        undoManager.clear();
+    public void historyChanged() {
+        if (stagePanel.getTimelined() != null) {
+            updatePropertiesPanel();
+        }
     }
 
-    private void updateUndos() {
-        undoButton.setEnabled(timelined != null && undoManager.canUndo(timelined.getSwf()));
-        redoButton.setEnabled(timelined != null && undoManager.canRedo(timelined.getSwf()));
-        if (timelined != null && undoManager.canUndo(timelined.getSwf())) {
-            undoButton.setToolTipText(EasyStrings.translate("undo").replace("%action%", undoManager.getUndoName(timelined.getSwf())));
-        } else {
-            undoButton.setToolTipText(EasyStrings.translate("undo.cannot"));
-        }
-        if (timelined != null && undoManager.canRedo(timelined.getSwf())) {
-            redoButton.setToolTipText(EasyStrings.translate("redo").replace("%action%", undoManager.getRedoName(timelined.getSwf())));
-        } else {
-            redoButton.setToolTipText(EasyStrings.translate("redo.cannot"));
-        }
-        if (stagePanel.getTimelined() == null) {
+    void finishHistoryReplay() {
+        updateHistoryTimeline(null);
+    }
+
+    void refreshAfterHistory(SWF swf) {
+        if (editingShape != null && swf.getCharacter(editingShape.getCharacterId()) == editingShape) {
+            editShape(editingShape, stagePanel.getShapeEditContext(), activeShapeLayer);
             return;
         }
-        updatePropertiesPanel();
-        Main.getMainFrame().getPanel().updateUiWithCurrentOpenable();        
+        Timelined selected = timelined;
+        if (!(selected instanceof CharacterTag)
+                || swf.getCharacter(((CharacterTag) selected).getCharacterId()) != selected) {
+            selected = swf;
+        }
+        updateHistoryTimeline(selected);
+    }
+
+    private void updateHistoryTimeline(Timelined target) {
+        updatingTimelined = true;
+        try {
+            updateTimelined(target, true, null, 0);
+        } finally {
+            updatingTimelined = false;
+        }
     }
 
     boolean isShapeLayerHidden(int layer) {
@@ -2976,7 +2946,6 @@ public class EasySwfPanel extends JPanel {
         hiddenDepthsByTimeline.clear();
         lockedDepthsByTimeline.clear();
         shapeLayerStatesByTag.clear();
-        undoManager.clear();
     }
 
     public List<Integer> getDepths() {

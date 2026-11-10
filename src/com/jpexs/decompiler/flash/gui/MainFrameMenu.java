@@ -24,6 +24,8 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
+import com.jpexs.decompiler.flash.easygui.EasyStrings;
+import com.jpexs.decompiler.flash.easygui.UndoManager;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.script.MxmlExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
@@ -81,7 +83,10 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 /**
  * @author JPEXS
@@ -297,6 +302,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             SWF swf = (SWF) openable;
             if (swf.binaryData != null) {
                 // embedded swf
+                mainFrame.getPanel().forgetEmbeddedMovieHistory(swf);
                 swf.binaryData.setInnerSwf(null);
                 swf.clearTagSwfs();
                 binaryDataClosedSwfs.add(swf);
@@ -1089,6 +1095,56 @@ public abstract class MainFrameMenu implements MenuBuilder {
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     }
 
+    static String historyPath(boolean redo) {
+        return redo ? "/file/history/redo" : "/file/history/undo";
+    }
+
+    static String historyListPath(boolean redo) {
+        return historyPath(redo) + "List";
+    }
+
+    static String historyListKey(boolean redo) {
+        return redo ? "menu.history.redo.list" : "menu.history.undo.list";
+    }
+
+    static final int HISTORY_VISIBLE_ROWS = 12;
+
+    static String historyEntryLabel(UndoManager.ReplayPlan plan, int index) {
+        return (index + 1) + ". " + plan.getOperation(index).getDescription();
+    }
+
+    private void showHistoryList(boolean redo) {
+        MainPanel panel = mainFrame.getPanel();
+        UndoManager.ReplayPlan plan = panel.getEditHistory(redo);
+        if (plan.size() == 0) {
+            return;
+        }
+        String[] labels = new String[plan.size()];
+        for (int index = 0; index < labels.length; index++) {
+            labels[index] = historyEntryLabel(plan, index);
+        }
+        JList<String> list = new JList<>(labels);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setVisibleRowCount(Math.min(HISTORY_VISIBLE_ROWS, labels.length));
+        list.setSelectedIndex(0);
+        if (ViewMessages.showConfirmDialog(panel, new JScrollPane(list), translate(historyListKey(redo)),
+                JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            panel.replayEdit(plan, list.getSelectedIndex() + 1);
+        }
+    }
+
+    void updateHistoryActions(String undo, String redo) {
+        setHistoryAction(false, undo != null, historyTooltip("undo", undo));
+        setHistoryAction(true, redo != null, historyTooltip("redo", redo));
+    }
+
+    private static String historyTooltip(String action, String description) {
+        return description == null ? EasyStrings.translate(action + ".cannot")
+                : EasyStrings.translate(action).replace("%action%", description);
+    }
+
+    protected abstract void setHistoryAction(boolean redo, boolean enabled, String tooltip);
+
     public void updateComponents() {
         updateComponents(openable);
     }
@@ -1366,6 +1422,20 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/closeAll", translate("menu.file.closeAll"), "closeall32", this::closeAllActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+SHIFT+X"), false);
 
         addSeparator("/file");
+
+        if (!supportsAppMenu()) {
+            addMenuItem("/file/history", translate("menu.history"), "undo16", null, 0, null, false, null, false);
+            addMenuItem(historyPath(false), translate("menu.history.undo"), "undo16",
+                    e -> mainFrame.getPanel().replayEdit(false), PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem(historyPath(true), translate("menu.history.redo"), "redo16",
+                    e -> mainFrame.getPanel().replayEdit(true), PRIORITY_MEDIUM, null, true, null, false);
+            addSeparator("/file/history");
+            addMenuItem(historyListPath(false), translate(historyListKey(false)) + "...", "undo16",
+                    e -> showHistoryList(false), PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem(historyListPath(true), translate(historyListKey(true)) + "...", "redo16",
+                    e -> showHistoryList(true), PRIORITY_MEDIUM, null, true, null, false);
+            finishMenu("/file/history");
+        }
 
         addMenuItem("/file/export", translate("menu.export"), null, null, 0, null, false, null, false);
         addMenuItem("/file/export/exportFla", translate("menu.file.export.fla"), "exportfla32", this::exportFlaActionPerformed, PRIORITY_TOP, null, true, null, false);

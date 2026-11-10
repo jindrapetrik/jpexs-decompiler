@@ -44,14 +44,19 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyBoundsAdapter;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.awt.geom.AffineTransform;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.RootPaneUI;
 import org.pushingpixels.flamingo.api.ribbon.JRibbon;
 import org.pushingpixels.flamingo.internal.ui.ribbon.appmenu.JRibbonApplicationMenuButton;
@@ -68,7 +73,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
     private final MainFrameMenu mainMenu;
 
-    private AffineTransform aeroSnapTransform = new AffineTransform();
+    private volatile AffineTransform aeroSnapTransform = new AffineTransform();
 
     public MainFrameRibbon() {
         super();
@@ -227,31 +232,33 @@ public final class MainFrameRibbon extends AppRibbonFrame {
             return;
         }
 
-        Point posOnScreen = new Point();
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                update();
+                updateAeroSnapMetrics();
             }
 
             @Override
             public void componentMoved(ComponentEvent e) {
-                update();
-            }
-
-            private void update() {
-                if (MainFrameRibbon.this.isVisible()) {
-                    posOnScreen.x = MainFrameRibbon.this.getLocationOnScreen().x;
-                    posOnScreen.y = MainFrameRibbon.this.getLocationOnScreen().y;
-                }
                 updateAeroSnapMetrics();
             }
         });
         addWindowListener(new WindowAdapter() {
             private BaseTSD.LONG_PTR oldWndProc;
             private StdCallLibrary.StdCallCallback newProc;
-            private Rectangle dragRect = new Rectangle();
-            private Rectangle toggleRect = new Rectangle();
+            private volatile Rectangle dragRect = new Rectangle();
+            private volatile Rectangle toggleRect = new Rectangle();
+            private volatile List<Rectangle> taskbarBounds = Collections.emptyList();
+
+            private void updateTaskbarBounds() {
+                List<Rectangle> bounds = new ArrayList<>();
+                for (Component control : getRibbon().getTaskbarComponents()) {
+                    if (control.isShowing()) {
+                        bounds.add(SwingUtilities.convertRectangle(control.getParent(), control.getBounds(), MainFrameRibbon.this));
+                    }
+                }
+                taskbarBounds = bounds;
+            }
 
             @Override
             public void windowOpened(WindowEvent e) {
@@ -306,6 +313,30 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                     titlePane.addComponentListener(ad);                    
 
                     ad.componentShown(null);
+
+                    ComponentAdapter taskbarLayoutListener = new ComponentAdapter() {
+                        @Override
+                        public void componentMoved(ComponentEvent e) {
+                            updateTaskbarBounds();
+                        }
+
+                        @Override
+                        public void componentResized(ComponentEvent e) {
+                            updateTaskbarBounds();
+                        }
+                    };
+                    HierarchyBoundsAdapter taskbarAncestorListener = new HierarchyBoundsAdapter() {
+                        @Override
+                        public void ancestorMoved(HierarchyEvent e) {
+                            updateTaskbarBounds();
+                        }
+                    };
+                    for (Component control : getRibbon().getTaskbarComponents()) {
+                        control.addComponentListener(taskbarLayoutListener);
+                        control.addHierarchyBoundsListener(taskbarAncestorListener);
+                        control.addHierarchyListener(event -> updateTaskbarBounds());
+                    }
+                    updateTaskbarBounds();
 
                     WinDef.HWND hwnd = new WinDef.HWND(Native.getComponentPointer(window));
 
@@ -387,16 +418,17 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                                     return new WinDef.LRESULT(WinUser.HTRIGHT);
                                 }
 
-                                Point p = new Point(x, y);
-
-                                if (aeroSnapTransform != null) {
-                                    p.x = (int) Math.round(p.x / aeroSnapTransform.getScaleX());
-                                    p.y = (int) Math.round(p.y / aeroSnapTransform.getScaleY());
-                                }
-
-                                p.x -= posOnScreen.x;
-                                p.y -= posOnScreen.y;
+                                AffineTransform scale = aeroSnapTransform;
+                                Point p = new Point(
+                                        (int) Math.floor((x - winRect.left) / scale.getScaleX()),
+                                        (int) Math.floor((y - winRect.top) / scale.getScaleY()));
                                 if (dragRect.contains(p)) {
+                                    // The Windows callback must not take the ribbon's Swing lock.
+                                    for (Rectangle bounds : taskbarBounds) {
+                                        if (bounds.contains(p)) {
+                                            return new WinDef.LRESULT(WinUser.HTCLIENT);
+                                        }
+                                    }
                                     return new WinDef.LRESULT(WinUser.HTCAPTION);
                                 }
 

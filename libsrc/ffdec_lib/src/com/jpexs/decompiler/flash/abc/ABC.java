@@ -1613,6 +1613,28 @@ public class ABC implements Openable {
     }
 
     /**
+     * Restores parsed contents while keeping the document and its listeners.
+     * @param source ABC parsed from the saved contents
+     */
+    public void restoreContents(ABC source) {
+        version = source.version;
+        constants = source.constants;
+        method_info = source.method_info;
+        metadata_info = source.metadata_info;
+        instance_info = source.instance_info;
+        class_info = source.class_info;
+        script_info = source.script_info;
+        bodies = source.bodies;
+        for (MethodBody body : bodies) {
+            body.setAbc(this);
+        }
+        dataSize = source.dataSize;
+        namespaceMap = null;
+        deobfuscation = null;
+        resetMethodIndexing();
+    }
+
+    /**
      * Resets method indexing.
      */
     public void resetMethodIndexing() {

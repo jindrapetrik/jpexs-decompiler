@@ -823,6 +823,23 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     /**
+     * Updates the local entries of an initialized ABC index after restoring tags.
+     * @param previous The movie's ABCs before the change
+     */
+    public void refreshAbcIndex(List<ABC> previous) {
+        if (abcIndex == null) {
+            return;
+        }
+        for (ABC abc : previous) {
+            abcIndex.removeAbc(abc);
+        }
+        for (ABCContainerTag container : getAbcList()) {
+            abcIndex.addAbc(container.getABC());
+        }
+        abcIndex.rebuildPkgToObjectsNameMap();
+    }
+
+    /**
      * Gets number of ABCIndex dependent SWFs
      *
      * @return Number of dependent SWFs
@@ -5503,6 +5520,18 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 timelined.setModified(true);
             }
         }
+    }
+
+    /**
+     * Replaces the timeline's tag list and invalidates its cached views.
+     * @param tags Tags in timeline order
+     */
+    public synchronized void replaceTags(List<Tag> tags) {
+        this.tags = new ArrayList<>(tags);
+        readOnlyTags = null;
+        setModified(true);
+        resetTimeline();
+        updateCharacters();
     }
 
     /**

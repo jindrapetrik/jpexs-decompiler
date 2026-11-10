@@ -380,7 +380,7 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         displayPanel.add(new JPanel(), gbc);
 
-        textPanel = new TextPanel(swfPanel.getMainPanel(), undoManager);        
+        textPanel = new TextPanel(swfPanel.getMainPanel(), false);
         JPanel filtersPanel = new JPanel(new BorderLayout());
         filtersPanel.setPreferredSize(new Dimension(400, 200));
         filtersTable = new FiltersTreeTable();

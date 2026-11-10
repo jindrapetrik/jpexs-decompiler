@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DocsPanel;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
@@ -228,19 +229,21 @@ public class MethodCodePanel extends JPanel {
         }
         MethodInfo methodInfoObj = new MethodInfo(new int[0], 0, 0, 0, null, null);
         ABC abc = getABC();
-        int methodInfo = abc.addMethodInfo(methodInfoObj);
-        MethodBody body = new MethodBody();
-        List<AVM2Instruction> code = body.getCode().code;
-        code.add(new AVM2Instruction(0, AVM2Instructions.ReturnVoid, new int[0]));
-        body.method_info = methodInfo;
-        abc.addMethodBody(body);
-        ((Tag) abc.parentTag).setModified(true);
-        if (ViewMessages.showConfirmDialog(this, AppStrings.translate("addfunction.result").replace("%method_info_index%", "" + methodInfo), AppStrings.translate("addfunction.result.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
-            return;
+        try (MainPanel.EditScope edit = sourceTextArea.getAbcPanel().getMainPanel().beginEdit("button.addfunction", abc)) {
+            int methodInfo = abc.addMethodInfo(methodInfoObj);
+            MethodBody body = new MethodBody();
+            List<AVM2Instruction> code = body.getCode().code;
+            code.add(new AVM2Instruction(0, AVM2Instructions.ReturnVoid, new int[0]));
+            body.method_info = methodInfo;
+            abc.addMethodBody(body);
+            ((Tag) abc.parentTag).setModified(true);
+            if (ViewMessages.showConfirmDialog(this, AppStrings.translate("addfunction.result").replace("%method_info_index%", "" + methodInfo), AppStrings.translate("addfunction.result.title"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                return;
+            }
+            StringSelection stringSelection = new StringSelection("" + methodInfo);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(stringSelection, null);
         }
-        StringSelection stringSelection = new StringSelection("" + methodInfo);
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(stringSelection, null);
     }
 
     public ASMSourceEditorPane getSourceTextArea() {

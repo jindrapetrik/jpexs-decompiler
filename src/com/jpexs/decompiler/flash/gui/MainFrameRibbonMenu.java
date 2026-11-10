@@ -21,11 +21,13 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.easygui.EasyPanel;
 import com.jpexs.decompiler.flash.easygui.ShapeTool;
+import com.jpexs.decompiler.flash.easygui.UndoManager;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -48,8 +50,11 @@ import org.pushingpixels.flamingo.api.common.AbstractCommandButton;
 import org.pushingpixels.flamingo.api.common.CommandButtonDisplayState;
 import org.pushingpixels.flamingo.api.common.CommandToggleButtonGroup;
 import org.pushingpixels.flamingo.api.common.JCommandButton;
+import org.pushingpixels.flamingo.api.common.JCommandMenuButton;
 import org.pushingpixels.flamingo.api.common.JCommandButtonPanel;
 import org.pushingpixels.flamingo.api.common.JCommandToggleButton;
+import org.pushingpixels.flamingo.api.common.RichTooltip;
+import org.pushingpixels.flamingo.api.common.popup.JCommandPopupMenu;
 import org.pushingpixels.flamingo.api.common.popup.JPopupPanel;
 import org.pushingpixels.flamingo.api.common.popup.PopupPanelCallback;
 import org.pushingpixels.flamingo.api.ribbon.AbstractRibbonBand;
@@ -62,11 +67,10 @@ import org.pushingpixels.flamingo.api.ribbon.RibbonApplicationMenuEntryPrimary;
 import org.pushingpixels.flamingo.api.ribbon.RibbonContextualTaskGroup;
 import org.pushingpixels.flamingo.api.ribbon.RibbonElementPriority;
 import org.pushingpixels.flamingo.api.ribbon.RibbonTask;
-import org.pushingpixels.flamingo.api.ribbon.resize.BaseRibbonBandResizePolicy;
 import org.pushingpixels.flamingo.api.ribbon.resize.CoreRibbonResizePolicies;
 import org.pushingpixels.flamingo.api.ribbon.resize.IconRibbonBandResizePolicy;
 import org.pushingpixels.flamingo.api.ribbon.resize.RibbonBandResizePolicy;
-import org.pushingpixels.flamingo.internal.ui.ribbon.AbstractBandControlPanel;
+import org.pushingpixels.flamingo.internal.utils.FlamingoUtilities;
 
 /**
  * @author JPEXS
@@ -78,6 +82,9 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     private final MainFrameRibbon mainFrame;
 
     private ShapeToolsRibbon shapeTools;
+
+    private JCommandButton undoButton;
+    private JCommandButton redoButton;
 
     private final Map<String, Object> menuItems = new HashMap<>();
 
@@ -118,11 +125,55 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
     @Override
     public void createMenuBar() {
         super.createMenuBar();
+        undoButton = addHistoryButton(false);
+        redoButton = addHistoryButton(true);
         shapeTools = new ShapeToolsRibbon(ribbon, this::translate,
                 tool -> mainFrame.getPanel().getEasyPanel().setShapeTool(tool),
                 () -> mainFrame.getPanel().getEasyPanel().replaceShape(false),
                 () -> mainFrame.getPanel().getEasyPanel().replaceShape(true),
                 () -> mainFrame.getPanel().getEasyPanel().exportShape());
+    }
+
+    private JCommandButton addHistoryButton(boolean redo) {
+        String action = redo ? "redo" : "undo";
+        JCommandButton button = new JCommandButton(translate("menu.history." + action), View.getResizableIcon(action + "16", 16));
+        button.setCommandButtonKind(JCommandButton.CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
+        button.addActionListener(e -> mainFrame.getPanel().replayEdit(redo));
+        button.setPopupCallback(source -> createHistoryPopup(redo));
+        button.setPopupRichTooltip(tooltip(translate(historyListKey(redo))));
+        button.setEnabled(false);
+        ribbon.addTaskbarComponent(button);
+        return button;
+    }
+
+    private JCommandPopupMenu createHistoryPopup(boolean redo) {
+        MainPanel panel = mainFrame.getPanel();
+        UndoManager.ReplayPlan plan = panel.getEditHistory(redo);
+        if (plan.size() == 0) {
+            return null;
+        }
+        JCommandPopupMenu popup = new JCommandPopupMenu();
+        popup.setMaxVisibleMenuButtons(HISTORY_VISIBLE_ROWS);
+        for (int index = 0; index < plan.size(); index++) {
+            int steps = index + 1;
+            JCommandMenuButton item = new JCommandMenuButton(historyEntryLabel(plan, index), null);
+            item.addActionListener(e -> panel.replayEdit(plan, steps));
+            popup.addMenuButton(item);
+        }
+        return popup;
+    }
+
+    @Override
+    protected void setHistoryAction(boolean redo, boolean enabled, String title) {
+        JCommandButton button = redo ? redoButton : undoButton;
+        button.setEnabled(enabled);
+        button.setActionRichTooltip(tooltip(title));
+    }
+
+    private static RichTooltip tooltip(String title) {
+        RichTooltip tooltip = new RichTooltip();
+        tooltip.setTitle(title);
+        return tooltip;
     }
 
     @Override
@@ -147,49 +198,34 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
         return title;
     }
 
-    private RibbonBandResizePolicy titleResizePolicies(final JRibbonBand ribbonBand) {
-        return new BaseRibbonBandResizePolicy<AbstractBandControlPanel>(ribbonBand.getControlPanel()) {
-            @Override
-            public int getPreferredWidth(int i, int i1) {
-                return ribbonBand.getGraphics().getFontMetrics(ribbonBand.getFont()).stringWidth(ribbonBand.getTitle()) + 20;
-            }
-
-            @Override
-            public void install(int i, int i1) {
-            }
-        };
+    private List<RibbonBandResizePolicy> getResizePolicies(JRibbonBand ribbonBand, boolean compactFileBand) {
+        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
+        resizePolicies.add(withMinimumBandWidth(ribbonBand, new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel())));
+        if (compactFileBand) {
+            resizePolicies.add(withMinimumBandWidth(ribbonBand, new CoreRibbonResizePolicies.Mid2Low(ribbonBand.getControlPanel())));
+        }
+        return resizePolicies;
     }
 
-    private List<RibbonBandResizePolicy> getResizePolicies(JRibbonBand ribbonBand) {
-        final List<RibbonBandResizePolicy> myResizePolicies = new ArrayList<>();
-        myResizePolicies.add(new CoreRibbonResizePolicies.Mirror(ribbonBand.getControlPanel()));
-        myResizePolicies.add(titleResizePolicies(ribbonBand));
-        myResizePolicies.add(new IconRibbonBandResizePolicy(ribbonBand.getControlPanel()));
-
-        List<RibbonBandResizePolicy> resizePolicies = new ArrayList<>();
-
-        resizePolicies.add(new RibbonBandResizePolicy() {
-
+    private RibbonBandResizePolicy withMinimumBandWidth(JRibbonBand ribbonBand, RibbonBandResizePolicy content) {
+        IconRibbonBandResizePolicy icon = new IconRibbonBandResizePolicy(ribbonBand.getControlPanel());
+        return new RibbonBandResizePolicy() {
             @Override
-            public int getPreferredWidth(int i, int i1) {
-                int pw = 0;
-                for (RibbonBandResizePolicy p : myResizePolicies) {
-                    int npw = p.getPreferredWidth(i, i1);
-                    if (npw > pw) {
-                        pw = npw;
-                    }
+            public int getPreferredWidth(int availableHeight, int gap) {
+                Font font = FlamingoUtilities.getFont(ribbonBand, "Ribbon.font", "Button.font", "Panel.font");
+                if (font == null) {
+                    font = UIManager.getFont("Label.font");
                 }
-                return pw;
+                int titleWidth = ribbonBand.getFontMetrics(font).stringWidth(ribbonBand.getTitle()) + 20;
+                int minWidth = Math.max(titleWidth, icon.getPreferredWidth(availableHeight, gap));
+                return Math.max(minWidth, content.getPreferredWidth(availableHeight, gap));
             }
 
             @Override
-            public void install(int i, int i1) {
-                for (RibbonBandResizePolicy p : myResizePolicies) {
-                    p.install(i, i1);
-                }
+            public void install(int availableHeight, int gap) {
+                content.install(availableHeight, gap);
             }
-        });
-        return resizePolicies;
+        };
     }
 
     @SuppressWarnings("unchecked")
@@ -430,8 +466,8 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                     } else {
                         cbut = new JCommandButton(fixCommandTitle(subTitle));
                     }
-                    if (subKey != null) {
-                        //cbut.setActionRichTooltip(new RichTooltip(subTitle, subKey.toString()));
+                    if (path.equals("/file") && subPriority == PRIORITY_MEDIUM) {
+                        cbut.setActionRichTooltip(tooltip(subTitle));
                     }
                     if (subLoader != null) {
                         cbut.setCommandButtonKind(JCommandButton.CommandButtonKind.ACTION_AND_POPUP_MAIN_ACTION);
@@ -520,7 +556,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             }
         } else { //3rd level - it's a Band!
             JRibbonBand band = new JRibbonBand(title, icon != null ? View.getResizableIcon(icon, 16) : null, null);
-            band.setResizePolicies(getResizePolicies(band));
+            band.setResizePolicies(getResizePolicies(band, path.equals("/file")));
             int cnt = 0;
             for (String sub : subs) {
                 if (sub.equals("-")) {

@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import com.jpexs.decompiler.flash.SWF;
+
 /**
  *
  * @author JPEXS
@@ -26,6 +28,10 @@ public interface DoableOperation {
     public void undoOperation();
     
     public String getDescription();
+
+    default boolean modifiesSwf(SWF swf) {
+        return modifiesSwf();
+    }
 
     default boolean modifiesSwf() {
         return true;

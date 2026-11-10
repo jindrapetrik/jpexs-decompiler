@@ -53,7 +53,6 @@ public class EasyPanel extends JPanel {
         for (SWF swf : swfs) {
             tabSwitcher.addTab(swf, swf.getShortPathTitle(), View.getIcon("flash16"));
         }
-        easySwfPanel.clearUndos();
     }
 
     public void setSwf(SWF swf) {
@@ -123,6 +122,22 @@ public class EasyPanel extends JPanel {
     public void dispose() {
         setSwfs(new ArrayList<>());
         easySwfPanel.dispose();
+    }
+
+    public void historyChanged() {
+        easySwfPanel.historyChanged();
+    }
+
+    public void prepareHistoryReplay(SWF swf) {
+        easySwfPanel.setSwf(swf);
+    }
+
+    public void finishHistoryReplay() {
+        easySwfPanel.finishHistoryReplay();
+    }
+
+    public void refreshAfterHistory(SWF swf) {
+        easySwfPanel.refreshAfterHistory(swf);
     }
 
     public void swfClosed(SWF swf) {

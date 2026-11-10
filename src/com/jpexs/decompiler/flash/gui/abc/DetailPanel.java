@@ -334,36 +334,38 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     }
 
     private void save(boolean refreshTree) {
-        if (cardMap.get(selectedCard) instanceof TraitDetail) {
-            if (((TraitDetail) cardMap.get(selectedCard)).save()) {
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.trait", abcPanel.abc)) {
+            if (cardMap.get(selectedCard) instanceof TraitDetail) {
+                if (((TraitDetail) cardMap.get(selectedCard)).save()) {
 
-                DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
-                if (!refreshTree) {
-                    decompiledTextArea.reloadClass();
-                    setEditMode(false);
-                    return;
-                }
-                int lastTrait = decompiledTextArea.lastTraitIndex;
-                int lastClassIndex = decompiledTextArea.getClassIndex();
-
-                Runnable reloadComplete = new Runnable() {
-                    @Override
-                    public void run() {
-                        decompiledTextArea.removeScriptListener(this);
-                        decompiledTextArea.setClassIndex(lastClassIndex); //reload resets caret to first class
-                        if (lastTrait == GraphTextWriter.TRAIT_UNKNOWN) {
-                            decompiledTextArea.gotoLastMethod();
-                        } else {
-                            decompiledTextArea.gotoTrait(lastTrait);
-                        }
+                    DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
+                    if (!refreshTree) {
+                        decompiledTextArea.reloadClass();
                         setEditMode(false);
-                        mainPanel.clearEditingStatus();
-                        ViewMessages.showMessageDialog(DetailPanel.this, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
+                        return;
                     }
-                };
+                    int lastTrait = decompiledTextArea.lastTraitIndex;
+                    int lastClassIndex = decompiledTextArea.getClassIndex();
 
-                decompiledTextArea.addScriptListener(reloadComplete);
-                decompiledTextArea.reloadClass();
+                    Runnable reloadComplete = new Runnable() {
+                        @Override
+                        public void run() {
+                            decompiledTextArea.removeScriptListener(this);
+                            decompiledTextArea.setClassIndex(lastClassIndex); //reload resets caret to first class
+                            if (lastTrait == GraphTextWriter.TRAIT_UNKNOWN) {
+                                decompiledTextArea.gotoLastMethod();
+                            } else {
+                                decompiledTextArea.gotoTrait(lastTrait);
+                            }
+                            setEditMode(false);
+                            mainPanel.clearEditingStatus();
+                            ViewMessages.showMessageDialog(DetailPanel.this, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
+                        }
+                    };
+
+                    decompiledTextArea.addScriptListener(reloadComplete);
+                    decompiledTextArea.reloadClass();
+                }
             }
         }
     }

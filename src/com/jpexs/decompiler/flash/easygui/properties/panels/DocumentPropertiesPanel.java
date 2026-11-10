@@ -201,17 +201,17 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
                 }
                 
                 undoManager.doOperation(new HeaderChangeDoableOperation("compression") {
-                    SWFCompression itemBefore = swf.compression;
+                    SWFCompression itemBefore = target.compression;
                     SWFCompression itemAfter = getCompression();
                     
                     @Override
                     public void doHeaderOperation() {
-                        swf.compression = itemAfter;
+                        target.compression = itemAfter;
                     }
 
                     @Override
                     public void undoHeaderOperation() {
-                        swf.compression = itemBefore;
+                        target.compression = itemBefore;
                     }
                     
                 }, swf);
@@ -222,17 +222,17 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
                 return;
             }
             undoManager.doOperation(new HeaderChangeDoableOperation("swfVersion") {
-                int itemBefore = swf.version;
+                int itemBefore = target.version;
                 int itemAfter = versionEditor.getValue();
 
                 @Override
                 public void doHeaderOperation() {
-                    swf.version = itemAfter;
+                    target.version = itemAfter;
                 }
 
                 @Override
                 public void undoHeaderOperation() {
-                    swf.version = itemBefore;
+                    target.version = itemBefore;
                 }
             }, swf);
         });
@@ -244,16 +244,16 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
                 return;
             }
             undoManager.doOperation(new HeaderChangeDoableOperation("encrypted") {
-                boolean itemBefore = swf.encrypted;
+                boolean itemBefore = target.encrypted;
                 boolean itemAfter = encryptedCheckBox.isSelected();
                 @Override
                 public void doHeaderOperation() {
-                    swf.encrypted = itemAfter;                    
+                    target.encrypted = itemAfter;
                 }
 
                 @Override
                 public void undoHeaderOperation() {
-                    swf.encrypted = itemBefore;                    
+                    target.encrypted = itemBefore;
                 }
             }, swf);
         });
@@ -266,17 +266,17 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
             }
             
             undoManager.doOperation(new HeaderChangeDoableOperation("gfx") {
-                boolean itemBefore = swf.gfx;
+                boolean itemBefore = target.gfx;
                 boolean itemAfter = gfxCheckBox.isSelected();
 
                 @Override
                 public void doHeaderOperation() {
-                    swf.gfx = itemAfter;
+                    target.gfx = itemAfter;
                 }
 
                 @Override
                 public void undoHeaderOperation() {
-                    swf.gfx = itemBefore;                    
+                    target.gfx = itemBefore;
                 }
             }, swf);
         });
@@ -285,17 +285,17 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
                 return;
             }
             undoManager.doOperation(new HeaderChangeDoableOperation("frameRate") {
-                float itemBefore = swf.frameRate;
+                float itemBefore = target.frameRate;
                 float itemAfter = frameRateEditor.getValue();
 
                 @Override
                 public void doHeaderOperation() {
-                    swf.frameRate = itemAfter;
+                    target.frameRate = itemAfter;
                 }
 
                 @Override
                 public void undoHeaderOperation() {
-                    swf.frameRate = itemBefore;                    
+                    target.frameRate = itemBefore;
                 }
             }, swf);
         });
@@ -304,20 +304,20 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
                 return;
             }
             undoManager.doOperation(new HeaderChangeDoableOperation("width") {
-                int xMinBefore = swf.displayRect.Xmin;
-                int xMaxBefore = swf.displayRect.Xmax;
+                int xMinBefore = target.displayRect.Xmin;
+                int xMaxBefore = target.displayRect.Xmax;
                 int xMaxAfter = widthEditor.getValue() * 20;
 
                 @Override
                 public void doHeaderOperation() {
-                    swf.displayRect.Xmin = 0;
-                    swf.displayRect.Xmax = xMaxAfter;                    
+                    target.displayRect.Xmin = 0;
+                    target.displayRect.Xmax = xMaxAfter;
                 }
 
                 @Override
                 public void undoHeaderOperation() {
-                    swf.displayRect.Xmin = xMinBefore;
-                    swf.displayRect.Xmax = xMaxBefore;
+                    target.displayRect.Xmin = xMinBefore;
+                    target.displayRect.Xmax = xMaxBefore;
                 }
             }, swf);
         });
@@ -326,20 +326,20 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
                 return;
             }
             undoManager.doOperation(new HeaderChangeDoableOperation("height") {
-                int yMinBefore = swf.displayRect.Ymin;
-                int yMaxBefore = swf.displayRect.Ymax;
+                int yMinBefore = target.displayRect.Ymin;
+                int yMaxBefore = target.displayRect.Ymax;
                 int yMaxAfter = heightEditor.getValue() * 20;
 
                 @Override
                 public void doHeaderOperation() {
-                    swf.displayRect.Ymin = 0;
-                    swf.displayRect.Ymax = yMaxAfter;
+                    target.displayRect.Ymin = 0;
+                    target.displayRect.Ymax = yMaxAfter;
                 }
 
                 @Override
                 public void undoHeaderOperation() {
-                    swf.displayRect.Ymin = yMinBefore;
-                    swf.displayRect.Ymax = yMaxBefore;
+                    target.displayRect.Ymin = yMinBefore;
+                    target.displayRect.Ymax = yMaxBefore;
                 }
             }, swf);
         });
@@ -353,34 +353,30 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
                 }
                 
                 undoManager.doOperation(new PropertyChangeDoableOperation("document.backgroundColor") {
+                    final SWF target = swf;
                     final RGB prevColor = backgroundColorTag.backgroundColor;
                     final RGB newColor = new RGB(colorSelectionButton.getValue());
-                    final boolean prevModified = backgroundColorTag.isModified();
                     
                     @Override
                     public void doOperation() {
                         modifying = true;
-                        SetBackgroundColorTag backgroundColorTag = swf.getBackgroundColor();
-                        if (backgroundColorTag == null) {
-                            return;
-                        }
                         backgroundColorTag.backgroundColor = newColor;
                         backgroundColorTag.setModified(true);
-                        swf.resetTimeline();
-                        refresh();
+                        target.resetTimeline();
+                        if (swf == target) {
+                            refresh();
+                        }
                         modifying = false;
                     }
 
                     @Override
                     public void undoOperation() {
-                        SetBackgroundColorTag backgroundColorTag = swf.getBackgroundColor();
-                        if (backgroundColorTag == null) {
-                            return;
-                        }
                         backgroundColorTag.backgroundColor = prevColor;
-                        backgroundColorTag.setModified(prevModified);
-                        swf.resetTimeline();
-                        refresh();
+                        backgroundColorTag.setModified(true);
+                        target.resetTimeline();
+                        if (swf == target) {
+                            refresh();
+                        }
                     }                    
                 }, swf);
             }
@@ -476,7 +472,8 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
 
     abstract class HeaderChangeDoableOperation extends ChangeDoableOperation {
 
-        private boolean modifiedBefore = swf.isHeaderModified();
+        protected final SWF target = swf;
+        private final boolean modifiedBefore = target.isHeaderModified();
 
         public HeaderChangeDoableOperation(String itemIdentifier) {
             super(itemIdentifier);
@@ -486,9 +483,11 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
         public final void doOperation() {
             modifying = true;
             doHeaderOperation();
-            swf.setHeaderModified(true);
-            refresh();
-            validateHeader();
+            target.setHeaderModified(true);
+            if (swf == target) {
+                refresh();
+                validateHeader();
+            }
             modifying = false;
         }
 
@@ -496,9 +495,11 @@ public class DocumentPropertiesPanel extends AbstractPropertiesPanel {
         public final void undoOperation() {
             modifying = true;
             undoHeaderOperation();
-            swf.setHeaderModified(modifiedBefore);
-            refresh();
-            validateHeader();
+            target.setHeaderModified(modifiedBefore);
+            if (swf == target) {
+                refresh();
+                validateHeader();
+            }
             modifying = false;
         }
 
