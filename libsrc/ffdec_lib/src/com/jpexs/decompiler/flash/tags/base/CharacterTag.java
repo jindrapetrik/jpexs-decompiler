@@ -113,7 +113,7 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         if (swf != null && chid > -1) {
             NameCharacterTag nameTag = (NameCharacterTag) swf.getCharacterIdTag(chid, NameCharacterTag.ID);
             if (nameTag != null) {
-                ret.put("nm", nameTag.name);
+                ret.put("nm", "\"" + Helper.escapePCodeString(nameTag.name) + "\"");
             }
         }
         return ret;
