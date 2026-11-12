@@ -989,17 +989,30 @@ public class EasySwfPanel extends JPanel {
     }
 
     private void selectFillTransform(Point2D point) {
-        ShapeSelection.RectangleSelection selection = shapeModel(activeShapeLayer).selectFillTransform(point, stagePanel.getTimelinedToPanelTransform());
-        shapeModels.put(activeShapeLayer, selection.model);
-        showShapeSelections(!selection.selected.isEmpty() && ShapeFillTransform.canTransform(selection.selected.get(0))
-                ? selection.selected : Collections.emptyList());
+        AffineTransform transform = stagePanel.getTimelinedToPanelTransform();
+        for (int layer = shapeLayers.size() - 1; layer >= 0; layer--) {
+            if (!shapeLayerEditable(layer)) {
+                continue;
+            }
+            ShapeSelection.RectangleSelection selection = shapeModel(layer).selectFillTransform(point, transform);
+            if (selection.selected.isEmpty()) {
+                continue;
+            }
+            if (ShapeFillTransform.canTransform(selection.selected.get(0))) {
+                shapeModels.put(layer, selection.model);
+                showLayerSelections(Collections.singletonMap(layer, selection.selected));
+                return;
+            }
+            break;
+        }
+        showShapeSelections(Collections.emptyList());
     }
 
     private void updateFillTransformHandles() {
         if (shapeTool != ShapeTool.GRADIENT_TRANSFORM) {
             return;
         }
-        if (editingShape == null || selectedShapeParts.isEmpty()
+        if (!shapeLayerEditable() || selectedShapeParts.isEmpty()
                 || !ShapeFillTransform.canTransform(selectedShapeParts.get(0))) {
             stagePanel.clearGradientTransform();
             return;
@@ -1130,10 +1143,11 @@ public class EasySwfPanel extends JPanel {
     private void updateShapeTool() {
         unfilteredShapePreview = null;
         boolean editable = shapeLayerEditable();
+        boolean fillTransform = editingShape != null && shapeTool == ShapeTool.GRADIENT_TRANSFORM;
         boolean anchorEditable = editable && shapeTool == ShapeTool.ANCHOR_POINT
                 && shapeLayerStates.stream().noneMatch(state -> state.hidden || state.locked);
         stagePanel.setShapeOriginVisible(anchorEditable);
-        if (editable && shapeTool == ShapeTool.GRADIENT_TRANSFORM) {
+        if (fillTransform) {
             stagePanel.setGradientTransformGestureListeners(this::beginFillTransform, this::finishFillTransform);
         } else {
             stagePanel.clearGradientTransform();
@@ -1147,7 +1161,7 @@ public class EasySwfPanel extends JPanel {
                 !selecting ? null : this::moveShapeSelection);
         stagePanel.setSelectionDeleteListener(editingShape == null ? this::deleteStageSelection
                 : selecting ? this::deleteShapeSelection : null);
-        boolean drawing = editable && (shapeTool == ShapeTool.ANCHOR_POINT ? anchorEditable : drawingToolSelected());
+        boolean drawing = fillTransform || editable && (shapeTool == ShapeTool.ANCHOR_POINT ? anchorEditable : drawingToolSelected());
         stagePanel.setShapeDrawingTool(!drawing || clickToolSelected() || shapeTool == ShapeTool.ANCHOR_POINT || shapeTool == ShapeTool.PEN
                 ? null : this::drawingCursor,
                 !drawing ? null : shapeTool == ShapeTool.PEN ? penTool : new ImagePanel.ShapeDrawListener() {
