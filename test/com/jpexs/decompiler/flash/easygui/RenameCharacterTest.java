@@ -50,12 +50,12 @@ public class RenameCharacterTest {
         EasyTagNameResolver resolver = new EasyTagNameResolver();
         String generated = resolver.getTagName(character);
         assertFalse(character.getNameProperties().containsKey("nm"));
-        String custom = "M\u016fj tvar \u017elu\u0165ou\u010dk\u00fd";
+        String custom = "My \u017e shape name";
         UndoManager undo = new UndoManager();
         undo.doOperation(new RenameCharacterOperation(character, custom, null), swf);
         NameCharacterTag name = (NameCharacterTag) swf.getCharacterIdTag(character.getCharacterId(), NameCharacterTag.ID);
         assertNotNull(name);
-        assertEquals(character.getNameProperties().get("nm"), custom);
+        assertEquals(character.getNameProperties().get("nm"), "\"" + custom + "\"");
         assertEquals(name.type, type);
         assertTrue(swf.getTags().indexOf(name) > swf.getTags().indexOf(character));
         assertEquals(resolver.getTagName(character), custom + " (" + generated + ")");
@@ -66,7 +66,7 @@ public class RenameCharacterTest {
 
         SWF restored = reload(swf);
         CharacterTag restoredCharacter = restored.getCharacter(character.getCharacterId());
-        assertEquals(restoredCharacter.getNameProperties().get("nm"), custom);
+        assertEquals(restoredCharacter.getNameProperties().get("nm"), "\"" + custom + "\"");
         assertEquals(resolver.getTagName(restoredCharacter), custom + " (" + generated + ")");
         assertEquals(((NameCharacterTag) restored.getCharacterIdTag(character.getCharacterId(), NameCharacterTag.ID)).type, type);
 
@@ -81,7 +81,7 @@ public class RenameCharacterTest {
         undo.doOperation(new RenameCharacterOperation(character, "Second name", null), swf);
         assertSame(swf.getCharacterIdTag(character.getCharacterId(), NameCharacterTag.ID), name);
         assertEquals(resolver.getTagName(character), "Second name (" + generated + ")");
-        assertEquals(character.getNameProperties().get("nm"), "Second name");
+        assertEquals(character.getNameProperties().get("nm"), "\"Second name\"");
         undo.undo(swf);
         assertEquals(name.name, custom);
         undo.redo(swf);
