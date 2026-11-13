@@ -74,6 +74,22 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> openMultipleFiles = null;
 
+    @ConfigurationDefaultString("openrouter")
+    @ConfigurationCategory("ai")
+    public static ConfigurationItem<String> aiProvider = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("ai")
+    public static ConfigurationItem<String> aiOpenRouterModel = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("ai")
+    public static ConfigurationItem<String> aiOpenCodeModel = null;
+
+    @ConfigurationDefaultString("payg")
+    @ConfigurationCategory("ai")
+    public static ConfigurationItem<String> aiOpenCodePlan = null;
+
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> decompile = null;

@@ -1,189 +1,229 @@
 # JPEXS Free Flash Decompiler
+
 ![Build passing badge](https://github.com/jindrapetrik/jpexs-decompiler/actions/workflows/build.yml/badge.svg?branch=dev)
 
-English | [简体中文](README_zh.md)
+English | [Português (Brasil)](README_pt_BR.md) | [简体中文](README_zh.md)
 
-Open Source Flash SWF decompiler and editor. Extract resources, convert SWF to FLA, edit ActionScript, replace images, sounds, texts and fonts. Various output formats available. Works with Java on Windows, Linux and macOS.
+Open-source Flash SWF decompiler and editor. Extract resources, convert SWF to FLA, edit ActionScript, and replace images, sounds, texts, and fonts. Works with Java on Windows, Linux, and macOS.
+
+## JPEXS AI Studio — first release
+
+This initial release adds an integrated chat window with direct access to the official **OpenRouter** and **OpenCode Console** APIs. It does not run the OpenCode CLI and cannot yet edit or recompile SWF content using AI tools.
+
+### Available features
+
+- Choose between OpenRouter and OpenCode Models, including pay-as-you-go and Go plans.
+- Dynamically load model catalogs. OpenRouter models can be filtered by free, paid, or all, with prices read from model metadata.
+- Test the connection and chat with streamed responses.
+- Limit context to structural metadata from the current SWF (name, version, FPS, dimensions, frames, and top-level tag count). The file, scripts, and resources are not uploaded automatically.
+- No automatic model switching: a request is sent only after the user explicitly selects a model and clicks **Send**.
+- OpenCode models explicitly marked as free are excluded. The Console may also return HTTP 403 for free models that can only be used within OpenCode; JPEXS explains the restriction and does not attempt to bypass it.
+
+### Setup and usage
+
+Open **Settings → Artificial Intelligence**. Enter the provider's API key, choose a password of at least 12 characters for the credential store, and click **Save and test**. To reuse saved keys after restarting JPEXS, enter the password and click **Unlock**. OpenCode also requires selecting the correct pay-as-you-go or Go plan.
+
+Keys are stored in an encrypted JCEKS file separate from the TOML configuration and are not written to logs. The credential-store password is not saved. If you forget it, the stored keys cannot be recovered.
+
+Then open **Tools → AI Studio**, refresh the catalog, explicitly choose a model, and send a message. Paid models may incur charges according to the provider's plan; check the price and modality before sending requests. The OpenRouter catalog can be browsed without a key, but chatting requires a valid key. For OpenCode, use a Console key and the plan that matches your account.
+
+### Limitations of this release
+
+This is only the first functional increment. AI editing tools, ActionScript execution, SWF creation, image generation, resource translation, and multi-SWF project management are not yet available. The chat is a separate resizable window, not a docked panel. The context sent contains only structural SWF metadata, not its contents.
+
+OpenCode restricts external use of free chat models. JPEXS does not bypass HTTP 403 or automatically switch to a paid model. OpenRouter free models may be selected when their metadata indicates zero cost for the applicable request.
+
+See [CHANGELOG_AI.md](CHANGELOG_AI.md), [ARQUITETURA_IA.md](ARQUITETURA_IA.md), and [TESTES_IA.md](TESTES_IA.md) for details and validation status.
 
 ## Application description and features
-For information about using the software, list of features, etc., visit [FFDec Wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki).
+
+For information about using the software and its features, visit the [FFDec Wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki).
 
 ## Free-Decompiler.com website
-In the past (before 2018), we were using *free-decompiler.com* domain as homepage and GitHub for the source code, We've now moved all information (except the issue tracker) to GitHub.
 
-## Download application
-For downloading the app, see [latest release](https://github.com/jindrapetrik/jpexs-decompiler/releases/latest).
-Older versions and nightly builds are available at the [releases section](https://github.com/jindrapetrik/jpexs-decompiler/releases)
+Before 2018, the *free-decompiler.com* domain was used as the project homepage and GitHub hosted the source code. Project information has since moved to GitHub, except for the issue tracker.
 
-### How to install
-See [installation section of the wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/Installation)
+## Download and installation
+
+- Download the [latest release](https://github.com/jindrapetrik/jpexs-decompiler/releases/latest).
+- Older versions and nightly builds are available on the [releases page](https://github.com/jindrapetrik/jpexs-decompiler/releases).
+- See the [installation instructions in the Wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/Installation).
 
 ## Source code
-### How to get the source
- You can make a local copy of the sources with the following command:
-```
+
+### Getting the source
+
+Clone the repository with:
+
+```sh
 git clone https://github.com/jindrapetrik/jpexs-decompiler.git
 ```
-This assumes you have git installed on your system.
 
-### Branches 
-Git source control manager supports multiple code branches. We use two main branches.
+Git must be installed.
 
-* `master` - for released "stable" versions
-* `dev` - for newest changes from developers - "nightly" version is released from this branch
+### Branches
 
-You can switch to `dev` branch with following git command:
-```
+The project has two main branches:
+
+- `master` — stable releases.
+- `dev` — latest changes; nightly builds are created from this branch.
+
+To switch to `dev`:
+
+```sh
 git checkout dev
 ```
 
-### GIT recommended
-It is recommended to have [GIT] commandline executables installed. Building script uses GIT to include revision number into the binary. (For Windows, you must enable Git in windows command line during installation.)
+### Git and NetBeans
 
-### Netbeans project
+Installing the [Git] command-line tools is recommended because the build script uses Git to include the revision in the binary. On Windows, enable Git on the command-line `PATH` during installation.
 
-Source code contains Netbeans Project so you can open it in [Netbeans IDE]. Then you can use standard actions like Run, Build, Debug, Clean and Build in the IDE. Other specific tasks can be executed via menu on build.xml (see Ant part)
+The source includes a NetBeans project. Open it in the [NetBeans IDE] to use the standard run, build, debug, and clean actions. Other tasks are available in `build.xml`.
 
-### Ant
-If you do not have Netbeans, you can build source code also with Apache Ant.
-After installing Ant it is good to put it into your PATH variable.
-Open up commandline and navigate to sources directory.
-To run application, execute task "run" by entering this command:
-```
+### Building with Apache Ant
+
+Install Apache Ant and add it to your `PATH`. From the source directory, run:
+
+```sh
 ant run
 ```
-To only build, execute build task:
-```
+
+To build without running:
+
+```sh
 ant build
 ```
 
-### Building libraries
+### Libraries
 
-There are few libraries which need to be built too. These libraries are placed in "libsrc" directory.
-* **FFDec_lib** - core of decompilation, SWF parsing, exporting
-**This library is built automatically with main project, but can be build also separately with its own Ant script.**
-* **jpacker** - used for compression of JavaScript Canvas scripts (Netbeans/Ant project)
-* **jpproxy** - proxy part of FFDec (Netbeans/Ant project)
-* **jsyntaxpane** - code editor (Netbeans/Apache Maven project)
-* **LZMA** - used for SWF compression (Netbeans/Ant project)
-* **nellymoser** - used for Nelly Moser sounds decoding (Netbeans/Ant project)
-* **Swf2Exe** - Stub for "Save to EXE" feature (Delphi 7 Project)
-* **ttf** - used for TTF font export (Netbeans/Ant project)
-* **gnujpdf** - used for PDF export (Netbeans/Ant project)
+Some libraries are in the `libsrc` directory:
+
+- **FFDec_lib** — decompilation, SWF parsing, and export core; built automatically by the main project and separately with its own Ant script.
+- **jpacker** — JavaScript Canvas script compression (NetBeans/Ant).
+- **jpproxy** — FFDec proxy component (NetBeans/Ant).
+- **jsyntaxpane** — code editor (NetBeans/Maven).
+- **LZMA** — SWF compression (NetBeans/Ant).
+- **nellymoser** — Nelly Moser audio decoding (NetBeans/Ant).
+- **Swf2Exe** — “Save as EXE” feature stub (Delphi 7).
+- **ttf** — TTF font export (NetBeans/Ant).
+- **gnujpdf** — PDF export (NetBeans/Ant).
 
 ## Docker
-We have `Dockerfile` for headless running for not needing to install Java or FFDec locally.
-(Original script by Mahdi Lazraq)
-### Build
-```
+
+The `Dockerfile` can run FFDec headlessly without installing Java or FFDec locally. The original script was created by Mahdi Lazraq.
+
+Build the image:
+
+```sh
 docker build -t ffdec .
 ```
-### Usage
-FFDec CLI is the entrypoint, so you can pass arguments directly:
-```
+
+The FFDec CLI is the entry point, so arguments can be passed directly:
+
+```sh
 docker run --rm -v ./input:/work/input -v ./output:/work/output ffdec [args]
 ```
 
+## AI tests and documentation
+
+The project's existing tests can be run with `ant test`. Tests for the initial AI integration are documented in [TESTES_IA.md](TESTES_IA.md). Provider connection and chat tests require user-supplied API keys and are not run automatically.
+
+- [AI integration architecture](ARQUITETURA_IA.md)
+- [AI integration changelog](CHANGELOG_AI.md)
+- [AI test results and limitations](TESTES_IA.md)
+
 ## Change log
-All notable changes are listed in the file [CHANGELOG.md](CHANGELOG.md)
+
+FFDec changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## Deployment
 
 ### Nightly builds
-When a commit is pushed/merged into `dev` branch, a new prerelease version is created automatically by GitHub actions CI.
-These prerelease versions are called nightly builds. On releasing a new nightly build, the previous nightly build is removed.
 
-### Stable versions
-A new stable version is created automatically by the GitHub Actions CI when merging  `dev` branch into `master`.
-To such version a tag is added in format `versionx.y.z`.
+When a change is pushed or merged into `dev`, GitHub Actions automatically creates a nightly prerelease. The previous nightly build is removed when a new one is published.
+
+### Stable releases
+
+GitHub Actions creates a stable release when `dev` is merged into `master`. The release is tagged in the format `versionx.y.z`.
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for the code of conduct and contribution process.
 
 ## Versioning
 
-Versions are in format `x.y.z`, for example `9.1.2`.
-For the versions available, see the [tags on this repository](https://github.com/jindrapetrik/jpexs-decompiler/tags).
-We try to use semantic versioning.
+Versions use the `x.y.z` format, for example `9.1.2`. See the [repository tags](https://github.com/jindrapetrik/jpexs-decompiler/tags). The project aims to follow semantic versioning.
 
-Nightly builds have additional suffix `_nightlyN` where `N` is number which increments with every (automatic) nightly release
-and does not depend on the `x.y.z` numbers. (This means nightly number is *NOT* reset to 0 when releasing stable)
-Older nightly builds are *NOT* available through git tags.
+Nightly builds have the suffix `_nightlyN`, where the number increases with each automatic build and is not reset when a stable release is published. Older nightly builds are not available through Git tags.
 
 ## Authors
-The decompiler was originally written by **Jindra Petřík** also known as **JPEXS**.
-The application was made in Czech Republic.
+
+The decompiler was originally written by **Jindra Petřík**, also known as **JPEXS**. The application was created in the Czech Republic.
 
 ### Developers
-* **JPEXS** - leader, development of the decompiler, website main admin, github account admin, organization
-* **honfika** - development of the decompiler
-* **Paolo Cancedda** - former developer
-* ...other pushers on GitHub or Google Code
+
+- **JPEXS** — project lead and decompiler development.
+- **honfika** — decompiler development.
+- **Paolo Cancedda** — former developer.
+- Other contributors who submitted changes through GitHub or Google Code.
 
 ### Translators
-* **Jaume Badiella Aguilera** - catalan translation
-* **Capasha** - swedish translation
-* **王晨旭** (Chenxu Wang), **晓之车**, **安安**, **Liushui**, **老biu** - chinese translation
-* **focus** - russian translation
-* **honfika** - hungarian translation
-* **kalip** - italian translation
-* **Krock** - german translation
-* **Laurent LOUVET** - french translation
-* **MaGiC** - portuguese translation
-* **martinkoza** - polish translation
-* **Osman ÖZ** - turkish translation
-* **pepka** - ukrainian and dutch translation
-* **poxyran** - spanish translation
-* **realmaster42**, **alimsoftware** - portuguese-brasil translation
-* **Rtsjx** - chinese translation
-* **koiru** - japanese translation
-* **J. Kramer** - dutch translation
-* **Andrew Poženel** - slovenian translation
-* **GitHub Copilot (Claude AI)** - german, slovak translation
 
-## Contact
-If you want to report a problem or request new feature, use our issue tracker at [https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues)
+- **Jaume Badiella Aguilera** — Catalan.
+- **Capasha** — Swedish.
+- **王晨旭 (Chenxu Wang)**, **晓之车**, **安安**, **Liushui**, **老biu** — Chinese.
+- **focus** — Russian.
+- **honfika** — Hungarian.
+- **kalip** — Italian.
+- **Krock** — German.
+- **Laurent LOUVET** — French.
+- **MaGiC** — Portuguese.
+- **martinkoza** — Polish.
+- **Osman ÖZ** — Turkish.
+- **pepka** — Ukrainian and Dutch.
+- **poxyran** — Spanish.
+- **realmaster42**, **alimsoftware** — Brazilian Portuguese.
+- **Rtsjx** — Chinese.
+- **koiru** — Japanese.
+- **J. Kramer** — Dutch.
+- **Andrew Poženel** — Slovenian.
+- **GitHub Copilot (Claude AI)** — German and Slovak.
 
-You should see [Frequently Asked Questions (FAQ) in wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/FAQ) before.
-Also see [Known problems list in wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/Known-problems)
+## Contact and support
 
-### Email contact
-Emergency contact to JPEXS developer is `jindra.petrik@gmail.com`.
-But we prefer Issue tracker contact.
+To report a problem or request a feature, use the [issue tracker](https://www.free-decompiler.com/flash/issues).
 
-## Licenses + Acknowledgments
+Also see the Wiki's [FAQ](https://github.com/jindrapetrik/jpexs-decompiler/wiki/FAQ) and [known problems](https://github.com/jindrapetrik/jpexs-decompiler/wiki/Known-problems).
+
+For emergencies, contact JPEXS at `jindra.petrik@gmail.com`. For general matters, please use the issue tracker.
+
+## Licenses and acknowledgments
+
 ### Application
 
-FFDec Application is licensed under the GNU GPL v3 (GPL-3.0-or-later) licence, see the [license.txt](license.txt).
-It uses modified code of these libraries:
+FFDec is licensed under GNU GPL v3 (GPL-3.0-or-later); see [license.txt](license.txt). The code uses a modified version of:
 
-* [JSyntaxPane] (Code editor) - Apache License 2.0
+- [JSyntaxPane] (code editor) — Apache License 2.0.
 
-And links also these libraries:
+It also links to:
 
-* [Java Native Access - JNA] (Registry association, Process memory reading) - LGPL
-* [Insubstantial] (Substance Look and Feel, Flamingo Ribbon component) - Revised BSD
-* [javactivex] (Flash Player ActiveX embedding) - LGPLv3
-* [flashdebugger library] (Debugging ActionScript) - LGPLv3
-* FFDec Library (LGPLv3) - see below
+- [Java Native Access — JNA] (file associations and process memory reading) — LGPL.
+- [Insubstantial] (Substance Look and Feel and Flamingo Ribbon component) — Revised BSD.
+- [javactivex] (Flash Player ActiveX embedding) — LGPLv3.
+- [flashdebugger library] (ActionScript debugging) — LGPLv3.
+- FFDec Library — LGPLv3; see the [library README](libsrc/ffdec_lib/README.md).
 
-Application uses also some icons of the [Silk icons pack], [Silk companion 1], [FatCow icons pack] and [Aha-Soft icons pack].
+The application also uses icons from the [Silk icons pack], [Silk companion 1], [FatCow icons pack], and [Aha-Soft icons pack]. EXE launchers use [Launch5j], licensed under MIT.
 
-For EXE launchers we use [Launch5j] - MIT.
-
-## Library
-See [library README](libsrc/ffdec_lib/README.md) for more info about FFDec library.
-
-[GIT]: http://git-scm.com/downloads
-[Netbeans IDE]: http://www.netbeans.org/
+[Git]: http://git-scm.com/downloads
+[NetBeans IDE]: http://www.netbeans.org/
 [Apache Ant]: http://ant.apache.org/
 [Launch5j]: https://github.com/lordmulder/Launch5j
 [NSIS]: http://nsis.sourceforge.net/
 [JSyntaxPane]: https://code.google.com/p/jsyntaxpane/
-[Java Native Access - JNA]: https://github.com/twall/jna
+[Java Native Access — JNA]: https://github.com/twall/jna
 [Insubstantial]: http://shemnon.com/speling/2011/04/insubstantial-62-release.html
-[javactivex]:https://github.com/jindrapetrik/javactivex
+[javactivex]: https://github.com/jindrapetrik/javactivex
 [flashdebugger library]: https://github.com/jindrapetrik/flashdebugger
 [Silk icons pack]: http://www.famfamfam.com/lab/icons/silk/
 [Silk companion 1]: http://damieng.com/creative/icons/silk-companion-1-icons
