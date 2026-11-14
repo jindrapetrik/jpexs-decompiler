@@ -67,6 +67,128 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="26.5.0" date="2026-11-14">
+			<description>
+				<p>Features</p>
+				<ul>
+					<li>mxml export (#763)</li>
+					<li>fla export: export as3 components</li>
+					<li>fla export: export as2 components</li>
+					<li>fla export: export as1 components</li>
+					<li>fla export: export flash 5 smart clips</li>
+					<li>add swz files reading support</li>
+					<li>fla export: convert tlf texts</li>
+					<li>as1/2 direct editor: group subsequent pushes (#2770)</li>
+					<li>simple editor: add shapes editor (#2777)</li>
+					<li>simple editor: add replace content of the selected frames (#2769)</li>
+					<li>simple editor: add show / hide depth switch</li>
+					<li>simple editor: add lock depth switch</li>
+					<li>simple editor: add lock/hide all depths switch</li>
+					<li>as3 sprite export (PR299)</li>
+					<li>cli: keep only the -selectclass classes in -swf2swc (PR309)</li>
+					<li>simple editor: order layers on timeline from topmost</li>
+					<li>simple editor: reorder layers by dragging</li>
+					<li>simple editor: add or remove layers</li>
+					<li>simple editor: add advanced add/remove/clear/convert frame</li>
+					<li>simple editor: improve dragging to stage from library</li>
+					<li>simple editor: add deleting objects on stage with del key</li>
+					<li>simple editor: select multiple layers</li>
+					<li>simple editor: scroll to selection</li>
+					<li>simple editor: double click to go to parent layer</li>
+					<li>simple editor: add masking property</li>
+					<li>simple editor: edit 9-slice scaling grid</li>
+					<li>simple editor: add buttons for adding shape, movie clip, button</li>
+					<li>simple editor: add layer icon</li>
+					<li>simple editor: add scripts layer icon</li>
+					<li>simple editor: add edit button</li>
+					<li>simple editor: add placing images from library to stage</li>
+					<li>play streamed sound on sprite/swf previews (#2558)</li>
+					<li>use NameCharacter to set character name (shape,sprite,button,sound)</li>
+					<li>add details about CharacterSet tag (macromedia generator)</li>
+					<li>add undo/redo of all edits, not just in the simple editor</li>
+					<li>add simple editor button under previews</li>
+					<li>add option to change ui font (#2695)</li>
+					<li>add font chooser dialog for advanced settings fonts (#1316)</li>
+					<li>add AppImage release for GNU/Linux (#2197)</li>
+					<li>read/write directUI fluster FTR files (#2495)</li>
+					<li>simple editor: show classic tween, option to add or remove tween</li>
+					<li>fla export: add option to use folders</li>
+				</ul>
+				<p>Bug Fixes</p>
+				<ul>
+					<li>fla export: export 8bit PCM samples, fix samplecount</li>
+					<li>as3: keep anonymous function in ternar operator branch</li>
+					<li>correct GraphPartMarkedArrayList.subList bounds</li>
+					<li>as3: keep switch cases lost when moving default body</li>
+					<li>loop exit to parent precontinue is a break, not a goto</li>
+					<li>loop exit which only returns is not the break when there is other exit</li>
+					<li>as3: declare register assigned in for loop first command</li>
+					<li>fla export: preserve morphs and other tweens (#2583, #2169, #2151, #2161, #2706)</li>
+					<li>fla export: fix morphshape detection - point order (#2169)</li>
+					<li>fla export: fix shapes with close intersections (#2669)</li>
+					<li>fla export: fix shapes overlapping fills (#1011)</li>
+					<li>fla export: fix export cancellation</li>
+					<li>fla export: preserve fills along coincident shape edges (#2532)</li>
+					<li>fix collect depth as sprite tag placement</li>
+					<li>as3: regexp literal that would be a comment</li>
+					<li>as3: attribute with runtime name lost the @</li>
+					<li>as3: imports for script initializer code after the package block</li>
+					<li>as3: slot increment through a temporary register</li>
+					<li>fla export: preserve fills in shapes with multiple style groups (#2772)</li>
+					<li>fla export: prevent old Flash editors crashes on degenerate shape edges (#281)</li>
+					<li>fla export: preserve existing files on export failure</li>
+					<li>fla export: propagate exceptions</li>
+					<li>font normalizer: fix device fonts (without layout)</li>
+					<li>fla export: preserve sampled motion for legacy targets</li>
+					<li>fla export: preserve dynamic text auto size</li>
+					<li>fla export: restore timeline tab order</li>
+					<li>fla export: restore class-based sound events</li>
+					<li>fla export: preserve publish settings and XMP metadata</li>
+					<li>fix nullpointer on missing font</li>
+					<li>handle ActionPush read out of bounds</li>
+					<li>handle invalid count of items in ActionConstantPool (#2775)</li>
+					<li>as1/2: handle too short ActionTry (#2775)</li>
+					<li>as1/2 deobfuscation: include ActionInitObject and ActionInitArray (#2775)</li>
+					<li>fix navigation to hex dump and taglist for frame scripts</li>
+					<li>fix transforming placeobject which has no matrix (has move)</li>
+					<li>fix rotation tween interpolation and add transformation point selection (#2776)</li>
+					<li>as3: type a for-each var declared before the loop from its coerce (PR297)</li>
+					<li>as3: type locals declared without a coerce from their coerced assignments (PR298)</li>
+					<li>fix definebuttons action position in the tag tree (#2779)</li>
+					<li>fla export: fix empty static text (#2780)</li>
+					<li>simple editor: fix frame adding / removing on timeline</li>
+					<li>as3: drop the dup temp of a compound assign whose value branches (PR296)</li>
+					<li>as3: drop the dup temp of a compound assign compiled with initproperty (PR300)</li>
+					<li>as3: wrap a constructor's code after an early return before super() (PR301)</li>
+					<li>as3: undo the parsed exceptions of a discarded precontinue walk (PR302)</li>
+					<li>as3: print a coerce to a subtype as an explicit cast (PR304)</li>
+					<li>as3: keep the body of a catch compiled without type and name (PR305)</li>
+					<li>as3: import the types of static vars set in the script initializer (PR306)</li>
+					<li>as3: qualify a field found through the scope chain that a local shadows (PR307)</li>
+					<li>as3: print returnvoid in a function returning a value as return undefined (PR308)</li>
+					<li>as3: break an inner loop whose exit is the continue of a for each (PR310)</li>
+					<li>as3: read values pushed before a cast check instead of printing §§pop (PR311)</li>
+					<li>swc: store the SWC library.swf uncompressed (PR312)</li>
+					<li>shape bitmap exporter: differentiate start and end cap style</li>
+					<li>simple editor: fix timeline frames border, empty frames drawing</li>
+					<li>fix nullpointer in CalcellableWorker</li>
+					<li>fix pixel hinting</li>
+					<li>simple editor: select newly created swf tab</li>
+					<li>fix nullpointer on timeline</li>
+					<li>fix add/remove character on non-unicode fonts</li>
+					<li>as3: compile super.method() as callsuper (#2784, PR315)</li>
+					<li>fix nullpointer on nonswf item</li>
+				</ul>
+				<p>Performance Improvements</p>
+				<ul>
+					<li>fla export: add tween detection quality setting</li>
+					<li>fla export: speed up mask frame tracking (#2136, #2154)</li>
+					<li>cache gfx externalimage error image</li>
+					<li>optimize blur</li>
+					<li>optimize blend composite</li>
+				</ul>
+			</description>
+		</release>
 		<release version="26.4.0" date="2026-10-19">
 			<description>
 				<p>Features</p>
