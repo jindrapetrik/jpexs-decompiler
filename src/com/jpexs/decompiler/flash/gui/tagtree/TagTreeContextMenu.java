@@ -2532,9 +2532,13 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void addAddTagMenuItems(List<Integer> allowedTagTypes, JMenu addTagMenu, TreeItem item, AddTagActionListener listener, String parentFolder, boolean includeCreateActions) {
-        int swfVersion = mainPanel.getCurrentSwf().version;
+        SWF swf = mainPanel.getCurrentSwf();
+        if (swf == null) {
+            return;
+        }
+        int swfVersion = swf.version;
         if (allowedTagTypes == null) {
-            boolean gfx = mainPanel.getCurrentSwf().gfx;
+            boolean gfx = swf.gfx;
 
             String[] folders = new String[]{
                 TagTreeModel.FOLDER_SHAPES,
