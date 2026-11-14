@@ -17,16 +17,22 @@ import static org.testng.Assert.assertTrue;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.easygui.TimelineFrameEdits.KeyEdit;
+import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShapeTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.timeline.TweenRange;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -39,7 +45,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -88,7 +97,7 @@ public class TimelineFrameEditsTest {
             TimelineBodyPanel body = new TimelineBodyPanel(null, new UndoManager());
             body.setTimeline(swf.getTimeline());
             body.frameSelect(1, 1, false);
-            JPopupMenu menu = body.createFrameMenu();
+            JPopupMenu menu = body.createFrameMenu(new Point(1, 1));
             assertFalse(menu.getComponent(1).isEnabled(), "No layer frame remains to remove");
             assertFalse(menu.getComponent(5).isEnabled(), "The layer termination is not an editable key");
         });
@@ -690,7 +699,7 @@ public class TimelineFrameEditsTest {
             TimelineBodyPanel body = new TimelineBodyPanel(null, new UndoManager());
             body.setTimeline(swf.getTimeline());
             body.frameSelect(0, 1, false);
-            JPopupMenu menu = body.createFrameMenu();
+            JPopupMenu menu = body.createFrameMenu(new Point(0, 1));
             List<String> keys = Arrays.asList("insertFrame", "removeFrames", "insertKeyframe", "insertBlankKeyframe",
                     "clearKeyframe", "convertToKeyframes", "convertToBlankKeyframes", "clearFrames");
             for (int i = 0; i < keys.size(); i++) {
@@ -699,8 +708,58 @@ public class TimelineFrameEditsTest {
                 assertTrue(item.isEnabled());
             }
             body.frameSelect(1, 1, false);
-            assertFalse(body.createFrameMenu().getComponent(8).isEnabled());
+            assertFalse(body.createFrameMenu(new Point(1, 1)).getComponent(8).isEnabled());
         });
+    }
+
+    @Test
+    public void tweenMenuUsesTheClickedSpanAndTheNextPlacementOnThatDepth() throws Exception {
+        SWF swf = new SWF();
+        int character = shape(swf);
+        int otherCharacter = shape(swf);
+        DefineSpriteTag sprite = new DefineSpriteTag(swf);
+        swf.addTag(sprite);
+        for (Timelined timeline : Arrays.asList(swf, sprite)) {
+            for (int depth = 1; depth <= 5; depth++) {
+                place(timeline, depth, character, 0, false);
+            }
+            endFrame(timeline);
+            place(timeline, 5, character, 100, true);
+            endFrame(timeline);
+            place(timeline, 1, character, 200, true);
+            place(timeline, 2, -1, 200, true);
+            place(timeline, 3, otherCharacter, 200, true);
+            remove(timeline, 4);
+            endFrame(timeline);
+            place(timeline, 4, character, 300, false);
+            endFrame(timeline);
+        }
+
+        SwingUtilities.invokeAndWait(() -> {
+            TimelineBodyPanel body = new TimelineBodyPanel(null, new UndoManager());
+            String tweenLabel = AppStrings.translate(MainFrame.class, "contextmenu.createTween");
+            for (Timelined timeline : Arrays.asList(swf, sprite)) {
+                body.setTimeline(timeline.getTimeline());
+                body.refreshAfterEdit(timeline, new LinkedHashSet<>(Arrays.asList(
+                        new Point(0, 3), new Point(0, 1), new Point(1, 1), new Point(1, 3))));
+                assertTrue(hasMenuItem(body.createFrameMenu(new Point(0, 1)), tweenLabel));
+                assertTrue(hasMenuItem(body.createFrameMenu(new Point(1, 1)), tweenLabel));
+                assertFalse(hasMenuItem(body.createFrameMenu(new Point(1, 3)), tweenLabel));
+                body.frameSelect(1, 2, false);
+                assertTrue(hasMenuItem(body.createFrameMenu(new Point(1, 2)), tweenLabel));
+                body.frameSelect(0, 4, false);
+                assertFalse(hasMenuItem(body.createFrameMenu(new Point(0, 4)), tweenLabel));
+                body.frameSelect(0, 5, false);
+                assertFalse(hasMenuItem(body.createFrameMenu(new Point(0, 5)), tweenLabel));
+                body.frameSelect(2, 1, false);
+                assertFalse(hasMenuItem(body.createFrameMenu(new Point(2, 1)), tweenLabel));
+            }
+        });
+    }
+
+    private static boolean hasMenuItem(JPopupMenu menu, String label) {
+        return Arrays.stream(menu.getComponents()).anyMatch(component ->
+                component instanceof JMenuItem && label.equals(((JMenuItem) component).getText()));
     }
 
     private static Set<Point> cells(int... frames) {
@@ -823,7 +882,8 @@ public class TimelineFrameEditsTest {
                 TimelineBodyPanel.FrameSpan mask = body.getMaskEditSpan(2, 2);
                 assertEquals(mask.first, 1);
                 assertEquals(mask.last, 2);
-                assertEquals(body.createFrameMenu().getComponentCount(), 11, "Masking is edited in Properties");
+                assertFalse(hasMenuItem(body.createFrameMenu(new Point(2, 2)), EasyStrings.translate("action.editMask")),
+                        "Masking is edited in Properties");
                 body.refreshAfterEdit(swf, new LinkedHashSet<>(Arrays.asList(new Point(2, 2), new Point(3, 2))));
                 TimelineBodyPanel.FrameSpan selected = body.getMaskEditSpan(2, 2);
                 assertEquals(selected.first, 2);
@@ -936,6 +996,154 @@ public class TimelineFrameEditsTest {
     }
 
     @Test
+    public void graphicsShapeTweensDrawAnArrowAndKeepTheEndpointKey() throws Exception {
+        SWF swf;
+        try (java.io.FileInputStream input = new java.io.FileInputStream("libsrc/ffdec_lib/testdata/graphics/graphics.swf")) {
+            swf = new SWF(input, false);
+        }
+        Map<Integer, List<TweenRange>> ranges = new XFLConverter().detectTimelineTweens(swf.getTimeline().getFrames(), swf);
+        int[] starts = {17, 21, 25, 29, 33, 37, 61};
+        assertEquals(ranges.get(2).size(), starts.length);
+        for (int i = 0; i < starts.length; i++) {
+            TweenRange range = ranges.get(2).get(i);
+            assertEquals(range.startPosition, starts[i]);
+            assertEquals(range.endPosition, starts[i] + 2);
+            assertEquals(range.shapeTween, starts[i] != 21);
+        }
+        assertEquals(ranges.get(3).size(), 1);
+        TweenRange gradient = ranges.get(3).get(0);
+        assertTrue(gradient.shapeTween);
+        assertEquals(gradient.startPosition, 61);
+        assertEquals(gradient.endPosition, 63);
+
+        TimelineBodyPanel body = paintWithDetectedTweens(swf);
+        SwingUtilities.invokeAndWait(() -> {
+            BufferedImage image = paintTimelineWithoutRibbon(body);
+            Rectangle middle = body.getFrameBounds(18, 2);
+            Rectangle last = body.getFrameBounds(19, 2);
+            Rectangle endpoint = body.getFrameBounds(20, 2);
+            int arrowY = middle.y + TimelineBodyPanel.FRAME_HEIGHT * 3 / 4;
+            assertEquals(image.getRGB(middle.x + 4, middle.y + 6), TimelineBodyPanel.SHAPE_TWEEN_COLOR.getRGB());
+            assertEquals(image.getRGB(middle.x + 4, arrowY), TimelineBodyPanel.KEY_COLOR.getRGB());
+            assertNotEquals(image.getRGB(last.x + 2, arrowY - 2), TimelineBodyPanel.SHAPE_TWEEN_COLOR.getRGB());
+            assertEquals(image.getRGB(endpoint.x + 4, arrowY), TimelineBodyPanel.KEY_COLOR.getRGB());
+            assertNotEquals(image.getRGB(endpoint.x + 4, endpoint.y + 6), TimelineBodyPanel.SHAPE_TWEEN_COLOR.getRGB());
+        });
+    }
+
+    @Test
+    public void timelineDrawsDetectedTweensAcrossSampledKeyframes() throws Exception {
+        SWF swf = new SWF();
+        swf.frameRate = 30;
+        int character = shape(swf);
+        DefineSpriteTag sprite = new DefineSpriteTag(swf);
+        swf.addTag(sprite);
+        for (int frame = 0; frame <= 20; frame++) {
+            place(swf, 1, frame == 0 ? character : -1, frame * 400, frame != 0);
+            MATRIX matrix = new MATRIX();
+            double t = frame / 20.0;
+            matrix.hasScale = true;
+            matrix.scaleX = (float) (Math.round((1 + t * t * t) * 65536) / 65536.0);
+            matrix.scaleY = (float) (Math.round((1 + 0.5 * t * t) * 65536) / 65536.0);
+            sprite.addTag(new PlaceObject2Tag(swf, frame != 0, 1, frame == 0 ? character : -1,
+                    matrix, null, -1, null, -1, null));
+            endFrame(swf);
+            endFrame(sprite);
+        }
+        Map<Integer, List<TweenRange>> motion = new XFLConverter().detectTimelineTweens(sprite.getTimeline().getFrames(), swf);
+        assertEquals(motion.get(1).size(), 1);
+        assertEquals(motion.get(1).get(0).startPosition, 0);
+        assertEquals(motion.get(1).get(0).endPosition, 20);
+
+        TimelineBodyPanel body = paintWithDetectedTweens(swf);
+        SwingUtilities.invokeAndWait(() -> {
+            BufferedImage image = paintTimelineWithoutRibbon(body);
+            Rectangle middle = body.getFrameBounds(10, 1);
+            Rectangle beforeEnd = body.getFrameBounds(19, 1);
+            Rectangle endpoint = body.getFrameBounds(20, 1);
+            int arrowY = middle.y + TimelineBodyPanel.FRAME_HEIGHT * 3 / 4;
+            assertEquals(image.getRGB(middle.x + 4, middle.y + 6), TimelineBodyPanel.MOTION_TWEEN_COLOR.getRGB());
+            assertEquals(image.getRGB(middle.x + 4, arrowY), TimelineBodyPanel.KEY_COLOR.getRGB());
+            assertNotEquals(image.getRGB(beforeEnd.x + 2, arrowY - 2), TimelineBodyPanel.MOTION_TWEEN_COLOR.getRGB());
+            assertEquals(image.getRGB(endpoint.x + 4, arrowY), TimelineBodyPanel.KEY_COLOR.getRGB());
+            assertNotEquals(image.getRGB(endpoint.x + 4, endpoint.y + 6), TimelineBodyPanel.MOTION_TWEEN_COLOR.getRGB());
+            String removeTween = EasyStrings.translate("action.removeTween");
+            body.frameSelect(10, 1, false);
+            assertTrue(hasMenuItem(body.createFrameMenu(new Point(10, 1)), removeTween));
+            body.frameSelect(20, 1, false);
+            assertFalse(hasMenuItem(body.createFrameMenu(new Point(20, 1)), removeTween));
+        });
+    }
+
+    private static TimelineBodyPanel paintWithDetectedTweens(SWF swf) throws Exception {
+        CountDownLatch detected = new CountDownLatch(1);
+        TimelineBodyPanel[] panel = new TimelineBodyPanel[1];
+        SwingUtilities.invokeAndWait(() -> {
+            panel[0] = new TimelineBodyPanel(null, new UndoManager()) {
+                @Override
+                public void repaint() {
+                    if (panel[0] == this) {
+                        detected.countDown();
+                    }
+                    super.repaint();
+                }
+            };
+            panel[0].setTimeline(swf.getTimeline());
+            paintTimelineWithoutRibbon(panel[0]);
+        });
+        assertTrue(detected.await(10, TimeUnit.SECONDS), "The detected tween should trigger a repaint");
+        return panel[0];
+    }
+
+    @Test
+    public void removingTweenHoldsItsFirstPlacementAndPreservesTheFollowingState() throws Exception {
+        SWF swf = new SWF();
+        int character = shape(swf);
+        for (int frame = 0; frame <= 4; frame++) {
+            place(swf, 1, frame == 0 ? character : -1, 200 + frame * 400, frame != 0);
+            place(swf, 2, frame == 0 ? character : -1, frame * 800, frame != 0);
+            endFrame(swf);
+        }
+        FrameLabelTag label = new FrameLabelTag(swf);
+        label.name = "after";
+        swf.addTag(label);
+        endFrame(swf);
+
+        TimelineFrameEdits edit = new TimelineFrameEdits(swf.getTimeline());
+        PlaceObject2Tag start = (PlaceObject2Tag) swf.getTimeline().getDepthState(0, 1).placeObjectTag;
+        edit.removeTween(1, new TweenRange(1, 3));
+        edit.apply();
+
+        assertEquals(swf.getTimeline().getFrameCount(), 6);
+        assertTrue(swf.getTimeline().getDepthState(0, 1).placeObjectTag == start);
+        for (int frame = 1; frame <= 3; frame++) {
+            assertEquals(swf.getTimeline().getDepthState(frame, 1).matrix.translateX, 600);
+            assertEquals(swf.getTimeline().getDepthState(frame, 2).matrix.translateX, frame * 800);
+        }
+        assertEquals(swf.getTimeline().getDepthState(4, 1).matrix.translateX, 1800);
+        assertTrue(swf.getTimeline().getFrame(5).labels.contains("after"));
+
+        edit = new TimelineFrameEdits(swf.getTimeline());
+        edit.removeTween(1, new TweenRange(1, 4));
+        edit.apply();
+        SWF saved = reopen(swf);
+        assertEquals(saved.getTimeline().getFrameCount(), 6);
+        assertEquals(saved.getTimeline().getDepthState(4, 1).matrix.translateX, 600);
+        assertEquals(saved.getTimeline().getDepthState(5, 1).matrix.translateX, 1800);
+        assertEquals(saved.getTimeline().getDepthState(5, 1).instanceId, saved.getTimeline().getDepthState(1, 1).instanceId);
+    }
+
+    private static BufferedImage paintTimelineWithoutRibbon(TimelineBodyPanel body) {
+        boolean ribbon = Configuration.useRibbonInterface.get();
+        Configuration.useRibbonInterface.set(false);
+        try {
+            return paintTimeline(body);
+        } finally {
+            Configuration.useRibbonInterface.set(ribbon);
+        }
+    }
+
+    @Test
     public void layerLabelsAndFrameBoundsUseTheSameReversedDepthOrder() throws Exception {
         SWF swf = new SWF();
         int character = shape(swf);
@@ -968,19 +1176,21 @@ public class TimelineFrameEditsTest {
         return shape.getCharacterId();
     }
 
-    private static void place(SWF swf, int depth, int character, int x, boolean move) {
+    private static void place(Timelined timeline, int depth, int character, int x, boolean move) {
         MATRIX matrix = new MATRIX();
         matrix.translateX = x;
-        swf.addTag(new PlaceObject2Tag(swf, move, depth, character, matrix, null, -1, null, -1, null));
+        PlaceObject2Tag placement = new PlaceObject2Tag(timeline.getSwf(), move, depth, character, matrix, null, -1, null, -1, null);
+        placement.setTimelined(timeline);
+        timeline.addTag(placement);
     }
 
-    private static void remove(SWF swf, int depth) {
-        RemoveObject2Tag remove = new RemoveObject2Tag(swf);
+    private static void remove(Timelined timeline, int depth) {
+        RemoveObject2Tag remove = new RemoveObject2Tag(timeline.getSwf());
         remove.setDepth(depth);
-        swf.addTag(remove);
+        timeline.addTag(remove);
     }
 
-    private static void endFrame(SWF swf) {
-        swf.addTag(new ShowFrameTag(swf));
+    private static void endFrame(Timelined timeline) {
+        timeline.addTag(new ShowFrameTag(timeline.getSwf()));
     }
 }

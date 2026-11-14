@@ -16,17 +16,24 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.easygui.TimelineFrameEdits.KeyEdit;
+import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.CreateTweenDialog;
+import com.jpexs.decompiler.flash.gui.MainFrame;
+import com.jpexs.decompiler.flash.gui.TweenCreation;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.timeline.TweenRange;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -53,14 +60,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -73,6 +85,9 @@ import org.pushingpixels.substance.internal.utils.SubstanceColorUtilities;
 public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListener {
 
     private Timeline timeline;
+    private Frame tweenSource;
+    private Map<Integer, List<TweenRange>> tweens = Collections.emptyMap();
+    private SwingWorker<Map<Integer, List<TweenRange>>, Void> tweenWorker;
     private int dropRow = -1;
     private MaskSpan hoveredMask;
 
@@ -291,6 +306,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
         int maxDepth = getDepthCount();
         int max_f = timeline.getFrameCount() - 1;
+        updateTweens();
 
         Set<Integer> selectedDepths = layerSelection.get().depths;
         drawFrameGrid(g, clip, frameWidth, row -> selectedDepths.contains(flipLayerOrder(row, maxDepth)));
@@ -330,22 +346,42 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 continue;
             }
 
+            List<TweenRange> ranges = tweens.getOrDefault(depth, Collections.emptyList());
+            int rangeIndex = 0;
+            while (rangeIndex < ranges.size() && ranges.get(rangeIndex).endPosition < start_f) {
+                rangeIndex++;
+            }
+            TweenRange range = rangeIndex < ranges.size() ? ranges.get(rangeIndex) : null;
+            int afterTween = rangeIndex == 0 ? 0 : ranges.get(rangeIndex - 1).endPosition + 1;
             int frame = start_f;
-            while (frame > 0 && !startsFrameBlock(frame, depth, blanks)) {
-                frame--;
+            if (range != null && range.startPosition <= start_f) {
+                frame = range.startPosition;
+            } else {
+                while (frame > afterTween && !startsFrameBlock(frame, depth, blanks)) {
+                    frame--;
+                }
             }
             while (frame <= end && frame <= end_f) {
+                if (range != null && frame == range.startPosition) {
+                    drawBlock(g, range.shapeTween ? SHAPE_TWEEN_COLOR : MOTION_TWEEN_COLOR,
+                            depth, frame, range.endPosition - frame + 1,
+                            range.shapeTween ? BlockType.SHAPE_TWEEN : BlockType.MOTION_TWEEN, frameWidth, true);
+                    frame = range.endPosition + 1;
+                    afterTween = frame;
+                    rangeIndex++;
+                    range = rangeIndex < ranges.size() ? ranges.get(rangeIndex) : null;
+                    continue;
+                }
                 DepthState state = getPlacedState(frame, depth);
                 int next = frame + 1;
-                while (next <= end && !startsFrameBlock(next, depth, blanks)) {
+                while (next <= end && (range == null || next < range.startPosition) && !startsFrameBlock(next, depth, blanks)) {
                     next++;
                 }
-                boolean shapeTween = state != null && state.getCharacter() instanceof MorphShapeTag;
-                boolean motionTween = state != null && state.motionTween;
-                Color color = state == null ? getEmptyFrameColor() : shapeTween ? SHAPE_TWEEN_COLOR : getFrameColor();
-                BlockType block = state == null ? BlockType.EMPTY
-                        : motionTween ? BlockType.MOTION_TWEEN : shapeTween ? BlockType.SHAPE_TWEEN : BlockType.NORMAL;
-                drawBlock(g, color, depth, frame, next - frame, block, frameWidth, isKey(frame, depth, blanks));
+                Color color = state == null ? getEmptyFrameColor() : getFrameColor();
+                BlockType block = state == null ? BlockType.EMPTY : BlockType.NORMAL;
+                boolean endpoint = rangeIndex > 0 && frame == afterTween && state != null
+                        && (ranges.get(rangeIndex - 1).shapeTween || state.placeFrame == state.frame);
+                drawBlock(g, color, depth, frame, next - frame, block, frameWidth, endpoint || isKey(frame, depth, blanks));
                 frame = next;
             }
             drawMaskStripes(g, row, depth, start_f, Math.min(end_f, Math.min(end, max_f)), frameWidth);
@@ -518,9 +554,12 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
         g.setColor(KEY_COLOR);
         if (isTween) {
-            g.drawLine(frame * frameWidth, rowY + frameHeight * 3 / 4,
-                    frame * frameWidth + num_frames * frameWidth - frameWidth / 2, rowY + frameHeight * 3 / 4
-            );
+            int y = rowY + frameHeight * 3 / 4;
+            int start = frame * frameWidth + frameWidth / 2 + MARKER_SIZE;
+            int tip = (frame + num_frames) * frameWidth - 3;
+            g.drawLine(start, y, tip, y);
+            g.drawLine(tip - 4, y - 3, tip, y);
+            g.drawLine(tip - 4, y + 3, tip, y);
         }
 
         if (cursor != null && cursor.contains(new Point(frame, depth))) {
@@ -540,9 +579,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             } else {
                 g.setColor(KEY_COLOR);
             }
-            if (isTween) {
-                g.fillOval(endFrame * frameWidth + frameWidth / 2 - MARKER_SIZE / 2, rowY + frameHeight * 3 / 4 - MARKER_SIZE / 2, MARKER_SIZE, MARKER_SIZE);
-            } else {
+            if (!isTween) {
 
                 if (cursor != null && cursor.contains(new Point(endFrame, depth))) {
                     g.setBackground(getSelectedColorText());
@@ -858,7 +895,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         requestFocusInWindow();
         if (SwingUtilities.isRightMouseButton(e)) {
 
-            JPopupMenu popupMenu = createFrameMenu();
+            JPopupMenu popupMenu = createFrameMenu(p);
             if (popupMenu.getComponentCount() > 0) {
                 showFrameMenu(popupMenu, e.getLocationOnScreen());
             }
@@ -894,7 +931,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 Math.max(workArea.y, Math.min(y, maxY)));
     }
 
-    JPopupMenu createFrameMenu() {
+    JPopupMenu createFrameMenu(Point clickedCell) {
         JPopupMenu menu = new JPopupMenu();
         Set<Point> cells = getEditableCells();
         if (cells.isEmpty()) {
@@ -917,16 +954,76 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
         addFrameMenuItem(menu, "action.clearFrames", canClearFrames(cells), () -> clearFrames(cells));
 
         if (!(timeline.timelined instanceof ButtonTag)) {
+            TweenRange detectedTween = getDetectedTween(clickedCell);
+            TweenCreation tween = detectedTween == null ? findTween(clickedCell) : null;
             Set<Point> realCells = new LinkedHashSet<>(cells);
             realCells.removeIf(cell -> timeline.getFrame(cell.x) == null);
-            if (!realCells.isEmpty()) {
+            if (detectedTween != null || tween != null || !realCells.isEmpty()) {
                 menu.addSeparator();
+            }
+            if (detectedTween != null) {
+                addFrameMenuItem(menu, "action.removeTween", true, () -> removeTween(clickedCell, detectedTween));
+            }
+            if (tween != null) {
+                JMenuItem createTween = new JMenuItem(AppStrings.translate(MainFrame.class, "contextmenu.createTween"),
+                        View.getIcon("tween16"));
+                createTween.addActionListener(event -> createTween(clickedCell));
+                menu.add(createTween);
+            }
+            if (!realCells.isEmpty()) {
                 JMenuItem replace = new JMenuItem(EasyStrings.translate("action.replaceSelectedContent") + "...");
                 replace.addActionListener(event -> replaceSelectedContent(realCells));
                 menu.add(replace);
             }
         }
         return menu;
+    }
+
+    private TweenRange getDetectedTween(Point cell) {
+        if (timeline == null || timeline.getFrame(0) != tweenSource || getLockedDepths().contains(cell.y)) {
+            return null;
+        }
+        for (TweenRange range : tweens.getOrDefault(cell.y, Collections.emptyList())) {
+            if (range.startPosition <= cell.x && cell.x <= range.endPosition) {
+                return range;
+            }
+        }
+        return null;
+    }
+
+    private void removeTween(Point cell, TweenRange range) {
+        if (getDetectedTween(cell) != range) {
+            return;
+        }
+        TimelineFrameEdits edit = new TimelineFrameEdits(timeline, getBlankFrames());
+        edit.removeTween(cell.y, range);
+        SWF swf = timeline.timelined.getSwf();
+        applyTimelineEdit(edit::apply, !edit.isEmpty(), edit.getBlankFrames(),
+                EasyStrings.translate("action.removeTween"), cursor, () -> swfPanel.getMainPanel().refreshTree(swf));
+    }
+
+    private TweenCreation findTween(Point cell) {
+        if (timeline == null || !(timeline.timelined instanceof SWF || timeline.timelined instanceof DefineSpriteTag)
+                || cell.y <= 0 || getLockedDepths().contains(cell.y)) {
+            return null;
+        }
+        DepthState state = getPlacedState(cell.x, cell.y);
+        return state == null || state.placeObjectTag == null ? null
+                : TweenCreation.find(timeline, state.placeFrame.frame, state.placeObjectTag);
+    }
+
+    private void createTween(Point cell) {
+        TweenCreation tween = findTween(cell);
+        if (tween == null) {
+            return;
+        }
+        CreateTweenDialog dialog = tween.createDialog(SwingUtilities.getWindowAncestor(this));
+        if (dialog.showDialog() == CreateTweenDialog.OK_OPTION) {
+            SWF swf = timeline.timelined.getSwf();
+            applyTimelineEdit(tween.createEdit(dialog), true, getBlankFrames(),
+                    AppStrings.translate(MainFrame.class, "contextmenu.createTween"), cursor,
+                    () -> swfPanel.getMainPanel().refreshTree(swf));
+        }
     }
 
     int getMaskClipDepthLimit() {
@@ -1125,7 +1222,8 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
 
     private void applyFrameEdit(TimelineFrameEdits edit, String description, Set<Point> after) {
         if (edit.fitsSwf()) {
-            applyTimelineEdit(edit::apply, !edit.isEmpty(), edit.getBlankFrames(), description, after);
+            applyTimelineEdit(edit::apply, !edit.isEmpty(), edit.getBlankFrames(),
+                    EasyStrings.translate(description), after, () -> {});
         }
     }
 
@@ -1139,7 +1237,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 button.getRecords().add(new BUTTONRECORD(record));
             }
             button.resetTimeline();
-        }, edit.changesRecords(), edit.getBlankFrames(), description, after);
+        }, edit.changesRecords(), edit.getBlankFrames(), EasyStrings.translate(description), after, () -> {});
     }
 
     boolean canAddLayer() {
@@ -1310,7 +1408,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     private void applyTimelineEdit(Runnable edit, boolean changesTags, TimelineBlankFrames blankFrames,
-            String description, Set<Point> selectionAfterEdit) {
+            String description, Set<Point> selectionAfterEdit, Runnable afterEdit) {
         TimelineBlankFrames originalBlanks = getBlankFrames();
         if (!changesTags && originalBlanks.equals(blankFrames)) {
             return;
@@ -1347,11 +1445,12 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 swfPanel.setTimelineDepthCount(timelined, depthCount);
                 swfPanel.setTimelineBlankFrames(timelined, frames);
                 refreshAfterEdit(timelined, selection);
+                afterEdit.run();
             }
 
             @Override
             public String getDescription() {
-                return EasyStrings.translate(description);
+                return description;
             }
 
             @Override
@@ -1520,7 +1619,64 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
     }
 
     public void setTimeline(Timeline timeline) {
+        if (this.timeline != timeline) {
+            clearTweens();
+        }
         this.timeline = timeline;
         refresh();
+    }
+
+    private void clearTweens() {
+        if (tweenWorker != null) {
+            tweenWorker.cancel(true);
+            tweenWorker = null;
+        }
+        tweenSource = null;
+        tweens = Collections.emptyMap();
+    }
+
+    private void updateTweens() {
+        if (!(timeline.timelined instanceof SWF || timeline.timelined instanceof DefineSpriteTag)) {
+            return;
+        }
+        // Timeline resets replace the frame objects, even when the Timeline is reused.
+        Frame first = timeline.getFrame(0);
+        if (first == tweenSource) {
+            return;
+        }
+        clearTweens();
+        tweenSource = first;
+        if (timeline.getFrameCount() < 3) {
+            return;
+        }
+        List<Frame> frames = new ArrayList<>(timeline.getFrames());
+        SWF swf = timeline.swf;
+        tweenWorker = new SwingWorker<Map<Integer, List<TweenRange>>, Void>() {
+            @Override
+            protected Map<Integer, List<TweenRange>> doInBackground() throws Exception {
+                return new XFLConverter().detectTimelineTweens(frames, swf);
+            }
+
+            @Override
+            protected void done() {
+                if (tweenWorker != this || isCancelled()) {
+                    return;
+                }
+                tweenWorker = null;
+                if (timeline.getFrame(0) != first) {
+                    repaint();
+                    return;
+                }
+                try {
+                    tweens = get();
+                    repaint();
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException ex) {
+                    Logger.getLogger(TimelineBodyPanel.class.getName()).log(Level.WARNING, "Cannot detect timeline tweens", ex.getCause());
+                }
+            }
+        };
+        tweenWorker.execute();
     }
 }

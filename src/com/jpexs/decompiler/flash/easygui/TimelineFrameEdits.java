@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.timeline.TweenRange;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -451,6 +452,36 @@ final class TimelineFrameEdits {
             blankFrames.extend(depth, last);
         }
         rewriteSpans(depth, replacement, timeline.getDepthMaxFrame().getOrDefault(depth, -1));
+    }
+
+    void removeTween(int depth, TweenRange range) {
+        DepthState first = placedAt(range.startPosition, depth);
+        DepthState last = placedAt(range.endPosition, depth);
+        for (int frame = range.startPosition + 1; frame <= range.endPosition; frame++) {
+            for (Tag tag : timeline.getFrame(frame).allInnerTags) {
+                if (getCommandDepth(tag) == depth) {
+                    removals.add(indices.get(tag));
+                }
+            }
+        }
+
+        int nextFrame = range.endPosition + 1;
+        DepthState next = placedAt(nextFrame, depth);
+        if (next == null || next.instanceId != last.instanceId || first.equals(last)) {
+            return;
+        }
+        // Keep the original state that a following hold or partial Move inherits.
+        PlaceObjectTypeTag restore = makePlacement(timelined, last, depth, true);
+        if (first.characterId == last.characterId) {
+            restore.setCharacterId(-1);
+        }
+        for (Tag tag : timeline.getFrame(nextFrame).allInnerTags) {
+            if (getCommandDepth(tag) == depth) {
+                insertions.computeIfAbsent(indices.get(tag), key -> new ArrayList<>()).add(restore);
+                return;
+            }
+        }
+        addToFrame(nextFrame, restore);
     }
 
     private void rewriteSpans(int depth, NavigableMap<Integer, DepthState> replacement, int layerEnd) {

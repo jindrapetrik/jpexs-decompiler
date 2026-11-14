@@ -62,7 +62,7 @@ import com.jpexs.decompiler.flash.gui.SaveFileMode;
 import com.jpexs.decompiler.flash.gui.SelectFramePositionDialog;
 import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
-import com.jpexs.decompiler.flash.gui.TweenEasing;
+import com.jpexs.decompiler.flash.gui.TweenCreation;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.abc.ABCExplorerDialog;
@@ -2128,7 +2128,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         if (items.size() == 1 && items.get(0) instanceof PlaceObjectTypeTag) {
-            createTweenMenuItem.setVisible(findTweenTarget((PlaceObjectTypeTag) items.get(0)) != null);
+            createTweenMenuItem.setVisible(TweenCreation.find((PlaceObjectTypeTag) items.get(0)) != null);
         }
 
         if (allSelectedIsText) {
@@ -3351,157 +3351,25 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
-    private TweenTarget findTweenTarget(PlaceObjectTypeTag source) {
-        Timelined timelined = source.getTimelined();
-        if (timelined == null) {
-            return null;
-        }
-        Timeline timeline = timelined.getTimeline();
-        int sourceFrame = -1;
-        for (int frameIndex = 0; frameIndex < timeline.getFrameCount(); frameIndex++) {
-            if (timeline.getFrame(frameIndex).innerTags.contains(source)) {
-                sourceFrame = frameIndex;
-                break;
-            }
-        }
-        if (sourceFrame < 0) {
-            return null;
-        }
-
-        DepthState sourceState = timeline.getFrame(sourceFrame).layers.get(source.getDepth());
-        if (sourceState == null || sourceState.characterId < 0) {
-            return null;
-        }
-        MATRIX startMatrix = sourceState.matrix == null ? new MATRIX() : new MATRIX(sourceState.matrix);
-
-        for (int frameIndex = sourceFrame + 1; frameIndex < timeline.getFrameCount(); frameIndex++) {
-            Frame frame = timeline.getFrame(frameIndex);
-            for (Tag tag : frame.innerTags) {
-                if (tag instanceof DepthTag && ((DepthTag) tag).getDepth() == source.getDepth()
-                        && !(tag instanceof PlaceObjectTypeTag)) {
-                    return null;
-                }
-                if (!(tag instanceof PlaceObjectTypeTag)) {
-                    continue;
-                }
-                PlaceObjectTypeTag candidate = (PlaceObjectTypeTag) tag;
-                if (candidate.getDepth() != source.getDepth()) {
-                    continue;
-                }
-
-                boolean sameCharacter = candidate.getCharacterId() == sourceState.characterId;
-                boolean moveWithoutCharacter = candidate.flagMove() && candidate.getCharacterId() == -1;
-                if (!sameCharacter && !moveWithoutCharacter) {
-                    return null;
-                }
-                if (frameIndex <= sourceFrame + 1) {
-                    return null;
-                }
-                DepthState targetState = frame.layers.get(source.getDepth());
-                if (targetState == null) {
-                    return null;
-                }
-                boolean tweenColorTransform = source.getColorTransform() != null
-                        || candidate.getColorTransform() != null;
-                CXFORMWITHALPHA startColorTransform = sourceState.colorTransForm == null
-                        ? null : new CXFORMWITHALPHA(sourceState.colorTransForm);
-                CXFORMWITHALPHA endColorTransform = targetState.colorTransForm == null
-                        ? null : new CXFORMWITHALPHA(targetState.colorTransForm);
-                boolean tweenRatio = source.getRatio() > -1 || candidate.getRatio() > -1;
-                int startRatio = tweenRatio ? Math.max(0, sourceState.ratio) : sourceState.ratio;
-                int endRatio = tweenRatio ? Math.max(0, targetState.ratio) : targetState.ratio;
-                return new TweenTarget(timelined, sourceFrame, frameIndex, source.getDepth(),
-                        sourceState.characterId, startMatrix,
-                        targetState.matrix == null ? new MATRIX() : new MATRIX(targetState.matrix),
-                        startColorTransform, endColorTransform, tweenColorTransform,
-                        startRatio, endRatio, tweenRatio);
-            }
-        }
-        return null;
-    }
-
     private void createTweenActionPerformed(ActionEvent evt) {
-        try (MainPanel.EditScope edit = mainPanel.beginEdit("contextmenu.createTween", getCurrentItem() == null ? null : getCurrentItem().getOpenable())) {
-            TreeItem selected = getCurrentItem();
-            if (!(selected instanceof PlaceObjectTypeTag)) {
-                return;
-            }
-            TweenTarget target = findTweenTarget((PlaceObjectTypeTag) selected);
-            if (target == null) {
-                return;
-            }
+        TreeItem selected = getCurrentItem();
+        if (!(selected instanceof PlaceObjectTypeTag)) {
+            return;
+        }
+        TweenCreation tween = TweenCreation.find((PlaceObjectTypeTag) selected);
+        if (tween == null) {
+            return;
+        }
+        CreateTweenDialog dialog = tween.createDialog(Main.getDefaultDialogsOwner());
+        if (dialog.showDialog() != CreateTweenDialog.OK_OPTION) {
+            return;
+        }
 
-            int tweenFrameCount = target.targetFrame - target.sourceFrame + 1;
-            CreateTweenDialog dialog = new CreateTweenDialog(Main.getDefaultDialogsOwner(),
-                    ((PlaceObjectTypeTag) selected).getSwf(), target.characterId, tweenFrameCount,
-                    target.startMatrix, target.endMatrix, target.startColorTransform,
-                    target.endColorTransform, target.tweenColorTransform,
-                    target.startRatio, target.endRatio, target.tweenRatio);
-            if (dialog.showDialog() != CreateTweenDialog.OK_OPTION) {
-                return;
-            }
-
-            SWF swf = ((PlaceObjectTypeTag) selected).getSwf();
-            Timeline timeline = target.timelined.getTimeline();
-            for (int frameIndex = target.sourceFrame + 1; frameIndex < target.targetFrame; frameIndex++) {
-                double progress = (double) (frameIndex - target.sourceFrame)
-                        / (target.targetFrame - target.sourceFrame);
-                double eased = dialog.getEasedProgress(progress);
-                MATRIX matrix = dialog.getInterpolatedMatrix(eased);
-                CXFORMWITHALPHA colorTransform = target.tweenColorTransform
-                        ? TweenEasing.interpolate(target.startColorTransform, target.endColorTransform, eased) : null;
-                int ratio = target.tweenRatio
-                        ? TweenEasing.interpolate(target.startRatio, target.endRatio, eased) : -1;
-                PlaceObject2Tag place = new PlaceObject2Tag(swf, true, target.depth, -1,
-                        matrix, colorTransform, ratio, null, -1, null);
-                place.setTimelined(target.timelined);
-                place.setModified(true);
-                Frame frame = timeline.getFrame(frameIndex);
-                int insertIndex = frame.showFrameTag == null
-                        ? target.timelined.getTags().size()
-                        : target.timelined.indexOfTag(frame.showFrameTag);
-                target.timelined.addTag(insertIndex, place);
-            }
-            target.timelined.resetTimeline();
-            swf.resetTimelines(target.timelined);
+        SWF swf = ((PlaceObjectTypeTag) selected).getSwf();
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("contextmenu.createTween", selected.getOpenable())) {
+            tween.createEdit(dialog).run();
             swf.setModified(true);
             mainPanel.refreshTree(swf);
-        }
-    }
-
-    private static class TweenTarget {
-
-        private final Timelined timelined;
-        private final int sourceFrame;
-        private final int targetFrame;
-        private final int depth;
-        private final int characterId;
-        private final MATRIX startMatrix;
-        private final MATRIX endMatrix;
-        private final CXFORMWITHALPHA startColorTransform;
-        private final CXFORMWITHALPHA endColorTransform;
-        private final boolean tweenColorTransform;
-        private final int startRatio;
-        private final int endRatio;
-        private final boolean tweenRatio;
-
-        TweenTarget(Timelined timelined, int sourceFrame, int targetFrame, int depth,
-                int characterId, MATRIX startMatrix, MATRIX endMatrix,
-                CXFORMWITHALPHA startColorTransform, CXFORMWITHALPHA endColorTransform,
-                boolean tweenColorTransform, int startRatio, int endRatio, boolean tweenRatio) {
-            this.timelined = timelined;
-            this.sourceFrame = sourceFrame;
-            this.targetFrame = targetFrame;
-            this.depth = depth;
-            this.characterId = characterId;
-            this.startMatrix = startMatrix;
-            this.endMatrix = endMatrix;
-            this.startColorTransform = startColorTransform;
-            this.endColorTransform = endColorTransform;
-            this.tweenColorTransform = tweenColorTransform;
-            this.startRatio = startRatio;
-            this.endRatio = endRatio;
-            this.tweenRatio = tweenRatio;
         }
     }
 

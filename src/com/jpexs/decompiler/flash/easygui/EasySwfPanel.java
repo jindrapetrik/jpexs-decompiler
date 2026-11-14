@@ -400,6 +400,7 @@ public class EasySwfPanel extends JPanel {
                             }
                         }
                         timelined.resetTimeline();
+                        timelinePanel.getTimelineBodyPanel().repaint();
                         stagePanel.repaint();
                         if (transformEnabled()) {
                             stagePanel.freeTransformDepths(depths);
@@ -433,6 +434,7 @@ public class EasySwfPanel extends JPanel {
                             }
                         }
                         stagePanel.getTimelined().resetTimeline();
+                        timelinePanel.getTimelineBodyPanel().repaint();
                         stagePanel.repaint();
                         if (transformEnabled()) {
                             stagePanel.freeTransformDepths(depths);

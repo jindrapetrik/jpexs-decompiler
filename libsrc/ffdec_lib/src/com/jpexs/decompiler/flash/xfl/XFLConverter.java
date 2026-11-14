@@ -122,8 +122,11 @@ import com.jpexs.decompiler.flash.tags.base.StartSoundBase;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
+import com.jpexs.decompiler.flash.timeline.DepthState;
+import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.SoundStreamFrameRange;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.timeline.TweenRange;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
@@ -687,6 +690,182 @@ public class XFLConverter {
             writer.writeAttribute("c", m.rotateSkew1);
         }
         writer.writeEndElement();
+    }
+
+    /**
+     * Detects the classic, motion and shape spans shown in the Simple Editor.
+     * The frames are a snapshot of one SWF or sprite timeline.
+     *
+     * @param frames source frames in timeline order
+     * @param swf source movie
+     * @return detected ranges by depth, in frame order
+     * @throws XMLStreamException if sample conversion fails
+     * @throws InterruptedException if detection is cancelled
+     */
+    public Map<Integer, List<TweenRange>> detectTimelineTweens(List<Frame> frames, SWF swf)
+            throws XMLStreamException, InterruptedException {
+        Map<Integer, List<DepthState>> layers = new HashMap<>();
+        boolean hasMorphShapes = false;
+        for (Frame frame : frames) {
+            checkInterrupted();
+            for (DepthState state : frame.layers.values()) {
+                layers.computeIfAbsent(state.depth, depth -> new ArrayList<>()).add(state);
+                hasMorphShapes = hasMorphShapes || state.getCharacter() instanceof MorphShapeTag;
+            }
+        }
+        Map<Integer, List<TweenRange>> result = new HashMap<>();
+        Map<CharacterTag, String> names = new HashMap<>();
+        Reference<Integer> importedId = new Reference<>(0);
+        Map<String, double[]> registrationPoints = new HashMap<>();
+        AccessibilityBag accessibility = new AccessibilityBag();
+        Map<Integer, Map<Integer, MorphShapeEndings.EndPlacement>> morphEndings =
+                hasMorphShapes ? findTimelineMorphEndings(frames) : Collections.emptyMap();
+        for (Map.Entry<Integer, List<DepthState>> layer : layers.entrySet()) {
+            checkInterrupted();
+            List<TweenRange> ranges = hasMorphShapes
+                    ? detectTimelineShapeTweens(layer.getValue(), morphEndings.getOrDefault(layer.getKey(), Collections.emptyMap()),
+                            swf, importedId, names)
+                    : new ArrayList<>();
+            XFLXmlWriter writer = new XFLXmlWriter();
+            Set<Integer> instanceStarts = new HashSet<>();
+            DepthState previous = null;
+            String elements = "";
+            int start = 0;
+            int samples = 0;
+            for (DepthState state : layer.getValue()) {
+                checkInterrupted();
+                int frame = state.frame.frame;
+                boolean newInstance = previous == null || previous.instanceId != state.instanceId
+                        || frame != previous.frame.frame + 1
+                        || previous.clipDepth != state.clipDepth
+                        || (state.placeFrame == state.frame && state.placeObjectTag != null && !state.placeObjectTag.flagMove());
+                if (!newInstance && state.placeObjectTag == previous.placeObjectTag) {
+                    previous = state;
+                    continue;
+                }
+                String nextElements = "";
+                CharacterTag character = state.getCharacter();
+                if ((character instanceof ShapeTag || character instanceof DefineSpriteTag
+                        || character instanceof DefineButton2Tag && ((DefineButton2Tag) character).actions.isEmpty())
+                        && state.clipActions == null && state.placeObjectTag != null
+                        && state.placeObjectTag.getAmfData() == null) {
+                    XFLXmlWriter instance = new XFLXmlWriter();
+                    convertSymbolInstance(frame, accessibility, importedId, names, swf, state.instanceName,
+                            state.matrix, state.colorTransForm, state.cacheAsBitmap, state.blendMode, state.filters,
+                            state.isVisible, state.backGroundColor, null, null, character, FLAVersion.CS6,
+                            instance, false, null, null);
+                    nextElements = instance.toString();
+                    String itemName = names.get(character);
+                    if (!registrationPoints.containsKey(itemName)) {
+                        RECT bounds = ((BoundedTag) character).getRect();
+                        registrationPoints.put(itemName, new double[]{
+                            bounds.getWidth() == 0 ? 0 : -bounds.Xmin / (double) bounds.getWidth(),
+                            bounds.getHeight() == 0 ? 0 : -bounds.Ymin / (double) bounds.getHeight()});
+                    }
+                }
+                if (newInstance || !elements.equals(nextElements)) {
+                    if (previous != null && !elements.isEmpty()) {
+                        convertFrame(importedId, names, false, null, null, start, previous.frame.frame - start + 1,
+                                "", elements, writer, null);
+                        samples++;
+                    }
+                    if (newInstance) {
+                        instanceStarts.add(frame);
+                    }
+                    elements = nextElements;
+                    start = frame;
+                }
+                previous = state;
+            }
+            if (previous != null && !elements.isEmpty()) {
+                convertFrame(importedId, names, false, null, null, start, previous.frame.frame - start + 1,
+                        "", elements, writer, null);
+                samples++;
+            }
+            if (samples >= 4) {
+                ranges.addAll(ClassicTweenDetector.detectRanges(writer.toString(), instanceStarts,
+                        swf.frameRate, registrationPoints, 100));
+            }
+            if (!ranges.isEmpty()) {
+                ranges.sort(Comparator.comparingInt(range -> range.startPosition));
+                result.put(layer.getKey(), ranges);
+            }
+        }
+        return result;
+    }
+
+    private static Map<Integer, Map<Integer, MorphShapeEndings.EndPlacement>> findTimelineMorphEndings(List<Frame> frames)
+            throws InterruptedException {
+        List<Tag> tags = new ArrayList<>();
+        for (Frame frame : frames) {
+            checkInterrupted();
+            tags.addAll(frame.allInnerTags);
+        }
+        Map<Integer, Map<Integer, MorphShapeEndings.EndPlacement>> result = new HashMap<>();
+        int frame = 0;
+        for (Tag tag : MorphShapeEndings.restore(new ReadOnlyTagList(tags), new MorphShapeSymbols())) {
+            checkInterrupted();
+            if (tag instanceof ShowFrameTag) {
+                frame++;
+            } else if (tag instanceof MorphShapeEndings.EndPlacement) {
+                MorphShapeEndings.EndPlacement ending = (MorphShapeEndings.EndPlacement) tag;
+                result.computeIfAbsent(ending.getDepth(), depth -> new HashMap<>()).put(frame, ending);
+            }
+        }
+        return result;
+    }
+
+    private static List<TweenRange> detectTimelineShapeTweens(List<DepthState> layer,
+            Map<Integer, MorphShapeEndings.EndPlacement> endings, SWF swf,
+            Reference<Integer> importedId, Map<CharacterTag, String> names) throws XMLStreamException, InterruptedException {
+        Map<Integer, MorphShapeTween.Sample> samples = new TreeMap<>();
+        Set<Integer> instanceStarts = new HashSet<>();
+        DepthState previous = null;
+        MorphShapeTween.Sample sample = null;
+        for (DepthState state : layer) {
+            checkInterrupted();
+            CharacterTag character = state.getCharacter();
+            if (character instanceof MorphShapeTag && state.placeObjectTag != null) {
+                int frame = state.frame.frame;
+                if (previous == null || previous.instanceId != state.instanceId
+                        || frame != previous.frame.frame + 1
+                        || (state.placeFrame == state.frame && !state.placeObjectTag.flagMove())) {
+                    instanceStarts.add(frame);
+                }
+                if (previous == null || previous.placeObjectTag != state.placeObjectTag
+                        || previous.characterId != state.characterId || previous.ratio != state.ratio) {
+                    sample = timelineMorphSample((MorphShapeTag) character, Math.max(0, state.ratio),
+                            state.matrix, swf, importedId, names);
+                }
+                if (sample != null) {
+                    samples.put(frame, sample);
+                }
+            } else {
+                sample = null;
+            }
+            previous = state;
+        }
+        for (Map.Entry<Integer, MorphShapeEndings.EndPlacement> entry : endings.entrySet()) {
+            int frame = entry.getKey();
+            MorphShapeTween.Sample preceding = samples.get(frame - 1);
+            if (preceding != null) {
+                MorphShapeTween.Sample endpoint = timelineMorphSample(preceding.morph, entry.getValue().getRatio(),
+                        entry.getValue().getMatrix(), swf, importedId, names);
+                if (endpoint != null) {
+                    samples.put(frame, endpoint);
+                }
+            }
+        }
+        return MorphShapeTween.detectRanges(samples, instanceStarts);
+    }
+
+    private static MorphShapeTween.Sample timelineMorphSample(MorphShapeTag morph, int ratio, MATRIX matrix,
+            SWF swf, Reference<Integer> importedId, Map<CharacterTag, String> names) throws XMLStreamException {
+        SHAPEWITHSTYLE pose = morph.getShapeAtRatio(ratio);
+        XFLXmlWriter elements = new XFLXmlWriter();
+        convertShape(importedId, names, swf, matrix, morph.getShapeNum() == 1 ? 3 : 4,
+                pose.shapeRecords, pose.fillStyles, pose.lineStyles, true, false, elements, morph.getCharacterId(), false);
+        return MorphShapeTween.sample(morph, ratio, matrix, elements.toString());
     }
 
     private static boolean shapeHasMultiLayers(List<SHAPERECORD> shapeRecords) throws XMLStreamException {

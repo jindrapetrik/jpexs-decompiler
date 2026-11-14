@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
+import com.jpexs.decompiler.flash.timeline.TweenRange;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,6 +76,18 @@ final class ClassicTweenDetector {
 
     static String detect(String frames, Set<Integer> instanceStarts, double motionFrameRate,
             Map<String, double[]> registrationPoints, int quality) throws XMLStreamException {
+        return detect(frames, instanceStarts, motionFrameRate, registrationPoints, quality, null);
+    }
+
+    static List<TweenRange> detectRanges(String frames, Set<Integer> instanceStarts, double frameRate,
+            Map<String, double[]> registrationPoints, int quality) throws XMLStreamException {
+        List<TweenRange> ranges = new ArrayList<>();
+        detect(frames, instanceStarts, frameRate, registrationPoints, quality, ranges);
+        return ranges;
+    }
+
+    private static String detect(String frames, Set<Integer> instanceStarts, double motionFrameRate,
+            Map<String, double[]> registrationPoints, int quality, List<TweenRange> ranges) throws XMLStreamException {
         if (quality < 0 || quality > 100) {
             throw new IllegalArgumentException("Tween detection quality must be between 0 and 100");
         }
@@ -143,6 +156,9 @@ final class ClassicTweenDetector {
         MotionTweenDetector.FitCache motionCache = null;
         int cachedRunEnd = -1;
         for (int start = 0; start < samples.size();) {
+            if (ranges != null && Thread.currentThread().isInterrupted()) {
+                return frames;
+            }
             Sample first = samples.get(start);
             int limit = runEnds[start];
             Integer acceleration = null;
@@ -170,6 +186,9 @@ final class ClassicTweenDetector {
                     end--;
                 }
             } catch (TweenDetectionBudget.Exhausted ex) {
+                if (ranges != null) {
+                    return frames;
+                }
                 // Discard the incomplete fit and keep every remaining source keyframe.
                 for (int i = start; i < samples.size(); i++) {
                     result.append(samples.get(i).xml).append('\n');
@@ -184,6 +203,11 @@ final class ClassicTweenDetector {
                         "<AnimationCore\\b[^>]*\\bduration=\"([0-9]+)\"").matcher(motion);
                 if (coreDuration.find()) {
                     duration = Integer.parseInt(coreDuration.group(1)) / 1000;
+                }
+                if (ranges != null) {
+                    ranges.add(new TweenRange(first.index, first.index + duration - 1));
+                    start = end + 1;
+                    continue;
                 }
                 String xml = first.xml.replaceFirst(" duration=\"[0-9]+\"", "").replaceFirst("keyMode=\"[0-9]+\"",
                         "keyMode=\"" + XFLConverter.KEY_MODE_MOTION_TWEEN + "\"");
@@ -202,11 +226,18 @@ final class ClassicTweenDetector {
                 }
                 start = end + 1;
             } else if (acceleration == null) {
-                result.append(first.xml).append('\n');
+                if (ranges == null) {
+                    result.append(first.xml).append('\n');
+                }
                 start++;
             } else {
                 changed = true;
                 int duration = samples.get(end).index - first.index;
+                if (ranges != null) {
+                    ranges.add(new TweenRange(first.index, first.index + duration - 1));
+                    start = end;
+                    continue;
+                }
                 String xml = first.xml.replaceFirst(" duration=\"[0-9]+\"", "").replaceFirst("keyMode=\"[0-9]+\"",
                         "keyMode=\"" + XFLConverter.KEY_MODE_CLASSIC_TWEEN + "\"");
                 xml = xml.replaceFirst("<DOMFrame", "<DOMFrame tweenType=\"motion\" motionTweenScale=\"true\""

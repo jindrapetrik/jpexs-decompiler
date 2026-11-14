@@ -618,6 +618,7 @@ public class Timeline {
                             }
                         }
                     }
+                    /*
                     //Special case, as FontTags are sometimes added to stage (like intestdata/as2.swf, Sprite 10)
                     //Do not display them.
                     //Steps to reproduce: Create new static text and set its orientation to vertical
@@ -629,6 +630,8 @@ public class Timeline {
                     } else {
                         fl.key = characterId != -1 || className != null;
                     }
+                    */
+                    fl.key = true;
 
                     if (po.flagMove()) {
                         MATRIX matrix2 = po.getMatrix();

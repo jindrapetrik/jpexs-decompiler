@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.timeline.TweenRange;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
@@ -28,9 +29,11 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.IntUnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
@@ -340,40 +343,19 @@ final class MorphShapeTween {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < xml.size();) {
             Sample first = samples.get(indices.get(i));
-            int end = i;
-            if (first != null) {
-                int direction = 0;
-                while (end + 1 < xml.size()) {
-                    Sample next = samples.get(indices.get(end + 1));
-                    Sample previous = samples.get(indices.get(end));
-                    int change = next == null ? 0 : Integer.compare(next.ratio, previous.ratio);
-                    if (next == null || next.morph != first.morph || next.tx != first.tx || next.ty != first.ty
-                            || next.curves.size() != first.curves.size()  || instanceStarts.contains(indices.get(end + 1))
-                            || indices.get(end + 1) != indices.get(end) + duration(xml.get(end))
-                            || change != 0 && direction != 0 && change != direction) {
-                        break;
-                    }
-                    if (change != 0) {
-                        direction = change;
-                    }
-                    end++;
-                }
-            }
-            Integer acceleration = null;
-            while (end >= i + 2 && (acceleration = fit(samples, indices.get(i), indices.get(end))) == null) {
-                end--;
-            }
+            Match match = findTween(indices, samples, instanceStarts, i, index -> duration(xml.get(index)));
             // Require actual intermediate samples; adjacent keyframes alone do
             // not establish a tween. Retain the last visible pose before removal.
-            if (acceleration == null) {
+            if (match == null) {
                 result.append(xml.get(i++)).append('\n');
                 continue;
             }
+            int end = match.end;
             Sample last = samples.get(indices.get(end));
             XFLXmlWriter tween = new XFLXmlWriter();
             tween.writeStartElement("DOMFrame", new String[]{"index", indices.get(i).toString(),
                 "duration", Integer.toString(indices.get(end) - indices.get(i)), "keyMode", Integer.toString(XFLConverter.KEY_MODE_SHAPE_TWEEN),
-                "tweenType", "shape", "acceleration", acceleration.toString()});
+                "tweenType", "shape", "acceleration", Integer.toString(match.acceleration)});
             // Frame-level hints survive CS6 rebuilding its MorphShape cache.
             // Hints inside MorphShape describe only the disposable cached mapping.
             tween.writeStartElement("morphHintsList");
@@ -395,6 +377,83 @@ final class MorphShapeTween {
             i = end;
         }
         return result.toString();
+    }
+
+    static List<TweenRange> detectRanges(Map<Integer, Sample> samples, Set<Integer> instanceStarts) {
+        List<TweenRange> ranges = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
+        Map<Integer, Integer> ends = new HashMap<>();
+        Sample previous = null;
+        int previousFrame = -2;
+        for (Map.Entry<Integer, Sample> entry : samples.entrySet()) {
+            int frame = entry.getKey();
+            Sample pose = entry.getValue();
+            if (previous == null || frame != previousFrame + 1 || instanceStarts.contains(frame)
+                    || pose.morph != previous.morph || pose.ratio != previous.ratio
+                    || pose.tx != previous.tx || pose.ty != previous.ty) {
+                indices.add(frame);
+            }
+            ends.put(indices.get(indices.size() - 1), frame + 1);
+            previous = pose;
+            previousFrame = frame;
+        }
+        for (int i = 0; i < indices.size() && !Thread.currentThread().isInterrupted();) {
+            Match match = findTween(indices, samples, instanceStarts, i, index -> {
+                int frame = indices.get(index);
+                return ends.get(frame) - frame;
+            });
+            if (match == null) {
+                i++;
+            } else {
+                ranges.add(new TweenRange(indices.get(i), indices.get(match.end) - 1, true));
+                i = match.end;
+            }
+        }
+        return ranges;
+    }
+
+    private static final class Match {
+        final int end;
+        final int acceleration;
+
+        Match(int end, int acceleration) {
+            this.end = end;
+            this.acceleration = acceleration;
+        }
+    }
+
+    private static Match findTween(List<Integer> indices, Map<Integer, Sample> samples,
+            Set<Integer> instanceStarts, int start, IntUnaryOperator durationAt) {
+        Sample first = samples.get(indices.get(start));
+        if (first == null) {
+            return null;
+        }
+        int end = start;
+        int direction = 0;
+        while (end + 1 < indices.size()) {
+            int nextIndex = indices.get(end + 1);
+            Sample next = samples.get(nextIndex);
+            Sample previous = samples.get(indices.get(end));
+            int change = next == null ? 0 : Integer.compare(next.ratio, previous.ratio);
+            if (next == null || next.morph != first.morph || next.tx != first.tx || next.ty != first.ty
+                    || next.curves.size() != first.curves.size() || instanceStarts.contains(nextIndex)
+                    || nextIndex != indices.get(end) + durationAt.applyAsInt(end)
+                    || change != 0 && direction != 0 && change != direction) {
+                break;
+            }
+            if (change != 0) {
+                direction = change;
+            }
+            end++;
+        }
+        while (end >= start + 2 && !Thread.currentThread().isInterrupted()) {
+            Integer acceleration = fit(samples, indices.get(start), indices.get(end));
+            if (acceleration != null) {
+                return new Match(end, acceleration);
+            }
+            end--;
+        }
+        return null;
     }
 
     private static int duration(String frame) {

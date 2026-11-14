@@ -33,9 +33,17 @@ public class TweenRange {
      */
     public int endPosition;
 
+    /** Whether this range describes interpolation of a morph shape. */
+    public final boolean shapeTween;
+
     public TweenRange(int startPosition, int endPosition) {
+        this(startPosition, endPosition, false);
+    }
+
+    public TweenRange(int startPosition, int endPosition, boolean shapeTween) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
+        this.shapeTween = shapeTween;
     }
 
     @Override
