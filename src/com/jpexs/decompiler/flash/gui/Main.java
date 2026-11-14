@@ -92,6 +92,7 @@ import com.jpexs.helpers.streams.SeekableInputStream;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.MenuItem;
@@ -162,9 +163,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
@@ -3520,6 +3523,16 @@ public class Main {
                 UIManager.put("FormattedTextField.background", null);
                 UIManager.put("CommandButtonUI", null);
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                Font uiFont = Configuration.getUiFont();
+                if (uiFont != null) {
+                    FontUIResource font = new FontUIResource(uiFont);
+                    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+                    for (Object key : defaults.keySet()) {
+                        if (key instanceof String && ((String) key).endsWith(".font")) {
+                            defaults.put(key, font);
+                        }
+                    }
+                }
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                     | UnsupportedLookAndFeelException ex) {
                 logger.log(Level.SEVERE, null, ex);

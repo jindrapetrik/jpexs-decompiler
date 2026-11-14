@@ -1299,6 +1299,11 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<Integer> lastFlaExportTweenDetectionQuality = null;
 
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("display")
+    @ConfigurationName("gui.font")
+    public static ConfigurationItem<String> uiFontString = null;
+
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 
@@ -1320,6 +1325,11 @@ public final class Configuration {
 
     public static Font getSourceFont() {
         return FontHelper.stringToFont(sourceFontString.get());
+    }
+
+    public static Font getUiFont() {
+        String fontString = uiFontString.get();
+        return fontString == null || fontString.isEmpty() ? null : FontHelper.stringToFont(fontString);
     }
 
     /**
