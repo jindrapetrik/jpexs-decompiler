@@ -139,3 +139,5 @@ Lexer\.java$
 \.swz$
 \.swc$
 ^libsrc/ffdec_lib/testdata/components/
+^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/xfl/as2_component_definitions\.xml$
+^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/xfl/as2_swc_definitions\.xml$
