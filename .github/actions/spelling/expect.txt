@@ -262,6 +262,7 @@ avmplus
 avt
 awidth
 awt
+awt's
 ayman
 backedges
 BACKGROUNDCOLOR
@@ -1002,6 +1003,7 @@ DUPLICATEMOVIECLIP
 dupsrc
 dval
 dvd
+dvd's
 dvf
 DVI
 dvp
@@ -1328,6 +1330,7 @@ FORMATETC
 forminfo
 fos
 fourcc
+fourcc's
 FOURTYEIGHT
 FOURTYFOUR
 foutdir
@@ -1514,6 +1517,7 @@ HASPARENT
 Hausmatt
 Hauspie
 haxe
+haxe's
 hbitmap
 hbm
 hbmp
@@ -1636,6 +1640,7 @@ ictx
 idat
 idata
 idct
+idct's
 Iddle
 IDecoder
 IDecompile
@@ -4166,6 +4171,7 @@ XENROLL
 XEvent
 XFixed
 xfl
+xfl's
 XFloat
 Xfm
 XHeight
