@@ -320,6 +320,7 @@ public final class Configuration {
     @ConfigurationDefaultString("Monospaced-Plain-12")
     @ConfigurationCategory("display")
     @ConfigurationName("gui.sourceFont")
+    @ConfigurationFont
     public static ConfigurationItem<String> sourceFontString = null;
 
     @ConfigurationDefaultDouble(0.5)
@@ -1302,6 +1303,7 @@ public final class Configuration {
     @ConfigurationDefaultString("")
     @ConfigurationCategory("display")
     @ConfigurationName("gui.font")
+    @ConfigurationFont
     public static ConfigurationItem<String> uiFontString = null;
 
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();

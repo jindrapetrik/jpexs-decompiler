@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationCategory;
 import com.jpexs.decompiler.flash.configuration.ConfigurationDirectory;
 import com.jpexs.decompiler.flash.configuration.ConfigurationFile;
+import com.jpexs.decompiler.flash.configuration.ConfigurationFont;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -465,6 +466,10 @@ public class AdvancedSettingsDialog extends AppDialog {
                                 c = new ConfigurationDirectorySelection(item, val.toString(), description);
                                 minW = 300;
                                 maxW = 300;
+                            } else if (itemType == String.class && field.isAnnotationPresent(ConfigurationFont.class)) {
+                                c = new ConfigurationFontSelection(val.toString(), description, resourceBundle.getString("fontChooser.open"));
+                                minW = 300;
+                                maxW = 300;
                             } else {
                                 JTextField tf = new JTextField();
                                 if (itemType == Calendar.class) {
@@ -529,6 +534,9 @@ public class AdvancedSettingsDialog extends AppDialog {
                     }
                     if (toLabelComponent instanceof ConfigurationDirectorySelection) {
                         toLabelComponent = ((ConfigurationDirectorySelection) toLabelComponent).getTextField();
+                    }
+                    if (toLabelComponent instanceof ConfigurationFontSelection) {
+                        toLabelComponent = ((ConfigurationFontSelection) toLabelComponent).getTextField();
                     }
                     l.setLabelFor(toLabelComponent);
                     gbc.gridx++;
@@ -609,6 +617,8 @@ public class AdvancedSettingsDialog extends AppDialog {
                 value = ((ConfigurationFileSelection) c).getValue();
             } else if (c instanceof ConfigurationDirectorySelection) {
                 value = ((ConfigurationDirectorySelection) c).getValue();
+            } else if (c instanceof ConfigurationFontSelection) {
+                value = ((ConfigurationFontSelection) c).getTextField().getText();
             } else if (name.equals("gui.skin")) {
                 value = ((SkinSelect) ((JComboBox<SkinSelect>) c).getSelectedItem()).className;
             } else if (itemType == String.class) {
