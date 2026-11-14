@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfMxmlProjectExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
+import com.jpexs.decompiler.flash.ftr.FtrSwfBundle;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
@@ -168,7 +169,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
                         openable.saveTo(baos);
                         saved = bundle.putOpenable(openable.getFileTitle(), new ByteArrayInputStream(baos.toByteArray()));
                     } catch (IOException ex) {
-                        Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                        if (bundle instanceof FtrSwfBundle) {
+                            Main.handleSaveError(ex);
+                        } else {
+                            Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                        }
                     }
                 } else {
                     ViewMessages.showMessageDialog(mainFrame.getWindow(), translate("error.readonly.cannotSave"), translate("error"), JOptionPane.ERROR_MESSAGE);

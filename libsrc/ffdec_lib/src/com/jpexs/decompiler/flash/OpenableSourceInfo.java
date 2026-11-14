@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.ftr.FtrSwfBundle;
 import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
 import com.jpexs.helpers.Path;
 import java.io.BufferedInputStream;
@@ -236,6 +237,8 @@ public class OpenableSourceInfo {
                     return new SWC(new File(file));
                 case ".zip":
                     return new ZippedBundle(new File(file));
+                case ".ftr":
+                    return new FtrSwfBundle(new File(file));
                 case ".iggy":
                     return new IggySwfBundle(new File(file));
                 case ".swz":

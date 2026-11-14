@@ -48,6 +48,7 @@ import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
+import com.jpexs.decompiler.flash.ftr.FtrSwfBundle;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.gui.debugger.DebugAdapter;
 import com.jpexs.decompiler.flash.gui.debugger.DebugLoaderDataModified;
@@ -1355,7 +1356,11 @@ public class Main {
                 String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, "WINDOWS-1252");
                 SwfProfile swfProfile = swfProfileSpecified ? requestedSwfProfile : conf == null ? null : SwfProfiles.getProfile(conf.getCustomData(CustomConfigurationKeys.KEY_SWF_PROFILE, ""));
                 String sourceName = file != null ? file : fileTitle;
-                if (sourceName != null && sourceName.toLowerCase(Locale.ENGLISH).endsWith(".iggy")) {
+                if (sourceName != null && sourceName.toLowerCase(Locale.ENGLISH).endsWith(".ftr")) {
+                    try (InputStream source = is) {
+                        is = FtrSwfBundle.openSwf(source);
+                    }
+                } else if (sourceName != null && sourceName.toLowerCase(Locale.ENGLISH).endsWith(".iggy")) {
                     try (InputStream source = is) {
                         IggySwfBundle iggy = file == null ? new IggySwfBundle(source) : new IggySwfBundle(new File(file));
                         is = iggy.getOpenable(iggy.getKeys().iterator().next());
@@ -1464,7 +1469,7 @@ public class Main {
                             }
                             // Try alternative container extensions after the requested SWF.
                             if (selFile == null && url.toLowerCase(Locale.ENGLISH).endsWith(".swf")) {
-                                for (String extension : new String[]{".gfx", ".iggy"}) {
+                                for (String extension : new String[]{".gfx", ".iggy", ".ftr"}) {
                                     File alternative = new File(new File(bundleOrFile).getParentFile(), url.substring(0, url.length() - 4) + extension);
                                     if (alternative.exists()) {
                                         try {
@@ -1488,7 +1493,7 @@ public class Main {
                                     FileChooser fc = new FileChooser();
                                     fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
                                     FileFilter allSupportedFilter = new FileFilter() {
-                                        private final String[] supportedExtensions = new String[]{".swf", ".spl", ".swt", ".gfx", ".iggy"};
+                                        private final String[] supportedExtensions = new String[]{".swf", ".spl", ".swt", ".gfx", ".iggy", ".ftr"};
 
                                         @Override
                                         public boolean accept(File f) {
@@ -1562,6 +1567,7 @@ public class Main {
                                         }
                                     };
                                     fc.addChoosableFileFilter(iggyFilter);
+                                    fc.addChoosableFileFilter(ftrFileFilter());
                                     fc.setAcceptAllFileFilterUsed(false);
                                     int returnVal = fc.showOpenDialog(getDefaultMessagesComponent());
                                     if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -1921,6 +1927,34 @@ public class Main {
 
     public static void saveFile(Openable openable, String outfile, SaveFileMode mode, ExeExportMode exeExportMode) throws IOException {
         File savedFile = new File(outfile);
+        if (mode != SaveFileMode.EXE && openable instanceof SWF && ".ftr".equals(Path.getExtension(savedFile))) {
+            startSaving(savedFile);
+            try {
+                SWF swf = (SWF) openable;
+                swf.saveNestedDefineBinaryData();
+                Bundle bundle = swf.getOpenableList() == null ? null : swf.getOpenableList().bundle;
+                if (bundle instanceof FtrSwfBundle) {
+                    ((FtrSwfBundle) bundle).saveCopy(swf, savedFile);
+                } else {
+                    FtrSwfBundle.save(swf, savedFile);
+                    if (mode == SaveFileMode.SAVEAS && swf.getOpenableList() != null && bundle == null) {
+                        OpenableList list = swf.getOpenableList();
+                        FtrSwfBundle ftr = new FtrSwfBundle(savedFile);
+                        list.sourceInfo = new OpenableSourceInfo(null, outfile, null);
+                        list.name = savedFile.getName();
+                        list.bundle = ftr;
+                        swf.setFile(null);
+                        swf.setFileTitle(ftr.getKeys().iterator().next());
+                        if (mainFrame != null && mainFrame.getPanel() != null) {
+                            mainFrame.getPanel().refreshPins();
+                        }
+                    }
+                }
+            } finally {
+                stopSaving(savedFile);
+            }
+            return;
+        }
         startSaving(savedFile);
         if (mode == SaveFileMode.SAVEAS && openable.getOpenableList() != null /*SWF in binarydata has null*/ && !openable.getOpenableList().isBundle()) {
             openable.setFile(outfile);
@@ -2615,6 +2649,10 @@ public class Main {
         return true;
     }
 
+    private static FileFilter ftrFileFilter() {
+        return new javax.swing.filechooser.FileNameExtensionFilter(AppStrings.translate("filter.ftr"), "ftr");
+    }
+
     public static boolean saveFileDialog(Openable openable, final SaveFileMode mode) {
 
         String ext = ".swf";
@@ -2781,13 +2819,25 @@ public class Main {
         } else if (openable instanceof ABC) {
             fc.setFileFilter(abcFilter);
         }
-        final String extension = ext;
+        FileFilter ftrFilter = ftrFileFilter();
+        if (mode != SaveFileMode.EXE && openable instanceof SWF) {
+            fc.addChoosableFileFilter(ftrFilter);
+            if ((openable.getOpenableList() != null
+                    && openable.getOpenableList().bundle instanceof FtrSwfBundle)
+                    || ".ftr".equals(ext)) {
+                fc.setFileFilter(ftrFilter);
+            }
+        }
+        final String extension = ".ftr".equals(ext) ? ".swf" : ext;
         fc.setAcceptAllFileFilterUsed(false);
         if (fc.showSaveDialog(getDefaultMessagesComponent()) == JFileChooser.APPROVE_OPTION) {
             File file = Helper.fixDialogFile(fc.getSelectedFile());
             FileFilter selFilter = fc.getFileFilter();
             try {
                 String fileName = file.getAbsolutePath();
+                if (selFilter == ftrFilter && !fileName.toLowerCase(Locale.ENGLISH).endsWith(".ftr")) {
+                    fileName += ".ftr";
+                }
                 if (selFilter == swfFilter) {
                     if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(extension)
                             && !fileName.toLowerCase(Locale.ENGLISH).endsWith(".spl")) {
@@ -2891,7 +2941,7 @@ public class Main {
         }
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         FileFilter allSupportedFilter = new FileFilter() {
-            private final String[] supportedExtensions = new String[]{".swf", ".spl", ".swt", ".gfx", ".swc", ".swz", ".zip", ".iggy", ".abc"};
+            private final String[] supportedExtensions = new String[]{".swf", ".spl", ".swt", ".gfx", ".swc", ".swz", ".zip", ".iggy", ".ftr", ".abc"};
 
             @Override
             public boolean accept(File f) {
@@ -2991,7 +3041,8 @@ public class Main {
                 return AppStrings.translate("filter.iggy");
             }
         };
-        fc.addChoosableFileFilter(iggyFilter);                
+        fc.addChoosableFileFilter(iggyFilter);
+        fc.addChoosableFileFilter(ftrFileFilter());
 
         FileFilter abcFilter = new FileFilter() {
             @Override
