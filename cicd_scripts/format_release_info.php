@@ -46,6 +46,12 @@ if($load_from == "-filever")
                    "type_icon" => "deb"
                ],
                [
+                   "file_name" => "ffdec_${filever_tag}_x86_64.AppImage",
+                   "ossupport" => ["linux"],
+                   "type_name" => "AppImage (Linux x86-64, Java included)",
+                   "type_icon" => "app"
+               ],
+               [
                    "file_name" => "ffdec_${filever_tag}.pkg",
                    "ossupport" => ["macosx"],
                    "type_name" => "Mac OS X Installer (pkg)",

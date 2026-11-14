@@ -265,6 +265,20 @@
         <delete file="${app.deb.desktop.temp}" />
     </target>         
     
+    <target name="appimage" depends="-loadversion,git-tag,-suffix" description="Package an existing dist directory as a Linux x86-64 AppImage">
+        <fail unless="appimage.jre.dir" message="Set -Dappimage.jre.dir to the extracted Linux x86-64 JRE directory." />
+        <property name="appimage.tool" value="appimagetool" />
+        <exec executable="bash" dir="${basedir}" failonerror="true">
+            <arg file="cicd_scripts/build_appimage.sh" />
+            <arg file="${dist.dir}" />
+            <arg file="${appimage.jre.dir}" />
+            <arg value="${appimage.tool}" />
+            <arg file="${resources.dir}/com.jpexs.decompiler.flash.metainfo.xml" />
+            <arg value="${version}${version.suffix}" />
+            <arg file="${releases.dir}/${prefix.filename}_${version}${version.suffix}_x86_64.AppImage" />
+        </exec>
+    </target>
+
     <target name="osx-app-installer" depends="osx-app-bundle" unless="is_windows">
         <mkdir dir="${app.installer.dir}/flat/base.pkg"/>
         <mkdir dir="${app.installer.dir}/flat/Resources/en.lproj"/>
