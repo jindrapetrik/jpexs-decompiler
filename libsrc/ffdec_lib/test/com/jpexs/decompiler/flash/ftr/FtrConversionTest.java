@@ -20,8 +20,14 @@ import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SearchMode;
+import com.jpexs.decompiler.flash.action.swf1.ActionGotoFrame;
+import com.jpexs.decompiler.flash.tags.DefineFontTag;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
+import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.RGB;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -80,6 +86,54 @@ public class FtrConversionTest {
             }
         } finally {
             Files.deleteIfExists(file);
+        }
+    }
+
+    @Test
+    public void convertsFontAndTextDefinitionsAndBothActionBehaviors() throws Exception {
+        ByteBuffer fixture = ByteBuffer.allocate(79).order(ByteOrder.LITTLE_ENDIAN);
+        fixture.putInt(0).putInt(0).putInt(8000).putInt(800).putDouble(24.0);
+        fixture.putInt(6);
+        fixture.putInt(DefineFontTag.ID).putShort((short) 7);
+        fixture.putInt(DefineTextTag.ID).putShort((short) 8);
+        fixture.putInt(26).put(new byte[]{0, 0, 0, 1, 0}).putShort((short) 1)
+                .putShort((short) 8).putShort((short) -1);
+        fixture.putInt(DoActionTag.ID).putInt(1).putShort((short) 3);
+        fixture.putInt(DoActionTag.ID).putInt(42).putShort((short) 99);
+        fixture.putInt(1);
+        Assert.assertFalse(fixture.hasRemaining());
+
+        SWF imported = FtrConverter.read(new ByteArrayInputStream(fixture.array()));
+        // Exercise the actual SWF serialization and parsing used by the bundle.
+        SWF swf = new SWF(swfBytes(imported), false);
+        Assert.assertTrue(((DefineFontTag) swf.getCharacter(7)).getGlyphShapeTable().isEmpty());
+        Assert.assertTrue(((DefineTextTag) swf.getCharacter(8)).textRecords.isEmpty());
+        Assert.assertEquals(((ActionGotoFrame) ((DoActionTag) swf.getTags().get(3)).getActions().get(0)).frame, 3);
+
+        ByteArrayOutputStream converted = new ByteArrayOutputStream();
+        FtrConverter.write(swf, converted);
+        // Only action 1 is interpreted by DirectUI. The other action becomes a no-op.
+        fixture.putInt(69, 0).putShort(73, (short) 0);
+        Assert.assertEquals(converted.toByteArray(), fixture.array());
+        SWF reopened = FtrConverter.read(new ByteArrayInputStream(converted.toByteArray()));
+        Assert.assertEquals(reopened.getFrameCount(), 1);
+        Assert.assertTrue(reopened.getCharacter(7) instanceof DefineFontTag);
+        Assert.assertTrue(reopened.getCharacter(8) instanceof DefineTextTag);
+
+        DefineFontTag font = (DefineFontTag) swf.getCharacter(7);
+        font.glyphShapeTable.add(new SHAPE());
+        assertConversionFails(swf, "cannot store glyphs");
+        font.glyphShapeTable.clear();
+        ((DefineTextTag) swf.getCharacter(8)).textRecords.add(new TEXTRECORD());
+        assertConversionFails(swf, "cannot store text records");
+    }
+
+    private static void assertConversionFails(SWF swf, String message) throws IOException {
+        try {
+            FtrConverter.write(swf, new ByteArrayOutputStream());
+            Assert.fail("Expected FTR conversion to reject unsupported data");
+        } catch (IOException ex) {
+            Assert.assertTrue(ex.getMessage().contains(message), ex.getMessage());
         }
     }
 

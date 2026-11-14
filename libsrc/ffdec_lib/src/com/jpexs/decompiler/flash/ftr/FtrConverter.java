@@ -20,9 +20,12 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.flash.action.swf1.ActionGotoFrame;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.tags.DefineFontTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
@@ -33,8 +36,10 @@ import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -54,6 +59,8 @@ import java.util.List;
 public final class FtrConverter {
 
     private static final int VERSION = 8;
+    private static final int ACTION_NONE = 0;
+    private static final int ACTION_GOTO_FRAME = 1;
 
     private FtrConverter() {
     }
@@ -131,6 +138,17 @@ public final class FtrConverter {
                     }
                     tag = shapes.read(in);
                     break;
+                case DefineFontTag.ID:
+                case DefineTextTag.ID:
+                    if (depth != 0) {
+                        throw new IOException("Font or text definition inside an FTR sprite");
+                    }
+                    // DirectUI's FTR readers for these two definitions only read a character ID.
+                    CharacterTag definition = type == DefineFontTag.ID ? new DefineFontTag(swf) : new DefineTextTag(swf);
+                    definition.setCharacterId(in.readUI16("characterId"));
+                    shapes.registerId(definition.getCharacterId());
+                    tag = definition;
+                    break;
                 case PlaceObject2Tag.ID:
                     tag = readPlacement(in, swf);
                     break;
@@ -153,11 +171,13 @@ public final class FtrConverter {
                 case DoActionTag.ID:
                     long action = in.readUI32("action");
                     int frame = in.readUI16("frame");
-                    if (action != 1) {
-                        throw new IOException("Unsupported FTR action " + action + " at offset " + offset);
-                    }
                     DoActionTag doAction = new DoActionTag(swf);
-                    doAction.setActions(Collections.<Action>singletonList(new ActionGotoFrame(frame, swf.getCharset())));
+                    // The DirectUI player ignores all action values other than GotoFrame.
+                    if (action == ACTION_GOTO_FRAME) {
+                        doAction.setActions(Collections.<Action>singletonList(new ActionGotoFrame(frame, swf.getCharset())));
+                    } else {
+                        doAction.setActions(Collections.emptyList());
+                    }
                     tag = doAction;
                     break;
                 default:
@@ -184,6 +204,20 @@ public final class FtrConverter {
             if (tag instanceof ShapeTag && depth == 0) {
                 out.writeUI32(32);
                 FtrShapes.write(out, swf, (ShapeTag) tag);
+            } else if (tag instanceof DefineFontTag && depth == 0) {
+                DefineFontTag font = (DefineFontTag) tag;
+                if (font.strippedShapes || !font.glyphShapeTable.isEmpty()) {
+                    throw new IOException("FTR DefineFont cannot store glyphs");
+                }
+                out.writeUI32(DefineFontTag.ID);
+                out.writeUI16(font.getCharacterId());
+            } else if (tag instanceof StaticTextTag && depth == 0) {
+                StaticTextTag text = (StaticTextTag) tag;
+                if (!text.textRecords.isEmpty()) {
+                    throw new IOException("FTR DefineText cannot store text records");
+                }
+                out.writeUI32(DefineTextTag.ID);
+                out.writeUI16(text.getCharacterId());
             } else if (tag instanceof DefineSpriteTag && depth == 0) {
                 DefineSpriteTag sprite = (DefineSpriteTag) tag;
                 out.writeUI32(DefineSpriteTag.ID);
@@ -233,12 +267,16 @@ public final class FtrConverter {
             Thread.currentThread().interrupt();
             throw new IOException("Interrupted while reading SWF actions", ex);
         }
-        if (actions.size() != 1 || !(actions.get(0) instanceof ActionGotoFrame)) {
-            throw new IOException("FTR only supports a single GotoFrame action per DoAction tag");
+        int count = actions.size();
+        if (count > 0 && actions.get(count - 1) instanceof ActionEnd) {
+            count--;
+        }
+        if (count > 1 || (count == 1 && !(actions.get(0) instanceof ActionGotoFrame))) {
+            throw new IOException("FTR only supports an empty action or a single GotoFrame per DoAction tag");
         }
         out.writeUI32(DoActionTag.ID);
-        out.writeUI32(1);
-        out.writeUI16(((ActionGotoFrame) actions.get(0)).frame);
+        out.writeUI32(count == 0 ? ACTION_NONE : ACTION_GOTO_FRAME);
+        out.writeUI16(count == 0 ? 0 : ((ActionGotoFrame) actions.get(0)).frame);
     }
 
     private static PlaceObject2Tag readPlacement(SWFInputStream in, SWF swf) throws IOException {
@@ -283,9 +321,12 @@ public final class FtrConverter {
         if (tag.placeFlagHasClipActions || tag.placeFlagHasName || tag.placeFlagHasRatio) {
             throw new IOException("FTR does not support PlaceObject2 names, ratios or clip actions");
         }
-        if (tag.placeFlagHasCharacter && !(swf.getCharacter(tag.characterId) instanceof ShapeTag)
-                && !(swf.getCharacter(tag.characterId) instanceof DefineSpriteTag)) {
-            throw new IOException("FTR cannot place character " + tag.characterId + " on the timeline");
+        if (tag.placeFlagHasCharacter) {
+            CharacterTag character = swf.getCharacter(tag.characterId);
+            if (!(character instanceof ShapeTag) && !(character instanceof DefineSpriteTag)
+                    && !(character instanceof StaticTextTag)) {
+                throw new IOException("FTR cannot place character " + tag.characterId + " on the timeline");
+            }
         }
         out.writeUI32(PlaceObject2Tag.ID);
         out.writeUI8(tag.placeFlagHasClipDepth ? 1 : 0);
