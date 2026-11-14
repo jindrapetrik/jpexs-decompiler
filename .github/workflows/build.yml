@@ -1031,7 +1031,7 @@ jobs:
         echo "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0  $appimagetool" | sha256sum --check
         chmod +x "$appimagetool"
         ant -Dappimage.jre.dir="$APPIMAGE_JRE" -Dappimage.tool="$appimagetool" new-version-set appimage
-        "./releases/ffdec_${FFDEC_VERSION}_x86_64.AppImage" --appimage-extract-and-run -help > "$RUNNER_TEMP/ffdec-appimage-help.txt"
+        "./releases/ffdec_${FFDEC_VERSION}.AppImage" --appimage-extract-and-run -help > "$RUNNER_TEMP/ffdec-appimage-help.txt"
         grep -F 'JPEXS Free Flash Decompiler' "$RUNNER_TEMP/ffdec-appimage-help.txt"
     
     - name: Upload packages
@@ -1144,7 +1144,7 @@ jobs:
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}.zip
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}.deb
-            releases/ffdec_${{ needs.compute-version.outputs.verShort }}_x86_64.AppImage
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.AppImage
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}.pkg
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}_macosx.zip
             releases/ffdec_lib_${{ needs.compute-version.outputs.verShort }}.zip

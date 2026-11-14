@@ -275,7 +275,7 @@
             <arg value="${appimage.tool}" />
             <arg file="${resources.dir}/com.jpexs.decompiler.flash.metainfo.xml" />
             <arg value="${version}${version.suffix}" />
-            <arg file="${releases.dir}/${prefix.filename}_${version}${version.suffix}_x86_64.AppImage" />
+            <arg file="${releases.dir}/${prefix.filename}_${version}${version.suffix}.AppImage" />
         </exec>
     </target>
 

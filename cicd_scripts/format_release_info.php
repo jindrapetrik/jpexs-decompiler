@@ -46,9 +46,9 @@ if($load_from == "-filever")
                    "type_icon" => "deb"
                ],
                [
-                   "file_name" => "ffdec_${filever_tag}_x86_64.AppImage",
+                   "file_name" => "ffdec_${filever_tag}.AppImage",
                    "ossupport" => ["linux"],
-                   "type_name" => "AppImage (Linux x86-64, Java included)",
+                   "type_name" => "AppImage (Linux, Java included)",
                    "type_icon" => "app"
                ],
                [
