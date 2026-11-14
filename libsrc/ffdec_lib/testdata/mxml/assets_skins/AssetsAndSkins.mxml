@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
+    xmlns:components="components.*" width="640" height="480">
+    <fx:Script><![CDATA[
+        import components.AssetHolder;
+        import skins.ShowcaseControlSkin;
+
+        [Embed(source="../../as3_embed/assets/image.png")]
+        private var picture:Class;
+
+        [Embed(source="../../as3_embed/assets/image.svg")]
+        private var vectorPicture:Class;
+
+        [Embed(source="../../as3_embed/assets/movie_symbol.swf", symbol="symbols.MySymbol")]
+        private var symbolPicture:Class;
+
+        private var assets:AssetHolder = new AssetHolder();
+    ]]></fx:Script>
+    <fx:Style><![CDATA[
+        @namespace s "library://ns.adobe.com/flex/spark";
+        @namespace mx "library://ns.adobe.com/flex/mx";
+        s|Button { skinClass: ClassReference("skins.ShowcaseButtonSkin"); }
+        mx|Button { icon: Embed(source="../../as3_embed/assets/image.png"); }
+    ]]></fx:Style>
+    <s:layout><s:VerticalLayout paddingLeft="20" paddingTop="20" gap="12"/></s:layout>
+    <s:Label text="Embedded assets and custom skins" fontSize="22"/>
+    <s:HGroup>
+        <s:Image id="rasterImage" source="{picture}" width="64" height="64"/>
+        <s:Image id="vectorImage" source="{vectorPicture}" width="64" height="64"/>
+        <s:Image id="symbolImage" source="{symbolPicture}" width="64" height="64"/>
+        <s:Image id="gridImage" width="80" height="64"
+            source="@Embed(source='../../as3_embed/assets/image_grid.png', scaleGridTop='10', scaleGridBottom='40', scaleGridLeft='10', scaleGridRight='70')"/>
+    </s:HGroup>
+    <components:ShowcaseControl id="customControl" skinClass="{ShowcaseControlSkin}"
+        caption="A custom component with a required skin part"/>
+    <s:Button id="skinnedButton" label="A button with a CSS skin"/>
+    <mx:Button id="iconButton" label="A button with a CSS icon"/>
+    <s:Label text="{assets.description}"/>
+</s:Application>

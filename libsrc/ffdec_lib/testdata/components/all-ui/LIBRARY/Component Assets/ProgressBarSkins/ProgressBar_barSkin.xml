@@ -1,0 +1,68 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ProgressBarSkins/ProgressBar_barSkin" itemID="44b2abe2-000001ba" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="ProgressBar_barSkin" scaleGridLeft="1" scaleGridRight="51.95" scaleGridTop="1" scaleGridBottom="2.9" lastModified="1168289651">
+  <timeline>
+    <DOMTimeline name="ProgressBar_barSkin">
+      <layers>
+        <DOMLayer name="skin" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <LinearGradient>
+                            <matrix>
+                              <Matrix a="0" b="-0.0083160400390625" c="0.0083160400390625" d="0" tx="6" ty="7.1"/>
+                            </matrix>
+                            <GradientEntry color="#99D7FE" ratio="0"/>
+                            <GradientEntry color="#D9F0FE" ratio="1"/>
+                          </LinearGradient>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!1040 61|20 60!20 60|20 19!20 19|1040 20!1040 20|1040 61"/>
+                        <Edge cubics="!20 60(;20,60 20,19 20,19p20 60 20 19);"/>
+                        <Edge cubics="!1040 61(;1040,61 20,60 20,60p1040 61 20 60);"/>
+                        <Edge cubics="!1040 20(;1040,20 1040,61 1040,61p1040 20 1040 61);"/>
+                        <Edge cubics="!20 19(;20,19 1040,20 1040,20p20 19 1040 20);"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <LinearGradient>
+                            <matrix>
+                              <Matrix a="0" b="-0.00787353515625" c="0.00787353515625" d="0" tx="106.5" ty="6.45"/>
+                            </matrix>
+                            <GradientEntry color="#0075BF" ratio="0"/>
+                            <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                          </LinearGradient>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!1060 0|0 0!0 0|0 80!0 80|1060 80!1060 80|1060 0!1040 60|20 60!20 60|20 20!20 20|1040 20!1040 20|1040 60"/>
+                        <Edge cubics="!0 0(;0,0 0,80 0,80q0 0 0 80);"/>
+                        <Edge cubics="!20 60(;20,60 20,20 20,20q20 60 20 20);"/>
+                        <Edge cubics="!1060 80(;1060,80 1060,0 1060,0q1060 80 1060 0);"/>
+                        <Edge cubics="!1040 20(;1040,20 1040,60 1040,60q1040 20 1040 60);"/>
+                        <Edge cubics="!1060 0(;1060,0 0,0 0,0q1060 0 0 0);"/>
+                        <Edge cubics="!0 80(;0,80 1060,80 1060,80q0 80 1060 80);"/>
+                        <Edge cubics="!1040 60(;1040,60 20,60 20,60q1040 60 20 60);"/>
+                        <Edge cubics="!20 20(;20,20 1040,20 1040,20q20 20 1040 20);"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

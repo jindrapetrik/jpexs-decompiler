@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow/fsb_upArrow_arrow" itemID="3bd4a05a-00000feb" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow/fsb_upArrow_arrow" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd4a05a-00000feb">
+  <timeline>
+    <DOMTimeline name="fsb_upArrow_arrow">
+      <layers>
+        <DOMLayer name="element" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!127 70[128 72 128 73!128 73[128 78 123 78!123 78|5 78!5 78[0 78 0 73!0 73[0 70 1 69!1 69|60 1!60 1[62 0 64 0!64 0[66 0 67 1!67 1|127 69!127 69|127 70"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

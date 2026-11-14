@@ -1,0 +1,83 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Component Skins/FPushButton Skins/fpb_over" itemID="3bde3b67-000000c3" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Component Skins/FPushButton Skins/fpb_over" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bde3b67-000000c3">
+  <timeline>
+    <DOMTimeline name="fpb_over">
+      <layers>
+        <DOMLayer name="README" color="#FF4F4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[var component = _parent._parent;
+//::: don't delete the above
+
+//::: SKIN ELEMENT REGISTRATION
+/*      To add styleFormat properties to your skins :
+   1) Break up your skin into individual movie clips (skinElements)
+   2) add a registerSkinElement line of code for each skinElement
+
+component.registerSkinElement(skinElement, propertyName)
+// makes the skinElement Listen to the propertyName specified (eg: "background")
+
+																	  n*/
+component.registerSkinElement(frame5, "face");
+component.registerSkinElement(frame3, "shadow");
+component.registerSkinElement(frame1, "darkshadow");
+component.registerSkinElement(frame4, "highlight");
+component.registerSkinElement(frame2, "highlight3D");
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="skin elements" color="#4F80FF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_rightOutFrame_over" name="frame1">
+                  <matrix>
+                    <Matrix a="2.00080871582031" d="2"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_leftOutFrame_over" name="frame2">
+                  <matrix>
+                    <Matrix a="2.40505981445313" d="2.40505981445313"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_rightInFrame_over" name="frame3">
+                  <matrix>
+                    <Matrix a="2.27848815917969" d="2.27848815917969" tx="5" ty="5"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_leftInFrame_over" name="frame4">
+                  <matrix>
+                    <Matrix a="2.15190124511719" d="2.15190124511719" tx="5" ty="5"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_face_over" name="frame5">
+                  <matrix>
+                    <Matrix a="2.02531433105469" d="2.02531433105469" tx="10" ty="10"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

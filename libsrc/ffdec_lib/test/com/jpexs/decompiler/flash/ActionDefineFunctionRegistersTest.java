@@ -297,7 +297,7 @@ public class ActionDefineFunctionRegistersTest {
         byte[] storedBytes = tag.getActionBytes().getRangeData();
         Assert.assertTrue(actions.stream().filter(a -> a instanceof ActionPush)
                 .anyMatch(a -> !((ActionPush) a).values.isEmpty()
-                && ((ActionPush) a).values.stream().allMatch(v -> v instanceof RegisterNumber)),
+                && ((ActionPush) a).values.get(0) instanceof RegisterNumber),
                 "Reading P-code must preserve the register-saving prologue");
 
         ActionList cleaned = Helper.deepCopy(actions);

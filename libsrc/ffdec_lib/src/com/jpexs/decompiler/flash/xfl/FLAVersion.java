@@ -70,6 +70,10 @@ public enum FLAVersion {
         return xflVersion;
     }
 
+    public boolean supportsLibraryFolders() {
+        return ordinal() >= F4.ordinal();
+    }
+
     public int maxSwfVersion() {
         return maxSwfVersion;
     }

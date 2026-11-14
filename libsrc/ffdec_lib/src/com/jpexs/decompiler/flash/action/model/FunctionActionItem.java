@@ -666,7 +666,9 @@ public class FunctionActionItem extends ActionItem {
         if (!needsFun2) {
             ret = preserveRegisters(asGenerator.toActionList(ret), asGenerator.getSwfVersion(), charset);
         }
-        int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, asGenerator.getSwfVersion()).length;
+        List<Action> groupedBody = asGenerator.toActionList(ret);
+        ret = new ArrayList<>(groupedBody);
+        int len = Action.actionsToBytes(groupedBody, false, asGenerator.getSwfVersion()).length;
         if (len > 0xFFFF) {
             throw new CompilationException("Function body is too large to fit into UI16.", line);
         }

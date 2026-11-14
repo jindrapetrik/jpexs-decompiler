@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Standard CS6 AS3 Inspector schemas and Library icons; runtime classes and skins come from the input SWF. -->
+<components>
+    <component name="Button" className="fl.controls.Button" minimumPlayerVersion="9" width="100" height="22" iconId="0">
+        <parameter id="emphasized" name="emphasized" variable="emphasized" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="label" name="label" variable="label" category="" verbose="0" defaultValue="Label" type="String" />
+        <parameter id="labelPlacement" name="labelPlacement" variable="labelPlacement" category="" verbose="0" defaultValue="right" enumeration="left,right,top,bottom" type="List" />
+        <parameter id="selected" name="selected" variable="selected" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="toggle" name="toggle" variable="toggle" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/Button.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="CheckBox" className="fl.controls.CheckBox" minimumPlayerVersion="9" width="100" height="22" iconId="0">
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="label" name="label" variable="label" category="" verbose="0" defaultValue="Label" type="String" />
+        <parameter id="labelPlacement" name="labelPlacement" variable="labelPlacement" category="" verbose="0" defaultValue="right" enumeration="left,right,top,bottom" type="List" />
+        <parameter id="selected" name="selected" variable="selected" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/CheckBox.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="ColorPicker" className="fl.controls.ColorPicker" minimumPlayerVersion="9" width="24" height="24" iconId="0">
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="selectedColor" name="selectedColor" variable="selectedColor" category="" verbose="0" defaultValue="#000000" type="Color" />
+        <parameter id="showTextField" name="showTextField" variable="showTextField" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/ColorPicker.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="ComboBox" className="fl.controls.ComboBox" minimumPlayerVersion="9" width="100" height="22" iconId="0">
+        <parameter id="dataProvider" name="dataProvider" variable="dataProvider" category="" verbose="0" defaultValue="fl.data.DataProvider, fl.data.SimpleCollectionItem, item, 0, 0" type="Collection" />
+        <parameter id="editable" name="editable" variable="editable" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="prompt" name="prompt" variable="prompt" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="restrict" name="restrict" variable="restrict" category="" verbose="1" defaultValue="" type="String" />
+        <parameter id="rowCount" name="rowCount" variable="rowCount" category="" verbose="0" defaultValue="5" type="Number" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/ComboBox.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="DataGrid" className="fl.controls.DataGrid" minimumPlayerVersion="9" width="100" height="100" iconId="0">
+        <parameter id="allowMultipleSelection" name="allowMultipleSelection" variable="allowMultipleSelection" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="editable" name="editable" variable="editable" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="headerHeight" name="headerHeight" variable="headerHeight" category="" verbose="0" defaultValue="25" type="Number" />
+        <parameter id="horizontalLineScrollSize" name="horizontalLineScrollSize" variable="horizontalLineScrollSize" category="" verbose="0" defaultValue="4" type="Number" />
+        <parameter id="horizontalPageScrollSize" name="horizontalPageScrollSize" variable="horizontalPageScrollSize" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="horizontalScrollPolicy" name="horizontalScrollPolicy" variable="horizontalScrollPolicy" category="" verbose="0" defaultValue="off" enumeration="on,off,auto" type="List" />
+        <parameter id="resizableColumns" name="resizableColumns" variable="resizableColumns" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="rowHeight" name="rowHeight" variable="rowHeight" category="" verbose="0" defaultValue="20" type="Number" />
+        <parameter id="showHeaders" name="showHeaders" variable="showHeaders" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="sortableColumns" name="sortableColumns" variable="sortableColumns" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="verticalLineScrollSize" name="verticalLineScrollSize" variable="verticalLineScrollSize" category="" verbose="0" defaultValue="4" type="Number" />
+        <parameter id="verticalPageScrollSize" name="verticalPageScrollSize" variable="verticalPageScrollSize" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="verticalScrollPolicy" name="verticalScrollPolicy" variable="verticalScrollPolicy" category="" verbose="0" defaultValue="auto" enumeration="on,off,auto" type="List" />
+        <icon resource="icons/DataGrid.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" />
+    </component>
+    <component name="Label" className="fl.controls.Label" minimumPlayerVersion="9" width="100" height="22" iconId="0">
+        <parameter id="autoSize" name="autoSize" variable="autoSize" category="" verbose="0" defaultValue="none" enumeration="left,center,right,none" type="List" />
+        <parameter id="condenseWhite" name="condenseWhite" variable="condenseWhite" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="htmlText" name="htmlText" variable="htmlText" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="selectable" name="selectable" variable="selectable" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="text" name="text" variable="text" category="" verbose="0" defaultValue="Label" type="String" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="wordWrap" name="wordWrap" variable="wordWrap" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <icon resource="icons/Label.bin" rowByteCount="88" colorDepth="32" width="22" height="18" frameRight="330" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="List" className="fl.controls.List" minimumPlayerVersion="9" width="100" height="100" iconId="0">
+        <parameter id="allowMultipleSelection" name="allowMultipleSelection" variable="allowMultipleSelection" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="dataProvider" name="dataProvider" variable="dataProvider" category="" verbose="0" defaultValue="fl.data.DataProvider, fl.data.SimpleCollectionItem, item, 0, 0" type="Collection" />
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="horizontalLineScrollSize" name="horizontalLineScrollSize" variable="horizontalLineScrollSize" category="" verbose="0" defaultValue="4" type="Number" />
+        <parameter id="horizontalPageScrollSize" name="horizontalPageScrollSize" variable="horizontalPageScrollSize" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="horizontalScrollPolicy" name="horizontalScrollPolicy" variable="horizontalScrollPolicy" category="" verbose="0" defaultValue="auto" enumeration="on,off,auto" type="List" />
+        <parameter id="verticalLineScrollSize" name="verticalLineScrollSize" variable="verticalLineScrollSize" category="" verbose="0" defaultValue="4" type="Number" />
+        <parameter id="verticalPageScrollSize" name="verticalPageScrollSize" variable="verticalPageScrollSize" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="verticalScrollPolicy" name="verticalScrollPolicy" variable="verticalScrollPolicy" category="" verbose="0" defaultValue="auto" enumeration="on,off,auto" type="List" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/List.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="NumericStepper" className="fl.controls.NumericStepper" minimumPlayerVersion="9" width="80" height="22" iconId="0">
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="maximum" name="maximum" variable="maximum" category="" verbose="0" defaultValue="10" type="Number" />
+        <parameter id="minimum" name="minimum" variable="minimum" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="stepSize" name="stepSize" variable="stepSize" category="" verbose="0" defaultValue="1" type="Number" />
+        <parameter id="value" name="value" variable="value" category="" verbose="0" defaultValue="1" type="Number" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/NumericStepper.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="ProgressBar" className="fl.controls.ProgressBar" minimumPlayerVersion="9" width="150" height="4" iconId="0">
+        <parameter id="direction" name="direction" variable="direction" category="" verbose="0" defaultValue="right" enumeration="right,left" type="List" />
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="mode" name="mode" variable="mode" category="" verbose="0" defaultValue="event" enumeration="event,polled,manual" type="List" />
+        <parameter id="sourceName" name="source" variable="sourceName" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/ProgressBar.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="RadioButton" className="fl.controls.RadioButton" minimumPlayerVersion="9" width="100" height="22" iconId="0">
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="groupName" name="groupName" variable="groupName" category="" verbose="0" defaultValue="RadioButtonGroup" type="String" />
+        <parameter id="label" name="label" variable="label" category="" verbose="0" defaultValue="Label" type="String" />
+        <parameter id="labelPlacement" name="labelPlacement" variable="labelPlacement" category="" verbose="0" defaultValue="right" enumeration="left,right,top,bottom" type="List" />
+        <parameter id="selected" name="selected" variable="selected" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="value" name="value" variable="value" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/RadioButton.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="ScrollPane" className="fl.containers.ScrollPane" minimumPlayerVersion="9" width="100" height="100" iconId="7">
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="horizontalLineScrollSize" name="horizontalLineScrollSize" variable="horizontalLineScrollSize" category="" verbose="0" defaultValue="4" type="Number" />
+        <parameter id="horizontalPageScrollSize" name="horizontalPageScrollSize" variable="horizontalPageScrollSize" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="horizontalScrollPolicy" name="horizontalScrollPolicy" variable="horizontalScrollPolicy" category="" verbose="0" defaultValue="auto" enumeration="on,off,auto" type="List" />
+        <parameter id="scrollDrag" name="scrollDrag" variable="scrollDrag" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="source" name="source" variable="source" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="verticalLineScrollSize" name="verticalLineScrollSize" variable="verticalLineScrollSize" category="" verbose="0" defaultValue="4" type="Number" />
+        <parameter id="verticalPageScrollSize" name="verticalPageScrollSize" variable="verticalPageScrollSize" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="verticalScrollPolicy" name="verticalScrollPolicy" variable="verticalScrollPolicy" category="" verbose="0" defaultValue="auto" enumeration="on,off,auto" type="List" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+    </component>
+    <component name="Slider" className="fl.controls.Slider" minimumPlayerVersion="9" width="80" height="3" iconId="0">
+        <parameter id="direction" name="direction" variable="direction" category="" verbose="0" defaultValue="horizontal" enumeration="horizontal,vertical" type="List" />
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="liveDragging" name="liveDragging" variable="liveDragging" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="maximum" name="maximum" variable="maximum" category="" verbose="0" defaultValue="10" type="Number" />
+        <parameter id="minimum" name="minimum" variable="minimum" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="snapInterval" name="snapInterval" variable="snapInterval" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="tickInterval" name="tickInterval" variable="tickInterval" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="value" name="value" variable="value" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/Slider.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="TextArea" className="fl.controls.TextArea" minimumPlayerVersion="9" width="100" height="44" iconId="0">
+        <parameter id="condenseWhite" name="condenseWhite" variable="condenseWhite" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="editable" name="editable" variable="editable" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="horizontalScrollPolicy" name="horizontalScrollPolicy" variable="horizontalScrollPolicy" category="" verbose="0" defaultValue="auto" enumeration="auto,on,off" type="List" />
+        <parameter id="htmlText" name="htmlText" variable="htmlText" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="maxChars" name="maxChars" variable="maxChars" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="restrict" name="restrict" variable="restrict" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="text" name="text" variable="text" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="verticalScrollPolicy" name="verticalScrollPolicy" variable="verticalScrollPolicy" category="" verbose="0" defaultValue="auto" enumeration="auto,on,off" type="List" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="wordWrap" name="wordWrap" variable="wordWrap" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <icon resource="icons/TextArea.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" />
+    </component>
+    <component name="TextInput" className="fl.controls.TextInput" minimumPlayerVersion="9" width="100" height="22" iconId="0">
+        <parameter id="displayAsPassword" name="displayAsPassword" variable="displayAsPassword" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="editable" name="editable" variable="editable" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="maxChars" name="maxChars" variable="maxChars" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="restrict" name="restrict" variable="restrict" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="text" name="text" variable="text" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/TextInput.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="TileList" className="fl.controls.TileList" minimumPlayerVersion="9" width="100" height="100" iconId="0">
+        <parameter id="allowMultipleSelection" name="allowMultipleSelection" variable="allowMultipleSelection" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="columnCount" name="columnCount" variable="columnCount" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="columnWidth" name="columnWidth" variable="columnWidth" category="" verbose="0" defaultValue="50" type="Number" />
+        <parameter id="dataProvider" name="dataProvider" variable="dataProvider" category="" verbose="0" defaultValue="fl.data.DataProvider, fl.data.TileListCollectionItem, item, 0, 0" type="Collection" />
+        <parameter id="direction" name="direction" variable="direction" category="" verbose="0" defaultValue="horizontal" enumeration="horizontal,vertical" type="List" />
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="horizontalLineScrollSize" name="horizontalLineScrollSize" variable="horizontalLineScrollSize" category="" verbose="0" defaultValue="4" type="Number" />
+        <parameter id="horizontalPageScrollSize" name="horizontalPageScrollSize" variable="horizontalPageScrollSize" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="rowCount" name="rowCount" variable="rowCount" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="rowHeight" name="rowHeight" variable="rowHeight" category="" verbose="0" defaultValue="50" type="Number" />
+        <parameter id="scrollPolicy" name="scrollPolicy" variable="scrollPolicy" category="" verbose="0" defaultValue="auto" enumeration="auto,on,off" type="List" />
+        <parameter id="verticalLineScrollSize" name="verticalLineScrollSize" variable="verticalLineScrollSize" category="" verbose="0" defaultValue="4" type="Number" />
+        <parameter id="verticalPageScrollSize" name="verticalPageScrollSize" variable="verticalPageScrollSize" category="" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/TileList.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="UILoader" className="fl.containers.UILoader" minimumPlayerVersion="9" width="100" height="100" iconId="0">
+        <parameter id="autoLoad" name="autoLoad" variable="autoLoad" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="enabled" name="enabled" variable="enabled" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <parameter id="maintainAspectRatio" name="maintainAspectRatio" variable="maintainAspectRatio" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="scaleContent" name="scaleContent" variable="scaleContent" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="source" name="source" variable="source" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/UILoader.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="UIScrollBar" className="fl.controls.UIScrollBar" minimumPlayerVersion="9" width="15" height="100" iconId="0">
+        <parameter id="direction" name="direction" variable="direction" category="" verbose="0" defaultValue="vertical" enumeration="vertical,horizontal" type="List" />
+        <parameter id="scrollTargetName" name="scrollTargetName" variable="scrollTargetName" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="visible" name="visible" variable="visible" category="" verbose="1" defaultValue="true" type="Boolean" />
+        <icon resource="icons/UIScrollBar.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="270" frameBottom="270" isTransparent="true" />
+    </component>
+    <component name="FlexComponentBase" className="mx.flash.FlexContentHolder" minimumPlayerVersion="9" width="500" height="375" iconId="0">
+        <parameter id="baseline" name="baseline" variable="baseline" category="" verbose="0" defaultValue="" type="Object" />
+        <parameter id="bottom" name="bottom" variable="bottom" category="" verbose="0" defaultValue="" type="Object" />
+        <parameter id="boundingBoxName" name="boundingBoxName" variable="boundingBoxName" category="" verbose="0" defaultValue="" type="String" />
+        <parameter id="hasFocusableChildren" name="hasFocusableChildren" variable="hasFocusableChildren" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="horizontalCenter" name="horizontalCenter" variable="horizontalCenter" category="" verbose="0" defaultValue="" type="Object" />
+        <parameter id="left" name="left" variable="left" category="" verbose="0" defaultValue="" type="Object" />
+        <parameter id="right" name="right" variable="right" category="" verbose="0" defaultValue="" type="Object" />
+        <parameter id="tabFocusEnabled" name="tabFocusEnabled" variable="tabFocusEnabled" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="top" name="top" variable="top" category="" verbose="0" defaultValue="" type="Object" />
+        <parameter id="verticalCenter" name="verticalCenter" variable="verticalCenter" category="" verbose="0" defaultValue="" type="Object" />
+        <parameter id="autoUpdateCurrentState" name="autoUpdateCurrentState" variable="autoUpdateCurrentState" category="General" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="autoUpdateMeasuredSize" name="autoUpdateMeasuredSize" variable="autoUpdateMeasuredSize" category="General" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="scaleContentWhenResized" name="scaleContentWhenResized" variable="scaleContentWhenResized" category="General" verbose="0" defaultValue="false" enumeration="false,true" type="List" />
+        <parameter id="x" name="x" variable="x" category="General" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="y" name="y" variable="y" category="General" verbose="0" defaultValue="0" type="Number" />
+        <parameter id="scaleX" name="scaleX" variable="scaleX" category="Size" verbose="0" defaultValue="1.0" type="Number" />
+        <parameter id="scaleY" name="scaleY" variable="scaleY" category="Size" verbose="0" defaultValue="1.0" type="Number" />
+        <parameter id="scaleZ" name="scaleZ" variable="scaleZ" category="Size" verbose="0" defaultValue="1.0" type="Number" />
+    </component>
+    <component name="FLVPlayback" className="fl.video.FLVPlayback" minimumPlayerVersion="9" width="321" height="240" iconId="0">
+        <parameter id="align" name="align" variable="align" category="" verbose="0" defaultValue="center" enumeration="center,top,left,bottom,right,topLeft,topRight,bottomLeft,bottomRight" type="List" />
+        <parameter id="autoPlay" name="autoPlay" variable="autoPlay" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="cuePoints" name="cuePoints" variable="cuePoints" category="" verbose="0" defaultValue="" type="Video Cue Points" />
+        <parameter id="isLive" name="isLive" variable="isLive" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="preview" name="preview" variable="preview" category="" verbose="0" defaultValue="" type="Video Preview" />
+        <parameter id="scaleMode" name="scaleMode" variable="scaleMode" category="" verbose="0" defaultValue="maintainAspectRatio" enumeration="maintainAspectRatio,noScale,exactFit" type="List" />
+        <parameter id="skin" name="skin" variable="skin" category="" verbose="0" defaultValue="" type="Video Skin" />
+        <parameter id="skinAutoHide" name="skinAutoHide" variable="skinAutoHide" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="skinBackgroundAlpha" name="skinBackgroundAlpha" variable="skinBackgroundAlpha" category="" verbose="0" defaultValue="0.85" type="Number" />
+        <parameter id="skinBackgroundColor" name="skinBackgroundColor" variable="skinBackgroundColor" category="" verbose="0" defaultValue="#47ABCB" type="Color" />
+        <parameter id="source" name="source" variable="source" category="" verbose="0" defaultValue="" type="Video Content Path" />
+        <parameter id="volume" name="volume" variable="volume" category="" verbose="0" defaultValue="1" type="Number" />
+        <icon resource="icons/FLVPlayback.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="360" frameBottom="360" isTransparent="true" />
+    </component>
+    <component name="FLVPlaybackCaptioning" className="fl.video.FLVPlaybackCaptioning" minimumPlayerVersion="9" width="72" height="84" iconId="0">
+        <parameter id="autoLayout" name="autoLayout" variable="autoLayout" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="captionTargetName" name="captionTargetName" variable="captionTargetName" category="" verbose="0" defaultValue="auto" type="String" />
+        <parameter id="flvPlaybackName" name="flvPlaybackName" variable="flvPlaybackName" category="" verbose="0" defaultValue="auto" type="String" />
+        <parameter id="showCaptions" name="showCaptions" variable="showCaptions" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="simpleFormatting" name="simpleFormatting" variable="simpleFormatting" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="source" name="source" variable="source" category="" verbose="0" defaultValue="" type="String" />
+        <icon resource="icons/FLVPlaybackCaptioning.bin" rowByteCount="64" colorDepth="32" width="16" height="16" frameRight="320" frameBottom="320" isTransparent="true" />
+    </component>
+    <component name="BackButton" className="BackButton" minimumPlayerVersion="9" width="19" height="19" requiredClasses="BackButtonNormal,BackButtonOver" iconId="0">
+        <icon resource="icons/BackButton.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="ForwardButton" className="ForwardButton" minimumPlayerVersion="9" width="19" height="19" requiredClasses="ForwardButtonNormal,ForwardButtonOver" iconId="0">
+        <icon resource="icons/ForwardButton.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="PauseButton" className="PauseButton" minimumPlayerVersion="9" width="23" height="23" requiredClasses="PauseButtonNormal,PauseButtonOver" iconId="0">
+        <icon resource="icons/PauseButton.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="PlayButton" className="PlayButton" minimumPlayerVersion="9" width="23" height="23" requiredClasses="PlayButtonNormal,PlayButtonOver" iconId="0">
+        <icon resource="icons/PlayButton.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="PlayPauseButton" className="PlayPauseButton" minimumPlayerVersion="9" width="23" height="23" requiredClasses="PlayButtonNormal,PauseButtonNormal" iconId="0">
+        <icon resource="icons/PlayPauseButton.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="StopButton" className="StopButton" minimumPlayerVersion="9" width="23" height="23" requiredClasses="StopButtonNormal,StopButtonOver" iconId="0">
+        <icon resource="icons/StopButton.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="VolumeBar" className="VolumeBar" minimumPlayerVersion="9" width="50" height="8" requiredClasses="VolumeBarHandle,VolumeBarProgress" iconId="0">
+        <icon resource="icons/VolumeBar.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="SeekBar" className="SeekBar" minimumPlayerVersion="9" width="101" height="9" requiredClasses="SeekBarHandle,SeekBarProgress" iconId="0">
+        <icon resource="icons/SeekBar.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="BufferingBar" className="BufferingBar" minimumPlayerVersion="9" width="101" height="9" requiredClasses="BufferingPatternSymbol" iconId="0">
+        <icon resource="icons/BufferingBar.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="MuteButton" className="MuteButton" minimumPlayerVersion="9" width="23" height="23" requiredClasses="MuteButtonOffNormal,MuteButtonOnNormal" iconId="0">
+        <icon resource="icons/MuteButton.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="FullScreenButton" className="FullScreenButton" minimumPlayerVersion="9" width="23" height="23" requiredClasses="FullScreenButtonOffNormal,FullScreenButtonOnNormal" iconId="0">
+        <icon resource="icons/FullScreenButton.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="CaptionButton" className="CaptionButton" minimumPlayerVersion="9" width="23" height="23" requiredClasses="CaptionButtonOffNormal,CaptionButtonOnNormal" iconId="0">
+        <icon resource="icons/CaptionButton.bin" rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" />
+    </component>
+    <component name="FLVPlayback 2.5" className="fl.video.FLVPlayback" minimumPlayerVersion="10" width="321" height="240" variantClass="fl.video.DynamicStreamItem" iconId="0">
+        <parameter id="align" name="align" variable="align" category="" verbose="0" defaultValue="center" enumeration="center,top,left,bottom,right,topLeft,topRight,bottomLeft,bottomRight" type="List" />
+        <parameter id="autoPlay" name="autoPlay" variable="autoPlay" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="cuePoints" name="cuePoints" variable="cuePoints" category="" verbose="0" defaultValue="" type="Video Cue Points" />
+        <parameter id="dvrFixedDuration" name="dvrFixedDuration" variable="dvrFixedDuration" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="dvrIncrement" name="dvrIncrement" variable="dvrIncrement" category="" verbose="0" defaultValue="1800" type="Number" />
+        <parameter id="dvrIncrementVariance" name="dvrIncrementVariance" variable="dvrIncrementVariance" category="" verbose="0" defaultValue="300" type="Number" />
+        <parameter id="dvrSnapToLive" name="dvrSnapToLive" variable="dvrSnapToLive" category="" verbose="0" defaultValue="true" type="Boolean" />
+        <parameter id="isDVR" name="isDVR" variable="isDVR" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="isLive" name="isLive" variable="isLive" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="preview" name="preview" variable="preview" category="" verbose="0" defaultValue="" type="Video Preview" />
+        <parameter id="scaleMode" name="scaleMode" variable="scaleMode" category="" verbose="0" defaultValue="maintainAspectRatio" enumeration="maintainAspectRatio,noScale,exactFit" type="List" />
+        <parameter id="skin" name="skin" variable="skin" category="" verbose="0" defaultValue="" type="Video Skin" />
+        <parameter id="skinAutoHide" name="skinAutoHide" variable="skinAutoHide" category="" verbose="0" defaultValue="false" type="Boolean" />
+        <parameter id="skinBackgroundAlpha" name="skinBackgroundAlpha" variable="skinBackgroundAlpha" category="" verbose="0" defaultValue="0.85" type="Number" />
+        <parameter id="skinBackgroundColor" name="skinBackgroundColor" variable="skinBackgroundColor" category="" verbose="0" defaultValue="#47ABCB" type="Color" />
+        <parameter id="source" name="source" variable="source" category="" verbose="0" defaultValue="" type="Video Content Path" />
+        <parameter id="volume" name="volume" variable="volume" category="" verbose="0" defaultValue="1" type="Number" />
+        <icon resource="icons/FLVPlayback_2_5.bin" rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="360" frameBottom="360" isTransparent="true" />
+    </component>
+</components>

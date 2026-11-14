@@ -565,6 +565,15 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testTernarFunction() {
+        decompileMethod("assembled", "testTernarFunction", "trace(param1 != null ? function():void\r\n"
+                + "{\r\n"
+                + "trace(\"f\");\r\n"
+                + "} : null);\r\n",
+                 false);
+    }
+
+    @Test
     public void testTryCatchLoopBreakLevel2() {
         decompileMethod("assembled", "testTryCatchLoopBreakLevel2", "var a:int = 0;\r\n"
                 + "a = 0;\r\n"
@@ -669,8 +678,9 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "}\r\n"
                 + "catch(_loc_e_:*)\r\n"
                 + "{\r\n"
-                + "return _loc5_;\r\n"
-                + "}\r\n",
+                + "var _loc14_:* = _loc_e_;\r\n"
+                + "}\r\n"
+                + "return _loc5_;\r\n",
                  false);
     }
 

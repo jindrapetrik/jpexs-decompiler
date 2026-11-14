@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:filters="flash.filters.*" layout="vertical" width="640" height="480" currentState="">
+    <mx:Script><![CDATA[
+        [Bindable] private var caption:String = "Expanded legacy state";
+    ]]></mx:Script>
+    <mx:states>
+        <mx:State name="expanded">
+            <mx:SetProperty target="{heading}" name="text" value="{caption}"/>
+            <mx:SetStyle target="{heading}" name="color" value="0x224466"/>
+            <mx:SetProperty target="{heading}" name="filters"><mx:value><mx:Array>
+                <filters:DropShadowFilter blurX="3" blurY="3" alpha="0.5"/>
+            </mx:Array></mx:value></mx:SetProperty>
+            <mx:AddChild relativeTo="{content}" position="lastChild" creationPolicy="all">
+                <mx:Label id="stateLabel" text="Added by a legacy state"/>
+            </mx:AddChild>
+            <mx:RemoveChild target="{baseLabel}"/>
+        </mx:State>
+        <mx:State name="detailed" basedOn="expanded">
+            <mx:SetProperty target="{heading}" name="text" value="Detailed inherited legacy state"/>
+        </mx:State>
+    </mx:states>
+    <mx:Label id="heading" text="Base legacy state"/>
+    <mx:VBox id="content"><mx:Label id="baseLabel" text="Visible in the base state"/></mx:VBox>
+    <mx:Button label="Toggle legacy state" click="currentState = currentState == '' ? 'expanded' : ''"/>
+</mx:Application>

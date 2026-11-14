@@ -1,0 +1,51 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="PlayPauseButton" itemID="42519c72-00000090" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="PlayPauseButton" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef="PlayPauseButton" sourceLastModified="1166032293" lastModified="1166032293" lastUniqueIdentifier="2" sourceItemID="42519c72-00000090" customIconID="0" persistLivePreview11="true" editFrameIndex="1" requiredMinimumPlayerVersion="8" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="PlayPauseButton">
+      <layers>
+        <DOMLayer name="play" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="PlayButton" name="play_mc" selected="true" uniqueID="1">
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='14.1'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="_visible">
+      <Inspectable name="visible" variable="_visible" category="" verbose="0" defaultValue="true" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="pause" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="PauseButton" name="pause_mc" selected="true" uniqueID="2">
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='14.2'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="_visible">
+      <Inspectable name="visible" variable="_visible" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <customIcon>
+    <CustomIcon rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" href="79cbnnm5cj.dat"/>
+  </customIcon>
+</DOMComponentItem>

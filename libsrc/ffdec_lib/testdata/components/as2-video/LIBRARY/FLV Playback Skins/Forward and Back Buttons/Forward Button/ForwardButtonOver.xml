@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonOver" itemID="42703131-000002f2" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="ForwardButtonOver" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonOver" sourceLastModified="1114719571" lastModified="1114719571" lastUniqueIdentifier="12" sourceItemID="42703131-000002f2">
+  <timeline>
+    <DOMTimeline name="ForwardButtonOver">
+      <layers>
+        <DOMLayer name="Icon" color="#FFFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardIcon" name="icon_mc">
+                  <matrix>
+                    <Matrix tx="9" ty="9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="3" y="2.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Button" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgOver" name="button_mc" selected="true">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

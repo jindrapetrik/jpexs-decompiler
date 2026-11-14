@@ -31,10 +31,11 @@ These include:
 * Open Imaging GIF Decoder - `gifreader.jar` - Importing GIFs
 * Miter clip - modified openjdk8 Stroker - `miterclip.jar` - Support for miter clip join style in shapes
 * FlexSDK Decimal128 class - `decimal.jar` - Working with decimal type in AS3
-* FLA Compound Document Tools - `flacomdoc.jar` - Exporting FLA to CS4 or lower
+* JPEXS FLA Convert - `fla_convert.jar` - Exporting FLA to CS4 or lower
 * TomlJ - `tomlj-1.1.1.jar` - Storing configuration
 * ANTLR - `antlr-runtime-4.11.1.jar` - Storing configuration
-* jpexs-apng - `jpexs-apng.jar` - APNG export
+* jpexs-apng - `jpexs-apng.jar` - APNG support
+* jpexs-jxr - `jpexs-jxr-1.0.0.jar` - JPEG XR display
 
 ## Basic library usage
 ```java
@@ -146,7 +147,9 @@ And also links to these libraries:
 * [FLA Compound Document Tools] (Exporting to FLA CS4 and below) - LGPLv2.1
 * [TomlJ] (Storing configuration) - Apache License 2.0
 * [ANTLR] (Storing configuration) - BSD 3-Clause
-* [jpexs-apng] (Exporting APNG) - MIT License
+* [jpexs-apng] (APNG support) - MIT License
+* [jpexs-jxr] (JXR display) - MIT License
+* [JPEXS FLA Convert] (FLA to CS or lower conversion) - LGPL v2.1
 
 [sfntly]: https://code.google.com/p/sfntly/
 [JLayer]: http://www.javazoom.net/javalayer/javalayer.html
@@ -166,8 +169,9 @@ And also links to these libraries:
 [Open Imaging GIF Decoder]: https://github.com/DhyanB/Open-Imaging
 [openjdk8 Stroker]: https://github.com/JetBrains/jdk8u_jdk
 [Apache Flex SDK]: https://github.com/apache/flex-sdk
-[FLA Compound Document Tools]: https://github.com/jindrapetrik/flacomdoc
+[JPEXS FLA Convert]: https://github.com/jindrapetrik/jpexs-fla-convert
 [TomlJ]: https://github.com/tomlj/tomlj
 [ANTLR]: https://www.antlr.org/
 [webp4j]: https://github.com/jindrapetrik/webp4j/tree/java8
 [jpexs-apng]: https://github.com/jindrapetrik/jpexs-apng
+[jpexs-jxr]: https://github.com/jindrapetrik/jpexs-jxr

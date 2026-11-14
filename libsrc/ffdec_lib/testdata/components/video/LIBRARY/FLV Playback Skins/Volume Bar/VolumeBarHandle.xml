@@ -1,0 +1,48 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Volume Bar/VolumeBarHandle" itemID="4295075b-000001cd" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="VolumeBarHandle" linkageClassName="VolumeBarHandle" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Volume Bar/VolumeBarHandle" sourceLastModified="1157562344" lastModified="1157562344" sourceItemID="4295075b-000001cd">
+  <timeline>
+    <DOMTimeline name="VolumeBarHandle">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isFloating="true">
+                  <matrix>
+                    <Matrix tx="-3.5" ty="-0.05"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!120 60S2|140 60!140 60|140 80!140 80|0 80!0 80|0 60!0 60|20 60!20 60|20 40!20 40|40 40!40 40|40 20!40 20|60 20!60 20|60 0!60 0|80 0!80 0|80 20!80 20|100 20!100 20|100 40!100 40|120 40!120 40|120 60"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="bgHit" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Volume Bar/VolumeBarHandleHit" selected="true" symbolType="graphic" loop="loop">
+                  <matrix>
+                    <Matrix tx="-10.5" ty="-7"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="10.5" y="9.5"/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0"/>
+                  </color>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

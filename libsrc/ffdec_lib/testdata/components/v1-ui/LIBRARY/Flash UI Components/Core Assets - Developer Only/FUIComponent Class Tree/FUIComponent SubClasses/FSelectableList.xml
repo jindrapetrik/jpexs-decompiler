@@ -1,0 +1,437 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/ FSelectableList" itemID="3bd4744b-00000289" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="FSelectableListSymbol" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/ FSelectableList" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd4744b-00000289" displayAsComponent="false" customIconID="12" persistLivePreview11="true" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name=" FSelectableList">
+      <layers>
+        <DOMLayer name="Methods" color="#FF4F4F" locked="true" current="true" isSelected="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip 1
+/*
+		FSelectableListClass
+		EXTENDS FUIComponentClass
+		
+		This is superClass for all selectable lists in the tree.
+*/
+
+function FSelectableListClass()
+{
+	this.init();
+}
+
+FSelectableListClass.prototype = new FUIComponentClass();
+
+
+FSelectableListClass.prototype.init = function() 
+{
+	super.init();
+	this.enable = true;
+	this.selected = new Array();
+	this.topDisplayed = this.numDisplayed = 0;
+	this.lastSelected = 0;
+	this.tabChildren = false;
+	if (this._name!=undefined) {
+		this.dataProvider = new DataProviderClass();
+		this.dataProvider.addView(this);
+	}
+}
+
+
+// ::: PUBLIC METHODS
+
+FSelectableListClass.prototype.addItemAt = function(index, label, data)
+{
+	if (index<0 || !this.enable) return;
+	this.dataProvider.addItemAt(index, {label:label, data:data}); 
+}
+
+FSelectableListClass.prototype.addItem = function(label, data)
+{ 
+	if (!this.enable) return;
+	this.dataProvider.addItem({label:label, data:data});
+}
+
+FSelectableListClass.prototype.removeItemAt = function(index) 
+{
+	this.selectHolder = this.getSelectedIndex();
+	var item = this.getItemAt(index);
+	this.dataProvider.removeItemAt(index);
+	return item;
+}
+
+FSelectableListClass.prototype.removeAll = function()
+{
+	this.dataProvider.removeAll();
+}
+
+FSelectableListClass.prototype.replaceItemAt = function(index, newLabel, newData) 
+{
+	this.dataProvider.replaceItemAt(index, {label:newLabel, data:newData} );
+}
+
+FSelectableListClass.prototype.sortItemsBy = function(fieldName, order) 
+{
+	this.lastSelID = this.dataProvider.getItemID(this.lastSelected);
+	this.dataProvider.sortItemsBy(fieldName, order);
+}
+
+FSelectableListClass.prototype.getLength = function()
+{
+	return this.dataProvider.getLength();
+}
+
+FSelectableListClass.prototype.getSelectedIndex = function()
+{
+	for (var uniqueID in this.selected) {
+		var tmpInd = this.selected[uniqueID].sIndex;
+		if (tmpInd!=undefined) {
+			return tmpInd;
+		}
+	}
+}
+
+FSelectableListClass.prototype.getSelectedItem = function() 
+{
+	return this.getItemAt(this.getSelectedIndex());
+}
+
+FSelectableListClass.prototype.getItemAt = function(index)
+{
+	return this.dataProvider.getItemAt(index);
+}
+
+FSelectableListClass.prototype.getEnabled = function() 
+{
+	return this.enable;
+}
+
+FSelectableListClass.prototype.getValue = function() 
+{
+	var item = this.getSelectedItem();
+	return (item.data==undefined) ? item.label : item.data;
+}
+
+
+// Sets the indices specified, executes change handler
+FSelectableListClass.prototype.setSelectedIndex = function(index, flag) 
+{
+	if (index>=0 && index<this.getLength() && this.enable) {
+		this.clearSelected();
+		this.selectItem(index, true);
+		this.lastSelected = index;
+		this.invalidate("updateControl");
+		if (flag!=false) {
+			this.executeCallBack();
+		}
+	}
+}
+
+FSelectableListClass.prototype.setDataProvider = function(obj)
+{
+	this.setScrollPosition(0);
+	this.clearSelected();
+	if (obj instanceof Array) {
+		this.dataProvider = new DataProviderClass();
+		for (var i=0; i<obj.length; i++) {
+			var value = (typeof(obj[i])=="string") ? {label:obj[i]} : obj[i];
+			this.dataProvider.addItem(value);
+		}
+	} else {
+		this.dataProvider = obj;
+	}
+	this.dataProvider.addView(this);
+}
+
+FSelectableListClass.prototype.setItemSymbol = function(linkID)
+{
+	this.tmpPos = this.getScrollPosition();
+	this.itemSymbol = linkID;
+	this.invalidate("setSize");
+	this.setScrollPosition(this.tmpPos);
+}
+
+FSelectableListClass.prototype.setEnabled = function(enabledFlag) 
+{
+// this ensures there is something displayed before disabling
+	this.cleanUI();
+	super.setEnabled(enabledFlag);
+	this.enable = enabledFlag;
+	this.boundingBox_mc.gotoAndStop( (this.enable) ? "enabled" : "disabled" );
+	var limit = Math.min(this.numDisplayed, this.getLength());
+	for (var i=0; i<limit; i++) {
+		this.container_mc["fListItem" + i + "_mc"].setEnabled(this.enable);
+	}
+	if (this.enable) {
+		this.invalidate("updateControl");
+	}
+}
+
+//update all the items based on position
+FSelectableListClass.prototype.updateControl = function() 
+{
+	for (var i=0; i<this.numDisplayed; i++) {
+		//drawItem() IMPLEMENTED IN FSelectableIemClass
+		this.container_mc["fListItem" + i + "_mc"].drawItem(this.getItemAt(this.topDisplayed + i), this.isSelected(this.topDisplayed+i));
+	}
+}
+
+FSelectableListClass.prototype.setSize = function(w, h) 
+{
+	super.setSize(w,h);
+	this.boundingBox_mc._xscale = this.boundingBox_mc._yscale = 100;
+	this.boundingBox_mc._xscale = this.width * 100 / this.boundingBox_mc._width;
+	this.boundingBox_mc._yscale = this.height * 100 / this.boundingBox_mc._height;
+	for (var i=0; i<this.numDisplayed; i++) {
+		this.container_mc.attachMovie(this.itemSymbol, "fListItem" + i + "_mc", 10 + i, {controller:this,itemNum:i});
+		var item_mc = this.container_mc["fListItem" + i + "_mc"];
+		var offset = (this.scrollOffset==undefined) ? 0 : this.scrollOffset;
+		item_mc.setSize(this.width-offset, this.itmHgt);
+		item_mc._y = (this.itmHgt-2)*i;
+	}
+	this.updateControl();
+}
+
+
+
+// ::: PRIVATE METHODS
+
+FSelectableListClass.prototype.modelChanged = function(eventObj)
+{
+	var firstRow = eventObj.firstRow;
+	var lastRow = eventObj.lastRow;
+	
+	var event = eventObj.event;
+
+	if (event=="addRows") {
+		for (var i in this.selected) {
+			if (this.selected[i].sIndex!=undefined && this.selected[i].sIndex>=firstRow) {
+				this.selected[i].sIndex+=lastRow-firstRow+1;
+				this.setSelectedIndex(this.selected[i].sIndex, false);
+			}
+		}
+	} else if (event=="deleteRows") {
+		if (firstRow==lastRow) { 
+			var index = firstRow;
+			if (this.selectHolder==index) {
+				this.selectionDeleted = true;
+			}
+		// only one was deleted
+			// if the view is scrolled but hasn't enough to display, scroll back
+			if (this.topDisplayed+this.numDisplayed>=this.getLength() && this.topDisplayed>0) {
+				this.topDisplayed--;
+				if (this.selectionDeleted && index-1>=0) {
+					this.setSelectedIndex(index-1, false);
+				}
+			} else if (this.selectionDeleted) {
+				var len = this.getLength();
+				if ( ( index==len-1 && len>1  || index>len/2)) {
+					this.setSelectedIndex(index-1, false);
+				} else {
+					this.setSelectedIndex(index, false);
+				}
+			}
+			for (var i in this.selected) {
+				if (this.selected[i].sIndex>firstRow) {
+					this.selected[i].sIndex--;
+				}
+			}
+				
+		} else {
+			// for now, assume all rows were deleted
+			this.clearSelected();
+			this.topDisplayed = 0;
+		}
+	} else if (event=="sort") {
+		// rehash selections
+		var len = this.getLength();
+		for (var i=0; i<len; i++) {
+			if (this.isSelected(i)) {
+				var id = this.dataProvider.getItemID(i);
+				if (id == this.lastSelID) {
+					this.lastSelected = i;
+				}
+				this.selected[String(id)].sIndex = i;
+			}
+		}
+	}
+	this.invalidate("updateControl");
+}
+
+FSelectableListClass.prototype.measureItmHgt = function()
+{
+	this.attachMovie(this.itemSymbol, "tmpItem_mc", 0, {controller:this});
+	this.tmpItem_mc.drawItem( {label:"Sizer: PjtTopg"}, false);
+	this.itmHgt = this.tmpItem_mc._height;
+	this.tmpItem_mc.removeMovieClip();
+}
+
+FSelectableListClass.prototype.selectItem = function(index, selectedFlag) 
+{
+	if (selectedFlag && !this.isSelected(index)) {
+		this.selected[String( this.dataProvider.getItemID(index) )] = { sIndex : index };
+	}
+	else if (!selectedFlag) {
+		delete this.selected[String( this.dataProvider.getItemID(index) )];
+	}
+}
+
+FSelectableListClass.prototype.isSelected = function(index) 
+{
+	return (this.selected[String( this.dataProvider.getItemID(index) )].sIndex!=undefined);
+}
+
+FSelectableListClass.prototype.clearSelected = function() 
+{
+	for (var uniqueID in this.selected) {
+		var index = this.selected[uniqueID].sIndex;
+		if (index!=undefined && this.topDisplayed<=index && index<this.topDisplayed+this.numDisplayed) {
+			this.container_mc["fListItem"+(index-this.topDisplayed)+"_mc"].drawItem(this.getItemAt(index), false);
+		}
+	}
+	delete this.selected;
+	this.selected = new Array();
+}
+
+FSelectableListClass.prototype.selectionHandler = function(itemNum) 
+{
+	var tmpInd = this.topDisplayed + itemNum;
+	if (this.getItemAt(tmpInd==undefined)) {
+		this.changeFlag = false;
+		return;
+	} else {
+		this.changeFlag = true;
+	}
+	this.clearSelected();
+	this.selectItem(tmpInd, true);
+	this.container_mc["fListItem" + itemNum + "_mc"].drawItem(this.getItemAt(tmpInd), this.isSelected(tmpInd));
+}
+ 
+FSelectableListClass.prototype.moveSelBy = function(incr)
+{
+	var itmNum = this.getSelectedIndex();
+	var newItm = itmNum + incr;
+	newItm = Math.max(0, newItm);
+	newItm = Math.min(this.getLength()-1, newItm);
+	if (newItm==itmNum) {
+		return;
+	}
+	if (itmNum<this.topDisplayed || itmNum>=this.topDisplayed+this.numDisplayed) {
+		this.setScrollPosition(itmNum);	// VIRTUAL Function -- EXTEND me
+	}
+	if (newItm>=this.topDisplayed+this.numDisplayed || newItm<this.topDisplayed) {
+		this.setScrollPosition(this.topDisplayed+incr);  // VIRTUAL Function -- EXTEND me
+	}
+	this.selectionHandler(newItm-this.topDisplayed);
+}
+
+FSelectableListClass.prototype.clickHandler = function(itmNum) 
+{
+	this.focusRect.removeMovieClip();
+	if (!this.focused) {
+		this.pressFocus();
+	}
+	this.selectionHandler(itmNum);
+	this.onMouseUp = this.releaseHandler;
+}
+
+FSelectableListClass.prototype.releaseHandler = function() 
+{
+	if (this.changeFlag) {
+		this.executeCallBack();
+	}
+	this.changeFlag=false;
+	this.onMouseUp=undefined;
+}
+
+FSelectableListClass.prototype.myOnSetFocus = function() 
+{
+	super.myOnSetFocus();
+	for (var i=0; i<this.numDisplayed; i++) {
+		this.container_mc["fListItem"+i+"_mc"].highlight_mc.gotoAndStop("enabled");
+	}
+}
+
+FSelectableListClass.prototype.myOnKillFocus = function() 
+{
+	super.myOnKillFocus();
+	for (var i=0; i<this.numDisplayed; i++) {
+		this.container_mc["fListItem"+i+"_mc"].highlight_mc.gotoAndStop("unfocused");
+	}
+}
+
+#endinitclip
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Virtual Assets" color="#9933CC" locked="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/DataProvider" name="dPAsset" uniqueID="1">
+                  <matrix>
+                    <Matrix d="0.956527709960938" tx="0.15" ty="1.1"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4.1.1.1'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem" name="ItemAsset" uniqueID="2">
+                  <matrix>
+                    <Matrix a="0.0001220703125" d="0.0005340576171875"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4.1.1.2'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="SuperClass" color="#4FFF4F" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent" name="superClassAsset" uniqueID="3">
+                  <matrix>
+                    <Matrix d="0.956527709960938"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4.1.1.3'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

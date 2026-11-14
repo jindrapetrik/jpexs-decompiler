@@ -530,6 +530,9 @@ public class Timeline {
         depthMaxFrame.clear();
         Set<Integer> fullDepths = new HashSet<>();
         for (Tag t : tagList) {
+            if (t == null) {
+                continue;
+            }
             newFrameNeeded = true;
             boolean isNested = ShowFrameTag.isNestedTagType(t.getId());
             if (isNested) {
@@ -615,6 +618,7 @@ public class Timeline {
                             }
                         }
                     }
+                    /*
                     //Special case, as FontTags are sometimes added to stage (like intestdata/as2.swf, Sprite 10)
                     //Do not display them.
                     //Steps to reproduce: Create new static text and set its orientation to vertical
@@ -626,6 +630,8 @@ public class Timeline {
                     } else {
                         fl.key = characterId != -1 || className != null;
                     }
+                    */
+                    fl.key = true;
 
                     if (po.flagMove()) {
                         MATRIX matrix2 = po.getMatrix();
@@ -1629,11 +1635,11 @@ public class Timeline {
      * @param aaScale Antialias conflation reducing scale coefficient
      */
     public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, ExportRectangle viewRectRaw, Matrix fullTransformation, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing, List<Integer> ignoreDepths, int aaScale) {
-        if (getFrameCount() <= frame) {
+        Frame frameObj = getFrame(frame);
+        if (frameObj == null) {
             return;
         }
 
-        Frame frameObj = getFrame(frame);
         Graphics2D g = (Graphics2D) image.getGraphics();
         Graphics2D fullG = (Graphics2D) fullImage.getGraphics();
         Shape prevClip = g.getClip();
@@ -2078,6 +2084,10 @@ public class Timeline {
      */
     public void toHtmlCanvas(StringBuilder result, double unitDivisor, List<Integer> frames) {
         FrameExporter.framesToHtmlCanvas(result, unitDivisor, this, frames, 0, null, 0, displayRect, null, null);
+    }
+
+    public void toAS3(StringBuilder result, double unitDivisor, List<Integer> frames) {
+        FrameExporter.framesToAS3(result, 1.0, this, frames);
     }
 
     /**

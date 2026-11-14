@@ -1,0 +1,92 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ScrollBarSkins/ScrollArrowUp_disabledSkin" itemID="4399b493-00008d74" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="ScrollArrowUp_disabledSkin" linkageClassName="ScrollArrowUp_disabledSkin" lastModified="1168290230">
+  <timeline>
+    <DOMTimeline name="ScrollArrowUp_disabledSkin">
+      <layers>
+        <DOMLayer name="skin" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMGroup>
+                      <members>
+                        <DOMShape>
+                          <fills>
+                            <FillStyle index="1">
+                              <LinearGradient>
+                                <matrix>
+                                  <Matrix a="0" b="-0.0083160400390625" c="0.0083160400390625" d="0" tx="6" ty="7.15"/>
+                                </matrix>
+                                <GradientEntry color="#E6E6E6" ratio="0"/>
+                                <GradientEntry color="#FFFFFF" ratio="1"/>
+                              </LinearGradient>
+                            </FillStyle>
+                          </fills>
+                          <edges>
+                            <Edge fillStyle1="1" edges="!20 20|280 20!280 20|280 260!280 260|20 260!20 260|20 20"/>
+                            <Edge cubics="!280 260(;280,260 20,260 20,260p280 260 20 260);"/>
+                            <Edge cubics="!280 20(;280,20 280,260 280,260p280 20 280 260);"/>
+                            <Edge cubics="!20 20(;20,20 280,20 280,20p20 20 280 20);"/>
+                            <Edge cubics="!20 260(;20,260 20,20 20,20p20 260 20 20);"/>
+                          </edges>
+                        </DOMShape>
+                      </members>
+                    </DOMGroup>
+                    <DOMGroup>
+                      <members>
+                        <DOMShape>
+                          <fills>
+                            <FillStyle index="1">
+                              <LinearGradient>
+                                <matrix>
+                                  <Matrix a="0" b="-0.00787353515625" c="0.00787353515625" d="0" tx="8.5" ty="6.45"/>
+                                </matrix>
+                                <GradientEntry color="#5B5D5E" alpha="0.298039215686275" ratio="0"/>
+                                <GradientEntry color="#B7BABC" alpha="0.298039215686275" ratio="1"/>
+                              </LinearGradient>
+                            </FillStyle>
+                          </fills>
+                          <edges>
+                            <Edge fillStyle0="1" edges="!280 260|20 260!20 260|20 20!20 20|280 20!280 20|280 260!0 280|300 280!300 280|300 0!300 0|0 0!0 0|0 280"/>
+                            <Edge cubics="!15400 16680(;15400,16680 15660,16680 15660,16680p15400 16680 15660 16680);"/>
+                            <Edge cubics="!15660 16920(;15660,16920 15400,16920 15400,16920p15660 16920 15400 16920);"/>
+                            <Edge cubics="!15680 16660(;15680,16660 15380,16660 15380,16660p15680 16660 15380 16660);"/>
+                            <Edge cubics="!15680 16940(;15680,16940 15680,16660 15680,16660p15680 16940 15680 16660);"/>
+                            <Edge cubics="!15380 16940(;15380,16940 15680,16940 15680,16940p15380 16940 15680 16940);"/>
+                            <Edge cubics="!15380 16660(;15380,16660 15380,16940 15380,16940p15380 16660 15380 16940);"/>
+                            <Edge cubics="!15400 16920(;15400,16920 15400,16680 15400,16680p15400 16920 15400 16680);"/>
+                            <Edge cubics="!15660 16680(;15660,16680 15660,16920 15660,16920p15660 16680 15660 16920);"/>
+                          </edges>
+                        </DOMShape>
+                      </members>
+                    </DOMGroup>
+                    <DOMGroup>
+                      <members>
+                        <DOMShape>
+                          <fills>
+                            <FillStyle index="1">
+                              <LinearGradient>
+                                <matrix>
+                                  <Matrix a="0" b="-0.00408935546875" c="0.009002685546875" d="0" tx="6.45" ty="4.1"/>
+                                </matrix>
+                                <GradientEntry color="#EEEEEE" alpha="0" ratio="0"/>
+                                <GradientEntry color="#FFFFFF" alpha="0.298039215686275" ratio="1"/>
+                              </LinearGradient>
+                            </FillStyle>
+                          </fills>
+                          <edges>
+                            <Edge fillStyle1="1" edges="!280 145|20 145!20 145|20 15!20 15|280 15!280 15|280 145"/>
+                          </edges>
+                        </DOMShape>
+                      </members>
+                    </DOMGroup>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

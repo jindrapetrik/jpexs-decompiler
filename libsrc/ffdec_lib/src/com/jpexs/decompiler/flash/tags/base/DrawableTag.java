@@ -132,6 +132,13 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
     public abstract void toHtmlCanvas(StringBuilder result, double unitDivisor);
 
     /**
+     * Converts the drawable to AS3 code.
+     * @param result Result
+     * @param unitDivisor Unit divisor
+     */
+    public abstract void toAS3(StringBuilder result, double unitDivisor);
+
+    /**
      * Gets number of frames.
      * @return Number of frames
      */

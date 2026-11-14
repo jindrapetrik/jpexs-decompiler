@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
+import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
@@ -52,6 +53,7 @@ import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.profiles.SwfProfile;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -172,65 +174,139 @@ public class ActionSourceGenerator implements SourceGenerator {
     }
 
     private List<GraphSourceItem> groupPushes(List<GraphSourceItem> items) {
-
-        if (swfVersion <= 4) {
+        if (swfVersion <= 4 || items.isEmpty()) {
             return items;
         }
 
-        return items;
+        long[] addresses = new long[items.size() + 1];
+        HashMap<Long, Long> relocatedAddresses = new HashMap<>();
+        Set<Long> boundaries = new HashSet<>();
+        for (int i = 0; i < items.size(); i++) {
+            addresses[i + 1] = addresses[i] + items.get(i).getBytesLength();
+            relocatedAddresses.put(addresses[i], addresses[i]);
+        }
+        long oldLength = addresses[items.size()];
+        relocatedAddresses.put(oldLength, oldLength);
 
-        //TODO: This should take into account important offsets (jumps)
-        //And not group Pushes over different parts of code
-        /*Like:
-           If locA
-             Push "A"
-             Push "B"
-           locA:
-           Push "C"
-        
-           Should not be grouped to Push "A","B","C"
-         
-        
-        //commented out for now...
-        Map<GraphSourceItem, Long> addresses = new LinkedHashMap<>();
-        List<Long> referencedAddresses = new ArrayList<>();
-        long addr = 0;
-        for (GraphSourceItem item : items) {
-            addresses.put(item, addr);
+        // All entry points and container divisions must remain action boundaries.
+        for (int i = 0; i < items.size(); i++) {
+            GraphSourceItem item = items.get(i);
             if (item instanceof ActionIf) {
-                ActionIf aIf = (ActionIf) item;
-                referencedAddresses.add(addr + 5 + aIf.getJumpOffset());
+                boundaries.add(addresses[i + 1] + ((ActionIf) item).getJumpOffset());
             }
             if (item instanceof ActionJump) {
-                ActionJump aJump = (ActionJump) item;
-                referencedAddresses.add(addr + 5 + aJump.getJumpOffset());
+                boundaries.add(addresses[i + 1] + ((ActionJump) item).getJumpOffset());
             }
-            addr += item.getBytesLength();            
-        }
-        
-        List<GraphSourceItem> ret = new ArrayList<>();
-        ActionPush prevPush = null;
-        for (GraphSourceItem s : items) {            
-            if (s instanceof ActionPush) {
-                if (prevPush == null) {
-                    prevPush = (ActionPush) s;
-                    ret.add(prevPush);                    
-                } else {
-                    long itemAddr = addresses.get(s);
-                    if (referencedAddresses.contains(itemAddr)) {
-                        prevPush = (ActionPush) s;
-                        ret.add(prevPush);
-                    } else {
-                        prevPush.values.addAll(((ActionPush) s).values);
-                        ((ActionPush) s).values.clear();
-                    }
+            if (item instanceof GraphSourceItemContainer) {
+                GraphSourceItemContainer container = (GraphSourceItemContainer) item;
+                long end = addresses[i] + container.getHeaderSize();
+                boundaries.add(end);
+                for (long size : container.getContainerSizes()) {
+                    end += size;
+                    boundaries.add(end);
                 }
-            } else {
-                ret.add(s);
-                prevPush = null;
-            }                      
+            }
+            if (item instanceof ActionStore) {
+                int end = i + 1 + ((ActionStore) item).getStoreSize();
+                if (end > items.size()) {
+                    return items;
+                }
+                boundaries.add(addresses[end]);
+            }
         }
-        return ret;   */
+        for (long boundary : boundaries) {
+            if (boundary >= 0 && boundary <= oldLength && !relocatedAddresses.containsKey(boundary)) {
+                return items;
+            }
+        }
+
+        List<GraphSourceItem> ret = new ArrayList<>();
+        int[] relocatedIndexes = new int[items.size() + 1];
+        long newLength = 0;
+        ActionPush prevPush = null;
+        int prevPushLength = 0;
+        boolean copiedPush = false;
+        for (int i = 0; i < items.size(); i++) {
+            GraphSourceItem item = items.get(i);
+            int length = (int) (addresses[i + 1] - addresses[i]);
+            relocatedAddresses.put(addresses[i], newLength);
+            relocatedIndexes[i] = ret.size();
+            if (item instanceof ActionPush) {
+                ActionPush push = (ActionPush) item;
+                if (prevPush != null && !boundaries.contains(addresses[i])
+                        && prevPush.replacement == null && push.replacement == null
+                        && prevPush.getCharset().equals(push.getCharset())
+                        && prevPushLength + length - 6 <= 0xFFFF) {
+                    if (!copiedPush) {
+                        ActionPush copy = new ActionPush(prevPush.values.toArray(), prevPush.getCharset());
+                        copy.constantPool = prevPush.constantPool;
+                        ret.set(ret.size() - 1, copy);
+                        prevPush = copy;
+                        copiedPush = true;
+                    }
+                    prevPush.values.addAll(push.values);
+                    prevPushLength += length - 3;
+                    newLength += length - 3;
+                    continue;
+                }
+                prevPush = push;
+                prevPushLength = length;
+                copiedPush = false;
+            } else {
+                prevPush = null;
+            }
+            ret.add(item);
+            newLength += length;
+        }
+        if (ret.size() == items.size()) {
+            return items;
+        }
+        relocatedAddresses.put(oldLength, newLength);
+        relocatedIndexes[items.size()] = ret.size();
+
+        // Relocate byte offsets and instruction counts using the original layout.
+        for (int i = 0; i < items.size(); i++) {
+            GraphSourceItem item = items.get(i);
+            if (item instanceof ActionJump || item instanceof ActionIf) {
+                int offset = item instanceof ActionJump
+                        ? ((ActionJump) item).getJumpOffset() : ((ActionIf) item).getJumpOffset();
+                long target = addresses[i + 1] + offset;
+                // A partially generated branch can still point outside this list.
+                long relocatedTarget = target < 0 ? target : target > oldLength
+                        ? target + newLength - oldLength : relocatedAddresses.get(target);
+                int relocatedOffset = (int) (relocatedTarget - relocatedAddresses.get(addresses[i + 1]));
+                if (item instanceof ActionJump) {
+                    ((ActionJump) item).setJumpOffset(relocatedOffset);
+                } else {
+                    ((ActionIf) item).setJumpOffset(relocatedOffset);
+                }
+            }
+            if (item instanceof GraphSourceItemContainer) {
+                GraphSourceItemContainer container = (GraphSourceItemContainer) item;
+                long start = addresses[i] + container.getHeaderSize();
+                List<Long> sizes = container.getContainerSizes();
+                for (int j = 0; j < sizes.size(); j++) {
+                    long end = start + sizes.get(j);
+                    container.setContainerSize(j, relocatedAddresses.get(end) - relocatedAddresses.get(start));
+                    start = end;
+                }
+            }
+            if (item instanceof ActionStore) {
+                ActionStore store = (ActionStore) item;
+                int end = relocatedIndexes[i + 1 + store.getStoreSize()];
+                List<Action> skipped = new ArrayList<>();
+                for (int j = relocatedIndexes[i + 1]; j < end; j++) {
+                    skipped.add((Action) ret.get(j));
+                }
+                store.setStore(skipped);
+            }
+        }
+        for (GraphSourceItem item : ret) {
+            if (item instanceof ActionPush) {
+                ((ActionPush) item).updateLength();
+            }
+        }
+        return ret;
     }
 
     private List<Action> nonempty(List<Action> list) {

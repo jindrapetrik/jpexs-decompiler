@@ -136,3 +136,13 @@ Lexer\.java$
 ^Dockerfile$
 (?:^|/)DoAction\.as$
 ^libsrc/ffdec_lib/testdata/motion_object/
+\.swz$
+\.swc$
+^libsrc/ffdec_lib/testdata/components/
+^libsrc/ffdec_lib/testdata/custom_component/
+^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/xfl/as1_component_definitions\.xml$
+^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/xfl/as2_component_definitions\.xml$
+^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/xfl/as2_swc_definitions\.xml$
+^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/xfl/component_definitions\.xml$
+^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/xfl/f5_smartclip_definitions\.xml$
+^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/exporters/script/mxml-components\.properties$

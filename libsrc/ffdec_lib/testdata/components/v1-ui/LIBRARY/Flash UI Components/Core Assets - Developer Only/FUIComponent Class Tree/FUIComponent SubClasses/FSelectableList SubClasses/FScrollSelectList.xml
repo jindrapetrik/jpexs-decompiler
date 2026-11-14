@@ -1,0 +1,263 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/ FSelectableList SubClasses/FScrollSelectList" itemID="3b7b828f-0000003c" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="FScrollSelectListSymbol" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/ FSelectableList SubClasses/FScrollSelectList" sourceLastModified="1015556309" lastModified="1015556309" lastUniqueIdentifier="1" sourceItemID="3b7b828f-0000003c" displayAsComponent="false" customIconID="12" persistLivePreview11="true" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="FScrollSelectList">
+      <layers>
+        <DOMLayer name="Methods" color="#4F80FF" locked="true" current="true" isSelected="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip 2
+/*
+		FScrollSelectListClass
+		EXTENDS FSelectableListClass
+		
+		adds scroll support to the list class. 
+*/
+
+function FScrollSelectListClass()
+{
+ 	this.init();
+}
+
+FScrollSelectListClass.prototype = new FSelectableListClass();
+
+
+
+
+// ::: PUBLIC METHODS
+
+
+FScrollSelectListClass.prototype.getScrollPosition = function() 
+{
+	return this.topDisplayed;
+}
+
+FScrollSelectListClass.prototype.setScrollPosition = function(pos) 
+{
+	if (this.enable) {
+		pos = Math.min(pos, this.getLength()-this.numDisplayed);
+		pos = Math.max(pos,0); 
+		this.scrollBar_mc.setScrollPosition(pos);
+	}
+}
+
+FScrollSelectListClass.prototype.setAutoHideScrollBar = function(flag) 
+{
+	this.permaScrollBar = !flag;
+	this.setSize(this.width, this.height);
+}
+
+FScrollSelectListClass.prototype.setEnabled = function(enabledFlag) 
+{
+	super.setEnabled(enabledFlag);
+	this.scrollBar_mc.setEnabled(this.enable);
+}
+
+FScrollSelectListClass.prototype.setSize = function(w,h)
+{
+	var pos = this.getScrollPosition();
+	super.setSize(w,h);
+	if (this.scrollBar_mc!=undefined) {
+		this.removed = true;
+	}
+	this.scrollBar_mc = undefined;
+	this.initScrollBar();
+	this.setScrollPosition(pos);
+}
+
+
+
+// ::: PRIVATE METHODS
+
+FScrollSelectListClass.prototype.modelChanged = function(eventObj)
+{
+	super.modelChanged(eventObj);
+	this.invalidate("initScrollBar");
+}
+
+FScrollSelectListClass.prototype.initScrollBar = function() 
+{
+	if (!this.permaScrollBar && this.getLength()<=this.numDisplayed) {
+		if (this.removed) {
+			this.scrollBar_mc.removeMovieClip();
+			this.scrollBar_mc = undefined;
+			this.scrollOffset=undefined;
+			this.invalidate("setSize");
+		}
+	} else {
+		if (this.scrollBar_mc==undefined) {
+			this.container_mc.attachMovie("FScrollBarSymbol","scrollBar_mc",3000, {hostStyle:this.styleTable}); // 3000 is arbitrarily high
+			this.scrollBar_mc = this.container_mc.scrollBar_mc;
+			this.scrollBar_mc.setChangeHandler("scrollHandler", this);
+			this.scrollBar_mc.setSize(this.height); 
+			this.scrollBar_mc._x = this.width - this.scrollBar_mc._width;
+			this.scrollBar_mc._y = 0;
+			this.scrollBar_mc.setLargeScroll(this.numDisplayed-1);
+			this.scrollOffset = this.scrollBar_mc._width;
+			this.invalidate("setSize");
+		} 
+		this.scrollBar_mc.setScrollProperties(this.numDisplayed, 0, this.getLength()-this.numDisplayed);
+	}
+}
+
+FScrollSelectListClass.prototype.scrollHandler = function(scrollBar) 
+{
+	var pos = scrollBar.getScrollPosition();
+	this.topDisplayed=pos;
+
+	if (this.lastPosition!=pos) {
+		this.updateControl();
+	}
+	this.lastPosition = pos;
+}
+
+FScrollSelectListClass.prototype.clickHandler = function(itmNum) 
+{
+	super.clickHandler(itmNum);
+	if (this.dragScrolling==undefined && this.scrollBar_mc!=undefined) {
+		this.dragScrolling = setInterval(this, "dragScroll", 15);
+	}
+}
+
+FScrollSelectListClass.prototype.releaseHandler = function() 
+{
+	clearInterval(this.dragScrolling);
+	this.dragScrolling = undefined;
+	super.releaseHandler();
+}
+
+FScrollSelectListClass.prototype.dragScroll = function() 
+{
+	clearInterval(this.dragScrolling);
+	if (this.container_mc._ymouse<0) {
+		this.setScrollPosition(this.getScrollPosition()-1);
+		this.selectionHandler(0);
+		this.scrollInterval = Math.max(25, -23.8*(0-this.container_mc._ymouse) + 500);
+		this.dragScrolling = setInterval(this, "dragScroll", this.scrollInterval);
+	} 
+	else if (this.container_mc._ymouse>(this.itmHgt-2)*this.numDisplayed) {
+		this.setScrollPosition(this.getScrollPosition() +1);
+		this.selectionHandler(this.numDisplayed-1);
+		this.scrollInterval = Math.max(25, -23.8*Math.abs((this.container_mc._ymouse-(this.itmHgt-2)*this.numDisplayed - 2)) + 500);
+		this.dragScrolling = setInterval(this, "dragScroll", this.scrollInterval);
+	} else {
+		this.dragScrolling = setInterval(this, "dragScroll", 15);
+	}
+}
+
+FScrollSelectListClass.prototype.myOnKeyDown= function()
+{
+
+	if (this.focused) {
+		this.keyCodes = new Array(Key.DOWN, Key.UP, Key.PGDN, Key.PGUP, Key.HOME, Key.END);
+		this.keyIncrs = new Array(1, -1, this.numDisplayed-1, -(this.numDisplayed-1), -this.getLength(), this.getLength());
+		for (var i=0; i<this.keyCodes.length; i++) {
+			if (Key.isDown(this.keyCodes[i])) {
+				this.moveSelBy(this.keyIncrs[i]);
+				return;
+			}
+		}
+		this.findInputText();
+	}
+}
+
+FScrollSelectListClass.prototype.findInputText = function()
+{
+	var tmpCode = Key.getAscii();
+	if (tmpCode>=33 && tmpCode<=126) {
+		this.findString(String.fromCharCode(tmpCode));
+	}
+}
+
+FScrollSelectListClass.prototype.findString = function(str)
+{
+	if (this.getLength()==0) return;
+	var itemNum = this.getSelectedIndex();
+	var jump = 0;
+	for (var i=itemNum+1; i!=itemNum; i++) {
+		var itmStr = this.getItemAt(i).label.substring(0,str.length);
+		if (str==itmStr || str.toUpperCase()==itmStr.toUpperCase()) {
+			var jump = i - itemNum;
+			break;
+		}
+		if (i>=this.getLength()-1) { 
+			i=-1;
+		}
+	}
+	if (jump!=0) {
+		this.moveSelBy(jump);
+	}
+}
+	
+#endinitclip
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="SuperClass" color="#FF4F4F" locked="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/ FSelectableList" name="superClassAsset" uniqueID="1">
+                  <matrix>
+                    <Matrix a="26.666748046875" d="3.63636779785156"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4.1.1'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Scroll Assets" color="#4FFF4F" locked="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/ ScrollBar" name="scrollBarAsset" uniqueID="2">
+                  <matrix>
+                    <Matrix a="0.25" d="0.03997802734375"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <Actionscript>
+                    <script><![CDATA[onClipEvent(load) {
+	this._width = this._height = 1;
+}]]></script>
+                  </Actionscript>
+                  <color>
+                    <Color/>
+                  </color>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4.1.2'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="_targetInstanceName">
+      <Inspectable name="Target TextField" variable="_targetInstanceName" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+   <property id="horizontal">
+      <Inspectable name="Horizontal" variable="horizontal" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

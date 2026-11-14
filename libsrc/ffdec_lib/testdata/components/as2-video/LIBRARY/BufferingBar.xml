@@ -1,0 +1,80 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="BufferingBar" itemID="4294fc18-00000729" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="BufferingBar" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef="BufferingBar" sourceLastModified="1166032235" lastModified="1166032235" lastUniqueIdentifier="8" sourceItemID="4294fc18-00000729" customIconID="0" persistLivePreview11="true" editFrameIndex="1" requiredMinimumPlayerVersion="8" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="BufferingBar">
+      <layers>
+        <DOMLayer name="script" color="#FFFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Outline" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#333333"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <SolidColor color="#999999"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!19.5 179|0 179!0 179|0 -0.5!0 -0.5|95 -0.5!95 -0.5|95 0!95 0|2000 0"/>
+                    <Edge fillStyle1="2" edges="!2000 0|2000 -0.5!2000 -0.5|2020 -0.5!2020 -0.5|2020 161!2020 161|2019.5 161!2019.5 161|2019.5 178.5!2019.5 178.5|1924.5 178.5!1924.5 178.5|1924.5 179!1924.5 179|19.5 179"/>
+                    <Edge fillStyle0="2" edges="!2000 20|2000 160!2000 160|20 160"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!20 160|19.5 160!19.5 160|19.5 179!2000 0|2000 20"/>
+                    <Edge fillStyle1="1" edges="!2000 20|20 20!20 20|20 160"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="mask" color="#FF4F4F" locked="true" current="true" isSelected="true" autoNamed="false" layerType="mask">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape isFloating="true">
+                  <matrix>
+                    <Matrix a="4.95001220703125" d="0.992904663085938" tx="-3.95"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FF0033"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!420 161S2|20 161!20 161|20 20!20 20|420 20!420 20|420 161"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="pattern" color="#4F80FF" parentLayerIndex="2" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Buffering Bar/BufferingPatternSymbol">
+                  <matrix>
+                    <Matrix tx="-1" ty="0.6"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="249.85" y="3.7"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <customIcon>
+    <CustomIcon rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" href="79cfknm5cj.dat"/>
+  </customIcon>
+</DOMComponentItem>

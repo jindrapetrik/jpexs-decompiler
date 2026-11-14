@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.swf5;
 
+import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -24,6 +25,7 @@ import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
+import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -71,10 +73,17 @@ public class ActionConstantPool extends Action {
      */
     public ActionConstantPool(int actionLength, SWFInputStream sis) throws IOException {
         super(0x88, actionLength, sis.getCharset());
-        //sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);
-        int count = sis.readUI16("count");
-        for (int i = 0; i < count; i++) {
-            constantPool.add(sis.readString("constant"));
+        DumpInfo di = sis.dumpInfo;
+        sis = sis.getLimitedStream(actionLength);
+        sis.dumpInfo = di;
+        try {
+            int count = sis.readUI16("count");        
+            for (int i = 0; i < count; i++) {
+                constantPool.add(sis.readString("constant"));
+            }
+        } catch (EndOfStreamException eof) {
+            //Newer flash players will stop playing the SWF,
+            //in older FPs like FP7, it will read invalid values from memory
         }
     }
 

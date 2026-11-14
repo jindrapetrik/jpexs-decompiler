@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:mx="library://ns.adobe.com/flex/mx" width="420" height="200" backgroundColor="0xEAF4FF">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var caption:String = "A separately compiled MX module";
+        public function describe():String {
+            return caption;
+        }
+        private function updateCaption():void {
+            caption = "The MX module button was clicked";
+        }
+    ]]></fx:Script>
+    <mx:VBox id="moduleBox" width="100%" verticalGap="12">
+        <mx:Label id="mxModuleLabel" text="{caption}"/>
+        <mx:Button id="mxModuleButton" label="Update MX module message" click="updateCaption()" color="0x224466"/>
+    </mx:VBox>
+</mx:Module>

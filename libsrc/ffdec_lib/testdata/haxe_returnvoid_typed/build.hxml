@@ -1,0 +1,4 @@
+-cp src
+-main Main
+-swf bin/haxe_returnvoid_typed.swf
+-swf-version 11

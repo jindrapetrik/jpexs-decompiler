@@ -18,9 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.easygui.DoableOperation;
-import com.jpexs.decompiler.flash.easygui.EasyStrings;
-import com.jpexs.decompiler.flash.easygui.UndoManager;
 import com.jpexs.decompiler.flash.gui.controls.JRepeatButton;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
@@ -90,14 +87,12 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     private TextTag textTag;
     
-    private final UndoManager undoManager;
     
     private String oldText = null;
 
-    public TextPanel(final MainPanel mainPanel, UndoManager undoManager) {
+    public TextPanel(final MainPanel mainPanel, boolean showReset) {
         super(new BorderLayout());
         
-        this.undoManager = undoManager;
 
         this.mainPanel = mainPanel;
         textSearchPanel = new SearchPanel<>(new FlowLayout(), mainPanel);
@@ -139,7 +134,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         textButtonsPanel.add(decreaseTranslateXButton);
         textButtonsPanel.add(increaseTranslateXButton);
         textButtonsPanel.add(changeCaseButton);
-        if (undoManager == null) {
+        if (showReset) {
             textButtonsPanel.add(undoChangesButton);
         }
 
@@ -372,7 +367,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     }
 
     private void saveText(boolean refresh) {
-        if (mainPanel.saveText(textTag, textValue.getText(), null, textValue, undoManager)) {                                   
+        if (mainPanel.saveText(textTag, textValue.getText(), null, textValue)) {
             setEditText(false);
             setModified(false);
             textTag.getSwf().clearImageCache();
@@ -384,88 +379,41 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     }
 
     private void textAlign(TextAlign textAlign) {
-        if (undoManager != null) {           
-            String prevText = textTag.getFormattedText(false).text;
-            undoManager.doOperation(new DoableOperation() {
-
-                    @Override
-                    public void doOperation() {
-                        textAlignInternal(textAlign);
-                    }
-
-                    @Override
-                    public void undoOperation() {
-                        try {
-                            textTag.setFormattedText(null, prevText, null);
-                        } catch (TextParseException ex) {
-                            //ignore
-                        }
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return EasyStrings.translate("action.change").replace("%item%", EasyStrings.translate("action.change.text"));
-                    }
-                }, textTag.getSwf());
-            return;
-        }
-        textAlignInternal(textAlign);
-    }
-        
-    private void textAlignInternal(TextAlign textAlign) {
-        if (textTag.alignText(textAlign)) {
-            updateButtonsVisibility();
-            refresh();            
-            textTag.getSwf().clearImageCache();
-            mainPanel.repaintTree();
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.align.text", textTag.getSwf())) {
+            if (textTag.alignText(textAlign)) {
+                updateButtonsVisibility();
+                refresh();
+                textTag.getSwf().clearImageCache();
+                mainPanel.repaintTree();
+            }
         }
     }
 
 
     private void translateX(int delta, int repeatCount) {
-        if (undoManager != null) {            
-            undoManager.doOperation(new DoableOperation() {
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.move.text", textTag.getSwf())) {
 
-                    @Override
-                    public void doOperation() {
-                        translateXInternal(delta, repeatCount);
-                    }
 
-                    @Override
-                    public void undoOperation() {
-                        translateXInternal(-delta, repeatCount);               
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return EasyStrings.translate("action.change").replace("%item%", EasyStrings.translate("action.change.text"));
-                    }
-                }, textTag.getSwf());
-            return;
-        }
-        translateXInternal(delta, repeatCount);
-    }
-
-    private void translateXInternal(int delta, int repeatCount) {
-        
-        
-        if (textTag.translateText(delta * (repeatCount + 1))) {
-            updateButtonsVisibility();
-            refresh();
-            textTag.getSwf().clearImageCache();
-            mainPanel.repaintTree();
+            if (textTag.translateText(delta * (repeatCount + 1))) {
+                updateButtonsVisibility();
+                refresh();
+                textTag.getSwf().clearImageCache();
+                mainPanel.repaintTree();
+            }
         }
     }
 
     private void undoChanges() {
-        try {
-            textTag.undo();
-        } catch (InterruptedException | IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.restore.text", textTag.getSwf())) {
+            try {
+                textTag.undo();
+            } catch (InterruptedException | IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
 
-        textTag.getSwf().clearImageCache();
-        mainPanel.repaintTree();
+            textTag.getSwf().clearImageCache();
+            mainPanel.repaintTree();
+        }
     }
 
     private void textChanged() {

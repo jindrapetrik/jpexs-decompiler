@@ -817,7 +817,7 @@ public abstract class TextTag extends DrawableTag {
                     }
                 }
 
-                if (pos >= selectionStart && pos < selectionEnd) {
+                if (pos >= selectionStart && pos < selectionEnd && font != null) {
                     Graphics2D g = (Graphics2D) image.getGraphics();
 
                     RGB borderColor = new RGBA(Color.black);

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark">
+    <fx:Script><![CDATA[
+        import model.Product;
+        import utils.CardFormatter;
+        [Bindable] public var product:Product;
+    ]]></fx:Script>
+    <s:Label text="{product == null ? '' : CardFormatter.title(product.name)}"/>
+</s:VGroup>

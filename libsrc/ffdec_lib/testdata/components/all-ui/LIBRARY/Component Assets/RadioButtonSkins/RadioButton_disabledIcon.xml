@@ -1,0 +1,66 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/RadioButtonSkins/RadioButton_disabledIcon" itemID="4399b23a-000082f3" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="RadioButton_disabledIcon" linkageClassName="RadioButton_disabledIcon" lastModified="1168289721">
+  <timeline>
+    <DOMTimeline name="RadioButton_disabledIcon">
+      <layers>
+        <DOMLayer name="highlight" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.00372314453125" c="0.0073089599609375" d="0" tx="5.9" ty="4"/>
+                        </matrix>
+                        <GradientEntry color="#CCCCCC" alpha="0" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!55 55[90 20 140 20!140 20[190 20 225 55!225 55[228 58 231 61!231 61[260 94 260 140!260 140|20 140!20 140[20 94 50 61!50 61[52 58 55 55"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="fill" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.0073089599609375" c="0.0073089599609375" d="0" tx="5.95" ty="6.3"/>
+                        </matrix>
+                        <GradientEntry color="#CCCCCC" alpha="0.2" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.008941650390625" c="0.008941650390625" d="0" tx="7.5" ty="6.65"/>
+                        </matrix>
+                        <GradientEntry color="#5B5D5E" alpha="0.298039215686275" ratio="0"/>
+                        <GradientEntry color="#B7BABC" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!260 140[260 190 225 225!225 225[190 260 140 260!140 260[90 260 55 225!55 225[20 190 20 140!20 140[20 94 50 61!50 61[52 58 55 55!55 55[90 20 140 20!140 20[190 20 225 55!225 55[228 58 231 61!231 61[260 94 260 140"/>
+                    <Edge fillStyle0="2" edges="!280 140[280 95 256 61!256 61[249 51 239 41!239 41[198 0 140 0!140 0[82 0 41 41!41 41[31 51 24 61!24 61[0 95 0 140!0 140[0 198 41 239!41 239[82 280 140 280!140 280[198 280 239 239!239 239[280 198 280 140"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

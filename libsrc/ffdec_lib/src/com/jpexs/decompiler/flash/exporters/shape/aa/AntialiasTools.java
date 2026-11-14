@@ -144,7 +144,8 @@ public class AntialiasTools {
             return path;
         }
 
-        for (List<Vec2> contour : contours) {
+        for (int contourIndex = 0; contourIndex < contours.size(); contourIndex++) {
+            List<Vec2> contour = contours.get(contourIndex);
             IVec2[] iPts = isStroke ? toFixedContour(contour) : toCleanFixedContour(contour);
             if (iPts == null || iPts.length < 2) {
                 continue;
@@ -154,11 +155,10 @@ public class AntialiasTools {
 
             for (int i = 1; i < iPts.length; i++) {
                 path.lineTo(iPts[i].x / (float) FIXED_ONE, iPts[i].y / (float) FIXED_ONE);
-            }           
-        }
-        
-        if (close) {
-            path.closePath();
+            }
+            if (close && contourIndex == contours.size() - 1) {
+                path.closePath();
+            }
         }
 
         return path;

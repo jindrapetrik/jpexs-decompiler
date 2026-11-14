@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Pause Button/PauseButtonDown" itemID="427077f9-00000418" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="PauseButtonDown" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Pause Button/PauseButtonDown" sourceLastModified="1157562301" lastModified="1157562301" lastUniqueIdentifier="8" sourceItemID="427077f9-00000418">
+  <timeline>
+    <DOMTimeline name="PauseButtonDown">
+      <layers>
+        <DOMLayer name="Icon" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Pause Button/Assets/PauseIcon" selected="true">
+                  <matrix>
+                    <Matrix tx="9" ty="9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="4.5" y="2.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Button" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/_SquareButton/SquareBgDown" name="button_mc">
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

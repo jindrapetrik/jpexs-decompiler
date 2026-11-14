@@ -344,35 +344,39 @@ public class ShapeFixer {
                 return System.identityHashCode(o1) - System.identityHashCode(o2);
             });
 
-            for (int i = splittedBewList.size() - 1; i >= 0; i--) {
-                BezierEdgeWrapper bew = splittedBewList.get(i);
-
+            double roundingDivisor = wasSmall ? 2 : 100;
+            Map<BezierEdgeWrapper, List<BezierEdge>> splitEdges = new LinkedHashMap<>();
+            for (BezierEdgeWrapper bew : splittedBewList) {
                 List<Double> splitT = splitPointsMap.get(bew);
                 splitT.sort((a, b) -> Double.compare(a, b));
-
-                BezierEdge be = bew.be;
                 List<Double> realSplitT = new ArrayList<>();
                 for (double t : splitT) {
-                    if (t == 0.0 || t == 1.0) {
-                        continue;
+                    if (t != 0.0 && t != 1.0) {
+                        realSplitT.add(t);
                     }
-
-                    realSplitT.add(t);
                 }
+                if (!realSplitT.isEmpty()) {
+                    List<BezierEdge> parts = bew.be.split(realSplitT);
+                    splitEdges.put(bew, parts);
+                    if (wasSmall && hasCollapsedJunctions(parts)) {
+                        // Half-twip rounding can merge a crossing with another
+                        // crossing or an existing corner and erase a whole fill.
+                        // Retain XFL's 1/256-twip precision for this layer.
+                        roundingDivisor = 256;
+                    }
+                }
+            }
 
-                if (realSplitT.isEmpty()) {
+            for (int i = splittedBewList.size() - 1; i >= 0; i--) {
+                BezierEdgeWrapper bew = splittedBewList.get(i);
+                List<BezierEdge> splitted = splitEdges.get(bew);
+                if (splitted == null) {
                     continue;
                 }
-
-                List<BezierEdge> splitted = be.split(realSplitT);
                 shapes.get(bew.shapeIndex).remove(bew.edgeIndex);
                 int pos = 0;
                 for (BezierEdge bes : splitted) {
-                    if (wasSmall) {
-                        bes.roundN(2); //this value works best for #1011, why? Also for #2532 it is okay.
-                    } else {
-                        bes.roundN(100); //this value works best for #2165, it's not multiplied by 20 like not small :-(
-                    }
+                    bes.roundN(roundingDivisor);
                     if (bes.isEmpty()) {
                         continue;
                     }
@@ -381,6 +385,29 @@ public class ShapeFixer {
                 }
             }
         }
+    }
+
+    private static boolean hasCollapsedJunctions(List<BezierEdge> parts) {
+        Map<Point2D, Point2D> junctions = new HashMap<>();
+        List<Point2D> points = new ArrayList<>();
+        points.add(parts.get(0).getBeginPoint());
+        for (BezierEdge part : parts) {
+            points.add(part.getEndPoint());
+        }
+        for (Point2D point : points) {
+            Point2D coarse = roundedPoint(point, 2);
+            Point2D fine = roundedPoint(point, 256);
+            Point2D previous = junctions.put(coarse, fine);
+            if (previous != null && !previous.equals(fine)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Point2D roundedPoint(Point2D point, double divisor) {
+        return new Point2D.Double(Math.round(point.getX() * divisor) / divisor,
+                Math.round(point.getY() * divisor) / divisor);
     }
 
     private void detectOverlappingEdges(
@@ -420,11 +447,43 @@ public class ShapeFixer {
         handleBewList(strokesBewList, shapes, wasSmall);
         handleBewList(fillsBewList, shapes, wasSmall);
 
-        for (int i1 = 0; i1 < shapes.size(); i1++) {
-            for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
-                BezierEdge be1 = shapes.get(i1).get(j1);
-                be1.shrinkToLine();
+        normalizeEdges(shapes);
+    }
+
+    private void normalizeEdges(List<List<BezierEdge>> shapes) {
+        for (int i = 0; i < shapes.size(); i++) {
+            List<BezierEdge> normalized = new ArrayList<>();
+            for (BezierEdge edge : shapes.get(i)) {
+                if (edge.isEmpty()) {
+                    continue;
+                }
+                if (edge.points.size() == 3) {
+                    Point2D start = edge.points.get(0);
+                    Point2D control = edge.points.get(1);
+                    Point2D end = edge.points.get(2);
+                    double dx = control.getX() - start.getX();
+                    double dy = control.getY() - start.getY();
+                    double ex = end.getX() - start.getX();
+                    double ey = end.getY() - start.getY();
+                    if (dx * ey - dy * ex == 0) {
+                        double denominator = dx != 0 ? 2 * dx - ex : 2 * dy - ey;
+                        double t = denominator == 0 ? 0 : (dx != 0 ? dx : dy) / denominator;
+                        if (t > 0 && t < 1) {
+                            // A collinear quadratic doubles back at its extremum.
+                            // Keep both traversals; a zero-length chord crashes Flash 4.
+                            double u = 1 - t;
+                            double x = u * u * start.getX() + 2 * u * t * control.getX() + t * t * end.getX();
+                            double y = u * u * start.getY() + 2 * u * t * control.getY() + t * t * end.getY();
+                            normalized.add(new BezierEdge(start.getX(), start.getY(), x, y));
+                            normalized.add(new BezierEdge(x, y, end.getX(), end.getY()));
+                            continue;
+                        }
+                    }
+                }
+                edge.shrinkToLine();
+                normalized.add(edge);
             }
+            shapes.set(i, normalized);
         }
     }
 
@@ -702,12 +761,7 @@ public class ShapeFixer {
             }
         }
 
-        for (int i1 = 0; i1 < shapes.size(); i1++) {
-            for (int j1 = 0; j1 < shapes.get(i1).size(); j1++) {
-                BezierEdge be1 = shapes.get(i1).get(j1);
-                be1.shrinkToLine();
-            }
-        }
+        normalizeEdges(shapes);
     }
 
     private void splitToLayers(

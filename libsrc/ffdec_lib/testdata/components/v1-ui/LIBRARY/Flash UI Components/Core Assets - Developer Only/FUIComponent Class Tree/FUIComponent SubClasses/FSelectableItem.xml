@@ -1,0 +1,223 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem" itemID="3b662a99-00000034" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="FSelectableItemSymbol" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3b662a99-00000034" displayAsComponent="false" customIconID="12" persistLivePreview11="true" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="FSelectableItem">
+      <layers>
+        <DOMLayer name="Methods" color="#4F80FF" locked="true" current="true" isSelected="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip 2
+/*
+
+		CLASS FSelectableItemClass
+		EXTENDS FUIComponentClass
+		
+		FSelectableItemClass is the super class for UI in all list and menu items.
+		Handles Highlighting (inc colors), HitArea management. 
+*/
+ 
+function FSelectableItemClass()
+{
+	this.init();
+}
+
+FSelectableItemClass.prototype = new FUIComponentClass();
+
+
+FSelectableItemClass.prototype.init = function()
+{
+	// Keep the label from instantiating if this is just an Asset
+	// This helps save RAM and prevents masking issues
+	if (this._name!="itemAsset") {
+		this.highlighted = false;
+		this.layoutContent(100);
+	}
+}
+
+
+// ::: PUBLIC METHODS
+
+
+/* DrawItem is the overall shell for displaying content in an item. Steps:
+   1) Displaying the text / other content to display in the item (from within the itmObj)
+   2) turning the highlight on or off
+*/
+FSelectableItemClass.prototype.drawItem = function(itmObj, selected)
+{
+
+	this.displayContent(itmObj, selected);
+
+	if ( (this.highlighted!=selected) || ((this.controller.focused!=this.oldFocus) && selected) ) {
+		this.setHighlighted(selected);
+	}
+	this.oldFocus = this.controller.focused;
+}
+
+
+//  This is for adjusting the size of the highlight and its associated hit area
+FSelectableItemClass.prototype.setSize = function(width, height)
+{
+	var LOWEST_DEPTH = -16384; // A constant (!) for the lowest authortime depth
+	this.width = width;
+	this.layoutContent(width); // EXTEND this for alternate content.
+	
+	this.attachMovie("FHighlightSymbol", "highlight_mc", LOWEST_DEPTH);
+	this.highlight_mc._x=0.5;
+	this.highlight_mc._width = width-0.5;
+	this.highlight_mc._height = height;
+	this.highlight_mc.controller = this;
+
+	this.highlight_mc._alpha = 0;
+	this.highlight_mc.trackAsMenu = true;
+
+	this.highlight_mc.onPress = function()
+	{
+		if (this.controller.enable) {
+			this.controller.controller.clickHandler(this.controller.itemNum);
+			
+		}
+	}
+	this.highlight_mc.onDragOver = function()
+	{
+		if (this.controller.controller.focused) {
+			this.onPress();
+		}
+	}
+	this.highlight_mc.useHandCursor = false;
+	this.highlight_mc.trackAsMenu = true;
+}
+
+
+// EXTEND this method to accomodate more than one label or other content.
+FSelectableItemClass.prototype.setEnabled = function(enabledFlag)
+{
+	this.enable =enabledFlag;
+	this.fLabel_mc.setEnabled(enabledFlag);
+	this.highlight_mc.gotoAndStop( (enabledFlag) ? "unfocused" : "disabled" );
+}
+
+
+
+// ::: PRIVATE METHODS
+
+// EXTEND this method to change the content of an item and its layout
+FSelectableItemClass.prototype.layoutContent = function(width)
+{
+	this.attachMovie("FLabelSymbol", "fLabel_mc", 2, {hostComponent:this.controller}); 
+	this.fLabel_mc._x = 2;
+	this.fLabel_mc._y = 0;
+	this.fLabel_mc.setSize(width-2);
+	this.fLabel_mc.labelField.selectable = false;
+}
+
+// EXTEND this method to change the rendering of the content in an item (multiple labels, icons, etc)
+FSelectableItemClass.prototype.displayContent = function(itmObj, selected)
+{
+	//:: Begin choosing the text to display, by introspecting the object a little.
+	var tmpLabel = "";
+	if (itmObj.label!=undefined) {
+		tmpLabel = itmObj.label;
+	} else {
+		if (typeof(itmObj)=="object") {
+			for (var i in itmObj) {
+				if (i!="__ID__") {
+					tmpLabel = itmObj[i] + ", " + tmpLabel;
+				}
+			}
+			tmpLabel = tmpLabel.substring(0,tmpLabel.length-2);
+
+		} else {
+			tmpLabel = itmObj;
+		}
+	}
+	//:: End choosing text to display; display it. 
+	if (this.fLabel_mc.labelField.text!=tmpLabel) {
+		this.fLabel_mc.setLabel(tmpLabel);
+	}
+	
+	// color the label. 
+	var clr = (selected) ? this.controller.styleTable.textSelected.value : this.controller.styleTable.textColor.value;
+	if (clr==undefined) {
+		clr = (selected) ? 0xffffff : 0x000000;
+	}
+	this.fLabel_mc.setColor(clr);
+
+}
+
+
+
+/* ::: convenience methods for accessing the data model associated with an item. 
+		Use these for round-tripping item-to-data interactions (like opening a tree node, or putting an
+	    input field in an item)
+*/
+FSelectableItemClass.prototype.getItemIndex = function()
+{
+	return this.controller.getScrollPosition() + this.itemNum;
+}
+
+FSelectableItemClass.prototype.getItemModel = function()
+{
+	return this.controller.getItemAt(this.getItemIndex());
+}
+
+FSelectableItemClass.prototype.getHostDataProvider = function()
+{
+	return this.controller.dataProvider;
+}
+
+// ::: End convenience methods
+
+
+// Controls the highlighting of items. Shouldn't need to be extended.
+FSelectableItemClass.prototype.setHighlighted = function(flag)
+{
+	fade = this.controller.styleTable["fadeRate"].value;
+	if (fade==undefined || fade==0 || !flag){
+		this.highlight_mc._alpha = (flag) ? 100 : 0;
+		delete this.onEnterFrame;
+	} else {
+		this.fadeN = fade;
+		this.fadeX = 1;
+		this.highLight_mc._alpha = 20;
+		this.onEnterFrame = function()
+		{
+			this.highLight_mc._alpha = 60*Math.sqrt(this.fadeX++/this.fadeN)+40;
+			if (this.fadeX>this.fadeN) {
+				delete this.onEnterFrame;
+			}
+		}
+	}
+	this.highlighted = flag;
+}
+
+#endinitclip
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Virtual Assets" color="#FF4F4F" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Component Skins/Global Skins/FHighlight" name="highlightAsset">
+                  <matrix>
+                    <Matrix a="0.0399932861328125" d="0.0399932861328125"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

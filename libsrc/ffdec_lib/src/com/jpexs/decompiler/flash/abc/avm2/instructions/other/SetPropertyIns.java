@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
@@ -121,6 +122,13 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             SetPropertyAVM2Item sp = (SetPropertyAVM2Item) result;
                             if (sp.object instanceof DuplicateSourceItem) {
                                 sp.object = sp.object.value;
+                            }
+                        }
+                        //Haxe assigns a compound property with initproperty
+                        if (result instanceof InitPropertyAVM2Item) {
+                            InitPropertyAVM2Item ip = (InitPropertyAVM2Item) result;
+                            if (ip.object instanceof DuplicateSourceItem) {
+                                ip.object = ip.object.value;
                             }
                         }
                     }                    

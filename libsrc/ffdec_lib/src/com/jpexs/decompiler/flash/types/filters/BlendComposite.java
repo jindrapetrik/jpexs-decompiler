@@ -236,6 +236,18 @@ public final class BlendComposite implements Composite {
 
         private final BlendComposite composite;
 
+        private final int[] result = new int[4];
+
+        private final int[] srcPixel = new int[4];
+
+        private final int[] dstPixel = new int[4];
+
+        private final int[] retPixel = new int[4];
+
+        private int[] srcPixels;
+
+        private int[] dstPixels;
+
         private BlendingContext(BlendComposite composite) {
             this.composite = composite;
             this.blender = Blender.getBlenderFor(composite);
@@ -243,6 +255,8 @@ public final class BlendComposite implements Composite {
 
         @Override
         public void dispose() {
+            srcPixels = null;
+            dstPixels = null;
         }
 
         @Override
@@ -252,12 +266,12 @@ public final class BlendComposite implements Composite {
 
             float alpha = composite.getAlpha();
 
-            int[] result = new int[4];
-            int[] srcPixel = new int[4];
-            int[] dstPixel = new int[4];
-            int[] retPixel = new int[4];
-            int[] srcPixels = new int[width];
-            int[] dstPixels = new int[width];
+            // Java2D calls compose repeatedly for tiles of the same draw.
+            // Keep the row buffers for the lifetime of this context.
+            if (srcPixels == null || srcPixels.length < width) {
+                srcPixels = new int[width];
+                dstPixels = new int[width];
+            }
 
             for (int y = 0; y < height; y++) {
                 src.getDataElements(0, y, width, 1, srcPixels);

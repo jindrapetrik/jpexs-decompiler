@@ -92,7 +92,7 @@ public abstract class AbstractPropertyField<E> extends JPanel {
         readLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1) {
+                if (isEnabled() && e.getClickCount() == 1) {
                     ((CardLayout) AbstractPropertyField.this.getLayout()).show(AbstractPropertyField.this, CARD_WRITE);
                     writeField.requestFocus();
                     writeField.selectAll();
@@ -143,7 +143,26 @@ public abstract class AbstractPropertyField<E> extends JPanel {
 
     protected abstract String valueToText(E value);
 
-    private synchronized void finishEdit() {
+    public void setColumns(int columns) {
+        writeField.setColumns(columns);
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (readLabel != null) {
+            readLabel.setEnabled(enabled);
+            readLabel.setCursor(Cursor.getPredefinedCursor(enabled ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
+        }
+        if (writeField != null) {
+            writeField.setEnabled(enabled);
+        }
+        if (!enabled) {
+            cancelEdit();
+        }
+    }
+
+    synchronized void finishEdit() {
         if (!editing) {
             return;
         }
@@ -230,6 +249,7 @@ public abstract class AbstractPropertyField<E> extends JPanel {
             return;
         }
         String text = valueToText(value);
+        undetermined = false;
         readLabel.setText(text);
         writeField.setText(text);
         if (!silent) {

@@ -1,0 +1,4 @@
+-cp src
+-swf bin/haxe_static_init_imports.swc
+-swf-version 11
+tests.TestHaxeStaticInitImports

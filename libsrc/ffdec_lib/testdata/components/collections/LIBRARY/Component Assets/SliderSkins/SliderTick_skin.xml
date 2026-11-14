@@ -1,0 +1,30 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/SliderSkins/SliderTick_skin" itemID="44fdb8d4-000002a7" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="SliderTick_skin" lastModified="1168290400">
+  <timeline>
+    <DOMTimeline name="SliderTick_skin">
+      <layers>
+        <DOMLayer name="skin" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#919999"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!10 40|-10 40!-10 40|-10 0!-10 0|10 0!10 0|10 40"/>
+                    <Edge cubics="!1 1(;1,1 20,1 20,1q1 1 20 1);"/>
+                    <Edge cubics="!1 39(;1,39 21,39 21,39q1 39 21 39);"/>
+                    <Edge cubics="!1 39(;1,39 1,1 1,1q1 39 1 1);"/>
+                    <Edge cubics="!20 1(;20,1 21,39 21,39q20 1 21 39);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

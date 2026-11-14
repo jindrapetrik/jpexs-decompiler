@@ -1,0 +1,78 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="PauseButton" itemID="4249d26f-000000fc" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="PauseButton" linkageClassName="PauseButton" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef="PauseButton" sourceLastModified="1166032280" lastModified="1166032280" lastUniqueIdentifier="5" sourceItemID="4249d26f-000000fc" customIconID="0" persistLivePreview11="true" editFrameIndex="2" requiredMinimumPlayerVersion="8" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="PauseButton">
+      <layers>
+        <DOMLayer name="script" color="#FF4FFF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();
+this.upLinkageID = "PauseButtonNormal";
+this.overLinkageID = "PauseButtonOver";
+this.downLinkageID = "PauseButtonDown";
+this.disabledLinkageID = "PauseButtonDisabled";
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="contents" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Pause Button/PauseButtonNormal" name="placeholder_mc">
+                  <matrix>
+                    <Matrix d="1.00057983398438"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Pause Button/PauseButtonDisabled">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="105"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Pause Button/PauseButtonNormal">
+                  <matrix>
+                    <Matrix d="1.00057983398438"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Pause Button/PauseButtonOver">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="35"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Pause Button/PauseButtonDown">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="71"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <customIcon>
+    <CustomIcon rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" href="79casnm5cj.dat"/>
+  </customIcon>
+</DOMComponentItem>

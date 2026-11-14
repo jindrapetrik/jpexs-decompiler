@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/Shared/panelBackground_Shadow" itemID="450ae432-0000043a" lastModified="1168290377">
+  <timeline>
+    <DOMTimeline name="panelBackground_Shadow">
+      <layers>
+        <DOMLayer name="shadow" color="#4FFF4F" outline="true" current="true" isSelected="true" useOutlineView="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape isDrawingObject="true">
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!5420 20|140 20!140 20[106 20 83 43!83 43[60 66 60 100!60 100|60 3840!60 3840|5500 3840!5500 3840|5500 100!5500 100[5500 66 5477 43!5477 43[5453 20 5420 20"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

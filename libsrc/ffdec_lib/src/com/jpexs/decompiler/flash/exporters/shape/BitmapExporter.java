@@ -49,8 +49,14 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,13 +109,13 @@ public class BitmapExporter extends ShapeExporterBase {
     protected double thicknessScaleY;
 
     protected double unzoom;
-    
+
     protected int aaScale;
 
     protected static boolean linearGradientColorWarningShown = false;
 
     protected boolean scaleStrokes;
-    
+
     protected class TransformedStroke implements Stroke {
 
         /**
@@ -161,8 +167,136 @@ public class BitmapExporter extends ShapeExporterBase {
         }
     }
 
+    protected static double getAlignedStrokeWidth(double width, boolean pixelHinting) {
+        double rasterWidth = roundToQuarterPixel(width);
+        if (pixelHinting) {
+            return Math.max(1, Math.floor(rasterWidth));
+        }
+        // Zero indicates that the original width is used and there is no axis alignment.
+        return rasterWidth == Math.floor(rasterWidth) ? rasterWidth : 0;
+    }
+
+    private static double roundToQuarterPixel(double value) {
+        return Math.floor(value * 4 + 0.5) / 4;
+    }
+
+    private static double snapStrokeCoordinate(double coordinate, double pixelWidth) {
+        // Odd widths are centered between pixel boundaries; even widths are centered on them.
+        double offset = pixelWidth % 2 / 2;
+        return Math.floor(roundToQuarterPixel(coordinate) - offset + 0.5) + offset;
+    }
+
+    protected static final class StrokePoint {
+
+        public final int segment;
+        public final double[] coordinates;
+        private final int anchor;
+        private boolean alignX;
+        private boolean alignY;
+
+        public StrokePoint(int segment, double... coordinates) {
+            this.segment = segment;
+            this.coordinates = coordinates;
+            anchor = segment == PathIterator.SEG_QUADTO ? 2 : segment == PathIterator.SEG_CUBICTO ? 4 : 0;
+        }
+
+        public double alignedX(double width, boolean pixelHinting) {
+            return pixelHinting || alignX ? snapStrokeCoordinate(coordinates[anchor], width) : roundToQuarterPixel(coordinates[anchor]);
+        }
+
+        public double alignedY(double width, boolean pixelHinting) {
+            return pixelHinting || alignY ? snapStrokeCoordinate(coordinates[anchor + 1], width) : roundToQuarterPixel(coordinates[anchor + 1]);
+        }
+    }
+
+    private static void alignStrokeSegment(StrokePoint from, StrokePoint to) {
+        boolean sameX = from.coordinates[from.anchor] == to.coordinates[to.anchor];
+        boolean sameY = from.coordinates[from.anchor + 1] == to.coordinates[to.anchor + 1];
+        if (sameX && !sameY) {
+            from.alignX = to.alignX = true;
+        } else if (sameY && !sameX) {
+            from.alignY = to.alignY = true;
+        }
+    }
+
+    protected static void markStrokeAxes(List<StrokePoint> points, boolean close, double width, boolean pixelHinting) {
+        if (pixelHinting || width <= 0 || points.size() < 2) {
+            return;
+        }
+        // An integral-width stroke aligns perpendicular to its straight, axis-aligned segments.
+        for (int i = 1; i < points.size(); i++) {
+            StrokePoint point = points.get(i);
+            if (point.segment == PathIterator.SEG_LINETO) {
+                alignStrokeSegment(points.get(i - 1), point);
+            }
+        }
+        StrokePoint first = points.get(0);
+        StrokePoint last = points.get(points.size() - 1);
+        if (first.coordinates[0] == last.coordinates[last.anchor]
+                && first.coordinates[1] == last.coordinates[last.anchor + 1]) {
+            first.alignX = last.alignX = first.alignX || last.alignX;
+            first.alignY = last.alignY = first.alignY || last.alignY;
+        } else if (close) {
+            alignStrokeSegment(last, first);
+        }
+    }
+
+    private static Shape snapStrokePath(Shape shape, double pixelWidth, boolean pixelHinting) {
+        PathIterator iterator = shape.getPathIterator(null);
+        Path2D.Double snapped = new Path2D.Double(iterator.getWindingRule());
+        List<StrokePoint> points = new ArrayList<>();
+        Point2D closedStart = null;
+        while (!iterator.isDone()) {
+            double[] coords = new double[6];
+            int segment = iterator.currentSegment(coords);
+            if (segment == PathIterator.SEG_MOVETO || segment == PathIterator.SEG_CLOSE) {
+                appendStrokeSubpath(snapped, points, segment == PathIterator.SEG_CLOSE, pixelWidth, pixelHinting);
+                points.clear();
+                closedStart = segment == PathIterator.SEG_CLOSE ? snapped.getCurrentPoint() : null;
+            }
+            if (segment != PathIterator.SEG_CLOSE) {
+                if (closedStart != null) {
+                    points.add(new StrokePoint(PathIterator.SEG_MOVETO, closedStart.getX(), closedStart.getY()));
+                    closedStart = null;
+                }
+                points.add(new StrokePoint(segment, coords));
+            }
+            iterator.next();
+        }
+        appendStrokeSubpath(snapped, points, false, pixelWidth, pixelHinting);
+        return snapped;
+    }
+
+    protected static void appendStrokeSubpath(Path2D.Double path, List<StrokePoint> points, boolean close,
+            double width, boolean pixelHinting) {
+        markStrokeAxes(points, close, width, pixelHinting);
+        for (StrokePoint point : points) {
+            double x = point.alignedX(width, pixelHinting);
+            double y = point.alignedY(width, pixelHinting);
+            double[] coords = point.coordinates;
+            switch (point.segment) {
+                case PathIterator.SEG_MOVETO:
+                    path.moveTo(x, y);
+                    break;
+                case PathIterator.SEG_LINETO:
+                    path.lineTo(x, y);
+                    break;
+                case PathIterator.SEG_QUADTO:
+                    path.quadTo(coords[0], coords[1], x, y);
+                    break;
+                case PathIterator.SEG_CUBICTO:
+                    path.curveTo(coords[0], coords[1], coords[2], coords[3], x, y);
+                    break;
+            }
+        }
+        if (close) {
+            path.closePath();
+        }
+    }
+
     /**
      * Exports a shape to a bitmap.
+     *
      * @param windingRule Winding rule
      * @param shapeNum Shape number
      * @param swf SWF
@@ -183,7 +317,7 @@ public class BitmapExporter extends ShapeExporterBase {
         } else {
             BitmapExporter exporter = new BitmapExporter(windingRule, shapeNum, swf, shape, defaultColor, colorTransform);
             exporter.setCanUseSmoothing(canUseSmoothing);
-            exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes, aaScale);      
+            exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes, aaScale);
         }
     }
 
@@ -208,23 +342,24 @@ public class BitmapExporter extends ShapeExporterBase {
         this.aaScale = aaScale;
         super.export();
     }
-    
+
     protected void setTransform(Graphics2D g, Matrix transformation) {
         AffineTransform at = transformation.toTransform();
         at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
-        graphics.setTransform(at);        
-    }            
+        graphics.setTransform(at);
+    }
 
     protected void calculateThicknessScale() {
         com.jpexs.decompiler.flash.exporters.commonshape.Point p00 = strokeTransformation.transform(0, 0);
         com.jpexs.decompiler.flash.exporters.commonshape.Point p11 = strokeTransformation.transform(1, 1);
         thicknessScale = p00.distanceTo(p11) / Math.sqrt(2);
         thicknessScaleX = Math.abs(p11.x - p00.x);
-        thicknessScaleY = Math.abs(p11.y - p00.y);            
+        thicknessScaleY = Math.abs(p11.y - p00.y);
     }
 
     /**
      * Returns the image.
+     *
      * @return Image
      */
     public SerializableImage getImage() {
@@ -240,7 +375,7 @@ public class BitmapExporter extends ShapeExporterBase {
     }
 
     @Override
-    public void beginFills() {        
+    public void beginFills() {
     }
 
     @Override
@@ -299,7 +434,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 break;
             }
         }
-        
+
         if (colors.isEmpty()) {
             colors.add(Color.red);
             ratios.add(0f);
@@ -383,36 +518,8 @@ public class BitmapExporter extends ShapeExporterBase {
         linePaint = null;
         lineTransform = null;
 
-        if (thickness == 0) {
-            lineColor = null;
-            return;
-        }
-
+        boolean hairline = thickness == 0;
         lineColor = color == null ? null : color.toColor();
-        int capStyle = BasicStroke.CAP_ROUND;
-        switch (startCaps) {
-            case LINESTYLE2.NO_CAP:
-                capStyle = BasicStroke.CAP_BUTT;
-                break;
-            case LINESTYLE2.ROUND_CAP:
-                capStyle = BasicStroke.CAP_ROUND;
-                break;
-            case LINESTYLE2.SQUARE_CAP:
-                capStyle = BasicStroke.CAP_SQUARE;
-                break;
-        }
-        int joinStyle = BasicStroke.JOIN_ROUND;
-        switch (joints) {
-            case LINESTYLE2.BEVEL_JOIN:
-                joinStyle = BasicStroke.JOIN_BEVEL;
-                break;
-            case LINESTYLE2.MITER_JOIN:
-                joinStyle = BasicStroke.JOIN_MITER;
-                break;
-            case LINESTYLE2.ROUND_JOIN:
-                joinStyle = BasicStroke.JOIN_ROUND;
-                break;
-        }
         if (scaleStrokes) {
             switch (scaleMode) {
                 case "VERTICAL":
@@ -429,26 +536,218 @@ public class BitmapExporter extends ShapeExporterBase {
             }
         }
 
-        if (Configuration.useMinimumStrokeWidth1Px.get()) {
-            //display minimum stroke of 1 pixel, no matter how zoomed it is
-            if (thickness * unzoom / aaScale < 1 * SWF.unitDivisor) {
-                thickness = 1 * SWF.unitDivisor / (unzoom / aaScale);
-            }   
+        double pixelsPerTwip = unzoom / SWF.unitDivisor;
+        double widthPx = thickness * pixelsPerTwip;
+        if (hairline || Configuration.useMinimumStrokeWidth1Px.get()) {
+            widthPx = Math.max(1, widthPx);
         }
-                
-        if (joinStyle == BasicStroke.JOIN_MITER) {
-            lineStroke = new ExtendedBasicStroke((float) thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit);
-        } else {
-            lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
-        }
+        AffineTransform deviceTransform = graphics.getTransform();
+        boolean strokeInPixels = deviceTransform.getDeterminant() != 0;
+        double alignedWidth = getAlignedStrokeWidth(widthPx, pixelHinting);
+        float fThickness = (float) (strokeInPixels ? (alignedWidth > 0 ? alignedWidth : widthPx) : thickness);
+        lineStroke = createLineStroke(fThickness, startCaps, endCaps, joints, miterLimit, noClose);
 
-        // Do not scale strokes automatically:
+        // Align the centerline before creating the outline in device pixels.
         try {
-            AffineTransform t = (AffineTransform) strokeTransformation.toTransform().clone();
-            lineStroke = new TransformedStroke(lineStroke, t);
+            if (strokeInPixels) {
+                Stroke stroke = lineStroke;
+                lineStroke = new TransformedStroke(
+                        s -> stroke.createStrokedShape(snapStrokePath(s, alignedWidth, pixelHinting)), deviceTransform);
+            } else {
+                lineStroke = new TransformedStroke(lineStroke, strokeTransformation.toTransform());
+            }
         } catch (NoninvertibleTransformException net) {
             // ignore
         }
+    }
+
+    protected static Stroke createLineStroke(float thickness, int startCaps, int endCaps, int joints, float miterLimit, boolean noClose) {
+        int capStyle = BasicStroke.CAP_BUTT;
+        if (startCaps == endCaps) {
+            switch (startCaps) {
+                case LINESTYLE2.NO_CAP:
+                    break;
+                case LINESTYLE2.SQUARE_CAP:
+                    capStyle = BasicStroke.CAP_SQUARE;
+                    break;
+                default:
+                    capStyle = BasicStroke.CAP_ROUND;
+                    break;
+            }
+        }
+
+        Stroke stroke;
+        switch (joints) {
+            case LINESTYLE2.MITER_JOIN:
+                stroke = new ExtendedBasicStroke(thickness, capStyle, ExtendedBasicStroke.JOIN_MITER_CLIP, miterLimit);
+                break;
+            case LINESTYLE2.BEVEL_JOIN:
+                stroke = new BasicStroke(thickness, capStyle, BasicStroke.JOIN_BEVEL);
+                break;
+            default:
+                stroke = new BasicStroke(thickness, capStyle, BasicStroke.JOIN_ROUND);
+                break;
+        }
+
+        if (startCaps == endCaps) {
+            return stroke;
+        }
+        return path -> applyStartEndCaps(path, stroke.createStrokedShape(path), startCaps, endCaps, thickness, noClose);
+    }
+
+    private static Shape drawSquareCap(
+            Point2D point,
+            double dx,
+            double dy,
+            double width,
+            boolean start) {
+
+        double length = Math.hypot(dx, dy);
+        if (length == 0) {
+            return null;
+        }
+
+        double ux = dx / length;
+        double uy = dy / length;
+
+        double nx = -uy;
+        double ny = ux;
+
+        double half = width / 2.0;
+
+        double offset = start ? -half : half;
+
+        double x = point.getX();
+        double y = point.getY();
+
+        Path2D cap = new Path2D.Double();
+
+        cap.moveTo(x + nx * half, y + ny * half);
+        cap.lineTo(x - nx * half, y - ny * half);
+        cap.lineTo(x + ux * offset - nx * half,
+                y + uy * offset - ny * half);
+        cap.lineTo(x + ux * offset + nx * half,
+                y + uy * offset + ny * half);
+        cap.closePath();
+
+        return cap;
+    }
+
+    private static void finishCaps(
+            Double startX, Double startY, Double startX2, Double startY2,
+            Double endX, Double endY, Double endX2, Double endY2,
+            Area area, float thickness, int startCaps, int endCaps, boolean closed) {
+        double halfThickness = thickness / 2.0;
+        if (startX != null && endX != null) {
+            if (!closed) {
+                Shape startCapShape = null;
+                switch (startCaps) {
+                    case LINESTYLE2.ROUND_CAP:
+                        startCapShape = new Ellipse2D.Double(startX - halfThickness, startY - halfThickness, thickness, thickness);
+                        break;
+                    case LINESTYLE2.SQUARE_CAP:
+                        startCapShape = drawSquareCap(new Point2D.Double(startX, startY), startX2 - startX, startY2 - startY, thickness, true);
+                        break;
+                }
+
+                if (startCapShape != null) {
+                    area.add(new Area(startCapShape));
+                }
+                Shape endCapShape = null;
+                switch (endCaps) {
+                    case LINESTYLE2.ROUND_CAP:
+                        endCapShape = new Ellipse2D.Double(endX - halfThickness, endY - halfThickness, thickness, thickness);
+                        break;
+                    case LINESTYLE2.SQUARE_CAP:
+                        endCapShape = drawSquareCap(new Point2D.Double(endX, endY), endX - endX2, endY - endY2, thickness, false);
+                        break;
+                }
+                if (endCapShape != null) {
+                    area.add(new Area(endCapShape));
+                }
+            }
+        }
+    }
+
+    private static Shape applyStartEndCaps(Shape original, Shape stroked, int startCaps, int endCaps, float thickness, boolean noClose) {
+        Area area = new Area(stroked);
+
+        Double startX = null;
+        Double startY = null;
+        Double startX2 = null;
+        Double startY2 = null;
+        Double endX = null;
+        Double endY = null;
+        Double endX2 = null;
+        Double endY2 = null;
+
+        Double x = null;
+        Double y = null;
+        boolean closed = false;
+
+        PathIterator iterator = original.getPathIterator(null);
+        while (!iterator.isDone()) {
+            double[] coords = new double[6];
+            int type = iterator.currentSegment(coords);
+            switch (type) {
+                case PathIterator.SEG_MOVETO:
+                    finishCaps(startX, startY, startX2, startY2, endX, endY, endX2, endY2, area, thickness, startCaps, endCaps, closed);
+
+                    startX = x = coords[0];
+                    startY = y = coords[1];
+                    startX2 = null;
+                    startY2 = null;
+                    endX = null;
+                    endY = null;
+                    closed = false;
+                    break;
+                case PathIterator.SEG_LINETO:
+                    endX2 = x;
+                    endY2 = y;
+                    endX = x = coords[0];
+                    endY = y = coords[1];
+                    if (startX2 == null) {
+                        startX2 = x;
+                        startY2 = y;
+                    }
+                    break;
+                case PathIterator.SEG_QUADTO:
+                    endX2 = coords[0];
+                    endY2 = coords[1];
+                    endX = x = coords[2];
+                    endY = y = coords[3];
+
+                    if (startX2 == null) {
+                        startX2 = coords[0];
+                        startY2 = coords[1];
+                    }
+                    break;
+                case PathIterator.SEG_CUBICTO:
+                    endX2 = coords[2];
+                    endY2 = coords[3];
+                    endX = x = coords[4];
+                    endY = y = coords[5];
+                    if (startX2 == null) {
+                        startX2 = coords[0];
+                        startY2 = coords[1];
+                    }
+                    break;
+                case PathIterator.SEG_CLOSE:
+                    closed = !noClose;
+                    endX2 = x;
+                    endY2 = y;
+                    endX = x = startX;
+                    endY = y = startY;
+                    if (startX2 == null) {
+                        startX2 = x;
+                        startY2 = y;
+                    }
+                    break;
+            }
+            iterator.next();
+        }
+        finishCaps(startX, startY, startX2, startY2, endX, endY, endX2, endY2, area, thickness, startCaps, endCaps, closed);
+        return area;
     }
 
     @Override
@@ -484,7 +783,7 @@ public class BitmapExporter extends ShapeExporterBase {
             colors.add(Color.RED);
             ratios.add(0f);
         }
-        
+
         if (colors.size() == 1) {
             colors.add(colors.get(0));
             ratios.set(0, 0f);
@@ -559,7 +858,7 @@ public class BitmapExporter extends ShapeExporterBase {
     public void curveTo(double controlX, double controlY, double anchorX, double anchorY) {
         path.quadTo(controlX, controlY, anchorX, anchorY);
     }
-    
+
     /**
      * Finalizes the path.
      */
@@ -707,8 +1006,8 @@ public class BitmapExporter extends ShapeExporterBase {
                     Shape strokeShape = new BasicStroke((float) (1 * SWF.unitDivisor / unzoom), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(shp);
                     graphics.fill(strokeShape);                    
                 }
-                */
-            }            
+                 */
+            }
         }
         if (linePaint != null && lineStroke != null) {
             if (true) {

@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [26.4.0] - 2026-10-19
 ### Features
-- add add multiple tags dialog ([#2755])
+- add multiple tags dialog ([#2755])
 - add configurable default as3 linkage parent class names ([#2754])
 - add linked asset panel to as3 view
 - add special icon for classes with linked asset

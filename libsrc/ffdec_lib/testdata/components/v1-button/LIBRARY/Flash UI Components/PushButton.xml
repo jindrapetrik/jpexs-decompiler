@@ -1,0 +1,435 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/ PushButton" itemID="3bd472da-00000284" linkageExportForAS="true" linkageIdentifier="FPushButtonSymbol" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/ PushButton" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd472da-00000284" tooltip="Push Button" customIconID="1" descriptionType="reference" livePreviewScmHRef="i747onmjiv.swf" livePreviewScmSourceFilename="button_live.swf" persistLivePreview11="true" symbolDescription="UI Components/FPushButton" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name=" PushButton">
+      <layers>
+        <DOMLayer name="Actions: Class" color="#4F80FF" current="true" isSelected="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip 1
+
+function FPushButtonClass()
+{
+	this.init();
+}
+
+FPushButtonClass.prototype = new FUIComponentClass();
+Object.registerClass("FPushButtonSymbol", FPushButtonClass);
+
+FPushButtonClass.prototype.init = function()
+{
+	super.setSize(this._width,this._height);
+	this.boundingBox_mc.unloadMovie();
+	this.attachMovie("fpb_states","fpbState_mc",1);
+	this.attachMovie("FLabelSymbol","fLabel_mc",2);
+	this.attachMovie("fpb_hitArea","fpb_hitArea_mc",3);
+	super.init();
+	this.btnState = false;
+	this.setClickHandler(this.clickHandler);
+	this._xscale = 100;
+	this._yscale = 100;
+	this.setSize(this.width,this.height);
+	if(this.label != undefined)this.setLabel(this.label);
+	// ACCESSIBILITY DEFINED ::o:: _accImpl object defined in base class ::o::
+		this.ROLE_SYSTEM_PUSHBUTTON  = 0x2b;
+		this.STATE_SYSTEM_PRESSED  = 0x00000008;
+		this.EVENT_OBJECT_STATECHANGE = 0x800a;
+		this.EVENT_OBJECT_NAMECHANGE = 0x800c;
+		this._accImpl.master = this;
+		this._accImpl.stub = false;
+		this._accImpl.get_accRole = this.get_accRole;
+		this._accImpl.get_accName = this.get_accName;	
+		this._accImpl.get_accState = this.get_accState;
+		this._accImpl.get_accDefaultAction = this.get_accDefaultAction;
+		this._accImpl.accDoDefaultAction = this.accDoDefaultAction;
+}
+
+FPushButtonClass.prototype.setHitArea = function(w,h)
+{	
+	var hit = this.fpb_hitArea_mc;
+	this.hitArea = hit;
+	hit._visible = false;
+	hit._width = w;
+	hit._height = (arguments.length > 1) ? h : hit._height;
+}
+
+FPushButtonClass.prototype.setSize = function(w,h)
+{
+	w = (w < 6) ? 6 : w;
+	if (arguments.length >1){
+		if (h < 6){
+			h = 6;
+		}
+	}
+	super.setSize(w,h)
+	this.setLabel(this.getLabel());
+	this.arrangeLabel();
+	this.setHitArea(w,h);
+	this.boundingBox_mc._width = w;
+	this.boundingBox_mc._height = h;
+	this.drawFrame();
+	if(this.focused)super.myOnSetFocus();
+	this.initContentPos("fLabel_mc");
+}
+
+FPushButtonClass.prototype.arrangeLabel = function()
+{
+	var label = this.fLabel_mc;
+	var h = this.height;
+	var w = this.width-2;
+	var b = 1; // frame border width 
+	this.fLabel_mc.setSize(w - (b * 4));
+	label._x = (b * 3);//padding value;
+	label._y = ( h/2-label._height/2);
+}
+
+FPushButtonClass.prototype.getLabel = function()
+{
+	return (this.fLabel_mc.labelField.text);
+}
+
+FPushButtonClass.prototype.setLabel = function(label)
+{
+	this.fLabel_mc.setLabel(label);
+	this.txtFormat();
+	this.arrangeLabel()
+	
+	// ACCESSIBILITY EVENT
+	if (Accessibility.isActive()){
+		Accessibility.sendEvent( this, 0, this.EVENT_OBJECT_NAMECHANGE );
+	}
+}
+
+FPushButtonClass.prototype.getEnabled = function()
+{
+	return(this.enabled);
+}
+	
+FPushButtonClass.prototype.setEnabled = function(enable)
+{
+	if ( enable || enable == undefined ) {
+		this.gotoFrame(1);
+		this.drawFrame();
+		this.flabel_mc.setEnabled(true);
+		this.enabled = true;
+		super.setEnabled(true);
+	} else {
+		this.gotoFrame(4);
+		this.drawFrame();
+		this.flabel_mc.setEnabled(false);
+		this.enabled = false;
+		super.setEnabled(false);
+	}
+}
+
+FPushButtonClass.prototype.txtFormat = function()
+{
+	var txtS = this.textStyle;
+	var sTbl = this.styleTable;
+	
+	txtS.align = (sTbl.textAlign.value == undefined) ? txtS.align = "center" : undefined;
+	txtS.leftMargin = (sTbl.textLeftMargin.value == undefined) ? txtS.leftMargin = 1 : undefined;
+	txtS.rightMargin = (sTbl.textRightMargin.value == undefined) ? txtS.rightMargin = 1 : undefined
+	
+	if(this.fLabel_mc._height > this.height){
+		super.setSize(this.width,this.fLabel_mc._height);
+	}else{
+		super.setSize(this.width,this.height);
+	}
+	this.fLabel_mc.labelField.setTextFormat(this.textStyle);
+	this.setEnabled(this.enable);
+}
+
+FPushButtonClass.prototype.drawFrame = function ()
+{	
+	var b = 1; // border width of frame;
+	var x1 = 0;
+	var y1 = 0;
+	var x2 = this.width;
+	var y2 = this.height;
+	var mc_array = ["up_mc","over_mc","down_mc","disabled_mc"];
+	var frame = mc_array[(this.fpbState_mc._currentframe) -1];
+	var mc = "frame";
+	
+	for (var i =0;i<6; i++){
+	 	x1 += ((i)%2)*b;
+	 	y1 += ((i)%2)*b;
+	 	x2 -= ((i+1)%2)*b;
+	 	y2 -= ((i+1)%2)*b;
+	 	var w = Math.abs (x1 - x2)+2*b;
+		var h = Math.abs (y1 - y2)+2*b;
+		this.fpbState_mc[frame][mc+i]._width = w;
+		this.fpbState_mc[frame][mc+i]._height = h;
+		this.fpbState_mc[frame][mc+i]._x = x1-b;
+		this.fpbState_mc[frame][mc+i]._y = y1-b;
+	}
+}
+
+FPushButtonClass.prototype.setClickHandler = function(chng,obj)
+{
+	this.handlerObj = (arguments.length<2) ? this._parent : obj;
+	this.clickHandler = chng;
+}
+
+FPushButtonClass.prototype.executeCallBack = function()
+{
+	this.handlerObj[this.clickHandler](this);
+}
+
+FPushButtonClass.prototype.initContentPos = function (mc) 
+{
+	this.incrVal = 1; // DISTANCE TEXT SHIFTS DOWN AND RIGHT ::mr::
+	this.initx = this[mc]._x - (this.getBtnState())*this.incrVal;
+	this.inity = this[mc]._y - (this.getBtnState())*this.incrVal;
+	this.togx = this.initx + this.incrVal;
+	this.togy = this.inity + this.incrVal;
+}
+
+FPushButtonClass.prototype.setBtnState = function (state) 
+{
+	this.btnState = state;
+	if (state) {
+		this.fLabel_mc._x = this.togx;
+		this.fLabel_mc._y = this.togy;
+	}else{
+		this.fLabel_mc._x = this.initx;
+		this.fLabel_mc._y = this.inity;
+	}
+}
+
+FPushButtonClass.prototype.getBtnState = function () 
+{
+	return this.btnState;
+}
+
+FPushButtonClass.prototype.myOnSetFocus = function()
+{
+	this.focused = true;
+	super.myOnSetFocus()
+}
+
+FPushButtonClass.prototype.onPress = function ()
+{
+	this.pressFocus();
+	this.fpbState_mc.gotoAndStop(3);
+	this.drawFrame();
+	this.setBtnState(true);
+	
+	// ACCESSIBILITY EVENT
+	if (Accessibility.isActive()){
+		Accessibility.sendEvent( this, 0, this.EVENT_OBJECT_STATECHANGE,true );
+	}
+}
+
+FPushButtonClass.prototype.onRelease = function ()
+{
+	this.fpbState_mc.gotoAndStop(2);
+	this.drawFrame();
+	this.executeCallBack();
+	this.setBtnState(false)
+	
+	// ACCESSIBILITY EVENT
+	if (Accessibility.isActive()){
+		Accessibility.sendEvent( this, 0, this.EVENT_OBJECT_STATECHANGE,true );
+	}
+}
+
+FPushButtonClass.prototype.onRollOver = function ()
+{
+	this.fpbState_mc.gotoAndStop(2);
+	this.drawFrame();
+}
+
+FPushButtonClass.prototype.onRollOut = function ()
+{
+	this.fpbState_mc.gotoAndStop(1);
+	this.drawFrame();	
+}
+
+FPushButtonClass.prototype.onReleaseOutside = function ()
+{	
+	this.setBtnState(false);
+	this.fpbState_mc.gotoAndStop(1);
+	this.drawFrame();	
+}
+
+FPushButtonClass.prototype.onDragOut = function ()
+{	
+	this.setBtnState(false);
+	this.fpbState_mc.gotoAndStop(1);
+	this.drawFrame();	
+}
+
+FPushButtonClass.prototype.onDragOver = function ()
+{	
+	this.setBtnState(true);
+	this.fpbState_mc.gotoAndStop(3);
+	this.drawFrame();	
+}
+
+FPushButtonClass.prototype.myOnKeyDown = function( )
+{
+	if (Key.getCode() == Key.SPACE && this.pressOnce == undefined ) {
+		this.onPress();
+		this.pressOnce = 1;
+	}
+}
+
+FPushButtonClass.prototype.myOnKeyUp = function( )
+{
+	if (Key.getCode() == Key.SPACE) {
+		this.onRelease();
+		this.pressOnce = undefined;
+	}
+}
+
+
+
+// START ACCESSIBILITY METHODS
+FPushButtonClass.prototype.get_accRole = function(childId)
+{
+	return this.master.ROLE_SYSTEM_PUSHBUTTON;
+}
+
+FPushButtonClass.prototype.get_accName = function(childId)
+{
+	return this.master.getLabel();
+}
+
+FPushButtonClass.prototype.get_accState = function(childId)
+{
+	if(this.pressOnce){
+		return this.master.STATE_SYSTEM_PRESSED;
+	}else{
+		return this.master.STATE_SYSTEM_DEFAULT;
+	}
+}
+
+FPushButtonClass.prototype.get_accDefaultAction = function(childId)
+{
+	return "Press";
+}
+
+FPushButtonClass.prototype.accDoDefaultAction = function(childId)
+{
+	this.master.onPress();
+	this.master.onRelease();
+}
+// END ACCESSIBILITY METHODS
+
+#endinitclip 
+
+
+boundingBox_mc._visible = false;
+deadPreview._visible = false;
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Name" color="#4F80FF" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/PushButton Name" name="deadPreview">
+                  <matrix>
+                    <Matrix tx="0.25" ty="0.25"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Bounding Box" color="#9933CC" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Component Skins/Global Skins/FBoundingBox" name="boundingBox_mc">
+                  <matrix>
+                    <Matrix d="0.199996948242188"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Assets" color="#4FFFFF" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/fpb_states" name="fpbstatesAsset">
+                  <matrix>
+                    <Matrix a="0.0099945068359375" d="0.0099945068359375" tx="-0.05" ty="0.1"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0"/>
+                  </color>
+                </DOMSymbolInstance>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Component Skins/Global Skins/FLabel" name="flabelAsset" uniqueID="1">
+                  <matrix>
+                    <Matrix a="0.0117645263671875" d="0.0539093017578125" tx="-0.05" ty="0.1"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='1.1'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_hitArea">
+                  <matrix>
+                    <Matrix a="0.0769195556640625" d="0.0769195556640625"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="SuperClass" color="#808080" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent" name="fuiAsset" uniqueID="2">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='1.2'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="label">
+      <Inspectable name="Label" variable="label" category="" verbose="0" defaultValue="Push Button" type="Default"/>
+   </property>
+   <property id="clickHandler">
+      <Inspectable name="Click Handler" variable="clickHandler" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

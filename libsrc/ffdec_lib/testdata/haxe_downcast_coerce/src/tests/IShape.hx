@@ -1,0 +1,4 @@
+package tests;
+
+interface IShape {
+}

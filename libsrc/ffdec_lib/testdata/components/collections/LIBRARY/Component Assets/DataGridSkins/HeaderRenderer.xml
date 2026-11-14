@@ -1,0 +1,251 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/DataGridSkins/HeaderRenderer" itemID="451918cb-00000051" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="fl.controls.dataGridClasses.HeaderRenderer" lastModified="1292423118" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="HeaderRenderer" currentFrame="1">
+      <layers>
+        <DOMLayer name="assets" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_disabledSkin">
+                  <matrix>
+                    <Matrix tx="13" ty="11.9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="76" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_downSkin">
+                  <matrix>
+                    <Matrix tx="13" ty="106.35"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="76" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_overSkin">
+                  <matrix>
+                    <Matrix tx="13" ty="75.9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="76" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_upSkin">
+                  <matrix>
+                    <Matrix tx="13" ty="42.4"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="76" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_selectedDisabledSkin">
+                  <matrix>
+                    <Matrix tx="13" ty="138.85"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="76" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_selectedDownSkin">
+                  <matrix>
+                    <Matrix tx="13" ty="173.3"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="76" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_selectedOverSkin">
+                  <matrix>
+                    <Matrix tx="13" ty="205.35"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="76" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_selectedUpSkin">
+                  <matrix>
+                    <Matrix tx="13" ty="237.75"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="76" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="asset names" color="#FF4FFF" locked="true" autoNamed="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMRectangleObject objectWidth="388.95" objectHeight="183" x="-1.55" y="30.3" lockFlag="true" topLeftRadius="10" topRightRadius="10" bottomLeftRadius="10" bottomRightRadius="10">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="1.493896484375" tx="1.55" ty="-45.25"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="192.9" y="121.85"/>
+                  </transformationPoint>
+                  <fill>
+                    <SolidColor color="#EEEEEE"/>
+                  </fill>
+                  <stroke>
+                    <SolidStroke scaleMode="normal">
+                      <fill>
+                        <SolidColor color="#CCCCCC"/>
+                      </fill>
+                    </SolidStroke>
+                  </stroke>
+                </DOMRectangleObject>
+                <DOMStaticText width="83.45" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="198.9" ty="20"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Disabled_Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="49.4" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="198.9" ty="52.9"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Up_Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="60.95" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="198.9" ty="81.4"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Over_Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="66.05" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="200.25" ty="111.85"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Down_Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="101.55" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="200.25" ty="144.4"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Selected_Disable</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="91.4" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="200.25" ty="178.85"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Selected_Down</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="86.3" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="200.25" ty="210.9"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Selected_Over</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="74.75" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="200.25" ty="243.3"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Selected_Up</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="avatar" color="#4FFF4F" locked="true" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/DataGridSkins/HeaderRendererSkins/HeaderRenderer_upSkin">
+                  <transformationPoint>
+                    <Point x="76" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="ComponentShim" color="#FFFF4F" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMCompiledClipInstance libraryItemName="Component Assets/_private/ComponentShim" uniqueID="1">
+                  <matrix>
+                    <Matrix tx="165" ty="1.45"/>
+                  </matrix>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='10.22.1'>
+</component>
+]]></dataBindingXML>
+                </DOMCompiledClipInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

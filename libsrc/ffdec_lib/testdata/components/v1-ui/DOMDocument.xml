@@ -1,0 +1,372 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" gridColor="#C0C0C0" guidesColor="#00FF00" width="900" height="600" frameRate="12" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" gridSpacingX="18" gridSpacingY="18" viewAngle3D="80.8511702896415" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <folders>
+          <DOMFolderItem name="Flash UI Components" itemID="3c195532-0000017b"/>
+          <DOMFolderItem name="Flash UI Components/Component Skins" itemID="3bd4722e-00000170"/>
+          <DOMFolderItem name="Flash UI Components/Component Skins/FCheckBox Skins" itemID="3bd47234-000001e5"/>
+          <DOMFolderItem name="Flash UI Components/Component Skins/FPushButton Skins" itemID="3bd47233-000001bf"/>
+          <DOMFolderItem name="Flash UI Components/Component Skins/FRadioButton Skins" itemID="3bd4722e-00000174"/>
+          <DOMFolderItem name="Flash UI Components/Component Skins/FScrollBar Skins" itemID="3bd47235-00000210"/>
+          <DOMFolderItem name="Flash UI Components/Component Skins/Global Skins" itemID="3bd4722e-0000016f"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only" itemID="3bd4722e-00000173"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree" itemID="3bd4722e-00000177"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses" itemID="3bd47236-00000247"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/ FSelectableList SubClasses" itemID="3bd47236-00000248"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem SubClasses" itemID="3bd47236-00000246"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets" itemID="3bd64376-000000aa"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets" itemID="3bd47234-000001e6"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements" itemID="3bd473d4-00000288"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets" itemID="3bd4ac6b-00001ecc"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements" itemID="3bd47233-000001c0"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled" itemID="3bd4aac2-00001ea9"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over" itemID="3bd4aa99-00001ea7"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press" itemID="3bd4aaab-00001ea8"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up" itemID="3bd4aa66-00001ea6"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets" itemID="3bd4722e-00000176"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements" itemID="3bd4722e-00000175"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets" itemID="3bd4722e-00000172"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements" itemID="3bd4722e-00000171"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow" itemID="3bd4a78c-00001e96"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_disabled" itemID="3bd4a680-00001e95"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_press" itemID="3bd4a7e1-00001e97"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbBottom" itemID="3bd4a91b-00001e9d"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbMiddle" itemID="3bd4a8d9-00001e9c"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbTop" itemID="3bd4a8a0-00001e9b"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow" itemID="3bd4a87d-00001e9a"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_disabled" itemID="3bd4a81c-00001e98"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_press" itemID="3bd4a84d-00001e99"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollPane Assets" itemID="3c0bed35-00000170"/>
+          <DOMFolderItem name="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols" itemID="3bd76a48-000000b2"/>
+     </folders>
+     <symbols>
+          <Include href="Flash UI Components/ CheckBox.xml" itemID="3bd472cc-00000281" lastModified="1015556309"/>
+          <Include href="Flash UI Components/ ComboBox.xml" itemID="3bd472d8-00000283" lastModified="1015556309"/>
+          <Include href="Flash UI Components/ ListBox.xml" itemID="3bd472ce-00000282" lastModified="1015556309"/>
+          <Include href="Flash UI Components/ PushButton.xml" itemID="3bd472da-00000284" lastModified="1015556309"/>
+          <Include href="Flash UI Components/ RadioButton.xml" itemID="3bddf6ef-000001d6" lastModified="1015556309"/>
+          <Include href="Flash UI Components/ ScrollBar.xml" itemID="3bd472e7-00000287" lastModified="1015556309"/>
+          <Include href="Flash UI Components/ ScrollPane.xml" itemID="3bd472e0-00000286" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FCheckBox Skins/ fcb_check.xml" loadImmediate="false" itemID="3bd77b3e-000002a6" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FCheckBox Skins/ fcb_check_disabled.xml" loadImmediate="false" itemID="3bd77b42-000002a7" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FCheckBox Skins/ fcb_frame.xml" loadImmediate="false" itemID="3bd77b4b-000002a8" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FCheckBox Skins/fcb_background.xml" loadImmediate="false" itemID="3bc0df4e-0000001d" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FCheckBox Skins/fcb_background_disabled.xml" loadImmediate="false" itemID="3bc0e01c-00000027" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FCheckBox Skins/fcb_background_pressed.xml" loadImmediate="false" itemID="3bc0e01f-00000028" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FPushButton Skins/fpb_disabled.xml" loadImmediate="false" itemID="3bde3b5d-000000c1" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FPushButton Skins/fpb_down.xml" loadImmediate="false" itemID="3bde3b63-000000c2" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FPushButton Skins/fpb_over.xml" loadImmediate="false" itemID="3bde3b67-000000c3" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FPushButton Skins/fpb_up.xml" loadImmediate="false" itemID="3bde3b6d-000000c4" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FRadioButton Skins/ frb_dot.xml" loadImmediate="false" itemID="3bd77b61-000002a9" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FRadioButton Skins/ frb_dot_disabled.xml" loadImmediate="false" itemID="3bd77b66-000002aa" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FRadioButton Skins/ frb_frame.xml" loadImmediate="false" itemID="3bd77b69-000002ab" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FRadioButton Skins/frb_background.xml" loadImmediate="false" itemID="3bc0d723-00000028" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FRadioButton Skins/frb_background_disabled.xml" loadImmediate="false" itemID="3bc0d719-00000026" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FRadioButton Skins/frb_background_pressed.xml" loadImmediate="false" itemID="3bbe8f1d-00000049" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FScrollBar Skins/fsb_downArrow.xml" loadImmediate="false" itemID="3bd49ca6-00000f62" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FScrollBar Skins/fsb_downArrow_disabled.xml" loadImmediate="false" itemID="3bd49a15-00000f4f" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FScrollBar Skins/fsb_downArrow_press.xml" loadImmediate="false" itemID="3b9d3e88-00000352" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FScrollBar Skins/fsb_ScrollTrack.xml" loadImmediate="false" itemID="3b9d3e88-00000370" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FScrollBar Skins/fsb_thumb_bottom.xml" loadImmediate="false" itemID="3bd4a9ed-00001ea0" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FScrollBar Skins/fsb_thumb_middle.xml" loadImmediate="false" itemID="3bd4a9ef-00001ea1" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FScrollBar Skins/fsb_thumb_top.xml" loadImmediate="false" itemID="3b9d3e88-0000035b" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FScrollBar Skins/fsb_upArrow.xml" loadImmediate="false" itemID="3bd49cb1-00000f64" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FScrollBar Skins/fsb_upArrow_disabled.xml" loadImmediate="false" itemID="3bd49cad-00000f63" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/FScrollBar Skins/fsb_upArrow_press.xml" loadImmediate="false" itemID="3b9d3e88-0000036a" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/Global Skins/FBoundingBox.xml" itemID="3b9d3e88-0000038e" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/Global Skins/FHighlight.xml" itemID="3b6794f1-00000025" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Component Skins/Global Skins/FLabel.xml" itemID="3bddf6ef-000001df" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Component Version .xml" loadImmediate="false" itemID="3bddfa05-000000b7" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/DataProvider.xml" itemID="3bb1683f-0000006e" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent.xml" itemID="3c3baa9b-00000254" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/ FSelectableList.xml" itemID="3bd4744b-00000289" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/ FSelectableList SubClasses/FScrollSelectList.xml" itemID="3b7b828f-0000003c" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem.xml" itemID="3b662a99-00000034" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem SubClasses/FComboBoxItem.xml" itemID="3b84383d-00000030" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem SubClasses/FListBoxItem.xml" itemID="3b843836-0000002f" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/ Highlight.xml" loadImmediate="false" itemID="3bd4a95a-00001e9e" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/boundingBox.xml" loadImmediate="false" itemID="3bcb68bf-000000af" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/fcb_states.xml" itemID="3bd5d9d6-00000193" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_background.xml" loadImmediate="false" itemID="3bde7d34-000006d1" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_background_disabled.xml" loadImmediate="false" itemID="3bde0b20-000002e3" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_background_pressed.xml" loadImmediate="false" itemID="3bde0c5a-000002e5" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_check.xml" loadImmediate="false" itemID="3bde089a-000002df" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_check_disabled.xml" loadImmediate="false" itemID="3bde08e6-000002e1" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_hitArea.xml" itemID="3bc11f6f-0000017c" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_leftIn.xml" loadImmediate="false" itemID="3bc0e143-0000002e" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_leftOut.xml" loadImmediate="false" itemID="3bc0e136-0000002c" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_rightIn.xml" loadImmediate="false" itemID="3bc0e157-00000032" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_rightOut.xml" loadImmediate="false" itemID="3bc0e14e-00000030" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/fpb_states.xml" itemID="3bd4c7d3-0000211e" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled/fpb_face_disabled.xml" loadImmediate="false" itemID="3bd47b84-000008c8" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled/fpb_leftInFrame_disabled.xml" loadImmediate="false" itemID="3bd47b91-0000092c" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled/fpb_leftOutFrame_disabled.xml" loadImmediate="false" itemID="3bd47b9f-00000991" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled/fpb_rightInFrame_disabled.xml" loadImmediate="false" itemID="3bd47b75-00000865" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_disabled/fpb_rightOutFrame_disabled.xml" loadImmediate="false" itemID="3bd47b5f-00000803" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_face_over.xml" loadImmediate="false" itemID="3bd47a2e-000002ee" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_leftInFrame_over.xml" loadImmediate="false" itemID="3bd47a43-00000348" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_leftOutFrame_over.xml" loadImmediate="false" itemID="3bd47a4d-000003a3" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_rightInFrame_over.xml" loadImmediate="false" itemID="3bd47a62-0000045c" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_over/fpb_rightOutFrame_over.xml" loadImmediate="false" itemID="3bd47a57-000003ff" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press/fpb_face_press.xml" loadImmediate="false" itemID="3bd47ae6-000005cb" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press/fpb_leftInFrame_press.xml" loadImmediate="false" itemID="3bd476ee-0000028e" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press/fpb_leftOutFrame_press.xml" loadImmediate="false" itemID="3bd47b24-00000744" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press/fpb_rightInFrame_press.xml" loadImmediate="false" itemID="3bd47bd1-00000992" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_press/fpb_rightOutFrame_press.xml" loadImmediate="false" itemID="3bd47b02-0000062a" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_face_up.xml" loadImmediate="false" itemID="3bd47718-00000292" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_hitArea.xml" itemID="3c4e4568-0000045f" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_leftInFrame_up.xml" loadImmediate="false" itemID="3bd476fc-00000290" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_leftOutFrame_up.xml" loadImmediate="false" itemID="3bd47721-00000293" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_rightInFrame_up.xml" loadImmediate="false" itemID="3bd47727-00000294" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_rightOutFrame_up.xml" loadImmediate="false" itemID="3bd4772e-00000295" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/frb_states.xml" itemID="3bddf6ef-000001dc" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_background.xml" loadImmediate="false" itemID="3bde7e3b-000006d3" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_background_disabled.xml" loadImmediate="false" itemID="3bde0d17-000002e7" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_background_pressed.xml" loadImmediate="false" itemID="3bde0da1-000002e9" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_dot.xml" loadImmediate="false" itemID="3bde0638-000002db" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_dot_disabled.xml" loadImmediate="false" itemID="3bde081a-000002dd" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_hitArea.xml" itemID="3bc24ffc-00000279" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_leftIn.xml" loadImmediate="false" itemID="3bbe8e96-0000003f" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_leftOut.xml" loadImmediate="false" itemID="3bbe8e7f-0000003d" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_rightIn.xml" loadImmediate="false" itemID="3bbe8e9f-00000041" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_rightOut.xml" loadImmediate="false" itemID="3bbe8eaa-00000043" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_DownArrow.xml" itemID="3b9d3e88-0000034c" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_ScrollThumb.xml" itemID="3b9d3e88-00000358" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_UpArrow.xml" itemID="3b9d3e88-00000364" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/ scrollTrack.xml" loadImmediate="false" itemID="3bd4b16f-00001f74" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow/fsb_downArrow_arrow.xml" loadImmediate="false" itemID="3bd4aa27-00001ea5" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow/fsb_downArrow_face.xml" loadImmediate="false" itemID="3bd4aa24-00001ea4" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow/fsb_downArrow_leftIn.xml" loadImmediate="false" itemID="3bd4ab22-00001eaa" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow/fsb_downArrow_leftOut.xml" loadImmediate="false" itemID="3bd4ab25-00001eab" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow/fsb_downArrow_rightIn.xml" loadImmediate="false" itemID="3bd4ab27-00001eac" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow/fsb_downArrow_rightOut.xml" loadImmediate="false" itemID="3bd4ab2a-00001ead" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_disabled/fsb_downArrow_disabled_arrow.xml" loadImmediate="false" itemID="3bd49978-00000f4e" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_disabled/fsb_downArrow_disabled_face.xml" loadImmediate="false" itemID="3bd4996e-00000f4c" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_disabled/fsb_downArrow_disabled_leftIn.xml" loadImmediate="false" itemID="3bd4ab32-00001eae" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_disabled/fsb_downArrow_disabled_leftOut.xml" loadImmediate="false" itemID="3bd4ab34-00001eaf" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_disabled/fsb_downArrow_disabled_rightIn.xml" loadImmediate="false" itemID="3bd4ab36-00001eb0" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_disabled/fsb_downArrow_disabled_rightOut.xml" loadImmediate="false" itemID="3bd4ab39-00001eb1" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_press/fsb_downArrow_press_arrow.xml" loadImmediate="false" itemID="3bd49f40-00000f73" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_press/fsb_downArrow_press_face.xml" loadImmediate="false" itemID="3bd49f35-00000f71" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_press/fsb_downArrow_press_leftIn.xml" loadImmediate="false" itemID="3bd4ab3f-00001eb2" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_press/fsb_downArrow_press_leftOut.xml" loadImmediate="false" itemID="3bd4ab41-00001eb3" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_press/fsb_downArrow_press_rightIn.xml" loadImmediate="false" itemID="3bd4ab44-00001eb4" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow_press/fsb_downArrow_press_rightOut.xml" loadImmediate="false" itemID="3bd4ab47-00001eb5" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbBottom/fsb_thumb_bottom_leftOut.xml" loadImmediate="false" itemID="3bd4ab54-00001eb6" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbBottom/fsb_thumb_bottom_rightIn.xml" loadImmediate="false" itemID="3bd4ab56-00001eb7" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbBottom/fsb_thumb_bottom_rightOut.xml" loadImmediate="false" itemID="3bd4ab58-00001eb8" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbMiddle/fsb_thumb_mid_face.xml" loadImmediate="false" itemID="3bd4a60c-00001e92" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbMiddle/fsb_thumb_mid_leftIn.xml" loadImmediate="false" itemID="3bd4ab5d-00001eb9" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbMiddle/fsb_thumb_mid_leftOut.xml" loadImmediate="false" itemID="3bd4ab5f-00001eba" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbMiddle/fsb_thumb_mid_rightIn.xml" loadImmediate="false" itemID="3bd4ab61-00001ebb" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbMiddle/fsb_thumb_mid_rightOut.xml" loadImmediate="false" itemID="3bd4ab63-00001ebc" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbTop/fsb_thumb_top_leftIn.xml" loadImmediate="false" itemID="3bd4ab66-00001ebd" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbTop/fsb_thumb_top_leftOut.xml" loadImmediate="false" itemID="3bd4ab68-00001ebe" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbTop/fsb_thumb_top_rightIn.xml" loadImmediate="false" itemID="3bd4ab6a-00001ebf" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_thumbTop/fsb_thumb_top_rightOut.xml" loadImmediate="false" itemID="3bd4acc5-00001ecd" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow/fsb_upArrow_arrow.xml" loadImmediate="false" itemID="3bd4a05a-00000feb" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow/fsb_upArrow_face.xml" loadImmediate="false" itemID="3bd4a087-00001064" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow/fsb_upArrow_leftIn.xml" loadImmediate="false" itemID="3bd4ab87-00001ec3" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow/fsb_upArrow_leftOut.xml" loadImmediate="false" itemID="3bd4ab85-00001ec2" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow/fsb_upArrow_rightIn.xml" loadImmediate="false" itemID="3bd4ab83-00001ec1" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow/fsb_upArrow_rightOut.xml" loadImmediate="false" itemID="3bd4ab7e-00001ec0" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_disabled/fsb_upArrow_disabled_arrow.xml" loadImmediate="false" itemID="3bd4b21c-00001f76" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_disabled/fsb_upArrow_disabled_face.xml" loadImmediate="false" itemID="3bd4a1ac-000015b1" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_disabled/fsb_upArrow_disabled_leftIn.xml" loadImmediate="false" itemID="3bd4ab8e-00001ec4" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_disabled/fsb_upArrow_disabled_leftOut.xml" loadImmediate="false" itemID="3c34b819-0000036c" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_disabled/fsb_upArrow_disabled_rightIn.xml" loadImmediate="false" itemID="3bd4ab92-00001ec6" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_disabled/fsb_upArrow_disabled_rightOut.xml" loadImmediate="false" itemID="3bd4ab94-00001ec7" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_press/fsb_upArrow_press_arrow.xml" loadImmediate="false" itemID="3bd4a27d-00001a3f" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_press/fsb_upArrow_press_face.xml" loadImmediate="false" itemID="3bd4a292-00001ac4" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_press/fsb_upArrow_press_leftIn.xml" loadImmediate="false" itemID="3bd4ab9e-00001ec8" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_press/fsb_upArrow_press_leftOut.xml" loadImmediate="false" itemID="3bd4aba0-00001ec9" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_press/fsb_upArrow_press_rightIn.xml" loadImmediate="false" itemID="3bd4aba3-00001eca" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_upArrow_press/fsb_upArrow_press_rightOut.xml" loadImmediate="false" itemID="3bd4aba6-00001ecb" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollPane Assets/LoadContent.xml" loadImmediate="false" itemID="3c0bed66-00000172" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/CheckBox Name.xml" loadImmediate="false" itemID="3bd76da6-000000b6" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/ComboBox Name.xml" loadImmediate="false" itemID="3bd76e6a-000000b8" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/ListBox Name.xml" loadImmediate="false" itemID="3bd76f2f-000000ba" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/PushButton Name.xml" loadImmediate="false" itemID="3bd76fb5-000000bc" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/RadioButton Name.xml" loadImmediate="false" itemID="3bd7762d-000000cd" lastModified="1015556309"/>
+          <Include href="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/ScrollPane Name.xml" loadImmediate="false" itemID="3bd76b12-000000b4" lastModified="1015556309"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4F80FF" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="Flash UI Components/ PushButton" name="samplePushButton" uniqueID="5">
+                                             <matrix>
+                                                  <Matrix tx="40" ty="50"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <dataBindingXML>&lt;component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='5'&gt;
+&lt;/component&gt;
+</dataBindingXML>
+                                             <parametersAsXML><![CDATA[<property id="label">
+      <Inspectable name="Label" variable="label" category="" verbose="0" defaultValue="Sample PushButton" type="Default"/>
+   </property>
+   <property id="clickHandler">
+      <Inspectable name="Click Handler" variable="clickHandler" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="Flash UI Components/ CheckBox" name="sampleCheckBox" uniqueID="2">
+                                             <matrix>
+                                                  <Matrix tx="250" ty="50"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <dataBindingXML>&lt;component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='2'&gt;
+&lt;/component&gt;
+</dataBindingXML>
+                                             <parametersAsXML><![CDATA[<property id="label">
+      <Inspectable name="Label" variable="label" category="" verbose="0" defaultValue="Sample CheckBox" type="Default"/>
+   </property>
+   <property id="initialValue">
+      <Inspectable name="Initial Value" variable="initialValue" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="labelPlacement">
+      <Inspectable name="Label Placement" variable="labelPlacement" category="" verbose="0" defaultValue="right" enumeration="left,right" type="List"/>
+   </property>
+   <property id="changeHandler">
+      <Inspectable name="Change Handler" variable="changeHandler" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="Flash UI Components/ ComboBox" name="sampleComboBox" uniqueID="3">
+                                             <matrix>
+                                                  <Matrix tx="460" ty="50"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <dataBindingXML>&lt;component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='3'&gt;
+&lt;/component&gt;
+</dataBindingXML>
+                                             <parametersAsXML><![CDATA[<property id="editable">
+      <Inspectable name="Editable" variable="editable" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="labels">
+      <Inspectable name="Labels" variable="labels" category="" verbose="0" defaultValue="First,Second,Third" type="Array"/>
+   </property>
+   <property id="data">
+      <Inspectable name="Data" variable="data" category="" verbose="0" defaultValue="1,2,3" type="Array"/>
+   </property>
+   <property id="rowCount">
+      <Inspectable name="Row Count" variable="rowCount" category="" verbose="0" defaultValue="8" type="Number"/>
+   </property>
+   <property id="changeHandler">
+      <Inspectable name="Change Handler" variable="changeHandler" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="Flash UI Components/ ListBox" name="sampleListBox" uniqueID="4">
+                                             <matrix>
+                                                  <Matrix tx="670" ty="50"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <dataBindingXML>&lt;component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4'&gt;
+&lt;/component&gt;
+</dataBindingXML>
+                                             <parametersAsXML><![CDATA[<property id="labels">
+      <Inspectable name="Labels" variable="labels" category="" verbose="0" defaultValue="First,Second,Third" type="Array"/>
+   </property>
+   <property id="data">
+      <Inspectable name="Data" variable="data" category="" verbose="0" defaultValue="1,2,3" type="Array"/>
+   </property>
+   <property id="selectMultiple">
+      <Inspectable name="Select Multiple" variable="selectMultiple" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="changeHandler">
+      <Inspectable name="Change Handler" variable="changeHandler" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="Flash UI Components/ RadioButton" name="sampleRadioButton" uniqueID="6">
+                                             <matrix>
+                                                  <Matrix tx="40" ty="280"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <dataBindingXML>&lt;component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='6'&gt;
+&lt;/component&gt;
+</dataBindingXML>
+                                             <parametersAsXML><![CDATA[<property id="label">
+      <Inspectable name="Label" variable="label" category="" verbose="0" defaultValue="Sample RadioButton" type="Default"/>
+   </property>
+   <property id="initialState">
+      <Inspectable name="Initial State" variable="initialState" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+   <property id="groupName">
+      <Inspectable name="Group Name" variable="groupName" category="" verbose="0" defaultValue="radioGroup" type="Default"/>
+   </property>
+   <property id="data">
+      <Inspectable name="Data" variable="data" category="" verbose="0" defaultValue="1,2,3" type="Default"/>
+   </property>
+   <property id="labelPlacement">
+      <Inspectable name="Label Placement" variable="labelPlacement" category="" verbose="0" defaultValue="right" enumeration="left,right" type="List"/>
+   </property>
+   <property id="changeHandler">
+      <Inspectable name="Change Handler" variable="changeHandler" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="Flash UI Components/ ScrollBar" name="sampleScrollBar" uniqueID="7">
+                                             <matrix>
+                                                  <Matrix tx="250" ty="280"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <dataBindingXML>&lt;component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='7'&gt;
+&lt;/component&gt;
+</dataBindingXML>
+                                             <parametersAsXML><![CDATA[<property id="_targetInstanceName">
+      <Inspectable name="Target TextField" variable="_targetInstanceName" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+   <property id="horizontal">
+      <Inspectable name="Horizontal" variable="horizontal" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="Flash UI Components/ ScrollPane" name="sampleScrollPane" selected="true" centerPoint3DX="510" centerPoint3DY="330" uniqueID="1">
+                                             <matrix>
+                                                  <Matrix tx="460" ty="280"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                             <dataBindingXML>&lt;component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='1'&gt;
+&lt;/component&gt;
+</dataBindingXML>
+                                             <parametersAsXML><![CDATA[<property id="scrollContent">
+      <Inspectable name="Scroll Content" variable="scrollContent" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+   <property id="hScroll">
+      <Inspectable name="Horizontal Scroll" variable="hScroll" category="" verbose="0" defaultValue="auto" enumeration="auto,true,false" type="List"/>
+   </property>
+   <property id="vScroll">
+      <Inspectable name="Vertical Scroll" variable="vScroll" category="" verbose="0" defaultValue="auto" enumeration="auto,true,false" type="List"/>
+   </property>
+   <property id="dragContent">
+      <Inspectable name="Drag Content" variable="dragContent" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory/>
+</DOMDocument>

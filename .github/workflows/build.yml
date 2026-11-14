@@ -1007,6 +1007,32 @@ jobs:
       
     - name: Create packages
       run: ant new-version-set release-no-dist
+
+    - name: Set up Temurin JRE for AppImage
+      id: appimage-jre
+      uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        architecture: x64
+        java-version: '21'
+        java-package: jre
+        check-latest: true
+
+    - name: Create and test AppImage
+      env:
+        APPIMAGE_JRE: ${{ steps.appimage-jre.outputs.path }}
+        FFDEC_VERSION: ${{ needs.compute-version.outputs.verShort }}
+      run: |
+        sudo apt-get install -y -qq desktop-file-utils appstream
+        appimagetool="$RUNNER_TEMP/appimagetool-x86_64.AppImage"
+        curl --fail --silent --show-error --location --retry 3 \
+          https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage \
+          --output "$appimagetool"
+        echo "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0  $appimagetool" | sha256sum --check
+        chmod +x "$appimagetool"
+        ant -Dappimage.jre.dir="$APPIMAGE_JRE" -Dappimage.tool="$appimagetool" new-version-set appimage
+        "./releases/ffdec_${FFDEC_VERSION}.AppImage" --appimage-extract-and-run -help > "$RUNNER_TEMP/ffdec-appimage-help.txt"
+        grep -F 'JPEXS Free Flash Decompiler' "$RUNNER_TEMP/ffdec-appimage-help.txt"
     
     - name: Upload packages
       uses: actions/upload-artifact@v7
@@ -1118,6 +1144,7 @@ jobs:
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}.msi
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}.zip
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}.deb
+            releases/ffdec_${{ needs.compute-version.outputs.verShort }}.AppImage
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}.pkg
             releases/ffdec_${{ needs.compute-version.outputs.verShort }}_macosx.zip
             releases/ffdec_lib_${{ needs.compute-version.outputs.verShort }}.zip

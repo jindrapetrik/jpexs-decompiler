@@ -1,4 +1,4 @@
-$exts = @('swf', 'spl', 'gfx', 'swt', 'swc')
+$exts = @('swf', 'spl', 'gfx', 'swt', 'swc', 'swz', 'abc', 'ftr')
 #$exts = @('xyz')
 
 $template = Get-Content -Path '.\ContextMenuExtensionTemplate.xml' -Raw -Encoding UTF8

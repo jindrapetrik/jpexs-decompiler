@@ -1,0 +1,28 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/ComboBox Name" itemID="3bd76e6a-000000b8" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/ComboBox Name" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd76e6a-000000b8">
+  <timeline>
+    <DOMTimeline name="ComboBox Name">
+      <layers>
+        <DOMLayer name="asset" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#D4D0D8"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!1870 128|1752 128!1752 128[1747 128 1747 133!1747 133[1747 136 1748 137!1748 137|1807 205!1807 205[1809 206 1811 206!1811 206[1813 206 1814 205!1814 205|1874 137!1874 137|1874 136!1874 136[1875 134 1875 133!1875 133[1875 128 1870 128
+!1671 307|1671 27!1671 27|1951 27!1951 27|1951 307!1951 307|1671 307!1651 327|1971 327!1971 327|1971 7!1971 7|1651 7!1651 7|1651 327!1575 162|66 162!66 162|66 183!66 183|124.5 183!124.5 183|124.5 182!124.5 182|1475 182!1475 182|1475 183
+!1475 183|1575 183!1575 183|1575 162"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

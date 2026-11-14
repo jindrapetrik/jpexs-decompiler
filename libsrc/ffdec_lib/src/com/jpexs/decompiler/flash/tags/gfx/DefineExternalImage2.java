@@ -68,6 +68,9 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
     private SerializableImage serImage;
 
     @HideInRawEdit
+    private SerializableImage errorSerImage;
+
+    @HideInRawEdit
     private String cachedImageFilename = null;
 
     /**
@@ -130,9 +133,17 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
     }
 
     private void createFailedImage() {
+        if (errorSerImage != null
+                && errorSerImage.getWidth() == targetWidth
+                && errorSerImage.getHeight() == targetHeight) {
+            serImage = errorSerImage;
+            return;
+        }
+
         if (targetWidth <= 0 || targetHeight <= 0) {
             serImage = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR_PRE);
             serImage.fillTransparent();
+            errorSerImage = serImage;
             return;
         }
 
@@ -141,6 +152,7 @@ public class DefineExternalImage2 extends AbstractGfxImageTag {
         g.setColor(SWF.ERROR_COLOR);
         g.fillRect(0, 0, targetWidth, targetHeight);
         cachedImageFilename = null;
+        errorSerImage = serImage;
     }
 
     @Override

@@ -164,79 +164,81 @@ public class FontPanel extends JPanel implements TagEditorPanel {
     }
 
     private void fontAddChars(FontTag ft, Set<Integer> selChars, Font font) {
-        FontTag f = (FontTag) mainPanel.getCurrentTree().getCurrentTreeItem();
-        String oldchars = f.getCharacters();
-        for (int ic : selChars) {
-            char c = (char) ic;
-            if (oldchars.indexOf((int) c) == -1) {
-                if (font.getSize() != 1024) { //Do not resize if not required so we can have single instance of custom fonts
-                    font = font.deriveFont(f.getFontStyle(), 1024);
-                }
-                if (Utf8Helper.charToCodePoint(c, ft.getCodesCharset()) == -1) {
-                    String msg = translate("error.charset.nocharacter").replace("%char%", "" + c);
-                    Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, msg);
-                    ViewMessages.showMessageDialog(FontPanel.this, msg, translate("error"), JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                if (!font.canDisplay(c)) {
-                    String msg = translate("error.font.nocharacter").replace("%char%", "" + c);
-                    Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, msg);
-                    ViewMessages.showMessageDialog(FontPanel.this, msg, translate("error"), JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            }
-        }
-
-        String[] yesno = new String[]{translate("button.yes"), translate("button.no"), translate("button.yes.all"), translate("button.no.all")};
-        boolean yestoall = false;
-        boolean notoall = false;
-        boolean replaced = false;
-        int numAdded = 0;
-        for (int ic : selChars) {
-            char c = (char) ic;
-            if (oldchars.indexOf((int) c) > -1) {
-                int opt = -1;
-                if (!(yestoall || notoall)) {
-                    opt = ViewMessages.showOptionDialog(FontPanel.this, translate("message.font.add.exists").replace("%char%", "" + c), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, translate("button.yes"));
-                    if (opt == 2) {
-                        yestoall = true;
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.font", ft.getSwf())) {
+            FontTag f = (FontTag) mainPanel.getCurrentTree().getCurrentTreeItem();
+            String oldchars = f.getCharacters();
+            for (int ic : selChars) {
+                char c = (char) ic;
+                if (oldchars.indexOf((int) c) == -1) {
+                    if (font.getSize() != 1024) { //Do not resize if not required so we can have single instance of custom fonts
+                        font = font.deriveFont(f.getFontStyle(), 1024);
                     }
-                    if (opt == 3) {
-                        notoall = true;
+                    if (Utf8Helper.charToCodePoint(c, ft.getCodesCharset()) == -1) {
+                        String msg = translate("error.charset.nocharacter").replace("%char%", "" + c);
+                        Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, msg);
+                        ViewMessages.showMessageDialog(FontPanel.this, msg, translate("error"), JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (!font.canDisplay(c)) {
+                        String msg = translate("error.font.nocharacter").replace("%char%", "" + c);
+                        Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, msg);
+                        ViewMessages.showMessageDialog(FontPanel.this, msg, translate("error"), JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
                 }
-
-                if (yestoall) {
-                    opt = 0; // yes
-                } else if (notoall) {
-                    opt = 1; // no
-                }
-
-                if (opt == 1) {
-                    continue;
-                }
-
-                replaced = true;
             }
 
-            if (!f.addCharacter(c, font)) {
-                ViewMessages.showMessageDialog(mainPanel, AppStrings.translate("error.font.cannotaddcharacter").replace("%numchars%", "" + numAdded), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-                break;
-            }
-            numAdded++;
-            oldchars += c;
-        }
+            String[] yesno = new String[]{translate("button.yes"), translate("button.no"), translate("button.yes.all"), translate("button.no.all")};
+            boolean yestoall = false;
+            boolean notoall = false;
+            boolean replaced = false;
+            int numAdded = 0;
+            for (int ic : selChars) {
+                char c = (char) ic;
+                if (oldchars.indexOf((int) c) > -1) {
+                    int opt = -1;
+                    if (!(yestoall || notoall)) {
+                        opt = ViewMessages.showOptionDialog(FontPanel.this, translate("message.font.add.exists").replace("%char%", "" + c), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, translate("button.yes"));
+                        if (opt == 2) {
+                            yestoall = true;
+                        }
+                        if (opt == 3) {
+                            notoall = true;
+                        }
+                    }
 
-        if (replaced) {
-            if (ViewMessages.showConfirmDialog(FontPanel.this, translate("message.font.replace.updateTexts"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
-                int fontId = ft.getCharacterId();
-                SWF swf = ft.getSwf();
-                for (Tag tag : swf.getTags()) {
-                    if (tag instanceof TextTag) {
-                        TextTag textTag = (TextTag) tag;
-                        if (textTag.getFontIds().contains(fontId)) {
-                            String text = textTag.getFormattedText(true).text;
-                            mainPanel.saveText(textTag, text, null, null, null);
+                    if (yestoall) {
+                        opt = 0; // yes
+                    } else if (notoall) {
+                        opt = 1; // no
+                    }
+
+                    if (opt == 1) {
+                        continue;
+                    }
+
+                    replaced = true;
+                }
+
+                if (!f.addCharacter(c, font)) {
+                    ViewMessages.showMessageDialog(mainPanel, AppStrings.translate("error.font.cannotaddcharacter").replace("%numchars%", "" + numAdded), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    break;
+                }
+                numAdded++;
+                oldchars += c;
+            }
+
+            if (replaced) {
+                if (ViewMessages.showConfirmDialog(FontPanel.this, translate("message.font.replace.updateTexts"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
+                    int fontId = ft.getCharacterId();
+                    SWF swf = ft.getSwf();
+                    for (Tag tag : swf.getTags()) {
+                        if (tag instanceof TextTag) {
+                            TextTag textTag = (TextTag) tag;
+                            if (textTag.getFontIds().contains(fontId)) {
+                                String text = textTag.getFormattedText(true).text;
+                                mainPanel.saveText(textTag, text, null, null);
+                            }
                         }
                     }
                 }
@@ -245,11 +247,13 @@ public class FontPanel extends JPanel implements TagEditorPanel {
     }
 
     private void fontRemoveChars(FontTag ft, Set<Integer> selChars) {
-        FontTag f = (FontTag) mainPanel.getCurrentTree().getCurrentTreeItem();
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.font", ft.getSwf())) {
+            FontTag f = (FontTag) mainPanel.getCurrentTree().getCurrentTreeItem();
 
-        for (int ic : selChars) {
-            char c = (char) ic;
-            f.removeCharacter(c);
+            for (int ic : selChars) {
+                char c = (char) ic;
+                f.removeCharacter(c);
+            }
         }
     }
 
@@ -616,43 +620,45 @@ public class FontPanel extends JPanel implements TagEditorPanel {
     }
 
     public boolean fontEmbed(TreeItem item, boolean create) {
-        if (item == null) {
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.font", item == null ? null : item.getOpenable())) {
+            if (item == null) {
+                return false;
+            }
+            FontTag ft = (FontTag) item;
+            FontEmbedDialog fed = new FontEmbedDialog(Main.getDefaultDialogsOwner(), ft.hasLayout() || ft.getCharacterCount() == 0, (FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText(), create);
+            if (fed.showDialog() == AppDialog.OK_OPTION) {
+                Set<Integer> selChars = fed.getSelectedChars();
+                if (!selChars.isEmpty() || fed.isImportAscentDescentLeading()) {
+                    if (ft.getCharacterCount() == 0) {
+                        ft.setHasLayout(true);
+                    }
+                    Font selFont = fed.getSelectedFont();
+                    fontFamilyNameSelection.setSelectedItem(new FontFamily(selFont));
+                    fontFaceSelection.setSelectedItem(new FontFace(selFont));
+                    fontAddChars(ft, selChars, selFont);
+                    if (fed.isImportAscentDescentLeading()) {
+                        Font adlFont = selFont;
+                        if (selFont.getSize() != 1024) {
+                            adlFont = selFont.deriveFont(1024f);
+                        }
+                        ft.setAscent((int) (ft.getDivider() * this.getFontMetrics(adlFont).getAscent()));
+                        ft.setDescent((int) (ft.getDivider() * this.getFontMetrics(adlFont).getDescent()));
+                        int leading = this.getFontMetrics(adlFont).getAscent() + this.getFontMetrics(adlFont).getDescent() - 1024;
+                        ft.setLeading((int) (ft.getDivider() * leading));
+                    }
+                    if (create) {
+                        ft.setFontNameIntag(fed.getCreateFontName());
+                        ft.setBold(fed.isBold());
+                        ft.setItalic(fed.isItalic());
+                    }
+                    fontAddCharactersField.setText("");
+                    ft.setModified(true);
+                    mainPanel.reload(true);
+                    return true;
+                }
+            }
             return false;
         }
-        FontTag ft = (FontTag) item;
-        FontEmbedDialog fed = new FontEmbedDialog(Main.getDefaultDialogsOwner(), ft.hasLayout() || ft.getCharacterCount() == 0, (FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText(), create);
-        if (fed.showDialog() == AppDialog.OK_OPTION) {
-            Set<Integer> selChars = fed.getSelectedChars();
-            if (!selChars.isEmpty() || fed.isImportAscentDescentLeading()) {
-                if (ft.getCharacterCount() == 0) {
-                    ft.setHasLayout(true);
-                }
-                Font selFont = fed.getSelectedFont();
-                fontFamilyNameSelection.setSelectedItem(new FontFamily(selFont));
-                fontFaceSelection.setSelectedItem(new FontFace(selFont));
-                fontAddChars(ft, selChars, selFont);
-                if (fed.isImportAscentDescentLeading()) {
-                    Font adlFont = selFont;
-                    if (selFont.getSize() != 1024) {
-                        adlFont = selFont.deriveFont(1024f);
-                    }
-                    ft.setAscent((int) (ft.getDivider() * this.getFontMetrics(adlFont).getAscent()));
-                    ft.setDescent((int) (ft.getDivider() * this.getFontMetrics(adlFont).getDescent()));
-                    int leading = this.getFontMetrics(adlFont).getAscent() + this.getFontMetrics(adlFont).getDescent() - 1024;
-                    ft.setLeading((int) (ft.getDivider() * leading));
-                }
-                if (create) {
-                    ft.setFontNameIntag(fed.getCreateFontName());
-                    ft.setBold(fed.isBold());
-                    ft.setItalic(fed.isItalic());
-                }
-                fontAddCharactersField.setText("");
-                ft.setModified(true);
-                mainPanel.reload(true);
-                return true;
-            }
-        }
-        return false;
     }
 
     private void fontEmbedButtonActionPerformed(ActionEvent evt) {
@@ -698,49 +704,51 @@ public class FontPanel extends JPanel implements TagEditorPanel {
     }
 
     private void saveButtonActionPerformed(ActionEvent evt) {
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.font", fontTag.getSwf())) {
 
-        if (!(fontTag instanceof DefineFontTag)) {
-            if (fontTag.getCharacterCount() == 0 && !fontTag.hasLayout()) {
-                fontTag.setHasLayout(true);
-            }
-            if (fontTag.hasLayout()) {
+            if (!(fontTag instanceof DefineFontTag)) {
+                if (fontTag.getCharacterCount() == 0 && !fontTag.hasLayout()) {
+                    fontTag.setHasLayout(true);
+                }
+                if (fontTag.hasLayout()) {
 
-                try {
-                    int ascent = Integer.parseInt(fontAscentTextField.getText());
-                    int descent = Integer.parseInt(fontDescentTextField.getText());
-                    int leading = Integer.parseInt(fontLeadingTextField.getText());
-                    if (ascent < 0 || descent < 0) {
+                    try {
+                        int ascent = Integer.parseInt(fontAscentTextField.getText());
+                        int descent = Integer.parseInt(fontDescentTextField.getText());
+                        int leading = Integer.parseInt(fontLeadingTextField.getText());
+                        if (ascent < 0 || descent < 0) {
+                            return;
+                        }
+                        fontTag.setAscent(ascent);
+                        fontTag.setDescent(descent);
+                        fontTag.setLeading(leading);
+
+                        fontAscentLabel.setText("" + ascent);
+                        fontDescentLabel.setText("" + descent);
+                        fontLeadingLabel.setText("" + leading);
+                    } catch (NumberFormatException nfe) {
                         return;
                     }
-                    fontTag.setAscent(ascent);
-                    fontTag.setDescent(descent);
-                    fontTag.setLeading(leading);
-
-                    fontAscentLabel.setText("" + ascent);
-                    fontDescentLabel.setText("" + descent);
-                    fontLeadingLabel.setText("" + leading);
-                } catch (NumberFormatException nfe) {
-                    return;
                 }
             }
-        }
 
-        if (fontTag.isBoldEditable()) {
-            fontTag.setBold(fontIsBoldCheckBox.isSelected());
-        }
-        if (fontTag.isItalicEditable()) {
-            fontTag.setItalic(fontIsItalicCheckBox.isSelected());
-        }
-        if (fontTag.isFontNameInTagEditable()) {
-            fontTag.setFontNameIntag(fontNameIntagTextField.getText());
-            fontNameIntagLabel.setText(fontNameIntagTextField.getText());
+            if (fontTag.isBoldEditable()) {
+                fontTag.setBold(fontIsBoldCheckBox.isSelected());
+            }
+            if (fontTag.isItalicEditable()) {
+                fontTag.setItalic(fontIsItalicCheckBox.isSelected());
+            }
+            if (fontTag.isFontNameInTagEditable()) {
+                fontTag.setFontNameIntag(fontNameIntagTextField.getText());
+                fontNameIntagLabel.setText(fontNameIntagTextField.getText());
 
-        }
+            }
 
-        mainPanel.getCurrentTree().repaint();
-        fontTag.setModified(true);
-        setEditable(false);
-        mainPanel.clearEditingStatus();
+            mainPanel.getCurrentTree().repaint();
+            fontTag.setModified(true);
+            setEditable(false);
+            mainPanel.clearEditingStatus();
+        }
     }
 
     private void cancelButtonActionPerformed(ActionEvent evt) {
@@ -754,8 +762,10 @@ public class FontPanel extends JPanel implements TagEditorPanel {
     }
 
     private void setAdvanceValuesButtonActionPerformed(ActionEvent evt) {
-        if (ViewMessages.showConfirmDialog(FontPanel.this, AppStrings.translate("message.font.setadvancevalues"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.showSetAdvanceValuesMessage, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
-            fontTag.setAdvanceValues(((FontFace) fontFaceSelection.getSelectedItem()).font);
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.font", fontTag.getSwf())) {
+            if (ViewMessages.showConfirmDialog(FontPanel.this, AppStrings.translate("message.font.setadvancevalues"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.showSetAdvanceValuesMessage, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+                fontTag.setAdvanceValues(((FontFace) fontFaceSelection.getSelectedItem()).font);
+            }
         }
     }
 

@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.StartSoundBase;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
@@ -33,7 +35,7 @@ import java.util.Set;
  * @author JPEXS
  */
 @SWFVersion(from = 9)
-public class StartSound2Tag extends Tag {
+public class StartSound2Tag extends Tag implements StartSoundBase {
 
     public static final int ID = 89;
 
@@ -95,5 +97,25 @@ public class StartSound2Tag extends Tag {
     public void getNeededCharacters(Set<Integer> needed, Set<String> neededClasses, SWF swf) {
         int characterId = swf.getCharacterId(swf.getCharacterByClass(soundClassName));
         needed.add(characterId);
-    }        
+    }
+
+    @Override
+    public SOUNDINFO getSoundInfo() {
+        return soundInfo;
+    }
+
+    @Override
+    public void setSoundInfo(SOUNDINFO soundInfo) {
+        this.soundInfo = soundInfo;
+    }
+
+    @Override
+    public int getSoundId() {
+        return -1;
+    }
+
+    @Override
+    public String getSoundClassName() {
+        return soundClassName;
+    }
 }

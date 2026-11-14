@@ -1,0 +1,4 @@
+-cp src
+-main Main
+-swf bin/haxe_downcast_coerce.swf
+-swf-version 11

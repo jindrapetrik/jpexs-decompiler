@@ -42,13 +42,16 @@ abctraits
 abcuint
 abff
 ABIOS
+ABlank
 ABORTWARNING
 abovenormal
 abreak
 Abstaende
+AButton
 abx
 ACCESSDENIED
 acff
+AClosed
 acode
 acolor
 acontinue
@@ -62,6 +65,7 @@ actionscriptdoc
 actionscriptsyntaxkit
 activex
 Actl
+ACurved
 adata
 addclass
 addexport
@@ -74,6 +78,7 @@ addtagmulti
 addtocontextmenu
 addtrait
 adff
+ADistinct
 adl
 adobehomepage
 ADOC
@@ -89,17 +94,25 @@ aev
 aex
 afff
 AFile
+AFill
+AFinal
 aforinif
 afp
 agentlib
 agentpath
+AGroup
 ags
 Aguilera
 ahoj
+AHollow
 aip
+aircontrols
+aircore
 airglobal
 airpath
 ajmp
+ALast
+ALayer
 alertable
 Algorithmen
 alimsoftware
@@ -123,6 +136,7 @@ alterneigh
 altersingle
 altglyph
 altsigner
+AMask
 ames
 amf
 AMuch
@@ -130,6 +144,7 @@ amxmlc
 aname
 ANDEQ
 Annots
+ANonexistent
 ANR
 antcall
 antex
@@ -146,8 +161,13 @@ apgeneratedsrcdir
 APICOM
 apiprivate
 apiversioning
+APlan
 apng
+appdata
+appdir
 apperr
+appimage
+appimagetool
 applytype
 appmenu
 APPWINDOW
@@ -156,6 +176,8 @@ apu
 Arbeitsbuch
 ARCHITEW
 arec
+ARectangular
+AReplaced
 argb
 argsfile
 Arnout
@@ -166,6 +188,7 @@ arrowup
 Artsimovich
 ASAO
 asasm
+AScene
 ascentdescentleading
 asciitochar
 asclass
@@ -176,6 +199,7 @@ asdec
 asdoc
 ASender
 ASF
+AShared
 asinterface
 Asize
 asms
@@ -184,6 +208,8 @@ ASQ
 asr
 asre
 ASSIGNPRIMARYTOKEN
+AStroke
+AStyle
 astype
 astypelate
 asv
@@ -196,6 +222,7 @@ atleast
 atmax
 atmin
 ATRAC
+ATrailing
 ATTRIBUTENAME
 ATTRIBUTEVALUE
 ATTRNAMEVAR
@@ -226,11 +253,12 @@ avimainheader
 avioldindex
 AVIPALCHANGE
 AVIPCM
+AVirtual
 AVISF
 avistreamheader
 AVIX
 avm
-AVMPLUS
+avmplus
 avt
 awidth
 awt
@@ -245,6 +273,7 @@ badid
 Badiella
 bading
 BADKEY
+badshape
 BADSIG
 badstring
 BADTIME
@@ -351,6 +380,7 @@ blockset
 blocktypenumber
 bluewin
 BLURFILTER
+bman
 bmatrix
 bmax
 BMHD
@@ -367,6 +397,7 @@ BOOTFILE
 BOOTMGR
 bordercolor
 borland
+bowlerhatllc
 boxblur
 boyerf
 Bpl
@@ -396,6 +427,7 @@ buildlog
 BUILDNUMBER
 bulkimport
 bundleswc
+buttonadd
 buttoncondaction
 buttonicon
 BUTTONRECORD
@@ -435,8 +467,8 @@ caprica
 CAPSLOCK
 CARDACTIONSCRIPT
 CARDACTIONSCRIPTPANEL
-Cardan
-Cardano
+Cardan's
+Cardano's
 CARDDUMPVIEW
 CARDEMPTYPANEL
 CARDFOLDERLISTPANEL
@@ -468,6 +500,7 @@ ccanvas
 ccff
 cch
 ccode
+CCommand
 CCs
 cctx
 CDDL
@@ -482,6 +515,7 @@ cei
 CELLBORDER
 CELP
 CENTERJSAMPLE
+centerlines
 centerx
 centery
 cer
@@ -558,6 +592,7 @@ CLERKEXISTS
 CLERKNOTFOUND
 CLexer
 CLFS
+clickable
 CLIENTCREATESTRUCT
 clientid
 CLIENTSITE
@@ -614,6 +649,7 @@ commonpart
 commonset
 commonshape
 compareresources
+compc
 compilerarg
 COMPILERKIND
 COMPILERPATH
@@ -651,11 +687,13 @@ coreceavm
 cosext
 counta
 countb
+CPic
 cpool
 cpos
 CProgress
 CRandom
 crcp
+CRCs
 createallsubdirs
 CREATEDIBSECTION
 CREATESTRUCT
@@ -672,6 +710,7 @@ csplit
 Csq
 CSRSS
 cstype
+CSwf
 CSyntax
 Ctag
 CText
@@ -714,11 +753,13 @@ darkcornersoftware
 darkmodeawaresyntaxkit
 dashmatch
 Dasm
+datamanagement
 datamodified
 datas
 datfiles
 dbcc
 dbch
+DBCSENABLED
 dbd
 dbff
 Dbi
@@ -808,6 +849,7 @@ deringing
 derrt
 dery
 descs
+deselection
 desktophints
 desktopicon
 destdir
@@ -886,6 +928,7 @@ doif
 doinit
 doinitaction
 DOLBY
+DOMTLF
 domx
 donot
 donotshowagain
@@ -958,10 +1001,11 @@ dumpview
 DUPLICATEMOVIECLIP
 dupsrc
 dval
-DVD
+dvd
 dvf
 DVI
 dvp
+dvr
 dvt
 DVTARGETDEVICE
 DWL
@@ -1136,7 +1180,7 @@ fctx
 Fdat
 FDE
 fdecompiled
-fdepth
+fdepths
 fdff
 fdformat
 fdir
@@ -1161,6 +1205,7 @@ fieldalign
 fifi
 fiftyseven
 fileattributes
+filechooser
 fileformat
 fileoffset
 fileschanged
@@ -1212,10 +1257,11 @@ FIXEDPARAMETER
 fji
 fjump
 fla
-flacomdoc
 flagval
 flashdebugger
+flashdevelop
 FLASHINFO
+flashlet
 flashlib
 flashlite
 flashpaper
@@ -1281,7 +1327,6 @@ forkmode
 FORMATETC
 forminfo
 fos
-fourcc
 FOURTYEIGHT
 FOURTYFOUR
 foutdir
@@ -1289,6 +1334,7 @@ FPoint
 fprevious
 fprop
 fpt
+FPush
 fqn
 fractpart
 frameadd
@@ -1314,9 +1360,11 @@ frm
 Frob
 fromsoft
 fromto
+frontmost
 fsb
 fscommand
 fscope
+FScroll
 FSMO
 fsrc
 fsv
@@ -1330,6 +1378,7 @@ ftime
 ftimeline
 Ftm
 ftn
+ftr
 ftrait
 fuer
 FULLAND
@@ -1491,6 +1540,7 @@ hget
 hgetbits
 hhea
 hhk
+hicolor
 hicon
 hideobject
 highlightings
@@ -1520,6 +1570,7 @@ HOOKPROC
 HORIX
 Hotkeys
 hotmail
+hotspot
 hovno
 hpalette
 hpen
@@ -1536,6 +1587,7 @@ HScale
 hscroll
 hshift
 hsize
+HSlider
 hsstell
 htab
 HTBOTTOM
@@ -1582,7 +1634,7 @@ icting
 ictx
 idat
 idata
-IDCT
+idct
 Iddle
 IDecoder
 IDecompile
@@ -1658,6 +1710,7 @@ importmovies
 importother
 importscript
 importshape
+importshapeupdatebounds
 importsound
 importsprite
 importsymbolclass
@@ -1665,6 +1718,7 @@ importtab
 importtext
 importxml
 imt
+IMXML
 incatch
 inclocal
 inclocalp
@@ -2010,6 +2064,7 @@ Listswf
 listswfprofiles
 Liushui
 livedocs
+livepreview
 lix
 ljcb
 ljrb
@@ -2027,6 +2082,7 @@ LOADMAP
 loadmemory
 LOADMOVIE
 LOADMOVIENUM
+loadorder
 loadresource
 LOADTRANSPARENT
 LOADURL
@@ -2238,7 +2294,7 @@ mgardi
 MGTPE
 mhreljac
 mhs
-Microsystem
+Microsystem's
 mindex
 minfo
 mingc
@@ -2270,6 +2326,7 @@ mmv
 mmx
 mmy
 moar
+mobilecomponents
 Mochi
 mochicrypt
 Modell
@@ -2352,6 +2409,7 @@ myf
 myfilecomp
 myfiledec
 MYFONT
+MYFRAME
 mygraph
 myhash
 myjson
@@ -2381,6 +2439,7 @@ myvectorint
 myxml
 Naashorn
 nai
+namecharacter
 Namesmy
 namespacekind
 namespaceset
@@ -2535,6 +2594,7 @@ noncontainer
 nondebug
 nondifferential
 nonewversion
+nonflex
 NONINFRINGEMENT
 nonlibrary
 nonmenu
@@ -2585,7 +2645,6 @@ nparams
 npe
 npp
 nps
-npw
 NRotate
 nsano
 NScale
@@ -2700,6 +2759,7 @@ origis
 origt
 Orost
 OSId
+osmf
 ossup
 ossupport
 OSVERSIONINFO
@@ -2709,6 +2769,7 @@ otherdoc
 otherns
 otherone
 oursidetrycatch
+Ouside
 outdir
 outdirectory
 outex
@@ -2825,7 +2886,7 @@ pointsedit
 poolable
 popscope
 popups
-Poskanzer
+Poskanzer's
 postdominator
 powerstate
 poxyran
@@ -3066,6 +3127,7 @@ retep
 RETEXIT
 retexpr
 RETFINAL
+Rethrown
 reti
 retlen
 RETRYNOW
@@ -3291,11 +3353,15 @@ sft
 sftable
 sfunc
 sgt
+shapeadd
 shapecache
 shapefixer
 shapenum
 shaperecord
 shapesfolder
+shapetool
+shapetoolpaint
+shapetoolpencil
 SHAPEWITHSTYLE
 sharedobjects
 sharepoint
@@ -3335,6 +3401,7 @@ sinitcode
 SISO
 sitem
 siz
+skinnable
 skinparts
 skipifsilent
 skm
@@ -3354,6 +3421,7 @@ SMALLICON
 smallpos
 smallval
 smartcard
+smartclip
 smartfoxserver
 SMask
 sme
@@ -3419,6 +3487,7 @@ SPLITPANE
 SPN
 spos
 spr
+spriteadd
 spriteinvalid
 spritesfolder
 spti
@@ -3511,9 +3580,11 @@ subbandnumber
 subbands
 subclassof
 subcnt
+subcurve
 subdata
 subdiv
 subframes
+subimage
 subkeys
 sublength
 sublimiter
@@ -3793,13 +3864,14 @@ ttffile
 TThread
 TTimer
 ttm
+ttp
 Turkowski
 turtlevax
 tuto
 TVar
 twalljava
 tweeked
-Tweener
+tweenquality
 tweens
 twindagger
 twip
@@ -3848,6 +3920,7 @@ undefineds
 undomanager
 undos
 Unescapes
+unescaping
 unexpand
 Ungrabs
 unichr
@@ -3961,6 +4034,7 @@ Vetrenko
 vetsinou
 VGACOLOR
 vgap
+VGroup
 Vid
 videocodecid
 VIDEODATA
@@ -3995,6 +4069,7 @@ vret
 vsa
 vsb
 VScale
+VSlider
 vstr
 vtle
 vtype
@@ -4076,6 +4151,7 @@ XBefore
 xbt
 XButton
 xcenter
+xch
 xcontent
 xcopy
 XCount
@@ -4091,14 +4167,12 @@ XFixed
 xfl
 XFloat
 Xfm
-XHalf
 XHeight
 xhtmlsyntaxkit
 xing
 XInstance
 XInteger
 XIntercept
-XInternal
 xlen
 xlist
 xlr
@@ -4172,7 +4246,6 @@ ydelta
 YEnd
 yestoall
 YFloat
-YHalf
 YInstance
 YInteger
 ylen
@@ -4181,7 +4254,7 @@ YMK
 ymouse
 ynew
 YNM
-yof
+YOF
 yorig
 yourfile
 Yoyodyne

@@ -578,22 +578,24 @@ public class DefineFont2Tag extends FontTag {
             }
             List<FontHelper.KerningPair> kerning = getFontKerningPairs(font, (int) (getDivider() * 1024));
             for (FontHelper.KerningPair pair : kerning) {
-                if (pair.char1 != code && pair.char2 != code) {
+                int code1 = (int) Utf8Helper.charToCodePoint(pair.char1, getCodesCharset());
+                int code2 = (int) Utf8Helper.charToCodePoint(pair.char2, getCodesCharset());
+                if (code1 != code && code2 != code) {
                     continue;
                 }
                 int glyph1 = charToGlyph(pair.char1);
-                if (pair.char1 == code) {
+                if (code1 == code) {
                     //empty
                 } else if (glyph1 == -1) {
                     continue;
                 }
                 int glyph2 = charToGlyph(pair.char2);
-                if (pair.char2 == code) {
+                if (code2 == code) {
                     //empty
                 } else if (glyph2 == -1) {
                     continue;
                 }
-                fontKerningTable.add(new KERNINGRECORD(pair.char1, pair.char2, pair.kerning));
+                fontKerningTable.add(new KERNINGRECORD(code1, code2, pair.kerning));
             }
         }
 
@@ -605,7 +607,7 @@ public class DefineFont2Tag extends FontTag {
 
     @Override
     public synchronized boolean removeCharacter(char character) {
-        int code = (int) character;
+        int code = (int) Utf8Helper.charToCodePoint(character, getCodesCharset());
         int pos = codeTable.indexOf(code);
         if (pos == -1) {
             return false;
@@ -619,8 +621,8 @@ public class DefineFont2Tag extends FontTag {
             fontAdvanceTable.remove(pos);
 
             for (int i = 0; i < fontKerningTable.size(); i++) {
-                if (fontKerningTable.get(i).fontKerningCode1 == character
-                        || fontKerningTable.get(i).fontKerningCode2 == character) {
+                if (fontKerningTable.get(i).fontKerningCode1 == code
+                        || fontKerningTable.get(i).fontKerningCode2 == code) {
                     fontKerningTable.remove(i);
                     i--;
                 }

@@ -1,0 +1,34 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/FullScreen Button/Assets/FullScreenOffIcon" itemID="455b9f3c-000002d3" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/FullScreen Button/Assets/FullScreenOffIcon" sourceLastModified="1163632632" lastModified="1163632632" sourceItemID="455b9f3c-000002d3">
+  <timeline>
+    <DOMTimeline name="FullScreenOffIcon">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isFloating="true">
+                  <matrix>
+                    <Matrix tx="-1"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF" alpha="0.650980392156863"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!223 20S2|223 41!223 41|243 41!243 41|243 20!243 20|223 20!223 101|182 101!182 101|182 81!182 81|162 81!162 81|162 41!162 41|142 41!142 41|142 121!142 121|223 121!223 121|223 101!223 41|202 41!202 41|202 61!202 61|223 61!223 61|223 41
+!263 20|263 182!263 182|243 182!243 182|243 202!243 202|142 202!142 202|142 121!142 121|0 121!0 121|0 20!0 20|20 20!20 20|20 0!20 0|243 0!243 0|243 20!243 20|263 20"/>
+                    <Edge fillStyle0="1" edges="
+!182 81S1|182 61!182 61|202 61!202 61|202 81!202 81|182 81"/>
+                    <Edge fillStyle1="1" edges="
+!20 182S2|0 182!0 182|0 141!0 141|121 141!121 141|121 202!121 202|20 202!20 202|20 182"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

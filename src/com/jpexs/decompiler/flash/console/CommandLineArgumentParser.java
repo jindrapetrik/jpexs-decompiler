@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
+import com.jpexs.decompiler.flash.SwzExtractor;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
@@ -88,6 +89,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
+import com.jpexs.decompiler.flash.exporters.script.MxmlExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
@@ -103,7 +105,11 @@ import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SymbolClassExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.XmlSwfExportSettings;
+import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfMxmlProjectExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
 import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -265,6 +271,9 @@ import org.fusesource.jansi.AnsiConsole;
  */
 public class CommandLineArgumentParser {
 
+    static final List<String> PROJECT_EXPORT_TYPES = Collections.unmodifiableList(Arrays.asList(
+            "flashdevelop", "flashdevelop_mxml", "intellij", "intellij_mxml", "vscode", "vscode_mxml"));
+
     private static final Logger logger = Logger.getLogger(CommandLineArgumentParser.class.getName());
 
     private static boolean commandLineMode = false;
@@ -387,6 +396,11 @@ public class CommandLineArgumentParser {
             exampleFound = true;
         }
 
+        if (filter.equals("tweenquality")) {
+            out.println(PREFIX + "-tweenQuality 50 -format xfl:cs6 -export xfl output input.swf");
+            exampleFound = true;
+        }
+
         if (filter == null || filter.equals("cli")) {
             out.println(PREFIX + "-cli myfile.swf");
             exampleFound = true;
@@ -464,6 +478,11 @@ public class CommandLineArgumentParser {
             exampleFound = true;
         }
 
+        if (filter == null || filter.equals("swz2swf")) {
+            out.println(PREFIX + "-swz2swf myfile.swz result.swf");
+            exampleFound = true;
+        }
+
         if (filter == null || filter.equals("header")) {
             out.println(PREFIX + "-header myfile.swf");
             out.println(PREFIX + "-header -set version 10 -set width 800px -set framerate 23.5 myfile.swf outfile.swf");
@@ -527,6 +546,7 @@ public class CommandLineArgumentParser {
         double zoom = 1;
         Double morphDuration = PreviewExporter.MORPH_SHAPE_DEFAULT_DURATION;
         int morphNumFrames = 10;
+        int tweenQuality = 0;
         String charset = Charset.defaultCharset().name();
         SwfProfile swfProfile = null;
         boolean cliMode = false;
@@ -581,6 +601,9 @@ public class CommandLineArgumentParser {
                     break;
                 case "-morphnumframes":
                     morphNumFrames = parseMorphNumFrames(args);
+                    break;
+                case "-tweenquality":
+                    tweenQuality = parseTweenQuality(args);
                     break;
                 case "-format":
                     format = parseFormat(args);
@@ -679,7 +702,7 @@ public class CommandLineArgumentParser {
             parseAbcMerge(args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("swf2swc")) {
-            parseSwf2Swc(args, charset, swfProfile);
+            parseSwf2Swc(selectionClasses, args, charset, swfProfile);
             System.exit(0);
         } else if (command.equals("linkreport")) {
             parseLinkReport(selectionClasses, args, charset, swfProfile);
@@ -708,7 +731,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("proxy")) {
             parseProxy(args);
         } else if (command.equals("export")) {
-            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, swfProfile, exportEmbed, transparentBackground, urlResolver, subLength, morphDuration, morphNumFrames);
+            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, swfProfile, exportEmbed, transparentBackground, urlResolver, subLength, morphDuration, morphNumFrames, tweenQuality);
             System.exit(0);
         } else if (command.equals("compress")) {
             parseCompress(args);
@@ -727,6 +750,9 @@ public class CommandLineArgumentParser {
             System.exit(0);
         } else if (command.equals("iggy2swf")) {
             parseIggy2Swf(args);
+            System.exit(0);
+        } else if (command.equals("swz2swf")) {
+            parseSwz2Swf(args);
             System.exit(0);
         } else if (command.equals("swf2xml")) {
             parseSwf2Xml(args, charset, swfProfile, handler);
@@ -1086,7 +1112,7 @@ public class CommandLineArgumentParser {
         }, charset, swfProfile);
     }
 
-    private static void parseSwf2Swc(Stack<String> args, String charset, SwfProfile swfProfile) {
+    private static void parseSwf2Swc(List<String> selectionClasses, Stack<String> args, String charset, SwfProfile swfProfile) {
         if (args.size() < 2) {
             badArguments("swf2swc");
         }
@@ -1095,7 +1121,7 @@ public class CommandLineArgumentParser {
         processReadSWF(swfFile, null, (SWF swf, OutputStream stdout) -> {
             SwfToSwcExporter exporter = new SwfToSwcExporter();
             try {
-                exporter.exportSwf(swf, outFile, false);
+                exporter.exportSwf(swf, outFile, false, selectionClasses);
             } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -1823,6 +1849,23 @@ public class CommandLineArgumentParser {
         return 2;
     }
 
+    private static int parseTweenQuality(Stack<String> args) {
+        if (args.isEmpty()) {
+            badArguments("tweenquality");
+            return 0;
+        }
+        try {
+            int value = Integer.parseInt(args.pop());
+            if (value >= 0 && value <= 100) {
+                return value;
+            }
+        } catch (NumberFormatException ex) {
+            // The help topic below describes the required integer range.
+        }
+        badArguments("tweenquality");
+        return 0;
+    }
+
     private static int parseMorphNumFrames(Stack<String> args) {
         if (args.isEmpty()) {
             System.err.println("number of frames parameter expected");
@@ -2205,7 +2248,8 @@ public class CommandLineArgumentParser {
             ConsoleUrlResolver urlResolver,
             int subFrameLength,
             double morphDuration,
-            int morphNumFrames
+            int morphNumFrames,
+            int tweenQuality
     ) {
         if (args.size() < 3) {
             badArguments("export");
@@ -2229,7 +2273,8 @@ public class CommandLineArgumentParser {
             "text",
             "all",
             "fla",
-            "xfl"
+            "xfl",
+            "mxml"
         };
 
         String[] removedExportFormats = new String[]{
@@ -2362,7 +2407,7 @@ public class CommandLineArgumentParser {
                     if (Arrays.asList(removedExportFormats).contains(exportFormat)) {
                         System.err.println("Error: Export format : " + exportFormat + " was REMOVED. Run application with --help parameter to see available formats.");
                         System.exit(1);
-                    } else if (!Arrays.asList(validExportItems).contains(exportFormat)) {
+                    } else if (!Arrays.asList(validExportItems).contains(exportFormat) && !PROJECT_EXPORT_TYPES.contains(exportFormat)) {
                         System.err.println("Invalid export item:" + exportFormat);
                         badArguments("export");
                     }
@@ -2507,12 +2552,26 @@ public class CommandLineArgumentParser {
 
                 if (exportFormats.contains("fla")) {
                     System.out.println("Exporting FLA...");
-                    exportFla(true, outDir, inFile, swf, multipleExportTypes, formats, handler);
+                    exportFla(true, outDir, inFile, swf, multipleExportTypes, formats, handler, tweenQuality);
                 }
 
                 if (exportFormats.contains("xfl")) {
                     System.out.println("Exporting XFL...");
-                    exportFla(false, outDir, inFile, swf, multipleExportTypes, formats, handler);
+                    exportFla(false, outDir, inFile, swf, multipleExportTypes, formats, handler, tweenQuality);
+                }
+
+                if (exportFormats.contains("mxml")) {
+                    System.out.println("Exporting MXML (experimental)...");
+                    File result = exportMxml(swf, outDir, multipleExportTypes);
+                    System.out.println("Exported MXML: " + result);
+                }
+
+                for (String projectType : PROJECT_EXPORT_TYPES) {
+                    if (exportFormats.contains(projectType)) {
+                        System.out.println("Exporting " + projectType + " project...");
+                        File result = exportProject(swf, outDir, projectType, multipleExportTypes, formats, handler, evl);
+                        System.out.println("Exported " + projectType + " project: " + result);
+                    }
                 }
 
                 if (!singleFile) {
@@ -2541,7 +2600,72 @@ public class CommandLineArgumentParser {
         System.exit(exportOK ? 0 : 1);
     }
 
-    private static void exportFla(boolean compressed, String outDir, File inFile, SWF swf, boolean multipleExportTypes, Map<String, String> formats, AbortRetryIgnoreHandler handler) throws IOException, InterruptedException {
+    static File exportMxml(SWF swf, String outDir, boolean multipleExportTypes) throws IOException, InterruptedException {
+        File target = new File(outDir, multipleExportTypes ? "mxml" : "");
+        return new MxmlExporter().exportMxml(swf, target);
+    }
+
+    static File exportProject(SWF swf, String outDir, String exportType, boolean multipleExportTypes,
+            Map<String, String> formats, AbortRetryIgnoreHandler handler, EventListener listener) throws IOException, InterruptedException {
+        if (!PROJECT_EXPORT_TYPES.contains(exportType)) {
+            throw new IllegalArgumentException("Unknown project export type: " + exportType);
+        }
+        boolean mxml = exportType.endsWith("_mxml");
+        String kind = mxml ? exportType.substring(0, exportType.length() - "_mxml".length()) : exportType;
+        SwfMxmlProjectExporter.ProjectType type;
+        boolean supported;
+        switch (kind) {
+            case "flashdevelop":
+                type = SwfMxmlProjectExporter.ProjectType.FLASH_DEVELOP;
+                supported = SwfFlashDevelopExporter.canExportSwf(swf);
+                break;
+            case "intellij":
+                type = SwfMxmlProjectExporter.ProjectType.INTELLIJ_IDEA;
+                supported = SwfIntelliJIdeaExporter.canExportSwf(swf);
+                break;
+            case "vscode":
+                type = SwfMxmlProjectExporter.ProjectType.VS_CODE;
+                supported = SwfVsCodeExporter.canExportSwf(swf);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown project export type: " + exportType);
+        }
+        if (mxml ? !MxmlExporter.canExportSwf(swf) : !supported) {
+            throw new IOException("SWF is not supported for " + exportType + " project export");
+        }
+        String platform = formats.getOrDefault(kind, "flash");
+        if (!mxml && !"intellij".equals(kind) && !"flash".equals(platform) && !"air".equals(platform)) {
+            throw new IllegalArgumentException("Invalid " + kind + " project format: " + platform + ". Use flash or air.");
+        }
+        File directory = new File(outDir, multipleExportTypes ? exportType : "").toPath().toAbsolutePath().normalize().toFile();
+        String name = Path.getFileNameWithoutExtension(new File(swf.getShortFileName()));
+        if (name.isEmpty() || "-".equals(name)) {
+            name = "project";
+        }
+        File destination = "flashdevelop".equals(kind) ? new File(directory, name + ".as3proj") : directory;
+        if (mxml) {
+            new SwfMxmlProjectExporter().exportProject(swf, destination, type);
+        } else {
+            Files.createDirectories(directory.toPath());
+            boolean air = "air".equals(platform);
+            switch (type) {
+                case FLASH_DEVELOP:
+                    new SwfFlashDevelopExporter().exportFlashDevelopProject(swf, destination, air, handler, listener);
+                    break;
+                case INTELLIJ_IDEA:
+                    new SwfIntelliJIdeaExporter().exportIntelliJIdeaProject(swf, destination, handler, listener);
+                    break;
+                case VS_CODE:
+                    new SwfVsCodeExporter().exportVsCodeProject(swf, destination, air, handler, listener);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown project export type: " + exportType);
+            }
+        }
+        return destination;
+    }
+
+    private static void exportFla(boolean compressed, String outDir, File inFile, SWF swf, boolean multipleExportTypes, Map<String, String> formats, AbortRetryIgnoreHandler handler, int tweenQuality) throws IOException, InterruptedException {
         String exportFormat = compressed ? "fla" : "xfl";
         String format = formats.get(exportFormat);
         boolean exportScript = true;
@@ -2565,6 +2689,7 @@ public class CommandLineArgumentParser {
         XFLExportSettings settings = new XFLExportSettings();
         settings.compressed = compressed;
         settings.exportScript = exportScript;
+        settings.tweenDetectionQuality = tweenQuality;
 
         try {
             if (Configuration.setFFDecVersionInExportedFont.get()) {
@@ -2801,6 +2926,27 @@ public class CommandLineArgumentParser {
             System.out.println("OK");
         } catch (IOException | IllegalArgumentException ex) {
             logger.log(Level.SEVERE, "Error converting Iggy to SWF", ex);
+            System.exit(1);
+        }
+    }
+
+    private static void parseSwz2Swf(Stack<String> args) {
+        if (args.size() != 2) {
+            badArguments("swz2swf");
+        }
+        String input = args.pop();
+        File output = new File(args.pop());
+        try {
+            byte[] swf;
+            try (InputStream stream = new BufferedInputStream(new StdInAwareFileInputStream(input))) {
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                Helper.copyStreamEx(stream, bytes);
+                swf = SwzExtractor.extract(bytes.toByteArray());
+            }
+            Files.write(output.toPath(), swf);
+            System.out.println("OK");
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "Error extracting SWZ to SWF", ex);
             System.exit(1);
         }
     }

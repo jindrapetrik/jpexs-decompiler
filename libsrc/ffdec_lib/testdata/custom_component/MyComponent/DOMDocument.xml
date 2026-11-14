@@ -1,0 +1,55 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="6" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <fonts>
+          <DOMFontItem name="Font 1" itemID="6af0696e-000001fa" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1794140526" embedRanges="1|2|3"/>
+     </fonts>
+     <symbols>
+          <Include href="MyComponent.xml" itemID="6af0663a-000001f1" lastModified="1794144921"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="MyComponent" centerPoint3DX="261.3" centerPoint3DY="166" uniqueID="4">
+                                             <matrix>
+                                                  <Matrix tx="204.8" ty="116.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="56.5" y="49.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="boxColor">
+      <Inspectable name="myColor" variable="boxColor" category="" verbose="0" defaultValue="#3399FF" type="Color"/>
+   </property>
+   <property id="opacity">
+      <Inspectable name="opacity" variable="opacity" category="" verbose="0" defaultValue="1" type="Number"/>
+   </property>
+   <property id="text">
+      <Inspectable name="text" variable="text" category="" verbose="0" defaultValue="Default text" type="String"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="14874" publishTime="1794144902"/>
+          <PublishItem publishSize="15432" publishTime="1794144814"/>
+          <PublishItem publishSize="14286" publishTime="1794144801"/>
+          <PublishItem publishSize="16280" publishTime="1794140701"/>
+          <PublishItem publishSize="15368" publishTime="1794140684"/>
+          <PublishItem publishSize="16276" publishTime="1794140642"/>
+          <PublishItem publishSize="16279" publishTime="1794140548"/>
+          <PublishItem publishSize="5499" publishTime="1794140512"/>
+          <PublishItem publishSize="6185" publishTime="1794139998"/>
+     </publishHistory>
+</DOMDocument>

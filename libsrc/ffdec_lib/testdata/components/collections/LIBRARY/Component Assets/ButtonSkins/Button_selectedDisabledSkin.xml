@@ -1,0 +1,114 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ButtonSkins/Button_selectedDisabledSkin" itemID="44a3392f-0000001e" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="Button_selectedDisabledSkin" linkageClassName="Button_selectedDisabledSkin" scaleGridLeft="7" scaleGridRight="57.75" scaleGridTop="5" scaleGridBottom="16" lastModified="1168286863">
+  <timeline>
+    <DOMTimeline name="Button_selectedDisabledSkin">
+      <layers>
+        <DOMLayer name="fill" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="0.0134429931640625" d="0" tx="71" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#CCCCCC" alpha="0.2" ratio="0"/>
+                        <GradientEntry color="#CCCCCC" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="-0.0134429931640625" d="0" tx="11.05" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#CCCCCC" alpha="0.2" ratio="0"/>
+                        <GradientEntry color="#CCCCCC" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!821 20|821 420"/>
+                    <Edge fillStyle0="1" edges="!821 420|1202 420!1202 420[1260 419 1260 360!1260 360|1260 80!1260 80[1260 22 1202 20!1202 20|821 20"/>
+                    <Edge fillStyle0="2" edges="!821 20|78 20!78 20[#14.7B #15.44 20.5 80!20.5 80|20.5 360!20.5 360[#14.7B #1A2.BC 78 420!78 420|821 420"/>
+                    <Edge cubics="!1260 80(;1260,80 1260,360 1260,360q1260 80 1260 360);"/>
+                    <Edge cubics="!821 420(;821,420 821,20 821,20q821 420 821 20);"/>
+                    <Edge cubics="!1202 420(;1202,420 821,420 821,420q1202 420 821 420);"/>
+                    <Edge cubics="!821 20(;821,20 1202,20 1202,20q821 20 1202 20);"/>
+                    <Edge cubics="!21 360(;21,360 21,80 21,80q21 360 21 80);"/>
+                    <Edge cubics="!78 420(;39,419 20,399 21,360q78 420Q20 419q21 360);"/>
+                    <Edge cubics="!78 20(;78,20 821,20 821,20q78 20 821 20);"/>
+                    <Edge cubics="!821 420(;821,420 78,420 78,420q821 420 78 420);"/>
+                    <Edge cubics="!1260 360(1260,360;1260,399 1241,419 1202,420q1260 360Q1260 419q1202 420);"/>
+                    <Edge cubics="!1202 20(;1241,21 1260,41 1260,80q1202 20Q1260 22q1260 80);"/>
+                    <Edge cubics="!78 20(;39,21 20,41 21,80q78 20Q20 21q21 80);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="border" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="0.0134429931640625" d="0" tx="71" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#585F63" alpha="0.298039215686275" ratio="0"/>
+                        <GradientEntry color="#B7BABC" alpha="0.2" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="-0.0134429931640625" d="0" tx="11.05" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#585F63" alpha="0.298039215686275" ratio="0"/>
+                        <GradientEntry color="#B7BABC" alpha="0.2" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!820 20|1202 20!1202 20[1260 22 1260 80!1260 80|1260 360!1260 360[1260 419 1202 420!1202 420|820 420"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!820 420|820 440"/>
+                    <Edge fillStyle0="1" edges="!820 440|1200 440!1200 440[1280 440 1280 360!1280 360|1280 80!1280 80[1280 0 1200 0!1200 0|820 0"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!820 0|820 20"/>
+                    <Edge fillStyle1="2" edges="!820 20|78 20!78 20[#14.7B #15.44 20.5 80!20.5 80|20.5 360!20.5 360[#14.7B #1A2.BC 78 420!78 420|820 420"/>
+                    <Edge fillStyle0="2" edges="!820 0|80.5 0!80.5 0[#0.7A 0 0.5 80!0.5 80|0.5 360!0.5 360[#0.7A 440 80.5 440!80.5 440|820 440"/>
+                    <Edge cubics="!1260 80(;1260,80 1260,360 1260,360q1260 80 1260 360);"/>
+                    <Edge cubics="!1280 360(;1280,360 1280,80 1280,80q1280 360 1280 80)1280,80;"/>
+                    <Edge cubics="!820 420(;820,420 820,440 820,440q820 420 820 440);"/>
+                    <Edge cubics="!820 0(;820,0 820,20 820,20q820 0 820 20);"/>
+                    <Edge cubics="!1202 420(1202,420;1202,420 820,420 820,420q1202 420 820 420)820,420;"/>
+                    <Edge cubics="!820 20(;820,20 1202,20 1202,20q820 20 1202 20);"/>
+                    <Edge cubics="!1200 0(;1200,0 820,0 820,0q1200 0 820 0);"/>
+                    <Edge cubics="!820 440(;820,440 1200,440 1200,440q820 440 1200 440);"/>
+                    <Edge cubics="!21 360(;21,360 21,80 21,80q21 360 21 80);"/>
+                    <Edge cubics="!1 80(;1,80 1,360 1,360q1 80 1 360);"/>
+                    <Edge cubics="!78 420(;39,419 20,399 21,360q78 420Q20 419q21 360);"/>
+                    <Edge cubics="!1 360(;0,413 27,440 81,440q1 360Q0 440q81 440)81,440;"/>
+                    <Edge cubics="!81 0(81,0;27,0 0,27 1,80q81 0Q0 0q1 80);"/>
+                    <Edge cubics="!78 20(;78,20 820,20 820,20q78 20 820 20);"/>
+                    <Edge cubics="!820 420(;820,420 78,420 78,420q820 420 78 420);"/>
+                    <Edge cubics="!81 440(;81,440 820,440 820,440q81 440 820 440);"/>
+                    <Edge cubics="!820 0(;820,0 81,0 81,0q820 0 81 0);"/>
+                    <Edge cubics="!1260 360(;1260,399 1241,419 1202,420q1260 360Q1260 419q1202 420);"/>
+                    <Edge cubics="!1202 20(1202,20;1241,21 1260,41 1260,80q1202 20Q1260 22q1260 80);"/>
+                    <Edge cubics="!1280 80(;1280,27 1253,0 1200,0q1280 80Q1280 0q1200 0);"/>
+                    <Edge cubics="!1200 440(1200,440;1253,440 1280,413 1280,360q1200 440Q1280 440q1280 360);"/>
+                    <Edge cubics="!21 80(;20,41 39,21 78,20q21 80Q20 21q78 20);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

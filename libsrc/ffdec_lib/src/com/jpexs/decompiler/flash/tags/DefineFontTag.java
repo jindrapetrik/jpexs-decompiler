@@ -91,10 +91,17 @@ public class DefineFontTag extends FontTag {
 
         strippedShapes = false;
 
+        // An empty glyph table has no offsets. The writer emits only the font ID in that case.
+        if (sis.available() == 0) {
+            return;
+        }
         long pos = sis.getPos();
         int firstOffset = sis.readUI16("firstOffset");
         int nGlyphs = firstOffset / 2;
 
+        if (nGlyphs == 0) {
+            return;
+        }
         long[] offsetTable = new long[nGlyphs];
         offsetTable[0] = firstOffset;
         for (int i = 1; i < nGlyphs; i++) {

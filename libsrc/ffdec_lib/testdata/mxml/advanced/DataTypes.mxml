@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+    width="400" height="240">
+    <fx:Script><![CDATA[
+        private function describe():String { return "Function declaration"; }
+    ]]></fx:Script>
+    <fx:Declarations>
+        <fx:int id="count">42</fx:int>
+        <fx:uint id="bitMask">4294967295</fx:uint>
+        <fx:Number id="ratio">1.5</fx:Number>
+        <fx:Boolean id="enabledFlag">true</fx:Boolean>
+        <fx:String id="literal">Literal \{braces} and a Windows path C:\demo</fx:String>
+        <fx:String id="directive">\@Embed('missing.png')</fx:String>
+        <fx:Class id="productClass">model.Product</fx:Class>
+        <fx:Function id="callback">describe</fx:Function>
+    </fx:Declarations>
+    <s:Label text="{count + ' - ' + callback()}"/>
+</s:Application>

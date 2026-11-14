@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.InvalidActionException;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
 import com.jpexs.decompiler.flash.action.flashlite.ActionStrictMode;
 import com.jpexs.decompiler.flash.action.profile.castlecrashers.ActionPushDefineLocal;
@@ -2008,8 +2009,8 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException On I/O error
      */
     public Action readAction() throws IOException {
-        int actionCode;
-
+        int actionCode = 0;
+        int actionLength = 0;
         try {
             actionCode = readUI8("actionCode");
             if (actionCode == 0) {
@@ -2018,7 +2019,7 @@ public class SWFInputStream implements AutoCloseable {
             if (actionCode == -1) {
                 return null;
             }
-            int actionLength = 0;
+            actionLength = 0;
             if (actionCode >= 0x80) {
                 actionLength = readUI16("actionLength");
             }
@@ -2251,7 +2252,9 @@ public class SWFInputStream implements AutoCloseable {
             }
         } catch (EndOfStreamException | ArrayIndexOutOfBoundsException eos) {
             return null;
-        }
+        } catch (InvalidActionException iae) {
+            return new ActionUnknown(actionCode, actionLength, getCharset());
+        }        
     }
 
     /**

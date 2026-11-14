@@ -1,0 +1,105 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/_SquareButton/SquareBgDown" itemID="4270372f-000005a7" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/_SquareButton/SquareBgDown" sourceLastModified="1157562211" lastModified="1157562211" sourceItemID="00000000-7fffffff">
+  <timeline>
+    <DOMTimeline name="SquareBgDown">
+      <layers>
+        <DOMLayer name="Glow" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#00FF00"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <SolidColor color="#00FF00" alpha="0.352941176470588"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!440 120S3|440 340!440 340[440 382 410 410!410 410[382 440 340 440!340 440|120 440!120 440[79 440 49 410!49 410[20 381 20 340!20 340|20 120!20 120[20 79 49 49!49 49[79 20 120 20!120 20|340 20!340 20[381 20 410 49!410 49[440 79 440 120"/>
+                    <Edge fillStyle1="2" edges="!460 120S2|460 340!460 340[460 390 425 425!425 425[390 460 340 460!340 460|120 460!120 460[70 460 35 425!35 425[0 390 0 340!0 340|0 120!0 120[0 70 35 35!35 35[70 0 120 0!120 0|340 0!340 0[390 0 425 35!425 35[460 70 460 120"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!420 340S3[420 374 396 396!396 396[374 420 340 420!340 420|120 420!120 420[87 420 63 396!63 396[40 373 40 340!40 340|40 120!40 120[40 87 63 63!63 63[87 40 120 40!120 40|340 40!340 40[373 40 396 63!396 63[420 87 420 120!420 120|420 340"/>
+                    <Edge fillStyle0="2" edges="!400 120S1|400 340!400 340[400 366 382 382!382 382[366 400 340 400!340 400|120 400!120 400[95 400 77 382!77 382[60 365 60 340!60 340|60 120!60 120[60 95 77 77!77 77[95 60 120 60!120 60|340 60!340 60[365 60 382 77!382 77[400 95 400 120"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Dimension" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="0.010986328125" c="-0.010986328125" d="-1.52587890625e-005" tx="22.95" ty="10.95"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="-1.52587890625e-005" b="-0.009765625" c="-0.009765625" d="0" tx="22.95" ty="11.95"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="3">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="0.013427734375" d="0" tx="23" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!419 339[419 373 395 395!395 395[373 419 339 419!339 419|119 419!119 419[86 419 62 395!62 395[39 372 39 339!39 339|39 119!39 119[39 86 62 62!62 62[86 39 119 39!119 39|339 39!339 39[372 39 395 62!395 62[419 86 419 119!419 119|419 339"/>
+                    <Edge fillStyle1="3" edges="!460 120|460 340!460 340[460 390 425 425!425 425[390 460 340 460!340 460|120 460!120 460[70 460 35 425!35 425[0 390 0 340!0 340|0 120!0 120[0 70 35 35!35 35[70 0 120 0!120 0|340 0!340 0[390 0 425 35!425 35[460 70 460 120"/>
+                    <Edge fillStyle0="3" edges="!440 120|440 340!440 340[440 382 410 410!410 410[382 440 340 440!340 440|120 440!120 440[79 440 49 410!49 410[20 381 20 340!20 340|20 120!20 120[20 79 49 49!49 49[79 20 120 20!120 20|340 20!340 20[381 20 410 49!410 49[440 79 440 120"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!99.5 62|116 59!116 59[#74.C #3B.04 117.5 59!117.5 59[#76.38 59 119 59!119 59|339 59!339 59[#15C.B2 59 357 61.5!357 61.5|366.5 65.5"/>
+                    <Edge fillStyle1="2" edges="!366.5 65.5[#176.AC #45.E2 381 77!381 77[#183.03 #52.58 391 89"/>
+                    <Edge fillStyle1="1" edges="!391 89[#183.03 #52.03 381 76!381 76[#176.7F #45.7F 366.5 65.5"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!391 89[399 #66.5A 399 119!399 119|399 339!399 339[399 #164.51 391 369!391 369[#183.03 #177.FD 381 382!381 382[#176.41 388.75 366 393!366 393|356 397!356 397[#15E.37 #18E.8B 343.5 399!343.5 399[#156.BD #18E.F8 342 399!342 399[#154.7F
+ 399 339 399!339 399|119 399!119 399[#76.38 399 117.5 399!117.5 399[#74.C #18E.FC 116 399!116 399|99.5 396!99.5 396[#56.8F #187.F9 76 382!76 382[#43.AD #175.2F 63.5 362.5!63.5 362.5|59 340.5!59 340.5[59 #153.C8 59 339!59 339|59 119!59
+ 119|63 96"/>
+                    <Edge fillStyle0="1" edges="
+!63 96[#43.6A #55.17 76 76!76 76[#56.8F #42.08 99.5 62"/>
+                    <Edge fillStyle1="2" edges="
+!63 96[67.5 85.5 76 77!76 77[#56.95 #42.6C 99.5 62"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Color Plate" color="#FF4FFF" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#666666"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="
+!420 340[420 373 396 396!396 396[373 420 340 420!340 420|120 420!120 420[87 420 63 396!63 396[40 373 40 340!40 340|40 120!40 120[40 87 63 63!63 63[87 40 120 40!120 40|340 40!340 40[373 40 396 63!396 63[420 87 420 120!420 120|420 340"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

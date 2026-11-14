@@ -36,6 +36,7 @@ import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.IntegerValueItem;
 import com.jpexs.decompiler.graph.model.IntegerValueTypeItem;
@@ -62,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
@@ -1220,6 +1222,9 @@ public class Graph {
         propagateBreaks(ret);
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
+        if (canResolvePopsAfterExitIfs()) {
+            resolvePopsAfterExitIfs(ret);
+        }
 
         if (!hasEmptyStackPops.getVal() || !containsPopItems(ret)) {
             promotePushItemsToCommands(ret);
@@ -1227,20 +1232,216 @@ public class Graph {
 
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
         //fixSwitchEnds(ret);
+        removeUnreadSetTemporaries(ret);
         handleSetTemporaryDeclarations(ret);
         return ret;
+    }
+
+    /**
+     * Whether resolvePopsAfterExitIfs applies. AS1/2 builds a typed catch from
+     * the pushes and pops around its rethrowing if.
+     *
+     * @return True to resolve them
+     */
+    protected boolean canResolvePopsAfterExitIfs() {
+        return false;
+    }
+
+    /**
+     * Gives the pops of a command the values pushed before ifs that exit.
+     * Haxe checks a cast inside an expression: in return "a" + f(cast(o,
+     * String)), "a" and f's object are pushed, then if (!(o is String)) throw
+     * runs with them on the stack, which printed §§push and §§pop. When only
+     * temporaries and such ifs (with side effect free conditions) follow the
+     * pushes, and the pushed values have no side effect and read no
+     * temporary set after them, the next command reads them in place of its
+     * pops.
+     *
+     * @param list List
+     */
+    private void resolvePopsAfterExitIfs(List<GraphTargetItem> list) {
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    resolvePopsAfterExitIfs(sub);
+                }
+                continue;
+            }
+            if (item instanceof PushItem) {
+                continue;
+            }
+            List<PopItem> pops = getUnresolvedPops(item);
+            if (pops.isEmpty()) {
+                continue;
+            }
+            List<Integer> pushIndices = new ArrayList<>();
+            int start = i - 1;
+            for (; start >= 0; start--) {
+                GraphTargetItem prev = list.get(start);
+                if (prev instanceof PushItem) {
+                    pushIndices.add(0, start);
+                    if (pushIndices.size() == pops.size()) {
+                        break;
+                    }
+                } else if (!(prev instanceof SetTemporaryItem) && !isExitIf(prev)) {
+                    break;
+                }
+            }
+            if (pushIndices.size() != pops.size() || !canMovePushedValues(list, pushIndices, i)) {
+                continue;
+            }
+            pops.sort((a, b) -> Long.compare(a.order, b.order));
+            for (int p = 0; p < pops.size(); p++) {
+                int pushIndex = pushIndices.get(pushIndices.size() - 1 - p);
+                pops.get(p).resolvedValue = ((PushItem) list.get(pushIndex)).value;
+            }
+            for (int p = pushIndices.size() - 1; p >= 0; p--) {
+                list.remove((int) pushIndices.get(p));
+            }
+            i -= pushIndices.size();
+        }
+    }
+
+    private static List<PopItem> getUnresolvedPops(GraphTargetItem item) {
+        List<PopItem> pops = new ArrayList<>();
+        Set<GraphTargetItem> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        if (item instanceof PopItem) {
+            pops.add((PopItem) item);
+            return pops;
+        }
+        item.visitRecursively(new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem sub) {
+                if (sub instanceof PopItem && ((PopItem) sub).resolvedValue == null && seen.add(sub)) {
+                    pops.add((PopItem) sub);
+                }
+                return true;
+            }
+        });
+        return pops;
+    }
+
+    private static boolean isExitIf(GraphTargetItem item) {
+        if (!(item instanceof IfItem)) {
+            return false;
+        }
+        IfItem ifItem = (IfItem) item;
+        if (ifItem.expression == null || ifItem.expression.hasSideEffect()) {
+            return false;
+        }
+        List<GraphTargetItem> exit = ifItem.onFalse.isEmpty() ? ifItem.onTrue : ifItem.onTrue.isEmpty() ? ifItem.onFalse : null;
+        return exit != null && !exit.isEmpty() && (exit.get(exit.size() - 1) instanceof ExitItem);
+    }
+
+    private static boolean canMovePushedValues(List<GraphTargetItem> list, List<Integer> pushIndices, int commandIndex) {
+        for (int pushIndex : pushIndices) {
+            GraphTargetItem value = ((PushItem) list.get(pushIndex)).value;
+            if (value == null || value.hasSideEffect()) {
+                return false;
+            }
+            Set<Integer> readTemps = new HashSet<>();
+            if (value instanceof HasTempIndex) {
+                readTemps.add(((HasTempIndex) value).getTempIndex());
+            }
+            value.visitRecursively(new AbstractGraphTargetVisitor() {
+                @Override
+                public boolean visit(GraphTargetItem sub) {
+                    if (sub instanceof HasTempIndex) {
+                        readTemps.add(((HasTempIndex) sub).getTempIndex());
+                    }
+                    return true;
+                }
+            });
+            for (int j = pushIndex + 1; j < commandIndex; j++) {
+                GraphTargetItem between = list.get(j);
+                if ((between instanceof SetTemporaryItem) && readTemps.contains(((SetTemporaryItem) between).tempIndex)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    /*
+     * Removes side effect free temporaries that nothing prints anymore. A
+     * compound assign whose value branches (_s += (c ? a : b) + d) folds its
+     * dup back after the dup temp was output, which then printed as a stray
+     * var _temp_1:* = §§findproperty(_s).
+     *
+     * @param list List
+     */
+    private void removeUnreadSetTemporaries(List<GraphTargetItem> list) {
+        Set<Integer> read = new HashSet<>();
+        Set<GraphTargetItem> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (GraphTargetItem item : list) {
+            collectTempReads(item, read, visited);
+        }
+        removeUnreadSetTemporaries(list, read);
+    }
+
+    private void removeUnreadSetTemporaries(List<GraphTargetItem> list, Set<Integer> read) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof SetTemporaryItem) {
+                SetTemporaryItem st = (SetTemporaryItem) item;
+                if (!read.contains(st.tempIndex) && st.value != null && !st.value.hasSideEffect()) {
+                    list.remove(i);
+                    continue;
+                }
+            }
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    removeUnreadSetTemporaries(sub, read);
+                }
+            }
+        }
+    }
+
+    private void collectTempReads(GraphTargetItem item, Set<Integer> read, Set<GraphTargetItem> visited) {
+        if (item == null || !visited.add(item)) {
+            return;
+        }
+        if ((item instanceof HasTempIndex) && !(item instanceof SetTemporaryItem)) {
+            read.add(((HasTempIndex) item).getTempIndex());
+        }
+        List<GraphTargetItem> printed = getPrintedChildren(item);
+        if (printed != null) {
+            for (GraphTargetItem child : printed) {
+                collectTempReads(child, read, visited);
+            }
+            return;
+        }
+        item.visit(new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem child) {
+                collectTempReads(child, read, visited);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Gets the children an item prints, when they differ from the ones it
+     * visits.
+     *
+     * @param item Item
+     * @return Printed children or null to use the visited ones
+     */
+    protected List<GraphTargetItem> getPrintedChildren(GraphTargetItem item) {
+        return null;
     }
 
     private boolean containsPopItems(List<GraphTargetItem> list) {
         Reference<Boolean> containsPopItem = new Reference<>(false);
         for (GraphTargetItem item : list) {
-            if (item instanceof PopItem) {
+            if (item instanceof PopItem && ((PopItem) item).resolvedValue == null) {
                 return true;
             }
             item.visitRecursively(new AbstractGraphTargetVisitor() {
                 @Override
                 public boolean visit(GraphTargetItem item) {
-                    if (item instanceof PopItem) {
+                    if (item instanceof PopItem && ((PopItem) item).resolvedValue == null) {
                         containsPopItem.setVal(true);
                         return false;
                     }
@@ -4150,6 +4351,11 @@ public class Graph {
                     for (Loop el : loops) {
                         loopPhases.add(el.phase);
                     }
+                    List<Integer> throwStatesBackup = new ArrayList<>();
+                    for (ThrowState ts : throwStates) {
+                        throwStatesBackup.add(ts.state);
+                    }
+                    Object localDataBackup = backupWalkedLocalData(localData);
                     precontinueCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, subVisited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, stopPartKind2, loops, throwStates, null, staticOperation, path, recursionLevel + 1);
                     currentLoop.loopPreContinue = backup;
                     checkContinueAtTheEnd(precontinueCommands, currentLoop);
@@ -4183,11 +4389,16 @@ public class Graph {
                             precontinueCommands.clear();
 
                             /*
-                             * Restore loop phases
+                             * Restore loop phases, throw states and the local
+                             * data the discarded walk changed
                              */
                             for (int i = 0; i < loopPhases.size(); i++) {
                                 loops.get(i).phase = loopPhases.get(i);
                             }
+                            for (int i = 0; i < throwStatesBackup.size(); i++) {
+                                throwStates.get(i).state = throwStatesBackup.get(i);
+                            }
+                            restoreWalkedLocalData(localData, localDataBackup);
                         }
                     }
                 }
@@ -4629,8 +4840,12 @@ public class Graph {
                         }
                         //List<GraphTargetItem> out2 = new ArrayList<>();
                         //makeAllCommands(out2, stack);
-                        makeAllCommands(onTrue, trueStack);
-                        makeAllCommands(onFalse, falseStack);
+                        //When both branches leave the same number of values on stack, it is a ternar
+                        //operator candidate and these values must not be filtered out
+                        int bsrCount = topBsr != null ? 1 : 0;
+                        boolean branchesLeaveValues = trueStack.size() > bsrCount && trueStack.size() == falseStack.size();
+                        makeAllBranchCommands(onTrue, trueStack, branchesLeaveValues);
+                        makeAllBranchCommands(onFalse, falseStack, branchesLeaveValues);
                         GraphTargetItem addAfterIf = null;
                         if (!onTrue.isEmpty() && !onFalse.isEmpty()
                                 && (onTrue.get(onTrue.size() - 1) instanceof ContinueItem)
@@ -5446,6 +5661,27 @@ public class Graph {
     }
 
     /**
+     * Backs up the local data that walking parts changes, so a walk whose
+     * result is discarded can be undone. Override this method when the local
+     * data has such state.
+     *
+     * @param localData Local data
+     * @return Backup to pass to restoreWalkedLocalData
+     */
+    protected Object backupWalkedLocalData(BaseLocalData localData) {
+        return null;
+    }
+
+    /**
+     * Restores the local data backed up by backupWalkedLocalData.
+     *
+     * @param localData Local data
+     * @param backup Backup
+     */
+    protected void restoreWalkedLocalData(BaseLocalData localData, Object backup) {
+    }
+
+    /**
      * Get source items for a part
      *
      * @param part Part
@@ -5504,6 +5740,18 @@ public class Graph {
      */
     public void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
         stack.finishBlock(commands, true);
+    }
+
+    /**
+     * Moves all stack items of if branch to commands.
+     *
+     * @param commands Commands
+     * @param stack Stack
+     * @param branchesLeaveValues Both branches leave the same number of values
+     * on stack (ternar operator candidate)
+     */
+    protected void makeAllBranchCommands(List<GraphTargetItem> commands, TranslateStack stack, boolean branchesLeaveValues) {
+        makeAllCommands(commands, stack);
     }
 
     /**

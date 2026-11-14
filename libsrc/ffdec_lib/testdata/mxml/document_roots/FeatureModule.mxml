@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Module xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark" width="440" height="200">
+    <fx:Script><![CDATA[
+        [Bindable]
+        public var caption:String = "A separately compiled Flex module";
+        private function updateCaption():void {
+            caption = "The module button was clicked";
+        }
+    ]]></fx:Script>
+    <s:layout><s:VerticalLayout gap="12"/></s:layout>
+    <s:Label id="moduleLabel" text="{caption}"/>
+    <s:Button id="moduleButton" label="Update module message" click="updateCaption()"/>
+</s:Module>

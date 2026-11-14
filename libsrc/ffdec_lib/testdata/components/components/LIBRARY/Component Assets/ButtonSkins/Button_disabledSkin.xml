@@ -1,0 +1,94 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ButtonSkins/Button_disabledSkin" itemID="44a3379e-00000015" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="Button_disabledSkin" linkageClassName="Button_disabledSkin" scaleGridLeft="6" scaleGridRight="74" scaleGridTop="5" scaleGridBottom="16" lastModified="1168286804">
+  <timeline>
+    <DOMTimeline name="Button_disabledSkin">
+      <layers>
+        <DOMLayer name="highlight" color="#4FFF4F" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.00396728515625" c="0.0183258056640625" d="0" tx="80.5" ty="4.75"/>
+                        </matrix>
+                        <GradientEntry color="#CCCCCC" alpha="0" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.141176470588235" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!1620.5 240|20.5 240!20.5 240|20 79.5!20 79.5[#13.FB #13.F3 80 20!80 20|1560 20!1560 20[#654.04 #13.F3 1620 79.5!1620 79.5|1620.5 240"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="fill" color="#FFFF4F" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="0.0134429931640625" d="0" tx="71" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#CCCCCC" alpha="0.2" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!1620.5 360[#654.84 #1A2.BC 1563 420!1563 420|78 420!78 420[#14.7B #1A2.BC 20.5 360!20.5 360|20.5 80!20.5 80[#14.7B #15.44 78 20!78 20|1563 20!1563 20[#654.84 #15.44 1620.5 80!1620.5 80|1620.5 360"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="border" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="0.0134429931640625" d="0" tx="71" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#585F63" alpha="0.298039215686275" ratio="0"/>
+                        <GradientEntry color="#B7BABC" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="-0.0134429931640625" d="0" tx="11.05" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#585F63" alpha="0.298039215686275" ratio="0"/>
+                        <GradientEntry color="#B7BABC" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!820 440|1560.5 440!1560.5 440[#668.86 440 1640.5 360!1640.5 360|1640.5 80!1640.5 80[#668.86 0 1560.5 0!1560.5 0|820 0"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!820 0|820 20"/>
+                    <Edge fillStyle1="2" edges="!820 20|78 20!78 20[#14.7B #15.44 20.5 80!20.5 80|20.5 360!20.5 360[#14.7B #1A2.BC 78 420!78 420|820 420"/>
+                    <Edge fillStyle1="1" edges="!820 420|1563 420!1563 420[#654.84 #1A2.BC 1620.5 360!1620.5 360|1620.5 80!1620.5 80[#654.84 #15.44 1563 20!1563 20|820 20"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!820 420|820 440"/>
+                    <Edge fillStyle1="2" edges="!820 440|80.5 440!80.5 440[#0.7A 440 0.5 360!0.5 360|0.5 80!0.5 80[#0.7A 0 80.5 0!80.5 0|820 0"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Volume Bar/VolumeBarFullnessFill" itemID="429d6119-00005fe7" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="VolumeBarProgress" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Volume Bar/VolumeBarFullnessFill" sourceLastModified="1157562341" lastModified="1157562341" sourceItemID="429d6119-00005fe7">
+  <timeline>
+    <DOMTimeline name="VolumeBarFullnessFill">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#333333"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!1000 0|0 0!0 0|0 140!0 140|1000 140!1000 140|1000 0"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

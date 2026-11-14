@@ -1,0 +1,33 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Mute Button/Assets/MuteOnIcon" itemID="427073fd-0000006a" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Mute Button/Assets/MuteOnIcon" sourceLastModified="1165901845" lastModified="1165901845" sourceItemID="427073fd-0000006a">
+  <timeline>
+    <DOMTimeline name="MuteOnIcon">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isFloating="true">
+                  <matrix>
+                    <Matrix tx="-6" ty="-6"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF" alpha="0.650980392156863"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!280 120|280 140!280 140|300 140!300 140|300 160!300 160|320 160!320 160|320 180!320 180|340 180!340 180|340 280!340 280|320 280!320 280|320 300!320 300|300 300!300 300|300 320!300 320|280 320!280 320|280 340!280 340|240 340!240 340|240
+ 320!240 320|280 320!280 320|280 300!280 300|300 300!300 300|300 280!300 280|320 280!320 280|320 180!320 180|300 180!300 180|300 160!300 160|280 160!280 160|280 140!280 140|240 140!240 140|240 120!240 120|280 120!280 180|280 200!280 200
+|300 200!300 200|300 260!300 260|280 260!280 260|280 280!280 280|260 280!260 280|260 300!260 300|240 300!240 300|240 280!240 280|260 280!260 280|260 260!260 260|280 260!280 260|280 200!280 200|260 200!260 200|260 180!260 180|240 180!240
+ 180|240 160!240 160|260 160!260 160|260 180!260 180|280 180!160 200|160 180!160 180|180 180!180 180|180 160!180 160|200 160!200 160|200 140!200 140|220 140!220 140|220 320!220 320|200 320!200 320|200 300!200 300|180 300!180 300|180 280
+!180 280|160 280!160 280|160 260!160 260|120 260!120 260|120 200!120 200|160 200"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>
