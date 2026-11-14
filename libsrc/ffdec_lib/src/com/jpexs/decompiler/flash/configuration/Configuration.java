@@ -1306,6 +1306,10 @@ public final class Configuration {
     @ConfigurationFont
     public static ConfigurationItem<String> uiFontString = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> useFoldersInFlaExport = null;
+
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 

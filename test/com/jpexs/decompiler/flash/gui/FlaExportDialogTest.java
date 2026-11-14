@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GraphicsEnvironment;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 import org.testng.Assert;
@@ -61,6 +62,21 @@ public class FlaExportDialogTest {
         return null;
     }
 
+    private JCheckBox checkBox(Container container, String text) {
+        for (Component component : container.getComponents()) {
+            if (component instanceof JCheckBox && ((JCheckBox) component).getText().equals(text)) {
+                return (JCheckBox) component;
+            }
+            if (component instanceof Container) {
+                JCheckBox result = checkBox((Container) component, text);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
+    }
+
     @DataProvider(name = "values")
     public Object[][] values() {
         return new Object[][]{{0}, {37}, {100}};
@@ -100,6 +116,45 @@ public class FlaExportDialogTest {
         } finally {
             Configuration.lastFlaExportTweenDetectionQuality.set(previous);
             Configuration.useRibbonInterface.set(ribbon);
+        }
+    }
+
+    @Test
+    public void storesFolderPreferenceOnlyOnConfirmation() throws Exception {
+        if (GraphicsEnvironment.isHeadless()) {
+            throw new SkipException("Requires a graphical environment to construct a Swing dialog");
+        }
+        boolean previous = Configuration.useFoldersInFlaExport.get();
+        boolean ribbon = Configuration.useRibbonInterface.get();
+        int quality = Configuration.lastFlaExportTweenDetectionQuality.get();
+        try {
+            Configuration.useRibbonInterface.set(false);
+            Configuration.useFoldersInFlaExport.set(false);
+            SwingUtilities.invokeAndWait(() -> {
+                FlaExportDialog dialog = new FlaExportDialog(null);
+                try {
+                    JCheckBox folders = checkBox(dialog.getContentPane(), dialog.translate("useFolders"));
+                    Assert.assertNotNull(folders);
+                    Assert.assertFalse(folders.isSelected());
+                    folders.doClick();
+                    cancel(dialog.getContentPane(), dialog.translate("button.cancel")).doClick();
+                    Assert.assertFalse(Configuration.useFoldersInFlaExport.get());
+                    dialog.getRootPane().getDefaultButton().doClick();
+                    Assert.assertTrue(Configuration.useFoldersInFlaExport.get());
+                } finally {
+                    dialog.dispose();
+                }
+                FlaExportDialog reopened = new FlaExportDialog(null);
+                try {
+                    Assert.assertTrue(checkBox(reopened.getContentPane(), reopened.translate("useFolders")).isSelected());
+                } finally {
+                    reopened.dispose();
+                }
+            });
+        } finally {
+            Configuration.useFoldersInFlaExport.set(previous);
+            Configuration.useRibbonInterface.set(ribbon);
+            Configuration.lastFlaExportTweenDetectionQuality.set(quality);
         }
     }
 }

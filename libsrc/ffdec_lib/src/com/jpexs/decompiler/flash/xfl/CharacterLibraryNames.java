@@ -17,12 +17,18 @@
 package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.NameCharacterTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,10 +39,68 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-/** Restores the Library names stored in Generator templates. */
+/** Restores Library names and optionally groups items by type. */
 final class CharacterLibraryNames {
 
-    private CharacterLibraryNames() {
+    private final Set<String> folders;
+    private final Set<String> used = new HashSet<>();
+    private final Map<String, String> folderNames = new LinkedHashMap<>();
+
+    CharacterLibraryNames(Set<String> folders, Map<CharacterTag, String> names) {
+        this.folders = folders;
+        for (String folder : folders) {
+            folderNames.putIfAbsent(folder.toLowerCase(Locale.ROOT), folder);
+            used.add(folder.toLowerCase(Locale.ROOT));
+        }
+        for (String name : names.values()) {
+            if (name.contains("/")) {
+                used.add(name.toLowerCase(Locale.ROOT));
+            }
+        }
+    }
+
+    String inFolder(String folder, String basename) {
+        String folderName = folderNames.computeIfAbsent(folder.toLowerCase(Locale.ROOT), key -> folder);
+        folders.add(folderName);
+        return uniqueName(used, folderName + "/" + basename);
+    }
+
+    void groupCharacters(SWF swf, Set<CharacterTag> characters, Map<CharacterTag, String> names,
+            List<CharacterTag> nonLibraryShapes, MorphShapeSymbols morphShapes) throws InterruptedException {
+        Set<CharacterTag> inlineShapes = new HashSet<>(nonLibraryShapes);
+        for (CharacterTag character : characters) {
+            ComponentConverter.checkInterrupted();
+            String name = names.get(character);
+            int id = swf.getCharacterId(character);
+            if (id == -1 || (name != null && name.contains("/"))) {
+                continue;
+            }
+            String folder;
+            String defaultName = "Symbol " + id;
+            if (character instanceof DefineSpriteTag) {
+                folder = "Movie Clips";
+            } else if (character instanceof ButtonTag) {
+                folder = "Buttons";
+            } else if ((character instanceof ShapeTag && !inlineShapes.contains(character))
+                    || (character instanceof MorphShapeTag && morphShapes.contains(id))) {
+                folder = "Graphics";
+            } else if (character instanceof FontTag && ((FontTag) character).getCharacterCount() > 0) {
+                folder = "Fonts";
+                defaultName = "Font " + id;
+            } else if (character instanceof DefineVideoStreamTag) {
+                folder = "Videos";
+                defaultName = "movie" + id;
+            } else if (character instanceof DefineSoundTag) {
+                folder = "Sounds";
+                defaultName = "Sound " + id;
+            } else if (character instanceof ImageTag) {
+                folder = "Bitmaps";
+                defaultName = "Bitmap " + id;
+            } else {
+                continue;
+            }
+            names.put(character, inFolder(folder, name == null ? defaultName : name));
+        }
     }
 
     static Set<String> initialize(ReadOnlyTagList tags, Set<CharacterTag> characters,
@@ -58,12 +122,7 @@ final class CharacterLibraryNames {
             if (!characters.contains(character)) {
                 continue;
             }
-            String base = entry.getValue();
-            String name = base;
-            for (int suffix = 2; !used.add(name.toLowerCase(Locale.ROOT)); suffix++) {
-                name = base + " " + suffix;
-            }
-            names.put(character, name);
+            names.put(character, uniqueName(used, entry.getValue()));
             // A named shape belongs in the Library even if it is used only once.
             nonLibraryShapes.remove(character);
         }
@@ -74,6 +133,14 @@ final class CharacterLibraryNames {
             }
         }
         return folders;
+    }
+
+    private static String uniqueName(Set<String> used, String base) {
+        String name = base;
+        for (int suffix = 2; !used.add(name.toLowerCase(Locale.ROOT)); suffix++) {
+            name = base + " " + suffix;
+        }
+        return name;
     }
 
     private static void collect(ReadOnlyTagList tags, Map<CharacterTag, String> requested) {

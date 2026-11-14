@@ -552,6 +552,10 @@ final class As2ComponentConverter {
         return folders;
     }
 
+    void updateLibraryNames(Map<CharacterTag, String> names) {
+        libraryNames.putAll(names);
+    }
+
     private Element swcItem(Document document, String name) {
         Element source = declarations.get(name);
         if (source == null) {

@@ -52,6 +52,8 @@ public class FlaExportDialog extends AppDialog {
     
     private JCheckBox compressedCheckBox;
 
+    private final JCheckBox useFoldersCheckBox;
+
     private JSlider tweenQualitySlider;
     
     public FlaExportDialog(Window owner) {
@@ -86,12 +88,16 @@ public class FlaExportDialog extends AppDialog {
         
         compressedCheckBox = new JCheckBox(translate("compressed"));
         compressedCheckBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        useFoldersCheckBox = new JCheckBox(translate("useFolders"), Configuration.useFoldersInFlaExport.get());
+        useFoldersCheckBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.add(comboPanel);
         centerPanel.add(compressedCheckBox);
+        centerPanel.add(useFoldersCheckBox);
 
         JPanel qualityPanel = new JPanel(new BorderLayout(8, 4));
         qualityPanel.setBorder(BorderFactory.createEmptyBorder(8, 12, 4, 12));
@@ -151,6 +157,7 @@ public class FlaExportDialog extends AppDialog {
                     compressedCheckBox.setSelected(true);
                 }
                 compressedCheckBox.setEnabled(item.flaVersion.xflVersion() != null);
+                useFoldersCheckBox.setEnabled(item.flaVersion.supportsLibraryFolders());
             }
         }
     }
@@ -196,6 +203,7 @@ public class FlaExportDialog extends AppDialog {
 
     private void okButtonActionPerformed(ActionEvent evt) {
         Configuration.lastFlaExportTweenDetectionQuality.set(getTweenDetectionQuality());
+        Configuration.useFoldersInFlaExport.set(useFoldersCheckBox.isSelected());
         result = OK_OPTION;
         setVisible(false);
     }
@@ -234,6 +242,7 @@ public class FlaExportDialog extends AppDialog {
             comboActionPerformed(null);
         }
         tweenQualitySlider.setValue(Math.max(0, Math.min(100, Configuration.lastFlaExportTweenDetectionQuality.get())));
+        useFoldersCheckBox.setSelected(Configuration.useFoldersInFlaExport.get());
         pack();
         setVisible(true);        
         return result;

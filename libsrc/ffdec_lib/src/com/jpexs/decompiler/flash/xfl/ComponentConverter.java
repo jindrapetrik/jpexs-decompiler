@@ -220,6 +220,12 @@ final class ComponentConverter {
                 : new ComponentLibrary().initializeNames(swf, characters, components, definitions.keySet(), names);
     }
 
+    void updateLibraryNames(Map<CharacterTag, String> names) {
+        if (as2 != null) {
+            as2.updateLibraryNames(names);
+        }
+    }
+
     static void appendIcon(Element root, ComponentDefinition definition, Map<String, byte[]> datfiles) throws IOException {
         if (!definition.iconId.isEmpty()) {
             root.setAttribute("customIconID", definition.iconId);

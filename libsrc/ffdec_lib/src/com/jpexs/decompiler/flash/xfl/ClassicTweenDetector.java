@@ -60,6 +60,13 @@ final class ClassicTweenDetector {
         double[] matrix = new double[4];
         List<FilterTweenDetector.Filter> filters = Collections.emptyList();
     }
+    
+    static List<TweenRange> detectRanges(String frames, Set<Integer> instanceStarts, double frameRate,
+            Map<String, double[]> registrationPoints, int quality) throws XMLStreamException {
+        List<TweenRange> ranges = new ArrayList<>();
+        detect(frames, instanceStarts, frameRate, registrationPoints, quality, ranges);
+        return ranges;
+    }
 
     static String detect(String frames) throws XMLStreamException {
         return detect(frames, Collections.emptySet());
@@ -77,14 +84,7 @@ final class ClassicTweenDetector {
     static String detect(String frames, Set<Integer> instanceStarts, double motionFrameRate,
             Map<String, double[]> registrationPoints, int quality) throws XMLStreamException {
         return detect(frames, instanceStarts, motionFrameRate, registrationPoints, quality, null);
-    }
-
-    static List<TweenRange> detectRanges(String frames, Set<Integer> instanceStarts, double frameRate,
-            Map<String, double[]> registrationPoints, int quality) throws XMLStreamException {
-        List<TweenRange> ranges = new ArrayList<>();
-        detect(frames, instanceStarts, frameRate, registrationPoints, quality, ranges);
-        return ranges;
-    }
+    }   
 
     private static String detect(String frames, Set<Integer> instanceStarts, double motionFrameRate,
             Map<String, double[]> registrationPoints, int quality, List<TweenRange> ranges) throws XMLStreamException {
