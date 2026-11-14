@@ -6534,6 +6534,24 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return false;
     }
 
+    public void showInEasyView(TreeItem item) {
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
+        }
+        if (!(item instanceof Timelined) && !(item instanceof ShapeTag)) {
+            return;
+        }
+        if (checkEdited() || !showView(VIEW_EASY)) {
+            return;
+        }
+        if (item instanceof ShapeTag) {
+            easyPanel.editShape((ShapeTag) item);
+        } else {
+            easyPanel.setTimelined((Timelined) item);
+        }
+        updateMenu();
+    }
+
     private void dumpViewReload(boolean forceReload) {
         showDetail(DETAILCARDEMPTYPANEL);
 
@@ -7103,6 +7121,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showCard(CARDPREVIEWPANEL);
         } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag))) {
             showPreview(treeItem, previewPanel, -1, null, false);
+            previewPanel.setSimpleEditorTag((DrawableTag) treeItem);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof FontTag) {
             showPreview(treeItem, previewPanel, -1, null, false);

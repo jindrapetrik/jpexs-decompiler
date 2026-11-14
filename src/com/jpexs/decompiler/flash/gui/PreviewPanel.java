@@ -54,6 +54,7 @@ import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -256,6 +257,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JButton replaceImageAlphaButton;
 
     private JButton replaceSpriteButton;
+
+    private JButton imageSimpleEditorButton;
+
+    private JButton displayEditSimpleEditorButton;
+
+    private DrawableTag simpleEditorTag;
 
     private JButton replaceMovieButton;
 
@@ -486,6 +493,21 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private JPanel createImageButtonsPanel() {
+        imageTransformButton = new JButton(mainPanel.translate("button.transform"), View.getIcon("freetransform16"));
+        imageTransformButton.setMargin(new Insets(3, 3, 3, 10));
+        imageTransformButton.addActionListener(this::transformImageButtonActionPerformed);
+        imageTransformButton.setVisible(false);
+
+        imageTransformSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
+        imageTransformSaveButton.setMargin(new Insets(3, 3, 3, 10));
+        imageTransformSaveButton.addActionListener(this::saveImageTransformButtonActionPerformed);
+        imageTransformSaveButton.setVisible(false);
+
+        imageTransformCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
+        imageTransformCancelButton.setMargin(new Insets(3, 3, 3, 10));
+        imageTransformCancelButton.addActionListener(this::cancelImageTransformButtonActionPerformed);
+        imageTransformCancelButton.setVisible(false);
+
         replaceSoundButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("importsound16"));
         replaceSoundButton.setMargin(new Insets(3, 3, 3, 10));
         replaceSoundButton.addActionListener(new ActionListener() {
@@ -542,6 +564,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         nextFontsButton.setVisible(false);
 
         ButtonsPanel imageButtonsPanel = new ButtonsPanel();
+        imageButtonsPanel.add(imageTransformButton);
+        imageButtonsPanel.add(imageTransformSaveButton);
+        imageButtonsPanel.add(imageTransformCancelButton);
         imageButtonsPanel.add(replaceSoundButton);
         //imageButtonsPanel.add(replaceShapeButton);
         //imageButtonsPanel.add(replaceShapeUpdateBoundsButton);
@@ -551,7 +576,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageButtonsPanel.add(replaceMovieButton);
         imageButtonsPanel.add(prevFontsButton);
         imageButtonsPanel.add(nextFontsButton);
+        imageSimpleEditorButton = createSimpleEditorButton();
+        imageButtonsPanel.add(imageSimpleEditorButton);
         return imageButtonsPanel;
+    }
+
+    private JButton createSimpleEditorButton() {
+        JButton button = new JButton(mainPanel.translate("menu.file.view.easy"), View.getIcon("easy16"));
+        button.setMargin(new Insets(3, 3, 3, 10));
+        button.addActionListener(e -> mainPanel.showInEasyView(simpleEditorTag));
+        button.setVisible(false);
+        return button;
     }
 
     private JPanel createBinaryButtonsPanel() {
@@ -706,28 +741,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         mediaPreviewCards.add(soundWaveformPanel, SOUND_PREVIEW_CARD);
         previewCnt.add(mediaPreviewCards, BorderLayout.CENTER);
 
-        JPanel buttonsPanel = new JPanel(new FlowLayout());
-
-        imageTransformButton = new JButton(mainPanel.translate("button.transform"), View.getIcon("freetransform16"));
-        imageTransformButton.setMargin(new Insets(3, 3, 3, 10));
-        imageTransformButton.addActionListener(this::transformImageButtonActionPerformed);
-
-        imageTransformSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
-        imageTransformSaveButton.setMargin(new Insets(3, 3, 3, 10));
-        imageTransformSaveButton.addActionListener(this::saveImageTransformButtonActionPerformed);
-
-        imageTransformCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
-        imageTransformCancelButton.setMargin(new Insets(3, 3, 3, 10));
-        imageTransformCancelButton.addActionListener(this::cancelImageTransformButtonActionPerformed);
-
-        buttonsPanel.add(imageTransformButton);
-        buttonsPanel.add(imageTransformSaveButton);
-        buttonsPanel.add(imageTransformCancelButton);
-
-        imageTransformSaveButton.setVisible(false);
-        imageTransformCancelButton.setVisible(false);
-
-        previewCnt.add(imagePlayControls = new PlayerControls(mainPanel, imagePanel, buttonsPanel), BorderLayout.SOUTH);
+        previewCnt.add(imagePlayControls = new PlayerControls(mainPanel, imagePanel, null), BorderLayout.SOUTH);
         imagePlayControls.setMedia(imagePanel);
         previewPanel.add(previewCnt, BorderLayout.CENTER);
         JLabel prevIntLabel = new HeaderLabel(mainPanel.translate("swfpreview.internal"));
@@ -2796,6 +2810,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditButtonsPanel.add(replaceMorphShapeButton);
         displayEditButtonsPanel.add(replaceMorphShapeUpdateBoundsButton);
         displayEditButtonsPanel.add(morphShowPanel);
+        displayEditSimpleEditorButton = createSimpleEditorButton();
+        displayEditButtonsPanel.add(displayEditSimpleEditorButton);
         return displayEditButtonsPanel;
     }
 
@@ -2838,8 +2854,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if ((timelined instanceof Tag) && ((Tag) timelined).isReadOnly()) {
             imageTransformButton.setVisible(false);
         }
-        imageTransformSaveButton.setVisible(false);
-        imageTransformCancelButton.setVisible(false);
+        setImageTransformOperationButtonsVisible(false);
         imagePanel.setAltSelectionEnabled(true);
         imagePanel.setTimelined(timelined, swf, frame, showObjectsUnderCursor, autoPlay, frozen, alwaysDisplay, muted, mutable, allowZoom, frozenButtons, canHaveRuler);
         if (canHaveRuler) {
@@ -2944,6 +2959,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     public void clear() {
+        setSimpleEditorTag(null);
         imagePanel.clearAll();
         displayEditImagePanel.clearAll();
         soundWaveformPanel.setPlayer(null);
@@ -3099,6 +3115,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             private void changed() {
                 displayEditSaveButton.setEnabled(true);
                 displayEditCancelButton.setEnabled(true);
+                updateSimpleEditorButtonsVisibility();
                 displayEditTransformButton.setVisible(false);
                 mainPanel.setEditingStatus();
                 if (Configuration.editorMode.get()) {
@@ -3195,8 +3212,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         setDisplayEditPropertiesVisible(true);
         displayEditSplitPane.setDividerLocation(0.6);
         displayEditGenericPanel.setVisible(!readOnly);
-        displayEditOperationSaveButton.setVisible(false);
-        displayEditOperationCancelButton.setVisible(false);
+        setDisplayEditOperationButtonsVisible(false);
 
         if (Configuration.editorMode.get()) {
             displayEditGenericPanel.setEditMode(!tag.isReadOnly(), tag);
@@ -3370,11 +3386,32 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void setDisplayEditOperationButtonsVisible(boolean visible) {
         displayEditOperationSaveButton.setVisible(visible);
         displayEditOperationCancelButton.setVisible(visible);
+        updateSimpleEditorButtonsVisibility();
+    }
+
+    private void setImageTransformOperationButtonsVisible(boolean visible) {
+        imageTransformSaveButton.setVisible(visible);
+        imageTransformCancelButton.setVisible(visible);
+        updateSimpleEditorButtonsVisibility();
     }
 
     private void reloadDisplayEditAttributes() {
         boolean edit = Configuration.editorMode.get() && !readOnly && !displayEditTag.isReadOnly();
         displayEditGenericPanel.setEditMode(edit, displayEditTag);
+    }
+
+    void setSimpleEditorTag(DrawableTag tag) {
+        simpleEditorTag = tag;
+        updateSimpleEditorButtonsVisibility();
+    }
+
+    private void updateSimpleEditorButtonsVisibility() {
+        imageSimpleEditorButton.setVisible(simpleEditorTag instanceof DefineSpriteTag
+                && !imageTransformCancelButton.isVisible());
+        boolean editingAttributes = displayEditCancelButton.isVisible()
+                && (!Configuration.editorMode.get() || displayEditCancelButton.isEnabled());
+        displayEditSimpleEditorButton.setVisible((simpleEditorTag instanceof ShapeTag || simpleEditorTag instanceof ButtonTag)
+                && !displayEditOperationCancelButton.isVisible() && !editingAttributes);
     }
 
     public void setImageReplaceButtonVisible(boolean showImage, boolean showAlpha, boolean showShape, boolean showSound, boolean showMovie, boolean showMorphShape, boolean showSprite) {
@@ -3882,7 +3919,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditTransformButton.setVisible(false);
         displayEditSaveButton.setVisible(true);
         displayEditCancelButton.setVisible(true);
-        displayEditAutoPreviewCheckBox.setVisible(true);        
+        displayEditAutoPreviewCheckBox.setVisible(true);
+        updateSimpleEditorButtonsVisibility();
         replaceShapeButton.setVisible(false);
         replaceMorphShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
@@ -4092,8 +4130,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             imageTransformScrollPane.setVisible(false);
             imagePanel.freeTransformDepth(-1);
             imageTransformButton.setVisible(true);
-            imageTransformCancelButton.setVisible(false);
-            imageTransformSaveButton.setVisible(false);
+            setImageTransformOperationButtonsVisible(false);
 
             TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
             if (item instanceof TagScript) {
@@ -4141,8 +4178,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageTransformScrollPane.setVisible(false);
         imagePanel.freeTransformDepth(-1);
         imageTransformButton.setVisible(true);
-        imageTransformCancelButton.setVisible(false);
-        imageTransformSaveButton.setVisible(false);
+        setImageTransformOperationButtonsVisible(false);
         mainPanel.clearEditingStatus();
         mainPanel.reload(true);
 
@@ -4291,8 +4327,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         replaceSpriteButton.setVisible(false);
         imageTransformButton.setVisible(false);
-        imageTransformSaveButton.setVisible(true);
-        imageTransformCancelButton.setVisible(true);
+        setImageTransformOperationButtonsVisible(true);
         imageTransformScrollPane.setVisible(true);
         mainPanel.setEditingStatus();
 
@@ -4401,6 +4436,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             setDisplayEditOperationButtonsVisible(false);
             setDisplayEditPropertiesVisible(true);
         }
+        updateSimpleEditorButtonsVisibility();
         updateEffectivePlaceObjectPanel();
         setEffectivePlaceObjectVisible(readOnly || displayEditTag.isReadOnly() || !Configuration.editorMode.get());
     }

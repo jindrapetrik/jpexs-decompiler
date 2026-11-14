@@ -5602,20 +5602,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void showInEasyViewActionPerformed(ActionEvent evt) {
-        TreeItem item = getCurrentItem();
-        if (item instanceof TagScript) {
-            item = ((TagScript) item).getTag();
-        }
-        if (!(item instanceof Timelined) && !(item instanceof ShapeTag)) {
-            return;
-        }
-        mainPanel.showView(MainPanel.VIEW_EASY);
-        if (item instanceof ShapeTag) {            
-            mainPanel.easyPanel.editShape((ShapeTag) item);
-        } else {
-            mainPanel.easyPanel.setTimelined((Timelined) item);        
-        }
-        mainPanel.updateMenu();
+        mainPanel.showInEasyView(getCurrentItem());
     }
 
     private void showInFlashPlayerActionPerformed(ActionEvent evt) {
