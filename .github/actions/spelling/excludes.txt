@@ -136,3 +136,6 @@ Lexer\.java$
 ^Dockerfile$
 (?:^|/)DoAction\.as$
 ^libsrc/ffdec_lib/testdata/motion_object/
+\.swz$
+\.swc$
+^libsrc/ffdec_lib/testdata/components/

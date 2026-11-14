@@ -148,6 +148,7 @@ apiprivate
 apiversioning
 apng
 apperr
+appimage
 applytype
 appmenu
 APPWINDOW
@@ -1330,6 +1331,7 @@ ftime
 ftimeline
 Ftm
 ftn
+ftr
 ftrait
 fuer
 FULLAND
@@ -2010,6 +2012,7 @@ Listswf
 listswfprofiles
 Liushui
 livedocs
+livepreview
 lix
 ljcb
 ljrb
@@ -3354,6 +3357,7 @@ SMALLICON
 smallpos
 smallval
 smartcard
+smartclip
 smartfoxserver
 SMask
 sme
