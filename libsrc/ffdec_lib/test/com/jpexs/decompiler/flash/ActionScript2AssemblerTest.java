@@ -646,4 +646,35 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "}");
     }
 
+    @Test
+    public void testStackSwapVariable() {
+        String res = decompilePcode("Push \"\"\n"
+                + "Push 7\n"
+                + "Push \"_root\"\n"
+                + "Push \"_parent\"\n"
+                + "GetVariable\n"
+                + "StackSwap\n"
+                + "GetVariable\n"
+                + "Push \"hasBall\"\n"
+                + "GetMember\n"
+                + "Equals2\n"
+                + "PushDuplicate\n"
+                + "If loc007a\n"
+                + "Pop\n"
+                + "Push \"_parent\"\n"
+                + "GetVariable\n"
+                + "Push \"_parent\"\n"
+                + "GetMember\n"
+                + "Push \"_parent\"\n"
+                + "GetMember\n"
+                + "Push \"_root\"\n"
+                + "GetVariable\n"
+                + "Push \"hasBall\"\n"
+                + "GetMember\n"
+                + "Equals2\n"
+                + "loc007a:SetProperty");
+        res = cleanPCode(res);
+        assertEquals(res, "_visible = _parent == _root.hasBall || _parent._parent._parent == _root.hasBall;");
+    }
+
 }

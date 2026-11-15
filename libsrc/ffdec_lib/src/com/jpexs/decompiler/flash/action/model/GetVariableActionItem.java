@@ -28,6 +28,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -39,7 +40,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class GetVariableActionItem extends ActionItem {
+public class GetVariableActionItem extends ActionItem implements SimpleValue {
 
     /**
      * Name
@@ -70,6 +71,11 @@ public class GetVariableActionItem extends ActionItem {
      * Print obfuscated name
      */
     public boolean printObfuscatedName = false;
+    
+    /**
+     * Is simple value
+     */
+    private boolean isSimple = false;
 
     @Override
     public String toString() {
@@ -199,5 +205,14 @@ public class GetVariableActionItem extends ActionItem {
     @Override
     public boolean hasReturnValue() {
         return true;
+    }
+
+    @Override
+    public boolean isSimpleValue() {
+        return isSimple;
+    }
+    
+    public void setSimple(boolean value) {
+        this.isSimple = value;
     }
 }

@@ -1226,7 +1226,7 @@ public class Graph {
             resolvePopsAfterExitIfs(ret);
         }
 
-        if (!hasEmptyStackPops.getVal() || !containsPopItems(ret)) {
+        if (!hasEmptyStackPops.getVal() && !containsPopItems(ret)) {
             promotePushItemsToCommands(ret);
         }
 

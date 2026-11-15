@@ -33,6 +33,7 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,9 @@ public class ActionGetVariable extends Action {
             GetVariableActionItem gvt = new GetVariableActionItem(this, lineStartAction, name);
             gvt.setComputedValue(computedVal);
             stack.push(gvt);
+            if (Arrays.asList("_root", "_parent", "_global", "this", "super", "arguments").contains(nameStr) || (nameStr != null && nameStr.matches("^level_[0-9]+$"))) {
+                gvt.setSimple(true);
+            }
         }
     }
 
