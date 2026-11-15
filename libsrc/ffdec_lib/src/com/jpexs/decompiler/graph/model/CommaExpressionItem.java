@@ -79,6 +79,9 @@ public class CommaExpressionItem extends GraphTargetItem {
                 writer.allowWrapHere().append(",");
             }
             t.toString(writer, localData);
+            if (!t.comment.isEmpty()) {
+                writer.append("/*").append(t.comment).append("*/");
+            }
             first = false;
         }
         return writer;

@@ -1460,18 +1460,21 @@ public class Graph {
     }
 
     private void promotePushItemsToCommands(List<GraphTargetItem> list) {
-        for (int i = 0; i < list.size(); i++) {
-            GraphTargetItem ti = list.get(i);
-            if (ti instanceof PushItem) {
-                PushItem pi = (PushItem) ti;
-                pi.asComment = true;
-                pi.comment = "unpopped";
-            }
-            if (ti instanceof Block) {
-                for (List<GraphTargetItem> sub : ((Block) ti).getSubs()) {
-                    promotePushItemsToCommands(sub);
+        GraphTargetVisitorInterface visitor = new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem item) {
+                if (item instanceof PushItem) {
+                    PushItem pi = (PushItem) item;
+                    pi.asComment = true;
+                    pi.comment = "unpopped";
                 }
+                return true;
             }
+        };
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem ti = list.get(i);    
+            visitor.visit(ti);
+            ti.visitRecursively(visitor);
         }
     }
 
