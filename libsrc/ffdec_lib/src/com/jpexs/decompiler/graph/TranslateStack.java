@@ -285,6 +285,9 @@ public class TranslateStack extends Stack<GraphTargetItem> {
                     } else if (pi.value instanceof TemporaryItem) {
                         connectedOutput.remove(i);
                         return pi.value;
+                    } else if ((pi.value instanceof SimpleValue) && (((SimpleValue) pi.value).isSimpleValue()) && !(pi.value instanceof DuplicateItem)) {
+                        connectedOutput.remove(i);
+                        return pi.value;
                     } else {
                         int temp = localData.maxTempIndex.getVal() + 1;
                         localData.maxTempIndex.setVal(temp);

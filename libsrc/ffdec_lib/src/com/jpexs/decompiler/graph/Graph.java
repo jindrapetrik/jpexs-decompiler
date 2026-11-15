@@ -4894,11 +4894,18 @@ public class Graph {
                                 filteredOnTrue = filteredOnFalse;
                                 //filteredOnFalse = tmp;
                             }
-                            if (!stack.isEmpty() && ((filteredOnTrue.size() == 1 && (filteredOnTrue.get(0) instanceof PopItem)) || ((filteredOnTrue.size() >= 2) && (filteredOnTrue.get(0) instanceof PopItem) && (filteredOnTrue.get(filteredOnTrue.size() - 1) instanceof PushItem)))) {
-                                if (filteredOnTrue.size() > 1) {
-                                    PushItem pi = (PushItem) filteredOnTrue.get(filteredOnTrue.size() - 1);
-                                    GraphTargetItem pushedValue = pi.value;
-                                    GraphTargetItem rightSide = ((PushItem) filteredOnTrue.get(filteredOnTrue.size() - 1)).value;
+                            int last = filteredOnTrue.size() - 1;
+                            if (!stack.isEmpty() && last >= 0 && filteredOnTrue.get(0) instanceof PopItem
+                                    && (last == 0 || (filteredOnTrue.get(last) instanceof PushItem
+                                    && filteredOnTrue.subList(1, last).stream().allMatch(GraphTargetItem::hasReturnValue)))) {
+                                if (last > 0) {
+                                    GraphTargetItem rightSide = filteredOnTrue.get(last).value;
+                                    if (last > 1) {
+                                        // Evaluate these expressions only when the right operand is reached.
+                                        List<GraphTargetItem> rightCommands = new ArrayList<>(filteredOnTrue.subList(1, last));
+                                        rightCommands.add(rightSide);
+                                        rightSide = new CommaExpressionItem(dialect, null, localData.lineStartInstruction, rightCommands);
+                                    }
                                     GraphTargetItem prevExpr = stack.pop();
                                     GraphTargetItem leftSide = expr.getNotCoercedNoDup();
                                     GraphTargetItem invertedLeftSide = leftSide;

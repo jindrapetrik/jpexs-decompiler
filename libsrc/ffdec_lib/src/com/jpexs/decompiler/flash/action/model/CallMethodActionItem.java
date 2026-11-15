@@ -65,6 +65,7 @@ public class CallMethodActionItem extends ActionItem {
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visitAll(arguments);
         visitor.visit(scriptObject);
+        visitor.visit(methodName);
     }
 
     /**

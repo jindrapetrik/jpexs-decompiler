@@ -896,7 +896,7 @@ public abstract class Action implements GraphSourceItem {
      * @return long value
      */
     protected long popLong(TranslateStack stack) {
-        GraphTargetItem item = stack.pop();
+        GraphTargetItem item = stack.pop().getThroughDuplicate();
         if (item instanceof DirectValueActionItem) {
             return (long) (double) EcmaScript.toNumberAs2(((DirectValueActionItem) item).value);
         }

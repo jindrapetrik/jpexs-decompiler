@@ -698,4 +698,38 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "sidespeed *= 1.1;");
     }
 
+    @Test
+    public void testStackSwapCallMethodTemporaries() {
+        String res = decompilePcode("Push 6\n"
+                + "Push 1\n"
+                + "Push \"gotoAndStop\"\n"
+                + "Push \"clip\"\n"
+                + "GetVariable\n"
+                + "StackSwap\n"
+                + "CallMethod\n"
+                + "Pop");
+        assertEquals(cleanPCode(res), "var _temp_3 = 6;\n"
+                + "var _temp_1 = \"gotoAndStop\";\n"
+                + "clip[_temp_1](_temp_3);");
+    }
+
+    @Test
+    public void testStackSwapShortCircuitTemporaries() {
+        String left = "Push \"ready\"\n"
+                + "GetVariable\n"
+                + "PushDuplicate\n";
+        String right = "If locEnd\n"
+                + "Pop\n"
+                + "Push \"key\"\n"
+                + "Push \"target\"\n"
+                + "GetVariable\n"
+                + "StackSwap\n"
+                + "GetMember\n"
+                + "locEnd:Trace";
+        assertEquals(cleanPCode(decompilePcode(left + "Not\n" + right)),
+                "var _temp_2;\ntrace(ready && ((_temp_2 = \"key\",target[_temp_2])));");
+        assertEquals(cleanPCode(decompilePcode(left + right)),
+                "var _temp_2;\ntrace(ready || ((_temp_2 = \"key\",target[_temp_2])));");
+    }
+
 }

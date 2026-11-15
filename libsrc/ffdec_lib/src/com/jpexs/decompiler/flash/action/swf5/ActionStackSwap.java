@@ -72,7 +72,7 @@ public class ActionStackSwap extends Action {
         GraphTargetItem o2 = stack.pop();
 
         if ((((o1 instanceof SimpleValue) && ((SimpleValue) o1).isSimpleValue() && !(o1 instanceof DuplicateItem)))
-                && (((o2 instanceof SimpleValue) && ((SimpleValue) o2).isSimpleValue() && !(o2 instanceof DuplicateItem)))) {
+                || (((o2 instanceof SimpleValue) && ((SimpleValue) o2).isSimpleValue() && !(o2 instanceof DuplicateItem)))) {
             stack.push(o1);
             stack.push(o2);
             o1.getMoreSrc().add(new GraphSourceItemPos(this, 0));
