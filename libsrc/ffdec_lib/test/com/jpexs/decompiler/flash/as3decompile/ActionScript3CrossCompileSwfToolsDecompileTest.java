@@ -86,7 +86,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
 
     @Test
     public void testTryCatchInIf() {
-        decompileMethod("swftools", "testTryCatchInIf", "var _loc1_:int = int(Math.random());\r\n"
+        decompileMethod("swftools", "testTryCatchInIf", "var _loc1_:int = Math.random();\r\n"
                 + "if(_loc1_ > 10)\r\n"
                 + "{\r\n"
                 + "try\r\n"
@@ -103,7 +103,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
 
     @Test
     public void testTryCatchInIf2() {
-        decompileMethod("swftools", "testTryCatchInIf2", "var _loc1_:int = int(Math.random());\r\n"
+        decompileMethod("swftools", "testTryCatchInIf2", "var _loc1_:int = Math.random();\r\n"
                 + "if(_loc1_ > 10)\r\n"
                 + "{\r\n"
                 + "try\r\n"
