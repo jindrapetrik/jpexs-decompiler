@@ -677,4 +677,25 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         assertEquals(res, "_visible = _parent == _root.hasBall || _parent._parent._parent == _root.hasBall;");
     }
 
+    @Test
+    public void testStackSwapSetVariableTemporaries() {
+        String res = decompilePcode("Push \"upspeed\"\n"
+                + "Push 1.1\n"
+                + "Push \"upspeed\"\n"
+                + "GetVariable\n"
+                + "StackSwap\n"
+                + "Multiply\n"
+                + "SetVariable\n"
+                + "Push \"sidespeed\"\n"
+                + "Push \"sidespeed\"\n"
+                + "GetVariable\n"
+                + "Push 1.1\n"
+                + "Multiply\n"
+                + "SetVariable");
+        assertEquals(cleanPCode(res), "var _temp_2 = \"upspeed\";\n"
+                + "var _temp_1 = 1.1;\n"
+                + "set(_temp_2,upspeed * _temp_1);\n"
+                + "sidespeed *= 1.1;");
+    }
+
 }

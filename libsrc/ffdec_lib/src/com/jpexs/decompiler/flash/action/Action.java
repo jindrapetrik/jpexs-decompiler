@@ -1318,6 +1318,10 @@ public abstract class Action implements GraphSourceItem {
             logger.log(Level.FINE, "Entering {0}-{1}{2}", new Object[]{start, end, actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""});
         }
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, variables, functions, graph.getUninitializedClassTraits(), usedDeobfuscations, new ArrayList<>(), new ArrayList<>());
+        if (stack.localData != null) {
+            // Both the actions and stack pops can allocate temporaries in this graph.
+            localData.maxTempIndex = stack.localData.maxTempIndex;
+        }
         localData.lineStartAction = lineStartActionRef.getVal();
         int ip = start;
         boolean isWhile = false;
