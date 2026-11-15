@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.helpers.ByteArrayRange;
@@ -37,8 +38,14 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import static org.testng.Assert.*;
+import org.testng.annotations.BeforeClass;
 
 public class XflSoundExportTest {
+    
+    @BeforeClass
+    public void init() {
+        Configuration.useFoldersInFlaExport.set(false);
+    }
 
     @Test
     public void pcmCacheUsesDecodedSampleCountAndBitDepth() throws Exception {

@@ -62,12 +62,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import static org.testng.Assert.*;
+import org.testng.annotations.BeforeClass;
 
 /**
  *
  * @author JPEXS
  */
 public class XFLConverterTest {
+    
+    @BeforeClass
+    public void init() {
+        Configuration.useFoldersInFlaExport.set(false);
+    }
+    
     @DataProvider(name = "provideFiles")
     public Object[][] provideFiles() {
         return new Object[][]{
