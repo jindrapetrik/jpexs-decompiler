@@ -1226,7 +1226,11 @@ public class Graph {
             resolvePopsAfterExitIfs(ret);
         }
 
-        if (!hasEmptyStackPops.getVal() && !containsPopItems(ret)) {
+        //Note: hasEmptyStack does not work as && / || operator uses pushduplicate+pop
+        //if (!hasEmptyStackPops.getVal() && 
+        
+        
+        if (!containsPopItems(ret)) {
             promotePushItemsToCommands(ret);
         }
 
