@@ -2805,9 +2805,10 @@ public class Graph {
                         if (ti instanceof LabelItem) {
                             LabelItem label = (LabelItem) ti;
                             if (label.labelName.equals(gi.labelName)) {
-                                if (blk.get(blk.size() - 1) instanceof ExitItem) {
-                                    int siz = blk.size();
-                                    for (int k = 0; k < siz - j; k++) {
+                                int size = blk.size();
+                                // Keep the goto if moving its target would put a block inside itself.
+                                if (blk.get(size - 1) instanceof ExitItem && !containsCommandList(blk, j, list)) {
+                                    for (int k = 0; k < size - j; k++) {
                                         list.add(i + 1 + k, blk.remove(j));
                                     }
                                     blk.add(j, list.remove(i));
@@ -2820,6 +2821,28 @@ public class Graph {
             }
         }
         alreadyProcessedBlocks.add(list);
+    }
+
+    private static boolean containsCommandList(List<GraphTargetItem> commands, int startIndex, List<GraphTargetItem> target) {
+        Set<List<GraphTargetItem>> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        Deque<List<GraphTargetItem>> pending = new ArrayDeque<>();
+        pending.add(commands);
+        while (!pending.isEmpty()) {
+            List<GraphTargetItem> current = pending.removeLast();
+            if (current == target) {
+                return true;
+            }
+            if (!visited.add(current)) {
+                continue;
+            }
+            for (int i = current == commands ? startIndex : 0; i < current.size(); i++) {
+                GraphTargetItem item = current.get(i);
+                if (item instanceof Block) {
+                    pending.addAll(((Block) item).getSubs());
+                }
+            }
+        }
+        return false;
     }
 
     /**
