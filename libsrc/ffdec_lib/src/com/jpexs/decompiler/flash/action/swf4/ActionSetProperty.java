@@ -99,11 +99,11 @@ public class ActionSetProperty extends Action {
                 try {
                     indexInt = Integer.parseInt(((DirectValueActionItem) index).toString());
                 } catch (NumberFormatException nfe) {
-                    Logger.getLogger(ActionGetProperty.class.getName()).log(Level.SEVERE, "Invalid property index: {0}", index.toString());
+                    Logger.getLogger(ActionGetProperty.class.getName()).log(Level.SEVERE, path + ": Invalid property index: {0}", index.toString());
                 }
             }
         } else {
-            Logger.getLogger(ActionGetProperty.class.getName()).log(Level.SEVERE, "Invalid property index: {0}", index.getClass().getSimpleName());
+            Logger.getLogger(ActionGetProperty.class.getName()).log(Level.SEVERE, path + ": Invalid property index: {0}", index.getClass().getSimpleName());
         }
         if (value.getThroughDuplicate() instanceof IncrementActionItem) {
             GraphTargetItem obj = ((IncrementActionItem) value).object;
