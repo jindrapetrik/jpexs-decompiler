@@ -1573,6 +1573,21 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testDescendantsPreservesNameTemporary() throws Exception {
+        decompilePCodeWithLines("getlex QName(PackageNamespace(\"\"),\"xml\")\n"
+                + "getlocal1\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"marker\"\n"
+                + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "getdescendants MultinameL([PackageNamespace(\"\")])\n"
+                + "returnvalue\n",
+                "         var _temp_2:* = xml;\n"
+                + "         var _temp_1:* = param1;\n"
+                + "         trace(\"marker\");\n"
+                + "         return _temp_2..[_temp_1];\n");
+    }
+
+    @Test
     public void testSlotIncrementWithTempRegister() throws Exception {
         //ASC compiles i++ of a script variable (a slot of the global scope)
         //with a temporary register, killed at the end

@@ -78,6 +78,9 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
         visitor.visit(object);
         visitor.visit(propertyName);
         visitor.visit(value);
+        if (compoundValue != null) {
+            visitor.visit(compoundValue);
+        }
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -172,6 +173,20 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        if (obj != null) {
+            visitor.visit(obj);
+        }
+        if (ns != null) {
+            visitor.visit(ns);
+        }
+        if (nameItem != null) {
+            visitor.visit(nameItem);
+        }
+        super.visit(visitor);
     }
 
     @Override

@@ -158,5 +158,8 @@ public class VariableActionItem extends ActionItem {
         if (storeValue != null) {
             visitor.visit(storeValue);
         }
+        if (it != null) {
+            visitor.visit(it);
+        }
     }        
 }

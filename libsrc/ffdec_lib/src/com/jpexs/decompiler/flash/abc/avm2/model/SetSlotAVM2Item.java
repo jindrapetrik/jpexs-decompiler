@@ -82,6 +82,9 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         if (value != null) {
             visitor.visit(value);
         }
+        if (compoundValue != null) {
+            visitor.visit(compoundValue);
+        }
     }
 
     @Override

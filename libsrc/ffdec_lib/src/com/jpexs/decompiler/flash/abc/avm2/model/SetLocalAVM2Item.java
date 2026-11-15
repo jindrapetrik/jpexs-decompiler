@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -100,6 +101,14 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.regIndex = regIndex;
         this.type = type;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        super.visit(visitor);
+        if (compoundValue != null) {
+            visitor.visit(compoundValue);
+        }
     }
 
     @Override

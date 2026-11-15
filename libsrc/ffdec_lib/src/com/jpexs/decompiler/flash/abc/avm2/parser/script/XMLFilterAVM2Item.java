@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -55,6 +56,12 @@ public class XMLFilterAVM2Item extends AVM2Item {
         super(null, null, NOPRECEDENCE, value);
         this.openedNamespaces = openedNamespaces;
         this.object = object;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(object);
+        super.visit(visitor);
     }
 
     @Override

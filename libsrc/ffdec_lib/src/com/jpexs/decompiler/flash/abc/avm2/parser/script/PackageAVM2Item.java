@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -58,6 +59,15 @@ public class PackageAVM2Item extends AVM2Item {
         this.importedClasses = importedClasses;
         this.items = items;
         this.packageName = packageName;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visitAll(items);
+    }
+
+    @Override
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
     }
 
     @Override

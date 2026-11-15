@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -61,6 +62,14 @@ public class FSCommandActionItem extends ActionItem {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.command = command;
         this.parameter = parameter;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(command);
+        if (parameter != null) {
+            visitor.visit(parameter);
+        }
     }
 
     @Override

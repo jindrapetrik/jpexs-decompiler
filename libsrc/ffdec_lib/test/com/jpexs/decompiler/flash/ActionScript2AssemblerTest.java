@@ -768,4 +768,41 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "set(_temp_1,_root.formation);");
     }
 
+    @Test
+    public void testCallFunctionPreservesNameTemporary() {
+        String res = decompilePcode("Push 0\n"
+                + "Push \"functionName\"\n"
+                + "GetVariable\n"
+                + "Push \"flag\"\n"
+                + "Push 1\n"
+                + "SetVariable\n"
+                + "CallFunction\n"
+                + "Pop");
+        assertEquals(cleanPCode(res), "var _temp_1 = functionName;\n"
+                + "flag = 1;\n"
+                + "_temp_1();");
+    }
+
+    @Test
+    public void testTellTargetPreservesTargetTemporary() {
+        String res = decompilePcode("Push \"memberName\"\n"
+                + "GetVariable\n"
+                + "Push \"flag\"\n"
+                + "Push 1\n"
+                + "SetVariable\n"
+                + "Push \"obj\"\n"
+                + "GetVariable\n"
+                + "StackSwap\n"
+                + "GetMember\n"
+                + "SetTarget2\n"
+                + "Play\n"
+                + "SetTarget \"\"");
+        assertEquals(cleanPCode(res), "var _temp_1 = memberName;\n"
+                + "flag = 1;\n"
+                + "tellTarget(obj[_temp_1])\n"
+                + "{\n"
+                + "play();\n"
+                + "}");
+    }
+
 }

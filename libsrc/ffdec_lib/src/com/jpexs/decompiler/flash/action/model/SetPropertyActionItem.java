@@ -29,6 +29,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -94,6 +95,12 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
         super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.target = target;
         this.propertyIndex = propertyIndex;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(target);
+        super.visit(visitor);
     }
 
     @Override

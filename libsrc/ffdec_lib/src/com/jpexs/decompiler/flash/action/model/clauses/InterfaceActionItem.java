@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -57,6 +58,12 @@ public class InterfaceActionItem extends ActionItem {
         super(null, null, NOPRECEDENCE);
         this.name = name;
         this.superInterfaces = superInterfaces;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(name);
+        visitor.visitAll(superInterfaces);
     }
 
     @Override

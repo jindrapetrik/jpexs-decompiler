@@ -115,6 +115,9 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
         if (value != null) {
             visitor.visit(value);
         }
+        if (compoundValue != null) {
+            visitor.visit(compoundValue);
+        }
     }
 
     private boolean resultNeeded() {

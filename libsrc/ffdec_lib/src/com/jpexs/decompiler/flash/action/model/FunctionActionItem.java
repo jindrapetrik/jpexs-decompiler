@@ -172,11 +172,15 @@ public class FunctionActionItem extends ActionItem {
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
+        visitNoBlock(visitor);
         visitor.visitAll(actions);
     }
 
     @Override
     public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+        if (calculatedFunctionName != null) {
+            visitor.visit(calculatedFunctionName);
+        }
 
     }
 

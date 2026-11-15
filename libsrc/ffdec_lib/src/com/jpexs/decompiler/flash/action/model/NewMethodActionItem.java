@@ -65,6 +65,7 @@ public class NewMethodActionItem extends ActionItem {
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visit(scriptObject);
         visitor.visitAll(arguments);
+        visitor.visit(methodName);
     }
 
     /**
