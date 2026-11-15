@@ -1112,9 +1112,11 @@ public class InstancePropertiesPanel extends AbstractPropertiesPanel {
         boolean visible = state != null && state.depth > 0 && state.depth <= limit;
         if (visible != maskingVisible) {
             setCardVisible("masking", visible);
+            /*
             if (visible) {
                 setCardOpened("masking", true);
             }
+            */
             maskingVisible = visible;
         }
         if (visible) {
