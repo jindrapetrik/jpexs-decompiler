@@ -692,9 +692,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "Push 1.1\n"
                 + "Multiply\n"
                 + "SetVariable");
-        assertEquals(cleanPCode(res), "var _temp_2 = \"upspeed\";\n"
-                + "var _temp_1 = 1.1;\n"
-                + "set(_temp_2,upspeed * _temp_1);\n"
+        assertEquals(cleanPCode(res), "upspeed *= 1.1;\n"
                 + "sidespeed *= 1.1;");
     }
 
@@ -708,9 +706,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "StackSwap\n"
                 + "CallMethod\n"
                 + "Pop");
-        assertEquals(cleanPCode(res), "var _temp_3 = 6;\n"
-                + "var _temp_1 = \"gotoAndStop\";\n"
-                + "clip[_temp_1](_temp_3);");
+        assertEquals(cleanPCode(res), "clip.gotoAndStop(6);");
     }
 
     @Test
@@ -721,15 +717,16 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         String right = "If locEnd\n"
                 + "Pop\n"
                 + "Push \"key\"\n"
+                + "GetVariable\n"
                 + "Push \"target\"\n"
                 + "GetVariable\n"
                 + "StackSwap\n"
                 + "GetMember\n"
                 + "locEnd:Trace";
         assertEquals(cleanPCode(decompilePcode(left + "Not\n" + right)),
-                "var _temp_2;\ntrace(ready && ((_temp_2 = \"key\",target[_temp_2])));");
+                "var _temp_2;\ntrace(ready && ((_temp_2 = key,target[_temp_2])));");
         assertEquals(cleanPCode(decompilePcode(left + right)),
-                "var _temp_2;\ntrace(ready || ((_temp_2 = \"key\",target[_temp_2])));");
+                "var _temp_2;\ntrace(ready || ((_temp_2 = key,target[_temp_2])));");
     }
 
     @Test
