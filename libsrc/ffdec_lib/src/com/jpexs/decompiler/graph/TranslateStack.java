@@ -57,6 +57,10 @@ public class TranslateStack extends Stack<GraphTargetItem> {
 
     private List<GraphTargetItem> connectedOutput = null;
 
+    private List<GraphTargetItem> precedingOutput;
+
+    private int precedingOutputStart;
+
     private int prevOutputSize = 0;
 
     private Map<String, GraphTargetItem> marks = new HashMap<>();
@@ -87,6 +91,11 @@ public class TranslateStack extends Stack<GraphTargetItem> {
         this.prevOutputSize = prevOutputSize;
         this.connectedOutput = connectedOutput;
         this.localData = localData;
+    }
+
+    void setPrecedingOutput(List<GraphTargetItem> output, int start) {
+        precedingOutput = output;
+        precedingOutputStart = start;
     }
 
     @Override
@@ -260,41 +269,9 @@ public class TranslateStack extends Stack<GraphTargetItem> {
             if (!isEmpty()) {
                 return pop();
             }
-            for (int i = connectedOutput.size() - 1; i >= 0; i--) {
-                GraphTargetItem item = connectedOutput.get(i);
-                if (item instanceof Block) {
-                    break;
-                }
-                if (item instanceof PushItem) {
-                    PushItem pi = (PushItem) item;
-                    if (pi.value instanceof SetTemporaryItem) {
-                        SetTemporaryItem st = (SetTemporaryItem) pi.value;
-                        connectedOutput.set(i, st);
-                        return new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, st.tempIndex);
-                    } else if (pi.value instanceof DuplicateSourceItem) {
-                        DuplicateSourceItem ds = (DuplicateSourceItem) pi.value;
-                        //connectedOutput.set(i, new SetTemporaryItem(pi.dialect, ds.getSrc(), ds.getLineStartItem(), ds.value, ds.tempIndex,"push"));
-                        connectedOutput.remove(i);
-                        return ds; //new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), ds.value, ds.tempIndex);
-                    } else if (pi.value instanceof DuplicateItem) {
-                        DuplicateItem d = (DuplicateItem) pi.value;
-                        //connectedOutput.remove(i);                       
-                        //connectedOutput.set(i, new SetTemporaryItem(pi.dialect, d.getSrc(), d.getLineStartItem(), d.value, d.tempIndex));
-                        connectedOutput.remove(i);
-                        return new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, d.tempIndex);
-                    } else if (pi.value instanceof TemporaryItem) {
-                        connectedOutput.remove(i);
-                        return pi.value;
-                    } else if ((pi.value instanceof SimpleValue) && (((SimpleValue) pi.value).isSimpleValue()) && !(pi.value instanceof DuplicateItem)) {
-                        connectedOutput.remove(i);
-                        return pi.value;
-                    } else {
-                        int temp = localData.maxTempIndex.getVal() + 1;
-                        localData.maxTempIndex.setVal(temp);
-                        connectedOutput.set(i, new SetTemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, temp, "push", 1));
-                        return new TemporaryItem(pi.dialect, pi.value.getSrc(), pi.value.getLineStartItem(), pi.value, temp);
-                    }
-                }
+            GraphTargetItem value = popFromOutput(connectedOutput, 0);
+            if (value != null) {
+                return value;
             }
         }
 
@@ -313,6 +290,41 @@ public class TranslateStack extends Stack<GraphTargetItem> {
             }
         }
         return super.pop();
+    }
+
+    private GraphTargetItem popFromOutput(List<GraphTargetItem> output, int start) {
+        for (int i = output.size() - 1; i >= start; i--) {
+            GraphTargetItem item = output.get(i);
+            if (item instanceof Block) {
+                return null;
+            }
+            if (!(item instanceof PushItem)) {
+                continue;
+            }
+            PushItem push = (PushItem) item;
+            GraphTargetItem value = push.value;
+            if (value instanceof SetTemporaryItem) {
+                output.set(i, value);
+                return new TemporaryItem(push.dialect, value.getSrc(), value.getLineStartItem(), value, ((SetTemporaryItem) value).tempIndex);
+            }
+            if (value instanceof DuplicateItem) {
+                output.remove(i);
+                return new TemporaryItem(push.dialect, value.getSrc(), value.getLineStartItem(), value, ((DuplicateItem) value).tempIndex);
+            }
+            if (value instanceof DuplicateSourceItem || value instanceof TemporaryItem
+                    || (value instanceof SimpleValue && ((SimpleValue) value).isSimpleValue())) {
+                output.remove(i);
+                return value;
+            }
+            int temp = localData.maxTempIndex.getVal() + 1;
+            localData.maxTempIndex.setVal(temp);
+            output.set(i, new SetTemporaryItem(push.dialect, value.getSrc(), value.getLineStartItem(), value, temp, "push", 1));
+            return new TemporaryItem(push.dialect, value.getSrc(), value.getLineStartItem(), value, temp);
+        }
+        if (output == connectedOutput && precedingOutput != null) {
+            return popFromOutput(precedingOutput, precedingOutputStart);
+        }
+        return null;
     }
 
     public void moveToStack(List<GraphTargetItem> output) {        

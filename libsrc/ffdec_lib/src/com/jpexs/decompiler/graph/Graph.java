@@ -4099,6 +4099,8 @@ public class Graph {
 
         Stack<LoopLocalData> loopStack = new Stack<>();
         GraphPart nextOnePart = null;
+        GraphPart lastTranslatedPart = null;
+        int linearOutputStart = 0;
 
         boolean isLoop = false;
         Loop currentLoop = null;
@@ -4408,6 +4410,13 @@ public class Graph {
             boolean parseNext = true;
 
             //****************************DECOMPILING PART*************
+            // Only recover saved stack values along an unbranched path in this output list.
+            if (isLoop || parent == null || parent != lastTranslatedPart
+                    || parent.nextParts.size() != 1 || parent.nextParts.get(0) != part
+                    || part.refs.size() != 1 || part.refs.get(0) != parent) {
+                linearOutputStart = currentRet.size();
+            }
+            lastTranslatedPart = null;
             if (stack.isEmpty() && (currentRet instanceof GraphPartMarkedArrayList)) {
                 ((GraphPartMarkedArrayList) currentRet).clearCurrentParts();
             }
@@ -4427,6 +4436,7 @@ public class Graph {
                     exHappened = false;
                     try {
                         stack.setConnectedOutput(currentRet.size(), output, localData);
+                        stack.setPrecedingOutput(currentRet, linearOutputStart);
                         code.translatePart(output, this, part, localData, stack, ipStart, part.end, staticOperation, path);
                         if (stack.emptyPopCount > 0) {
                             hasEmptyStackPops.setVal(true);
@@ -4448,6 +4458,8 @@ public class Graph {
                                 break;
                             }
                         }
+                    } finally {
+                        stack.setPrecedingOutput(null, 0);
                     }
                 } while (exHappened);
                 if ((part.end >= code.size() - 1) && getNextParts(localData, part).isEmpty()) {
@@ -4467,6 +4479,7 @@ public class Graph {
                     //return ret;
                 } else {
                     currentRet.addAll(output);
+                    lastTranslatedPart = part;
                 }
             }
 

@@ -732,4 +732,43 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 "var _temp_2;\ntrace(ready || ((_temp_2 = \"key\",target[_temp_2])));");
     }
 
+    @Test
+    public void testStackValueAcrossJump() {
+        String res = decompilePcode("Push \"keyFormation\"\n"
+                + "Push \"_root\"\n"
+                + "GetVariable\n"
+                + "Push \"P1keyFormation\"\n"
+                + "Push \"keyPASS\"\n"
+                + "Push \"_root\"\n"
+                + "GetVariable\n"
+                + "Push \"P1keyPASS\"\n"
+                + "GetMember\n"
+                + "SetVariable\n"
+                + "GetMember\n"
+                + "Jump locAssign\n"
+                + "Push \"unreachable\"\n"
+                + "locAssign:SetVariable");
+        assertEquals(cleanPCode(res), "keyPASS = _root.P1keyPASS;\n"
+                + "keyFormation = _root.P1keyFormation;");
+    }
+
+    @Test
+    public void testStackValueAcrossJumpKeepsEvaluationOrder() {
+        String res = decompilePcode("Push \"targetName\"\n"
+                + "GetVariable\n"
+                + "Push \"_root\"\n"
+                + "GetVariable\n"
+                + "Push \"formation\"\n"
+                + "Push \"targetName\"\n"
+                + "Push \"after\"\n"
+                + "SetVariable\n"
+                + "GetMember\n"
+                + "Jump locAssign\n"
+                + "Push \"unreachable\"\n"
+                + "locAssign:SetVariable");
+        assertEquals(cleanPCode(res), "var _temp_1 = targetName;\n"
+                + "targetName = \"after\";\n"
+                + "set(_temp_1,_root.formation);");
+    }
+
 }
