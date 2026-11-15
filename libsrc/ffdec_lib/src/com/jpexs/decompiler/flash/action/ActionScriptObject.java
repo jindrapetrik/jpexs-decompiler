@@ -18,7 +18,9 @@ package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +39,7 @@ public class ActionScriptObject implements Cloneable {
     /**
      * Members of the object
      */
-    protected Map<String, Object> members = new HashMap<>();
+    protected Map<String, Object> members = new LinkedHashMap<>();
 
     /**
      * Object that this object extends
@@ -152,6 +154,34 @@ public class ActionScriptObject implements Cloneable {
      */
     public List<String> enumerate() {
         return new ArrayList<>(members.keySet());
+    }
+
+    /**
+     * Gets the named members stored directly on this object, in insertion order.
+     *
+     * @return Read-only view of the members
+     */
+    public Map<String, Object> getOwnMembers() {
+        return Collections.unmodifiableMap(members);
+    }
+
+    /**
+     * Sets a member using its literal name.
+     *
+     * @param name Member name
+     * @param value Member value
+     */
+    public void setOwnMember(String name, Object value) {
+        members.put(name, value);
+    }
+
+    /**
+     * Checks whether the object has state outside its own members.
+     *
+     * @return True if the object has indexed properties or inheritance state
+     */
+    public boolean hasNonLiteralState() {
+        return !properties.isEmpty() || extendsObj != null || !implementsObjs.isEmpty();
     }
 
     /**

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -80,6 +81,80 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
         writer.finishHilights();
         return writer.toString().trim().replace("\r\n", "\n");
+    }
+
+    @Test
+    public void testFoldArrayLiteral() throws Exception {
+        String res = decompilePCode("Push \"sample\"\n"
+                + "Push undefined\n"
+                + "Push 40\n"
+                + "Push 2\n"
+                + "Add\n"
+                + "Push 2\n"
+                + "InitArray\n"
+                + "SetVariable\n"
+                + "Push \"sample\"\n"
+                + "GetVariable\n"
+                + "Trace");
+        Assert.assertEquals(res, "sample = [42,undefined];\ntrace(sample);");
+    }
+
+    @Test
+    public void testFoldObjectWithNestedArray() throws Exception {
+        String res = decompilePCode("Push \"sample\"\n"
+                + "Push \"second\"\n"
+                + "Push false\n"
+                + "Push \"first\"\n"
+                + "Push undefined\n"
+                + "Push 40\n"
+                + "Push 2\n"
+                + "Add\n"
+                + "Push 2\n"
+                + "InitArray\n"
+                + "Push 2\n"
+                + "InitObject\n"
+                + "SetVariable\n"
+                + "Push \"sample\"\n"
+                + "GetVariable\n"
+                + "Trace");
+        Assert.assertEquals(res, "sample = {second:false,first:[42,undefined]};\ntrace(sample);");
+    }
+
+    @Test
+    public void testKeepSharedArrayReference() throws Exception {
+        String res = decompilePCode("Push \"a\"\n"
+                + "Push 40\n"
+                + "Push 2\n"
+                + "Add\n"
+                + "Push 1\n"
+                + "InitArray\n"
+                + "SetVariable\n"
+                + "Push \"b\"\n"
+                + "Push \"a\"\n"
+                + "GetVariable\n"
+                + "SetVariable\n"
+                + "Push \"b\"\n"
+                + "GetVariable\n"
+                + "Trace");
+        assertTrue(res.contains("b = a;"), res);
+    }
+
+    @Test
+    public void testKeepFunctionReturningArray() throws Exception {
+        decompilePCode("DefineFunction \"-\" 0 {\n"
+                + "Push 0\n"
+                + "InitArray\n"
+                + "Return\n"
+                + "}\n"
+                + "Push \"result\"\n"
+                + "Push 0\n"
+                + "Push \"-\"\n"
+                + "CallFunction\n"
+                + "SetVariable\n"
+                + "Push \"result\"\n"
+                + "GetVariable\n"
+                + "Trace");
+        assertTrue(getFirstActionTag().getActions().stream().anyMatch(a -> a instanceof ActionDefineFunction));
     }
 
     @DataProvider(name = "provideBasicTrueExpressions")

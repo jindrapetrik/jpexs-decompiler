@@ -62,7 +62,7 @@ public class ActionInitArray extends Action {
 
         ActionScriptArray arr = new ActionScriptArray();
         for (int i = 0; i < num; i++) {
-            arr.setValueAtIndex(i, lda.pop());
+            arr.appendValue(lda.pop());
         }
 
         lda.push(arr);

@@ -69,7 +69,7 @@ public class ActionInitObject extends Action {
         for (int i = 0; i < num; i++) {
             Object val = lda.pop();
             String name = lda.popAsString();
-            obj.setMember(name, val);
+            obj.setOwnMember(name, val);
         }
 
         lda.push(obj);
