@@ -19,6 +19,8 @@ package com.jpexs.decompiler.graph;
 import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,8 +33,69 @@ import java.util.logging.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-/** Differential regression for postdominator membership and candidate order. */
+/** Tests for loop exit selection and postdominator ordering. */
 public class LoopDetectorPostDominatorTest {
+
+    @Test
+    public void testInnerLoopExitsJoinBeforeOuterContinue() throws InterruptedException {
+        assertInnerLoopExit(true);
+    }
+
+    @Test
+    public void testInnerLoopExitsJoinAtBranchingOuterPrecontinue() throws InterruptedException {
+        assertInnerLoopExit(false);
+    }
+
+    private void assertInnerLoopExit(boolean canSkipInnerLoop) throws InterruptedException {
+        GraphPart entry = new GraphPart(0, 0);
+        GraphPart outerCondition = new GraphPart(1, 1);
+        GraphPart innerInit = new GraphPart(2, 2);
+        GraphPart innerCondition = new GraphPart(3, 3);
+        GraphPart innerBody = new GraphPart(4, 4);
+        GraphPart innerIncrement = new GraphPart(5, 5);
+        GraphPart earlyExit = new GraphPart(6, 6);
+        GraphPart naturalExit = new GraphPart(7, 7);
+        GraphPart commonExit = new GraphPart(8, 8);
+        GraphPart reportMissing = new GraphPart(9, 9);
+        GraphPart outerIncrement = new GraphPart(10, 10);
+        GraphPart done = new GraphPart(11, 11);
+
+        connect(entry, outerCondition);
+        connect(outerCondition, innerInit, done);
+        connect(innerInit, innerCondition);
+        if (canSkipInnerLoop) {
+            connect(innerInit, outerIncrement);
+        }
+        connect(innerCondition, innerBody, naturalExit);
+        connect(innerBody, innerIncrement, earlyExit);
+        connect(innerIncrement, innerCondition);
+        connect(earlyExit, commonExit);
+        connect(naturalExit, commonExit);
+        connect(commonExit, outerIncrement, reportMissing);
+        connect(reportMissing, outerIncrement);
+        connect(outerIncrement, outerCondition);
+
+        Set<GraphPart> parts = new LinkedHashSet<>(Arrays.asList(entry, outerCondition, innerInit,
+                innerCondition, innerBody, innerIncrement, earlyExit, naturalExit, commonExit,
+                reportMissing, outerIncrement, done));
+        List<Loop> loops = new ArrayList<>();
+        new LoopDetector().detectLoops(Collections.singletonList(entry), loops, Collections.emptyList(),
+                parts, Collections.emptyList(), Collections.emptyList(), true);
+
+        Assert.assertEquals(loops.size(), 2);
+        Assert.assertSame(loops.get(1).loopContinue, innerCondition);
+        if (!canSkipInnerLoop) {
+            Assert.assertSame(loops.get(0).loopPreContinue, commonExit);
+        }
+        Assert.assertSame(loops.get(1).loopBreak, commonExit);
+    }
+
+    private void connect(GraphPart from, GraphPart... successors) {
+        for (GraphPart to : successors) {
+            from.nextParts.add(to);
+            to.refs.add(from);
+        }
+    }
 
     @Test
     public void testAgainstOrderedSetAlgorithm() throws Exception {

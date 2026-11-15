@@ -4,6 +4,7 @@ import com.jpexs.decompiler.graph.precontinues.GraphPrecontinueDetector;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
@@ -495,6 +496,7 @@ public class LoopDetector {
             //The natural exit of this loop (from its continue part) leading to the precontinue
             //of a parent loop, or to the continue of the direct parent when this loop ends its
             //body (as in a for each), is the code after this loop, not a continue of the parent loop
+            Set<GraphPart> naturalParentContinues = new LinkedHashSet<>();
             for (GraphPartEdge edge : loop.edgesOutside) {
                 if (edge.from == loop.loopContinue
                         && !ignoredEdges.contains(edge)
@@ -502,6 +504,7 @@ public class LoopDetector {
                         && (isParentPreContinueOnly(loop, edge.to)
                         || (loop.parentLoop != null && loop.parentLoop.loopContinue == edge.to))) {
                     parentContinues.remove(edge.to);
+                    naturalParentContinues.add(edge.to);
                 }
             }
 
@@ -561,13 +564,24 @@ public class LoopDetector {
 
             Set<GraphPart> classifiedAbruptTargets = new LinkedHashSet<>(abruptTargets);
             if (!naturalOutParts.isEmpty() && !abruptTargets.isEmpty()) {
-                Set<GraphPart> boundaryTargets = new LinkedHashSet<>(abruptTargets);
-                boundaryTargets.addAll(naturalOutParts);
-                boundaryTargets.addAll(exceptionTargets);
+                Set<GraphPart> stopTargets = new LinkedHashSet<>(abruptTargets);
+                stopTargets.addAll(exceptionTargets);
+                stopTargets.addAll(naturalParentContinues);
+                Set<GraphPart> boundaryTargets = new LinkedHashSet<>(stopTargets);
+                // An early exit can join the natural exit after their first blocks.
+                Set<GraphPart> naturalContinuation = getReachable(naturalOutParts, backEdges, stopTargets, walker, ignoredEdges, false);
+                boundaryTargets.addAll(naturalContinuation);
+                // A branching precontinue may be emitted as part of the parent body.
+                // If the natural exit reaches it, it can also be the inner loop's join.
+                for (GraphPart target : parentContinues) {
+                    if (naturalContinuation.contains(target) && target.nextParts.size() > 1 && !parentBreaks.contains(target)
+                            && isParentPreContinueOnly(loop, target)) {
+                        abruptTargets.remove(target);
+                        classifiedAbruptTargets.remove(target);
+                    }
+                }
                 for (GraphPart outPart : outParts) {
-                    if (naturalOutParts.contains(outPart)
-                            || exceptionTargets.contains(outPart)
-                            || abruptTargets.contains(outPart)) {
+                    if (boundaryTargets.contains(outPart)) {
                         continue;
                     }
                     if (leadsOnlyToAbruptTargets(
@@ -1153,16 +1167,19 @@ public class LoopDetector {
         return null;
     }*/
     private Set<GraphPart> getReachable(GraphPart startPart, Set<GraphPartEdge> backEdges, Set<GraphPart> ignoredParts, PrevNextWalker pnw, Set<GraphPartEdge> ignoredEdges) {
+        return getReachable(Collections.singleton(startPart), backEdges, ignoredParts, pnw, ignoredEdges, true);
+    }
+
+    private Set<GraphPart> getReachable(Set<GraphPart> startParts, Set<GraphPartEdge> backEdges, Set<GraphPart> stopParts,
+            PrevNextWalker pnw, Set<GraphPartEdge> ignoredEdges, boolean includeBackEdgeTargets) {
         Set<GraphPart> visited = new LinkedHashSet<>();
 
-        Queue<GraphPart> q = new ArrayDeque<>();
-        q.offer(startPart);
+        Queue<GraphPart> q = new ArrayDeque<>(startParts);
         while (!q.isEmpty()) {
             GraphPart part = q.poll();
-            if (visited.contains(part)) {
+            if (!visited.add(part) || stopParts.contains(part)) {
                 continue;
-            }            
-            visited.add(part);
+            }
 
             for (GraphPart next : pnw.getNext(part)) {
                 GraphPartEdge edge = new GraphPartEdge(part, next);
@@ -1170,11 +1187,10 @@ public class LoopDetector {
                 if (ignoredEdges.contains(edge)) {
                     continue;
                 }
-                if (ignoredParts.contains(part)) {
-                    continue;
-                }
                 if (backEdges.contains(edge)) {
-                    visited.add(edge.to);
+                    if (includeBackEdgeTargets) {
+                        visited.add(edge.to);
+                    }
                     continue;
                 }
                 q.offer(next);
