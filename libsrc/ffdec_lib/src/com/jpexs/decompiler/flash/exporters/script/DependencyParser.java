@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
@@ -254,6 +255,7 @@ public class DependencyParser {
             AVM2Instruction prevIns = null;
             for (int i = 0; i < instructions.size(); i++) {
                 AVM2Instruction ins = instructions.get(i);
+                AVM2Instruction nextIns = i + 1 < instructions.size() ? instructions.get(i + 1) : null;
                 
                 
                 //Do not parse dependencies from class parent chain
@@ -279,11 +281,13 @@ public class DependencyParser {
                     }
                 }
                 if (ins.definition instanceof NewFunctionIns) {
-                    if (ins.operands[0] != method_index) {
-                        if (!visitedMethods.contains(ins.operands[0])) {
-                            parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, ins.operands[0], dependencies, ignorePackage, fullyQualifiedNames, visitedMethods, uses, numberContextRef);
+                    if (nextIns == null || !(nextIns.definition instanceof PopIns)) { //in obfuscated code the newfunction is immediately popped, do not process such functions
+                        if (ins.operands[0] != method_index) {
+                            if (!visitedMethods.contains(ins.operands[0])) {
+                                parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, ins.operands[0], dependencies, ignorePackage, fullyQualifiedNames, visitedMethods, uses, numberContextRef);
+                            }
                         }
-                    }
+                    }                    
                 }
                 if (ins.definition instanceof ConstructPropIns) {
                     Multiname m = abc.constants.getMultiname(ins.operands[0]);
