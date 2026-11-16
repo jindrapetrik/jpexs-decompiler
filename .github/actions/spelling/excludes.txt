@@ -149,3 +149,4 @@ Lexer\.java$
 ^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/xfl/f5_smartclip_definitions\.xml$
 ^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/exporters/script/mxml-components\.properties$
 ^docs/.*_pt_BR\.md$
+^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/math/area/
