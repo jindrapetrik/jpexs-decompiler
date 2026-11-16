@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionWith;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -520,6 +521,52 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         } catch (IOException | ActionParseException | InterruptedException ex) {
             fail();
         }
+    }
+
+    @Test
+    public void testJumpPastWithBodyEnteredFromScriptEntry() throws Exception {
+        String pcode = "Jump entry\n"
+                + "withHeader: With {\n"
+                + "entry: Push \"state\", 7\n"
+                + "DefineLocal\n"
+                + "dispatch: Push \"state\"\n"
+                + "GetVariable\n"
+                + "Push 9\n"
+                + "Equals\n"
+                + "If withHeader\n"
+                + "Push true\n"
+                + "Push \"state\"\n"
+                + "GetVariable\n"
+                + "Push 7\n"
+                + "Equals\n"
+                + "If afterWith\n"
+                + "Jump dispatch\n"
+                + "}\n"
+                + "afterWith: If correct\n"
+                + "Push \"WRONG\"\n"
+                + "Trace\n"
+                + "Jump done\n"
+                + "correct: Push \"OK\"\n"
+                + "Trace\n"
+                + "done: End\n";
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        DoActionTag source = getFirstActionTag();
+        source.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+        ActionList deobfuscated = source.getActions();
+        Assert.assertFalse(deobfuscated.stream().anyMatch(action -> action instanceof ActionWith), "The bypassed with must be removed");
+
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        source.getActionScriptSource(writer, deobfuscated);
+        writer.finishHilights();
+        Assert.assertEquals(writer.toString().trim().replace("\r\n", "\n"), "var state = 7;\ntrace(\"OK\");");
+    }
+
+    @Test
+    public void testKeepExecutedWithScope() throws Exception {
+        String result = recompile("var scope = {value: 1}; with(scope) { trace(value); } trace(2);");
+        assertTrue(result.contains("with(scope)"), result);
+        assertTrue(result.contains("trace(value);"), result);
+        assertTrue(result.contains("trace(2);"), result);
     }
 
     @Test

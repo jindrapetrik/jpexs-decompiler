@@ -80,6 +80,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionReturn;
 import com.jpexs.decompiler.flash.action.swf5.ActionToNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionToString;
 import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
+import com.jpexs.decompiler.flash.action.swf5.ActionWith;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
@@ -622,10 +623,10 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
      * @param result Execution result
      * @param fakeFunctions Fake functions
      * @param useVariables Use variables
-     * @param allowGetUninitializedVariables Allow get uninitialized variables
+     * @param startsAtScriptEntry Whether execution starts at the script entry
      * @throws InterruptedException On interrupt
      */
-    private void executeActions(ActionItem item, LocalDataArea localData, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions, boolean useVariables, boolean allowGetUninitializedVariables) throws InterruptedException {
+    private void executeActions(ActionItem item, LocalDataArea localData, ActionConstantPool constantPool, ExecutionResult result, Map<String, Object> fakeFunctions, boolean useVariables, boolean startsAtScriptEntry) throws InterruptedException {
         if (item.action.isExit()) {
             return;
         }
@@ -735,7 +736,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
                 String variableName = stack.peek().toString();
                 if (!localData.localVariables.containsKey(variableName)
-                        && (!allowGetUninitializedVariables || !isFakeName(variableName))) {
+                        && (!startsAtScriptEntry || !isFakeName(variableName))) {
                     break;
                 }
             }
@@ -840,7 +841,10 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                 }
             }
 
-            if (jumpedHere && item.prev.isContainerLastAction()) {
+            // A trace from the script entry stops at ActionWith itself. If it bypassed
+            // that instruction, a jump past the body does not leave an active with scope.
+            if (jumpedHere && item.prev.isContainerLastAction()
+                    && (!startsAtScriptEntry || item.prev.lastActionOf.stream().anyMatch(container -> !(container.action instanceof ActionWith)))) {
                 break;
             }
 
