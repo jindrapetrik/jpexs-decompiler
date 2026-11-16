@@ -648,7 +648,7 @@ public class ActionScript3Parser {
             s = lex();
             expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
             String name = s.value.toString();
-            Map.Entry<String, Map<String, String>> en = new AbstractMap.SimpleEntry<>(name, new HashMap<String, String>());
+            Map.Entry<String, Map<String, String>> en = new AbstractMap.SimpleEntry<>(name, new LinkedHashMap<String, String>());
             s = lex();
             if (s.isType(SymbolType.PARENT_OPEN)) {
                 s = lex();
