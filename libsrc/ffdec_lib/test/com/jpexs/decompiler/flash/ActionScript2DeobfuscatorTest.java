@@ -24,6 +24,8 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionWith;
+import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -523,37 +525,50 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         }
     }
 
-    @Test
-    public void testJumpPastWithBodyEnteredFromScriptEntry() throws Exception {
+    @DataProvider
+    public Object[][] bypassedContainerHeaders() {
+        return new Object[][]{
+            {"With {\n", "}\n", "", ActionWith.class},
+            {"DefineFunction \"bypassed\" 0 {\n", "}\n", "", ActionDefineFunction.class},
+            {"DefineFunction2 \"bypassed\" 0 1 false false false false false false false false false {\n", "}\n", "", ActionDefineFunction2.class},
+            {"Try \"e\" {\n", "}\nCatch {\n", "}\nFinally {\nJump done\n}\n", ActionTry.class},
+            {"Try \"e\" {\nJump correct\n}\nCatch {\n", "}\nFinally {\n", "}\n", ActionTry.class},
+            {"Try \"e\" {\nJump correct\n}\nCatch {\nJump correct\n}\nFinally {\n", "}\n", "", ActionTry.class}
+        };
+    }
+
+    @Test(dataProvider = "bypassedContainerHeaders")
+    public void testJumpPastContainerBodyEnteredFromScriptEntry(String header, String boundary, String trailingSections, Class<? extends Action> containerClass) throws Exception {
         String pcode = "Jump entry\n"
-                + "withHeader: With {\n"
+                + "containerHeader: " + header
                 + "entry: Push \"state\", 7\n"
                 + "DefineLocal\n"
                 + "dispatch: Push \"state\"\n"
                 + "GetVariable\n"
                 + "Push 9\n"
                 + "Equals\n"
-                + "If withHeader\n"
+                + "If containerHeader\n"
                 + "Push true\n"
                 + "Push \"state\"\n"
                 + "GetVariable\n"
                 + "Push 7\n"
                 + "Equals\n"
-                + "If afterWith\n"
+                + "If afterContainer\n"
                 + "Jump dispatch\n"
-                + "}\n"
-                + "afterWith: If correct\n"
+                + boundary
+                + "afterContainer: If correct\n"
                 + "Push \"WRONG\"\n"
                 + "Trace\n"
                 + "Jump done\n"
                 + "correct: Push \"OK\"\n"
                 + "Trace\n"
+                + trailingSections
                 + "done: End\n";
         List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
         DoActionTag source = getFirstActionTag();
         source.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
         ActionList deobfuscated = source.getActions();
-        Assert.assertFalse(deobfuscated.stream().anyMatch(action -> action instanceof ActionWith), "The bypassed with must be removed");
+        Assert.assertFalse(deobfuscated.stream().anyMatch(containerClass::isInstance), "The bypassed container must be removed");
 
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         source.getActionScriptSource(writer, deobfuscated);
@@ -567,6 +582,15 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         assertTrue(result.contains("with(scope)"), result);
         assertTrue(result.contains("trace(value);"), result);
         assertTrue(result.contains("trace(2);"), result);
+    }
+
+    @Test
+    public void testKeepExecutedTryCatchFinally() throws Exception {
+        String result = recompile("try { throw 'error'; } catch (e) { trace(e); } finally { trace('finally'); } trace('after');");
+        assertTrue(result.contains("throw \"error\";"), result);
+        assertTrue(result.contains("catch") && result.contains("trace(e);"), result);
+        assertTrue(result.contains("finally") && result.contains("trace(\"finally\");"), result);
+        assertTrue(result.contains("trace(\"after\");"), result);
     }
 
     @Test

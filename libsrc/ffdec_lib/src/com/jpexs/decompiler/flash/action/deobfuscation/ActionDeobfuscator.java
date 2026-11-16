@@ -84,6 +84,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionWith;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
@@ -614,6 +615,13 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         return !IdentifiersDeobfuscation.isValidName(false, name);
     }
 
+    private static boolean canSkipContainerBoundaryAtScriptEntry(Action action) {
+        // The simulator stops at these headers. A jump from the script entry can run
+        // bytes in their bodies without opening a with scope, calling a function or entering a try.
+        return action instanceof ActionWith || action instanceof ActionDefineFunction
+                || action instanceof ActionDefineFunction2 || action instanceof ActionTry;
+    }
+
     /**
      * Execute actions.
      *
@@ -841,10 +849,8 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                 }
             }
 
-            // A trace from the script entry stops at ActionWith itself. If it bypassed
-            // that instruction, a jump past the body does not leave an active with scope.
             if (jumpedHere && item.prev.isContainerLastAction()
-                    && (!startsAtScriptEntry || item.prev.lastActionOf.stream().anyMatch(container -> !(container.action instanceof ActionWith)))) {
+                    && (!startsAtScriptEntry || item.prev.lastActionOf.stream().anyMatch(container -> !canSkipContainerBoundaryAtScriptEntry(container.action)))) {
                 break;
             }
 
