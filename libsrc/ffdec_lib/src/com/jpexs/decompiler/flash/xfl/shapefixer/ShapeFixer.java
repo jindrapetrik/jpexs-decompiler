@@ -141,6 +141,11 @@ public class ShapeFixer {
         Rectangle2D bbox() {
             return be.bbox();
         }
+
+        static int compareSourceOrder(BezierEdgeWrapper first, BezierEdgeWrapper second) {
+            int shapeOrder = Integer.compare(first.shapeIndex, second.shapeIndex);
+            return shapeOrder != 0 ? shapeOrder : Integer.compare(first.edgeIndex, second.edgeIndex);
+        }
     }
 
     static final class Event implements Comparable<Event> {
@@ -169,8 +174,7 @@ public class ShapeFixer {
             if (ct != 0) {
                 return ct;
             }
-            int ce = System.identityHashCode(this.e) - System.identityHashCode(o.e);
-            return ce;
+            return BezierEdgeWrapper.compareSourceOrder(e, o.e);
         }
     }
 
@@ -182,7 +186,7 @@ public class ShapeFixer {
             if (cMinY != 0) {
                 return cMinY;
             }
-            return Integer.compare(System.identityHashCode(e1), System.identityHashCode(e2));
+            return BezierEdgeWrapper.compareSourceOrder(e1, e2);
         };
         final java.util.TreeSet<BezierEdgeWrapper> status = new TreeSet<>(statusCmp);
         //final java.util.Set<BezierEdgeWrapper> status = new HashSet<>();
@@ -208,7 +212,8 @@ public class ShapeFixer {
 
                 switch (ev.type) {
                     case START:
-                        BezierEdgeWrapper beMaxY = new BezierEdgeWrapper(null, 0, 0, 0) {
+                        // Include every edge whose minimum Y is exactly the upper bound.
+                        BezierEdgeWrapper beMaxY = new BezierEdgeWrapper(null, 0, Integer.MAX_VALUE, Integer.MAX_VALUE) {
                             @Override
                             double minY() {
                                 return ev.e.maxY();
@@ -332,17 +337,7 @@ public class ShapeFixer {
 
             List<BezierEdgeWrapper> splittedBewList = new ArrayList<>(splitPointsMap.keySet());
 
-            splittedBewList.sort((BezierEdgeWrapper o1, BezierEdgeWrapper o2) -> {
-                int dShapeIndex = o1.shapeIndex - o2.shapeIndex;
-                if (dShapeIndex != 0) {
-                    return dShapeIndex;
-                }
-                int dEIndex = o1.edgeIndex - o2.edgeIndex;
-                if (dEIndex != 0) {
-                    return dEIndex;
-                }
-                return System.identityHashCode(o1) - System.identityHashCode(o2);
-            });
+            splittedBewList.sort(BezierEdgeWrapper::compareSourceOrder);
 
             double roundingDivisor = wasSmall ? 2 : 100;
             Map<BezierEdgeWrapper, List<BezierEdge>> splitEdges = new LinkedHashMap<>();

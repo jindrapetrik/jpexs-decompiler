@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.shape.CurvedEdge;
 import com.jpexs.decompiler.flash.exporters.shape.IEdge;
 import com.jpexs.decompiler.flash.exporters.shape.ShapeExporterBase;
 import com.jpexs.decompiler.flash.math.BezierEdge;
+import com.jpexs.decompiler.flash.math.area.BezierArea;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -32,14 +33,13 @@ import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Reference;
-import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -91,7 +91,7 @@ public class SwitchedFillSidesFixer {
         int fillStyle;
         boolean filled = true;
         Polygon parent = null;
-        Area areaObj;
+        BezierArea areaObj;
         double area;
         Rectangle2D bbox;
 
@@ -103,7 +103,7 @@ public class SwitchedFillSidesFixer {
             PathArea.orientationSingleClosed(path, orientationRef, areaRef);
             this.ccw = orientationRef.getVal() == PathArea.Orientation.COUNTER_CLOCKWISE;
             this.area = areaRef.getVal();
-            this.areaObj = new Area(path);
+            this.areaObj = new BezierArea(path);
             this.bbox = this.areaObj.getBounds2D();
             this.fillStyle = fillStyle;
         }
@@ -135,7 +135,7 @@ public class SwitchedFillSidesFixer {
             if (other.areaObj.isEmpty()) {
                 return false;
             }
-            Area diff = new Area(other.areaObj);
+            BezierArea diff = new BezierArea(other.areaObj);
             diff.subtract(areaObj);
             return diff.isEmpty();
         }
@@ -218,7 +218,7 @@ public class SwitchedFillSidesFixer {
 
         List<Polygon> query(Rectangle2D r) {
             // Collect candidates from overlapping cells (deduplicated)
-            HashSet<Polygon> set = new HashSet<>();
+            LinkedHashSet<Polygon> set = new LinkedHashSet<>();
             forEachCell(r, (gx, gy) -> {
                 List<Polygon> bucket = cells.get(key(gx, gy));
                 if (bucket != null) {
