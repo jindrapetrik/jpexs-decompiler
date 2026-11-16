@@ -677,9 +677,10 @@ public class ActionScript3Parser {
 
             /*
              * Skip Embed metadata - these are loaded automatically by the
-             * assignment in SymbolClass tag
+             * assignment in SymbolClass tag.
+             * Also skip SWF metadata as that is added automatically.
              */
-            if (!"Embed".equals(name)) {
+            if (!"Embed".equals(name) && !"SWF".equals(name)) {
                 metadata.add(en);
             }
         }
