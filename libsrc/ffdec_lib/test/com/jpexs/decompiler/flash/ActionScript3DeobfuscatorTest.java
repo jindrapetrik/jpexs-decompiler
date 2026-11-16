@@ -1688,6 +1688,64 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "         return _loc2_;\n");
     }
 
+    @DataProvider(name = "prefixUpdates")
+    public Object[][] prefixUpdates() {
+        return new Object[][]{{"++"}, {"--"}};
+    }
+
+    @Test(dataProvider = "prefixUpdates")
+    public void testChainedIndexedAssignmentWithTypedPrefixUpdate(String operator) throws Exception {
+        String update = "id = table[key] = " + operator + "uid;";
+        String source = recompileSource("package {"
+                + "import flash.utils.Dictionary;"
+                + "public class Test {"
+                + "private static var uid:int;"
+                + "private static var table:Dictionary = new Dictionary();"
+                + "public static function test(key:Object):int {"
+                + "var id:int = int(table[key]);"
+                + "if(id == 0) { " + update + " }"
+                + "return id;"
+                + "}"
+                + "}"
+                + "}");
+        assertTrue(source.contains("var id:int = int(table[key]);"), source);
+        assertTrue(source.contains(update), source);
+    }
+
+    @DataProvider(name = "postUpdates")
+    public Object[][] postUpdates() {
+        return new Object[][]{{"increment", "++"}, {"decrement", "--"}};
+    }
+
+    @Test(dataProvider = "postUpdates")
+    public void testUnsignedPostUpdateInShortCircuit(String instruction, String operator) throws Exception {
+        String readByte = "getlocal2\n"
+                + "dup\n"
+                + "convert_u\n"
+                + "setlocal3\n"
+                + instruction + "\n"
+                + "convert_u\n"
+                + "setlocal2\n"
+                + "getlocal3\n"
+                + "li8\n";
+        decompilePCodeWithLines("getlocal1\n"
+                + "convert_u\n"
+                + "setlocal2\n"
+                + "pushtrue\n"
+                + readByte
+                + "pushbyte 47\n"
+                + "ifne done\n"
+                + "pop\n"
+                + readByte
+                + "pushbyte 42\n"
+                + "equals\n"
+                + "not\n"
+                + "done:\n"
+                + "returnvalue\n",
+                "         var _loc2_:uint = param1;\n"
+                + "         return li8(_loc2_" + operator + ") != 47 || li8(_loc2_" + operator + ") != 42;\n");
+    }
+
     @Test
     public void testSlotIncrementWithTempRegister() throws Exception {
         //ASC compiles i++ of a script variable (a slot of the global scope)

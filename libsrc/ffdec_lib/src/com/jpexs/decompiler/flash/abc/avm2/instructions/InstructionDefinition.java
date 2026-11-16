@@ -562,6 +562,10 @@ public abstract class InstructionDefinition implements Serializable {
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins, output);
         GraphTargetItem obj = stack.pop();
 
+        if (!init && foldPrefixPropertyUpdate(localData, stack, obj, multiname, value)) {
+            return;
+        }
+
         /*
         if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
             boolean isIncrement = (value instanceof IncrementAVM2Item);
@@ -1401,6 +1405,41 @@ public abstract class InstructionDefinition implements Serializable {
         }
         SetPropertyIns.handleCompound(localData, obj, multiname, value, output, stack, result);
         SetTypeIns.handleResult(value, stack, output, localData, (GraphTargetItem) result, -1, type.getVal());
+    }
+
+    private boolean foldPrefixPropertyUpdate(AVM2LocalData localData, TranslateStack stack,
+            GraphTargetItem obj, FullMultinameAVM2Item name, GraphTargetItem value) {
+        // ASC duplicates the increment result before storing it in a temporary register.
+        if (!(obj instanceof LocalRegAVM2Item) || !(value instanceof LocalRegAVM2Item)
+                || stack.isEmpty() || !(stack.peek() instanceof SetLocalAVM2Item)
+                || name.name != null || name.namespace != null) {
+            return false;
+        }
+        SetLocalAVM2Item saved = (SetLocalAVM2Item) stack.peek();
+        LocalRegAVM2Item loaded = (LocalRegAVM2Item) value;
+        GraphTargetItem update = saved.value;
+        if (!saved.directlyCausedByDup || saved.regIndex != loaded.regIndex || saved.getSrc() == null || loaded.getSrc() == null
+                || loaded.computedValue == null || loaded.computedValue.getThroughDuplicate() != update
+                || !(update instanceof IncrementAVM2Item || update instanceof DecrementAVM2Item)
+                || !TypeItem.INT.equals(update.returnType()) || !(update.value instanceof GetPropertyAVM2Item)) {
+            return false;
+        }
+        GetPropertyAVM2Item property = (GetPropertyAVM2Item) update.value;
+        if (!(property.object instanceof FindPropertyAVM2Item)
+                || property.object != ((LocalRegAVM2Item) obj).computedValue
+                || !name.equals(property.propertyName) || !TypeItem.INT.equals(property.returnType())) {
+            return false;
+        }
+        Set<Integer> usages = localData.getSetLocalUsages(localData.code.adr2pos(saved.getSrc().getAddress()));
+        if (usages.size() != 1 || !usages.contains(localData.code.adr2pos(loaded.getSrc().getAddress()))) {
+            return false;
+        }
+
+        stack.pop();
+        stack.push(update instanceof IncrementAVM2Item
+                ? new PreIncrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, TypeItem.INT)
+                : new PreDecrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, TypeItem.INT));
+        return true;
     }
 
     /**
