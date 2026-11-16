@@ -376,7 +376,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "break;\n"
                 + "}\n"
                 + "var _temp_3:* = §§pop();\n"
-                + "var _temp_4:* = §§pop() - 1;\n"
+                + "var _temp_4:* = int(int(§§pop()) - 1);\n"
                 + "_temp_3[_temp_3.length] = 0x29 ^ 0x6F;\n"
                 + "_temp_3[_temp_3.length] = 9 ^ 0x54;\n"
                 + "§§push(_temp_3);\n"

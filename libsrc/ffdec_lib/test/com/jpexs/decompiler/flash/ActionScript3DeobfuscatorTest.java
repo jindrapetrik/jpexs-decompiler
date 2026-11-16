@@ -1649,6 +1649,45 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "         return _temp_2..[_temp_1];\n");
     }
 
+    @DataProvider(name = "integerIncrementAndDecrement")
+    public Object[][] integerIncrementAndDecrement() {
+        return new Object[][]{{"increment_i", "+"}, {"decrement_i", "-"}};
+    }
+
+    @Test(dataProvider = "integerIncrementAndDecrement")
+    public void testChainedIndexedAssignmentWithIntegerUpdate(String instruction, String operator) throws Exception {
+        //ASC keeps the indexed receiver and key below the expansion of ++uid or --uid.
+        decompilePCodeWithLines("getlex QName(PackageNamespace(\"\"),\"table\")\n"
+                + "getlocal1\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"uid\")\n"
+                + "dup\n"
+                + "setlocal 2\n"
+                + "getproperty QName(PackageNamespace(\"\"),\"uid\")\n"
+                + instruction + "\n"
+                + "dup\n"
+                + "setlocal 3\n"
+                + "getlocal 2\n"
+                + "getlocal 3\n"
+                + "setproperty QName(PackageNamespace(\"\"),\"uid\")\n"
+                + "kill 3\n"
+                + "kill 2\n"
+                + "dup\n"
+                + "setlocal 2\n"
+                + "setproperty MultinameL([PackageNamespace(\"\")])\n"
+                + "getlocal 2\n"
+                + "kill 2\n"
+                + "convert_i\n"
+                + "returnvalue\n",
+                "         var _temp_4:* = table;\n"
+                + "         var _temp_3:* = param1;\n"
+                + "         var _loc3_:int;\n"
+                + "         var _temp_2:* = _loc3_ = int(int(uid) " + operator + " 1);\n"
+                + "         uid = _loc3_;\n"
+                + "         var _loc2_:int = _temp_2;\n"
+                + "         _temp_4[_temp_3] = _temp_2;\n"
+                + "         return _loc2_;\n");
+    }
+
     @Test
     public void testSlotIncrementWithTempRegister() throws Exception {
         //ASC compiles i++ of a script variable (a slot of the global scope)
