@@ -1627,42 +1627,92 @@ public class Main {
         OpenableList result = new OpenableList();
 
         InputStream inputStream = sourceInfo.getInputStream();
-        Bundle bundle = null;
+        Bundle bundle = null;       
         FileInputStream fis = null;
-        if (inputStream == null) {
-            inputStream = new BufferedInputStream(fis = new FileInputStream(sourceInfo.getFile()));
-            bundle = sourceInfo.getBundle(false, SearchMode.ALL);
-            logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
-        } else if (inputStream instanceof SeekableInputStream
-                || inputStream instanceof BufferedInputStream) {
-            try {
-                inputStream.reset();
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+        Stopwatch sw = null;
+        try {
+            if (inputStream == null) {
+                inputStream = new BufferedInputStream(fis = new FileInputStream(sourceInfo.getFile()));
+                bundle = sourceInfo.getBundle(false, SearchMode.ALL);
+                logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
+            } else if (inputStream instanceof SeekableInputStream
+                    || inputStream instanceof BufferedInputStream) {
+                try {
+                    inputStream.reset();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+                logger.log(Level.INFO, "Load stream: {0}", sourceInfo.getFileTitle());
             }
-            logger.log(Level.INFO, "Load stream: {0}", sourceInfo.getFileTitle());
-        }
 
-        Stopwatch sw = Stopwatch.startNew();
-        if (bundle != null) {
-            if (bundle.isReadOnly()) {
-                View.execInEventDispatchLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        ViewMessages.showMessageDialog(getMainFrame().getWindow(), AppStrings.translate("warning.readonly").replace("%file%", sourceInfo.getFileTitleOrName()), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningOpeningReadOnly);
+            sw = Stopwatch.startNew();
+            if (bundle != null) {
+                if (bundle.isReadOnly()) {
+                    View.execInEventDispatchLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            ViewMessages.showMessageDialog(getMainFrame().getWindow(), AppStrings.translate("warning.readonly").replace("%file%", sourceInfo.getFileTitleOrName()), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningOpeningReadOnly);
+                        }
+                    });
+                }
+                result.bundle = bundle;
+                SwfProfile implicitSwfProfile = bundle.getImplicitSwfProfile();
+                result.name = new File(sourceInfo.getFileTitleOrName()).getName();
+                final String fname = result.name;
+                for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
+                    InputStream stream = streamEntry.getValue();
+                    stream.reset();
+                    CancellableWorker<? extends Openable> worker = null;
+                    if (streamEntry.getKey().toLowerCase().endsWith(".abc")) {
+                        CancellableWorker<ABC> abcWorker = new CancellableWorker<ABC>("parseOpenable") {
+                            private ABC open(InputStream is, String file, String fileTitle) throws IOException, InterruptedException {
+                                SWF dummySwf = new SWF();
+                                dummySwf.setFileTitle(fileTitle != null ? fileTitle : file);
+                                FileAttributesTag fileAttributes = new FileAttributesTag(dummySwf);
+                                fileAttributes.actionScript3 = true;
+                                dummySwf.addTag(fileAttributes);
+                                fileAttributes.setTimelined(dummySwf);
+                                DoABC2Tag doABC2Tag = new DoABC2Tag(dummySwf);
+                                dummySwf.addTag(doABC2Tag);
+                                doABC2Tag.setTimelined(dummySwf);
+                                dummySwf.clearModified();
+                                startWork(AppStrings.translate("work.reading.abc"), this, true);
+                                ABC abc = new ABC(new ABCInputStream(new MemoryInputStream(Helper.readStream(is))), dummySwf, doABC2Tag, file, fileTitle);
+                                doABC2Tag.setABC(abc);
+                                return abc;
+                            }
+
+                            @Override
+                            protected ABC doInBackground() throws Exception {
+                                return open(stream, null, streamEntry.getKey());
+                            }
+
+                            @Override
+                            protected void done() {
+                                stopWork();
+                            }
+
+                        };
+                        worker = abcWorker;
+                    } else {
+                        worker = getSwfWorker(sourceInfo.getFile(), fname + "/" + streamEntry.getKey(), stream, null, streamEntry.getKey(), implicitSwfProfile != null ? implicitSwfProfile : requestedSwfProfile, implicitSwfProfile != null || swfProfileSpecified);
                     }
-                });
-            }
-            result.bundle = bundle;
-            SwfProfile implicitSwfProfile = bundle.getImplicitSwfProfile();
-            result.name = new File(sourceInfo.getFileTitleOrName()).getName();
-            final String fname = result.name;
-            for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
-                InputStream stream = streamEntry.getValue();
-                stream.reset();
+                    loadingDialog.setWorker(worker);
+                    worker.execute();
+
+                    try {
+                        result.add(worker.get());
+                    } catch (CancellationException ex) {
+                        logger.log(Level.WARNING, "Loading SWF {0} was cancelled.", streamEntry.getKey());
+                    }
+                }
+            } else {
+                InputStream fInputStream = inputStream;
+
                 CancellableWorker<? extends Openable> worker = null;
-                if (streamEntry.getKey().toLowerCase().endsWith(".abc")) {
-                    CancellableWorker<ABC> abcWorker = new CancellableWorker<ABC>("parseOpenable") {
+
+                if (sourceInfo.getKind() == OpenableSourceKind.ABC) {
+                    CancellableWorker<ABC> abcWorker = new CancellableWorker<ABC>("abcWorker") {
                         private ABC open(InputStream is, String file, String fileTitle) throws IOException, InterruptedException {
                             SWF dummySwf = new SWF();
                             dummySwf.setFileTitle(fileTitle != null ? fileTitle : file);
@@ -1682,7 +1732,7 @@ public class Main {
 
                         @Override
                         protected ABC doInBackground() throws Exception {
-                            return open(stream, null, streamEntry.getKey());
+                            return open(fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle());
                         }
 
                         @Override
@@ -1692,76 +1742,32 @@ public class Main {
 
                     };
                     worker = abcWorker;
-                } else {
-                    worker = getSwfWorker(sourceInfo.getFile(), fname + "/" + streamEntry.getKey(), stream, null, streamEntry.getKey(), implicitSwfProfile != null ? implicitSwfProfile : requestedSwfProfile, implicitSwfProfile != null || swfProfileSpecified);
+                } else if (sourceInfo.getKind() == OpenableSourceKind.SWF) {
+                    String shortName = sourceInfo.getFileTitle() != null ? sourceInfo.getFileTitle() : sourceInfo.getFile();
+                    String fileKey = shortName == null ? "" : new File(shortName).getName();
+                    worker = getSwfWorker(sourceInfo.getFile(), fileKey, fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle(), requestedSwfProfile, swfProfileSpecified);
                 }
-                loadingDialog.setWorker(worker);
+                if (loadingDialog != null) {
+                    loadingDialog.setWorker(worker);
+                }
                 worker.execute();
 
                 try {
                     result.add(worker.get());
+                    worker.free();
+                    worker = null;
                 } catch (CancellationException ex) {
-                    logger.log(Level.WARNING, "Loading SWF {0} was cancelled.", streamEntry.getKey());
+                    logger.log(Level.WARNING, "Loading SWF {0} was cancelled.", sourceInfo.getFileTitleOrName());
                 }
             }
-        } else {
-            InputStream fInputStream = inputStream;
 
-            CancellableWorker<? extends Openable> worker = null;
-
-            if (sourceInfo.getKind() == OpenableSourceKind.ABC) {
-                CancellableWorker<ABC> abcWorker = new CancellableWorker<ABC>("abcWorker") {
-                    private ABC open(InputStream is, String file, String fileTitle) throws IOException, InterruptedException {
-                        SWF dummySwf = new SWF();
-                        dummySwf.setFileTitle(fileTitle != null ? fileTitle : file);
-                        FileAttributesTag fileAttributes = new FileAttributesTag(dummySwf);
-                        fileAttributes.actionScript3 = true;
-                        dummySwf.addTag(fileAttributes);
-                        fileAttributes.setTimelined(dummySwf);
-                        DoABC2Tag doABC2Tag = new DoABC2Tag(dummySwf);
-                        dummySwf.addTag(doABC2Tag);
-                        doABC2Tag.setTimelined(dummySwf);
-                        dummySwf.clearModified();
-                        startWork(AppStrings.translate("work.reading.abc"), this, true);
-                        ABC abc = new ABC(new ABCInputStream(new MemoryInputStream(Helper.readStream(is))), dummySwf, doABC2Tag, file, fileTitle);
-                        doABC2Tag.setABC(abc);
-                        return abc;
-                    }
-
-                    @Override
-                    protected ABC doInBackground() throws Exception {
-                        return open(fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle());
-                    }
-
-                    @Override
-                    protected void done() {
-                        stopWork();
-                    }
-
-                };
-                worker = abcWorker;
-            } else if (sourceInfo.getKind() == OpenableSourceKind.SWF) {
-                String shortName = sourceInfo.getFileTitle() != null ? sourceInfo.getFileTitle() : sourceInfo.getFile();
-                String fileKey = shortName == null ? "" : new File(shortName).getName();
-                worker = getSwfWorker(sourceInfo.getFile(), fileKey, fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle(), requestedSwfProfile, swfProfileSpecified);
-            }
-            if (loadingDialog != null) {
-                loadingDialog.setWorker(worker);
-            }
-            worker.execute();
-
-            try {
-                result.add(worker.get());
-                worker.free();
-                worker = null;
-            } catch (CancellationException ex) {
-                logger.log(Level.WARNING, "Loading SWF {0} was cancelled.", sourceInfo.getFileTitleOrName());
+        } finally {
+            if (fis != null) {                
+                fis.close();
             }
         }
-
         if (fis != null) {
             logger.log(Level.INFO, "File loaded in {0} seconds.", (sw.getElapsedMilliseconds() / 1000));
-            fis.close();
         } else {
             logger.log(Level.INFO, "Stream loaded in {0} seconds.", (sw.getElapsedMilliseconds() / 1000));
         }
