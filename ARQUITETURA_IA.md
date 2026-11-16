@@ -9,6 +9,8 @@
 5. `AIChatService` cria a solicitação OpenAI Chat Completions em streaming e mantém o identificador estável `x-opencode-session` para o OpenCode.
 6. `AIContextManager` descreve somente metadados estruturais do SWF atual. Nenhum dado binário, script ou recurso é enviado automaticamente.
 
+7. Para alterações de métodos ActionScript 3, o usuário pode incluir o código-fonte no pedido e aplicar uma resposta em bloco `pcode` ao editor do método aberto. A aplicação exige confirmação; a gravação no SWF continua sendo feita pelo fluxo normal de salvar do editor.
+
 ## Endpoints utilizados
 
 - OpenRouter: `https://openrouter.ai/api/v1/models`, `https://openrouter.ai/api/v1/key` e `https://openrouter.ai/api/v1/chat/completions`.
@@ -33,4 +35,4 @@ O OpenCode usa uma chave Console e o cabeçalho de sessão documentado. Resposta
 - `AICredentialManager`, `AIContextManager`
 - `AIStudioDialog`, `AISettingsDialog`
 
-`AIToolDispatcher` e `AIImageService` não fazem parte desta primeira entrega, pois ainda não há ferramentas de edição ou geração de imagens para despachar.
+`AIToolDispatcher` e `AIImageService` não fazem parte desta entrega. A edição assistida atual limita-se a aplicar P-Code gerado ao editor aberto; não executa ferramentas arbitrárias nem gera imagens.

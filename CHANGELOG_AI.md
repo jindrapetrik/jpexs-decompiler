@@ -1,5 +1,11 @@
 # Changelog — JPEXS AI Studio
 
+## Edição assistida
+
+- Respostas que contêm um bloco `pcode` podem ser aplicadas, após confirmação, ao método ActionScript 3 que estava aberto no editor.
+- O código-fonte não é enviado automaticamente ao provedor; o usuário escolhe o que incluir no pedido. O SWF só é alterado pelo fluxo normal de salvar do editor.
+- A configuração existente de provedores, modelos e cofre de credenciais permanece a mesma.
+
 ## 2026-11-04 — Primeira integração de provedores
 
 - Adicionados os provedores OpenRouter e OpenCode Models, com catálogo dinâmico.

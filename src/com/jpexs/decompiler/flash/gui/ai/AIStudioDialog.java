@@ -9,18 +9,23 @@
 package com.jpexs.decompiler.flash.gui.ai;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.abc.ASMSourceEditorPane;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -49,27 +54,42 @@ public class AIStudioDialog extends AppDialog {
     private final JButton refreshButton = new JButton(text("button.refresh"));
     private final JButton settingsButton = new JButton(text("button.settings"));
     private final JButton sendButton = new JButton(text("button.send"));
+    private final JButton applyButton = new JButton(text("button.apply"));
     private final AIModelCatalog modelCatalog = new AIModelCatalog();
     private final AIChatService chatService = new AIChatService();
     private final List<AIChatMessage> history = new ArrayList<>();
     private List<AIModel> allModels = new ArrayList<>();
     private final String context;
+    private final ASMSourceEditorPane targetEditor;
+    private final Object targetAbc;
+    private final int targetBodyIndex;
+    private final int targetMethodIndex;
+    private final int targetScriptIndex;
     private final String sessionId = new AIChatService().newSessionId();
+    private String lastAssistantResponse;
     private boolean initialized;
 
-    public AIStudioDialog(Window owner, String swfTitle, String swfContext) {
+    public AIStudioDialog(Window owner, String swfTitle, String swfContext,
+            ASMSourceEditorPane targetEditor) {
         super(owner);
+        this.targetEditor = targetEditor;
+        targetAbc = targetEditor == null ? null : targetEditor.abc;
+        targetBodyIndex = targetEditor == null ? -1 : targetEditor.bodyIndex;
+        targetMethodIndex = targetEditor == null ? -1 : targetEditor.methodIndex;
+        targetScriptIndex = targetEditor == null ? -1 : targetEditor.getScriptIndex();
         setTitle(text("studio.title"));
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setModal(false);
         setResizable(true);
         setMinimumSize(new Dimension(700, 500));
-        context = swfTitle == null || swfTitle.trim().isEmpty()
+        String baseContext = swfTitle == null || swfTitle.trim().isEmpty()
                 ? text("context.noSwf")
                 : text("context.swf") + ": " + swfTitle + "\n"
                 + (swfContext == null ? "" : swfContext) + "\n"
                 + text("context.limited");
+        context = baseContext + "\n\n" + text("context.editInstructions");
         initComponents();
+        updateApplyButton();
         View.centerScreen(this);
         setSize(900, 650);
         loadConfiguration();
@@ -94,6 +114,8 @@ public class AIStudioDialog extends AppDialog {
         modelCombo.addActionListener(e -> modelSelected());
         filterCombo.addActionListener(e -> showFilteredModels());
         refreshButton.addActionListener(e -> refreshModels());
+        applyButton.addActionListener(e -> applyResponseToEditor());
+        applyButton.setToolTipText(text("button.apply.tooltip"));
         settingsButton.addActionListener(e -> {
             new AISettingsDialog(this).setVisible(true);
             refreshModels();
@@ -119,7 +141,10 @@ public class AIStudioDialog extends AppDialog {
         JPanel bottom = new JPanel(new BorderLayout(6, 6));
         bottom.add(statusLabel, BorderLayout.NORTH);
         bottom.add(new JScrollPane(prompt), BorderLayout.CENTER);
-        bottom.add(sendButton, BorderLayout.EAST);
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        actions.add(applyButton);
+        actions.add(sendButton);
+        bottom.add(actions, BorderLayout.EAST);
 
         getContentPane().setLayout(new BorderLayout(5, 5));
         getContentPane().add(toolbar, BorderLayout.NORTH);
@@ -238,6 +263,8 @@ public class AIStudioDialog extends AppDialog {
         }
         String providerId = getProviderId();
         String plan = getPlan();
+        lastAssistantResponse = null;
+        updateApplyButton();
         history.add(new AIChatMessage("user", userText));
         conversation.append(text("chat.you") + ": " + userText + "\n\n"
                 + text("chat.assistant") + ": ");
@@ -259,6 +286,8 @@ public class AIStudioDialog extends AppDialog {
                 refreshButton.setEnabled(true);
                 try {
                     String answer = get();
+                    lastAssistantResponse = answer;
+                    updateApplyButton();
                     if (answer.isEmpty()) {
                         conversation.append("\n[" + text("status.emptyResponse") + "]");
                     }
@@ -273,6 +302,52 @@ public class AIStudioDialog extends AppDialog {
                 }
             }
         }.execute();
+    }
+
+    private void updateApplyButton() {
+        applyButton.setEnabled(extractPCode(lastAssistantResponse) != null && isTargetCurrent());
+    }
+
+    private boolean isTargetCurrent() {
+        return targetEditor != null && targetAbc != null && targetBodyIndex >= 0
+                && targetMethodIndex >= 0 && targetScriptIndex >= 0
+                && targetEditor.abc == targetAbc
+                && targetEditor.bodyIndex == targetBodyIndex
+                && targetEditor.methodIndex == targetMethodIndex
+                && targetEditor.getScriptIndex() == targetScriptIndex;
+    }
+
+    private void applyResponseToEditor() {
+        String code = extractPCode(lastAssistantResponse);
+        if (code == null || !isTargetCurrent()) {
+            updateApplyButton();
+            return;
+        }
+        int choice = JOptionPane.showConfirmDialog(this, text("dialog.applyConfirm"),
+                text("button.apply"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (choice != JOptionPane.OK_OPTION) {
+            return;
+        }
+        targetEditor.getAbcPanel().detailPanel.setEditMode(true);
+        if (targetEditor.getExportMode() != ScriptExportMode.PCODE) {
+            statusLabel.setText(text("status.applyFailed"));
+            return;
+        }
+        targetEditor.setText(code);
+        targetEditor.requestFocusInWindow();
+        statusLabel.setText(text("status.staged"));
+    }
+
+    private static String extractPCode(String response) {
+        if (response == null) {
+            return null;
+        }
+        Matcher matcher = Pattern.compile("(?is)```pcode\\s*\\r?\\n(.*?)```").matcher(response);
+        if (!matcher.find()) {
+            return null;
+        }
+        String code = matcher.group(1).trim();
+        return code.isEmpty() ? null : code;
     }
 
     private String getProviderId() {

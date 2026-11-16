@@ -854,6 +854,13 @@ public class DebugPanel extends JPanel {
         DebuggerHandler.getPool().submit(r);
     }
 
+    public void showWatchesOrLocals() {
+        DebuggerSession session = Main.getCurrentDebugSession();
+        selectedTab = session != null && !session.getWatches().isEmpty()
+                ? SelectedTab.WATCHES : SelectedTab.LOCALS;
+        refresh();
+    }
+
     public void dispose() {
         Main.getDebugHandler().removeBreakListener(breakListener);
         Main.getDebugHandler().removeFrameChangeListener(frameChangeListener);

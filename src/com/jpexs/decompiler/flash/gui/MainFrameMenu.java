@@ -941,7 +941,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
         SWF swf = mainFrame.getPanel().getCurrentSwf();
         String swfTitle = swf == null ? "" : swf.getTitleOrShortFileName();
         String swfContext = new AIContextManager().describe(swf);
-        new AIStudioDialog(mainFrame.getWindow(), swfTitle, swfContext).setVisible(true);
+        com.jpexs.decompiler.flash.gui.abc.ASMSourceEditorPane sourceEditor = null;
+        if (swf != null && swf.isAS3()) {
+            sourceEditor = mainFrame.getPanel().getABCPanel().detailPanel
+                    .methodTraitPanel.methodCodePanel.getSourceTextArea();
+        }
+        new AIStudioDialog(mainFrame.getWindow(), swfTitle, swfContext, sourceEditor).setVisible(true);
     }
 
     protected void solEditorActionPerformed(ActionEvent evt) {
@@ -1263,13 +1268,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         setPathVisible("/debugging", !isListening && isDebugRunning);
         setPathVisible("/debugging/debug", !isListening && isDebugRunning);
-        //setMenuEnabled("/debugging/debug/pause", isDebugRunning);
+        setMenuEnabled("/debugging/debug/pause", isDebugRunning && !isDebugPaused);
         setMenuEnabled("/debugging/debug/stepOver", isDebugPaused);
         setMenuEnabled("/debugging/debug/stepInto", isDebugPaused);
         setMenuEnabled("/debugging/debug/stepOut", isDebugPaused);
         setMenuEnabled("/debugging/debug/continue", isDebugPaused);
-        //setMenuEnabled("/debugging/debug/stack", isDebugPaused);
-        //setMenuEnabled("/debugging/debug/watch", isDebugPaused);
+        setMenuEnabled("/debugging/debug/stack", isDebugPaused);
+        setMenuEnabled("/debugging/debug/watch", isDebugPaused);
 
         setPathVisible("/debuggingListen", isListening);
         setPathVisible("/debuggingListen/debug", isListening);
@@ -1454,13 +1459,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/debugging", translate("menu.debugging"), null, null, 0, null, false, null, true);
         addMenuItem("/debugging/debug", translate("menu.debugging.debug"), null, null, 0, null, false, null, false);
         addMenuItem("/debugging/debug/stop", translate("menu.file.start.stop"), "stop32", this::stopActionPerformed, PRIORITY_TOP, null, true, null, false);
-        //addMenuItem("/debugging/debug/pause", translate("menu.debugging.debug.pause"), "pause32", this::pauseActionPerformed, PRIORITY_TOP, null, true,false);
+        addMenuItem("/debugging/debug/pause", translate("menu.debugging.debug.pause"), "pause32", this::pauseActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/debugging/debug/continue", translate("menu.debugging.debug.continue"), "continue32", this::continueActionPerformed, PRIORITY_TOP, null, true, new HotKey("F5"), false);
         addMenuItem("/debugging/debug/stepOver", translate("menu.debugging.debug.stepOver"), "stepover32", this::stepOverActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("F8"), false);
         addMenuItem("/debugging/debug/stepInto", translate("menu.debugging.debug.stepInto"), "stepinto32", this::stepIntoActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("F7"), false);
         addMenuItem("/debugging/debug/stepOut", translate("menu.debugging.debug.stepOut"), "stepout32", this::stepOutActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+F7"), false);
-        //addMenuItem("/debugging/debug/stack", translate("menu.debugging.debug.stack"), "stack32", this::stackActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        //addMenuItem("/debugging/debug/watch", translate("menu.debugging.debug.watch"), "watch32", this::watchActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/debugging/debug/stack", translate("menu.debugging.debug.stack"), "stack32", this::stackActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/debugging/debug/watch", translate("menu.debugging.debug.watch"), "watch32", this::watchActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/debugging/debug");
         finishMenu("/debugging");
 
@@ -1891,15 +1896,24 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean pauseActionPerformed(ActionEvent evt) {
-        try {
-            DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
-            //TODO
-
-        } catch (IOException ex) {
-            Main.getCurrentDebugSession().disconnect();
-            //ignore
+        DebuggerSession session = Main.getCurrentDebugSession();
+        if (session == null || session.isPaused()) {
+            return false;
         }
-        return true;
+        try {
+            mainFrame.getPanel().clearDebuggerColors();
+            Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
+            if (!session.getCommands().suspend()) {
+                Main.stopWork();
+                return false;
+            }
+            return true;
+        } catch (IOException ex) {
+            session.disconnect();
+            Main.stopWork();
+            //ignore
+            return false;
+        }
     }
 
     public boolean stepOverActionPerformed(ActionEvent evt) {
@@ -1971,12 +1985,26 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean stackActionPerformed(ActionEvent evt) {
-        //TODO
+        if (!Main.isDebugPaused()) {
+            return false;
+        }
+        mainFrame.getPanel().showDebugStackFrame();
         return true;
     }
 
     public boolean watchActionPerformed(ActionEvent evt) {
-        //TODO
+        DebuggerSession session = Main.getCurrentDebugSession();
+        if (session == null || !session.isPaused()) {
+            return false;
+        }
+        SWF swf = session.getCurrentSwf();
+        if (swf == null) {
+            return false;
+        }
+        DebugPanel debugPanel = swf.isAS3()
+                ? mainFrame.getPanel().getABCPanel().getDebugPanel()
+                : mainFrame.getPanel().getActionPanel().getDebugPanel();
+        debugPanel.showWatchesOrLocals();
         return true;
     }
 

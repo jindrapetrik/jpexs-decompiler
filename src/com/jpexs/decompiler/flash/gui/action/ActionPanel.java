@@ -205,9 +205,15 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     private JPanel pcodePanel;
 
     private JPanel iconsPanel;
+
+    private DebugPanel debugPanel;
     
     public synchronized boolean isScriptLoaded() {
         return scriptLoaded;
+    }
+
+    public DebugPanel getDebugPanel() {
+        return debugPanel;
     }
 
     public void addScriptListener(Runnable listener) {
@@ -976,7 +982,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         panA.add(decLabel, BorderLayout.NORTH);
 
-        DebugPanel debugPanel = new DebugPanel(false);
+        debugPanel = new DebugPanel(false);
 
         JPanel panelWithHint = new JPanel(new BorderLayout());
         brokenHintPanel = new JPanel(new BorderLayout(10, 10));
