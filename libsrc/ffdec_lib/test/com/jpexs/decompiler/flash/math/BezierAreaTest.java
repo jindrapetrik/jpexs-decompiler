@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 public class BezierAreaTest {
 
     @Test
-    public void largeCurvedAreaHasStableContourSegments() {
+    public void largeCurvedAreaKeepsWholeContours() {
         Path2D path = new Path2D.Double(Path2D.WIND_EVEN_ODD);
         // Stagger the curved contours so many edges are active in the same sweep rows.
         for (int i = 0; i < 48; i++) {
@@ -38,7 +38,7 @@ public class BezierAreaTest {
             path.closePath();
         }
         BezierArea area = new BezierArea(path);
-        Assert.assertEquals(segmentFingerprint(area.getPathIterator(null)), 0x37c7941d9da8235fL);
+        Assert.assertEquals(segmentFingerprint(area.getPathIterator(null)), 0x819a77a1f587e500L);
         Assert.assertTrue(area.contains(1, 40));
         Assert.assertFalse(area.contains(7, 40));
     }

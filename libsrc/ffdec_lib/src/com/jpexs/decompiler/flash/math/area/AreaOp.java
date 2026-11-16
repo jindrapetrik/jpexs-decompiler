@@ -147,8 +147,6 @@ public abstract strictfp class AreaOp {
     public static final int RSTAG_INSIDE = 1;
     public static final int RSTAG_OUTSIDE = -1;
 
-    public static final int MAX_LINK_COUNT = 1024;
-
     public abstract void newRow();
 
     public abstract int classify(Edge e);
@@ -199,9 +197,7 @@ public abstract strictfp class AreaOp {
     };
 
     private void consumeSubCurves(Vector<CurveLink> subcurves,
-                                  Vector<ChainEnd> chains,
                                   Vector<Curve> curve) {
-        finalizeSubCurves(subcurves, chains);
         Enumeration<CurveLink> enum_ = subcurves.elements();
         while (enum_.hasMoreElements()) {
             CurveLink link = enum_.nextElement();
@@ -215,6 +211,7 @@ public abstract strictfp class AreaOp {
             }
             curve.add(link.getSubCurve());
         }
+        subcurves.clear();
     }
 
     private Vector<Curve> pruneEdges(Vector<Edge> edges) {
@@ -240,7 +237,6 @@ public abstract strictfp class AreaOp {
         Vector<ChainEnd> chains = new Vector<>();
         Vector<CurveLink> links = new Vector<>();
         Vector<Curve> ret = new Vector<>();
-        int linkCount = 0;
         // Active edges are between left (inclusive) and right (exclusive)
         while (left < numedges) {
             double y = yrange[0];
@@ -413,22 +409,18 @@ public abstract strictfp class AreaOp {
                     System.out.println("  "+link.getSubCurve());
                 }
             }
-            // If we have complex area calculation, we should consume the
-            // intermediate subcurves to optimize memory footprint
-            if (linkCount >= MAX_LINK_COUNT) {
-                consumeSubCurves(subcurves, chains, ret);
-                linkCount = 0;
-                chains.clear();
-                subcurves.clear();
-            }
-            linkCount += links.size();
             resolveLinks(subcurves, chains, links);
             links.clear();
+            // Emit completed contours without closing chains that continue into the next row.
+            if (!subcurves.isEmpty()) {
+                consumeSubCurves(subcurves, ret);
+            }
             // Finally capture the bottom of the valid Y range as the top
             // of the next Y range.
             yrange[0] = yend;
         }
-        consumeSubCurves(subcurves, chains, ret);
+        finalizeSubCurves(subcurves, chains);
+        consumeSubCurves(subcurves, ret);
         return ret;
     }
 

@@ -99,10 +99,13 @@ final strictfp class ChainEnd {
     }
 
     public void addLink(CurveLink newlink) {
+        // Coalesce slices of the same curve while the contour is still open.
         if (etag == AreaOp.ETAG_ENTER) {
-            tail.setNext(newlink);
-            tail = newlink;
-        } else {
+            if (!tail.absorb(newlink)) {
+                tail.setNext(newlink);
+                tail = newlink;
+            }
+        } else if (!head.absorb(newlink)) {
             newlink.setNext(head);
             head = newlink;
         }
