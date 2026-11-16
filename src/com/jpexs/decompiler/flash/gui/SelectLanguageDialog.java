@@ -43,6 +43,13 @@ public class SelectLanguageDialog extends AppDialog {
 
     protected static final String[] languages = new String[]{"en", "ca", "cs", "zh", "de", "es", "fr", "hu", "it", "ja", "nl", "pl", "pt", "pt-BR", "ru", "sk", "sl", "sv", "tr", "uk"};
 
+    public static String normalizeLanguageCode(String localeCode) {
+        if (localeCode == null || localeCode.trim().isEmpty() || localeCode.equalsIgnoreCase("en")) {
+            return "en";
+        }
+        return localeCode;
+    }
+
     public SelectLanguageDialog(Window owner) {
         super(owner);
         setSize(350, 130);
@@ -51,11 +58,11 @@ public class SelectLanguageDialog extends AppDialog {
         cnt1.setLayout(new BorderLayout());
         cnt1.add(cnt, BorderLayout.CENTER);
 
-        String currentLanguage = Configuration.locale.get(Locale.getDefault().getLanguage());
+        String currentLanguage = normalizeLanguageCode(Configuration.locale.get(Locale.getDefault().getLanguage()));
         boolean found = false;
         int enIndex = 0;
         for (String code : languages) {
-            String name = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()), Locale.forLanguageTag(code.equals("en") ? "" : code)).getString("language");
+            String name = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()), Locale.forLanguageTag(code.equals("en") ? "en" : code)).getString("language");
             if (name.length() > 1) {
                 name = name.substring(0, 1).toUpperCase() + name.substring(1);
             }
@@ -101,12 +108,8 @@ public class SelectLanguageDialog extends AppDialog {
 
     private void okButtonActionPerformed(ActionEvent evt) {
         if (languageCombobox.getSelectedIndex() != -1) {
-            languageCode = ((Language) languageCombobox.getSelectedItem()).code;
-            String newLanguage = languageCode;
-            if (newLanguage.equals("en")) {
-                newLanguage = "";
-            }
-            Configuration.locale.set(newLanguage);
+            languageCode = normalizeLanguageCode(((Language) languageCombobox.getSelectedItem()).code);
+            Configuration.locale.set(languageCode);
             reloadUi();
         }
 
@@ -118,7 +121,9 @@ public class SelectLanguageDialog extends AppDialog {
     }
 
     public static void reloadUi() {
-        Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
+        String localeCode = normalizeLanguageCode(Configuration.locale.get());
+        Configuration.locale.set(localeCode);
+        Locale.setDefault(Locale.forLanguageTag(localeCode));
         DefaultSyntaxKit.reloadConfigs();
         Main.initLang();
         Main.reloadApp();

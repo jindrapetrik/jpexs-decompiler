@@ -3633,45 +3633,12 @@ public class Main {
     }
 
     public static void initLang() {
-        if (!Configuration.locale.hasValue()) {
-            if (Platform.isWindows()) {
-                //Load from Installer
-                String uninstKey = "{E618D276-6596-41F4-8A98-447D442A77DB}_is1";
-                uninstKey = "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + uninstKey;
-                try {
-                    if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, uninstKey)) {
-                        if (Advapi32Util.registryValueExists(WinReg.HKEY_LOCAL_MACHINE, uninstKey, "NSIS: Language")) {
-                            String installedLoc = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, uninstKey, "NSIS: Language");
-                            int lcid = Integer.parseInt(installedLoc);
-                            char[] buf = new char[9];
-                            int cnt = Kernel32.INSTANCE.GetLocaleInfo(lcid, Kernel32.LOCALE_SISO639LANGNAME, buf, 9);
-                            String langCode = new String(buf, 0, cnt).trim().toLowerCase();
-
-                            cnt = Kernel32.INSTANCE.GetLocaleInfo(lcid, Kernel32.LOCALE_SISO3166CTRYNAME, buf, 9);
-                            String countryCode = new String(buf, 0, cnt).trim().toLowerCase();
-
-                            List<String> langs = Arrays.asList(SelectLanguageDialog.getAvailableLanguages());
-                            for (int i = 0; i < langs.size(); i++) {
-                                langs.set(i, langs.get(i).toLowerCase());
-                            }
-
-                            String selectedLang = null;
-
-                            if (langs.contains(langCode + "-" + countryCode)) {
-                                selectedLang = SelectLanguageDialog.getAvailableLanguages()[langs.indexOf(langCode + "-" + countryCode)];
-                            } else if (langs.contains(langCode)) {
-                                selectedLang = SelectLanguageDialog.getAvailableLanguages()[langs.indexOf(langCode)];
-                            }
-                            if (selectedLang != null) {
-                                Configuration.locale.set(selectedLang);
-                            }
-                        }
-                    }
-                } catch (Exception ex) {
-                    //ignore
-                }
-            }
+        if (!Configuration.locale.hasValue() || Configuration.locale.get() == null || Configuration.locale.get().trim().isEmpty()) {
+            Configuration.locale.set(SelectLanguageDialog.normalizeLanguageCode(Configuration.locale.get()));
+        } else {
+            Configuration.locale.set(SelectLanguageDialog.normalizeLanguageCode(Configuration.locale.get()));
         }
+
         Locale.setDefault(Locale.forLanguageTag(Configuration.locale.get()));
         AppStrings.updateLanguage();
 
