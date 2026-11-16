@@ -168,6 +168,11 @@ public class AVM2LocalData extends BaseLocalData {
     public Map<Integer, GraphPart> finallyTargetParts = new HashMap<>();
 
     /**
+     * Mapping from finally exception index to the shared finally body.
+     */
+    public Map<Integer, GraphPart> finallyBodyParts = new HashMap<>();
+
+    /**
      * Mapping from switchedPart to index of nextpart
      */
     public Map<GraphPart, Integer> defaultWays = new HashMap<>();
@@ -291,6 +296,7 @@ public class AVM2LocalData extends BaseLocalData {
         inGetLoops = localData.inGetLoops;
         parsedExceptionIds = localData.parsedExceptionIds;
         finallyTargetParts = localData.finallyTargetParts;
+        finallyBodyParts = localData.finallyBodyParts;
         pushDefaultPart = localData.pushDefaultPart;
         finallyKinds = localData.finallyKinds;
         seenMethods = localData.seenMethods;

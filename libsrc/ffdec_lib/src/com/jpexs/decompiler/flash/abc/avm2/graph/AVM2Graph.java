@@ -329,16 +329,8 @@ public class AVM2Graph extends Graph {
                 continue;
             }
 
-            GraphPart finallyTryTargetPart = null;
-            int targetIp = code.adr2pos(ex.target);
-            for (GraphPart p : allParts) {
-                if (targetIp >= p.start && targetIp <= p.end) {
-                    finallyTryTargetPart = p;
-                    break;
-                }
-            }
-
-            GraphPart finallyPart = finallyTryTargetPart.nextParts.size() > 0 ? finallyTryTargetPart.nextParts.get(0) : null;
+            GraphPart handlerStart = localData.finallyTargetParts.get(e);
+            GraphPart handlerPart = handlerStart;
 
             TranslateStack finallyTryTargetStack = (TranslateStack) new TranslateStack("try_target");
 
@@ -347,44 +339,58 @@ public class AVM2Graph extends Graph {
             localData2.localScopeStack = new ScopeStack();
 
             List<GraphTargetItem> targetOutput = new GraphPartMarkedArrayList<>();
-            finallyTryTargetStack.setConnectedOutput(0, targetOutput, localData);
-            try {
-                translatePart(targetOutput, localData2, finallyTryTargetPart, finallyTryTargetStack, 0 /*??*/, "try_target");
-            } catch (GraphPartChangeException ex1) { //should not happen
-                targetOutput.clear();
-            }
-
             int switchedReg = -1;
             int finallyKind = FINALLY_KIND_UNKNOWN;
             Integer finallyThrowPushByte = null;
-            if (finallyTryTargetStack.size() == 1 && finallyTryTargetStack.peek() instanceof IntegerValueAVM2Item) {
-                finallyKind = FINALLY_KIND_STACK_BASED;
-                finallyThrowPushByte = ((IntegerValueAVM2Item) finallyTryTargetStack.peek()).intValue();
-            } else if (targetOutput.size() >= 2
-                    && (targetOutput.get(targetOutput.size() - 1) instanceof SetLocalAVM2Item)
-                    && (targetOutput.get(targetOutput.size() - 2) instanceof SetLocalAVM2Item)
-                    && (((SetLocalAVM2Item) targetOutput.get(targetOutput.size() - 1)).value instanceof IntegerValueAVM2Item)) {
-                SetLocalAVM2Item setLocal = ((SetLocalAVM2Item) targetOutput.get(targetOutput.size() - 1));
-                switchedReg = setLocal.regIndex;
-                finallyThrowPushByte = ((IntegerValueAVM2Item) setLocal.value).intValue();
-                finallyKind = FINALLY_KIND_REGISTER_BASED;
-            } else if (!targetOutput.isEmpty() && (targetOutput.get(targetOutput.size() - 1) instanceof ThrowAVM2Item)) {
-                //inlined to single part                    
-                //TODO: maybe replace all instances of exit nodes of try block
-                finallyKind = FINALLY_KIND_INLINED;
-            } else {
-                //probably inlined code in more parts, cannot do :-(                    
+            GraphPart finallyPart;
+            while (true) {
+                finallyPart = handlerPart.nextParts.isEmpty() ? null : handlerPart.nextParts.get(0);
+                try {
+                    translatePart(targetOutput, localData2, handlerPart, finallyTryTargetStack, 0, "try_target");
+                } catch (GraphPartChangeException ex1) { //should not happen
+                    targetOutput.clear();
+                    break;
+                }
+
+                boolean canEnterFinally = handlerPart == handlerStart
+                        || (handlerPart.nextParts.size() == 1 && finallyPart.refs.size() > 1);
+                if (canEnterFinally && finallyTryTargetStack.size() == 1
+                        && finallyTryTargetStack.peek() instanceof IntegerValueAVM2Item) {
+                    finallyKind = FINALLY_KIND_STACK_BASED;
+                    finallyThrowPushByte = ((IntegerValueAVM2Item) finallyTryTargetStack.peek()).intValue();
+                    break;
+                }
+                if (canEnterFinally && targetOutput.size() >= 2
+                        && (targetOutput.get(targetOutput.size() - 1) instanceof SetLocalAVM2Item)
+                        && (targetOutput.get(targetOutput.size() - 2) instanceof SetLocalAVM2Item)
+                        && (((SetLocalAVM2Item) targetOutput.get(targetOutput.size() - 1)).value instanceof IntegerValueAVM2Item)) {
+                    SetLocalAVM2Item setLocal = ((SetLocalAVM2Item) targetOutput.get(targetOutput.size() - 1));
+                    switchedReg = setLocal.regIndex;
+                    finallyThrowPushByte = ((IntegerValueAVM2Item) setLocal.value).intValue();
+                    finallyKind = FINALLY_KIND_REGISTER_BASED;
+                    break;
+                }
+                if (handlerPart == handlerStart && !targetOutput.isEmpty()
+                        && (targetOutput.get(targetOutput.size() - 1) instanceof ThrowAVM2Item)) {
+                    finallyKind = FINALLY_KIND_INLINED;
+                    break;
+                }
+                // Follow jumps within the handler prologue, stopping at shared code.
+                if (handlerPart.nextParts.size() != 1 || finallyPart.refs.size() != 1 || finallyPart == handlerStart
+                        || !(avm2code.code.get(handlerPart.end).definition instanceof JumpIns)) {
+                    break;
+                }
+                handlerPart = finallyPart;
             }
-            localData.finallyKinds.put(e, finallyKind);
             Integer defaultPushByte = null;
             GraphPart switchPart = null;
-            if (finallyKind == FINALLY_KIND_STACK_BASED) {
+            if (finallyKind == FINALLY_KIND_STACK_BASED && finallyPart != null) {
                 /*
                     Search for a lookupswitch which first pops from the stack
                  */
                 List<Integer> foundIps = new ArrayList<>();
                 List<GraphPart> foundParts = new ArrayList<>();
-                int stackAfter = localData.codeStats.instructionStats[finallyTryTargetPart.end].stackpos_after;
+                int stackAfter = localData.codeStats.instructionStats[handlerPart.end].stackpos_after;
 
                 //System.err.println("searching pops from stack size " + stackAfter);
                 findAllPops(localData, stackAfter, finallyPart, foundIps, foundParts, new HashSet<>());
@@ -465,7 +471,7 @@ public class AVM2Graph extends Graph {
                         }
                     }
                 }
-            } else if (finallyKind == FINALLY_KIND_REGISTER_BASED) {
+            } else if (finallyKind == FINALLY_KIND_REGISTER_BASED && finallyPart != null) {
                 switchPart = findLookupSwitchWithGetLocal(switchedReg, finallyPart);
                 int startIp = code.adr2pos(ex.start, true);
                 GraphPart tryPart = searchPart(startIp, allParts);
@@ -497,8 +503,10 @@ public class AVM2Graph extends Graph {
                     }
                 }
             }
+            localData.finallyKinds.put(e, switchPart == null && handlerPart != handlerStart ? FINALLY_KIND_UNKNOWN : finallyKind);
             localData.switchedRegs.put(e, switchedReg);
             if (switchPart != null) {
+                localData.finallyBodyParts.put(e, finallyPart);
 
                 localData.defaultWays.put(switchPart, defaultPushByte);
 
@@ -1323,12 +1331,11 @@ public class AVM2Graph extends Graph {
 
                 localData.finallyIndexToDefaultGraphPart.put(finallyIndex, defaultPart);
 
-                GraphPart finallyTryTargetPart = null;
-                int targetPos = avm2code.adr2pos(finallyException.target);
-                finallyTryTargetPart = searchPart(targetPos, allParts);
+                GraphPart finallyTryTargetPart = localData.finallyTargetParts.get(finallyIndex);
 
-                //Is it wrong to assume try target is only single part before finally?
-                finallyPart = finallyTryTargetPart.nextParts.isEmpty() ? null : finallyTryTargetPart.nextParts.get(0);
+                finallyPart = switchPart == null
+                        ? (finallyTryTargetPart.nextParts.isEmpty() ? null : finallyTryTargetPart.nextParts.get(0))
+                        : localData.finallyBodyParts.get(finallyIndex);
 
                 //List<GraphPart> finallyTargetStopPart = new ArrayList<>(stopPart);
                 if (finallyPart != null) {

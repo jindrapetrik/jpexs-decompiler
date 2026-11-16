@@ -825,6 +825,56 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testFinallyWithSplitExceptionHandler() throws Exception {
+        decompilePCodeWithLines(
+                "   protected_start:\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"work\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump normal_exit\n"
+                + "            pushtrue\n"
+                + "            pop\n"
+                + "   normal_exit:\n"
+                + "            pushbyte -1\n"
+                + "   protected_end:\n"
+                + "            jump cleanup\n"
+                + "   handler:\n"
+                + "            getlocal0\n"
+                + "            pushscope\n"
+                + "            jump save_exception\n"
+                + "            pushtrue\n"
+                + "            pop\n"
+                + "   save_exception:\n"
+                + "            coerce_a\n"
+                + "            setlocal2\n"
+                + "            pushbyte 0\n"
+                + "            jump cleanup\n"
+                + "   rethrow:\n"
+                + "            getlocal2\n"
+                + "            kill 2\n"
+                + "            throw\n"
+                + "   cleanup:\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"cleanup\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            lookupswitch done, [rethrow]\n"
+                + "   done:\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"after\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            try from protected_start to protected_end target handler type null name null end\n",
+                "         try\n"
+                + "         {\n"
+                + "            trace(\"work\");\n"
+                + "         }\n"
+                + "         finally\n"
+                + "         {\n"
+                + "            trace(\"cleanup\");\n"
+                + "         }\n"
+                + "         trace(\"after\");\n");
+    }
+
+    @Test
     public void testWhileTrue() throws Exception {
         decompilePCode(
                 "            getlex QName(PackageNamespace(\"\"),\"Math\")\n"
