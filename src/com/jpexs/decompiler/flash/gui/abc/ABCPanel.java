@@ -89,6 +89,7 @@ import com.jpexs.decompiler.flash.simpleparser.LinkHandler;
 import com.jpexs.decompiler.flash.simpleparser.LinkType;
 import com.jpexs.decompiler.flash.simpleparser.Path;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
@@ -2846,7 +2847,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     private void showLinkedAssetPreview() {
-        MainPanel.showPreview(linkedAsset, linkedAssetPreviewPanel, -1, null, true);
+        TreeItem previewItem = linkedAsset instanceof DefineFont4Tag ? null : linkedAsset;
+        MainPanel.showPreview(previewItem, linkedAssetPreviewPanel, -1, null, true);
         linkedAssetPreviewPanel.prepareEmbeddedAssetPreview();
         setLinkedAssetPreviewPlaying(Configuration.guiAvm2AssetPreviewPlaying.get(), false);
     }
