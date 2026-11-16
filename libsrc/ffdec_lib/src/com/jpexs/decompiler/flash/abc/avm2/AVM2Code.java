@@ -250,6 +250,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
@@ -257,6 +258,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IncLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
@@ -315,6 +317,7 @@ import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ForItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.CancellableWorker;
@@ -330,6 +333,7 @@ import java.io.OutputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -2756,6 +2760,8 @@ public class AVM2Code implements Cloneable {
         } catch (SecondPassException spe) {
             list = AVM2Graph.translateViaGraph(usedDeobfuscations, swfVersion, spe.getData(), callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssignmentIps, thisHasDefaultToPrimitive);
         }
+        Set<GraphTargetItem> scriptLocalInitializers = initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER
+                ? Collections.newSetFromMap(new IdentityHashMap<>()) : Collections.emptySet();
         if (initTraits != null) {
 
             Map<Integer, Traits> initClassMultinames = new LinkedHashMap<>();
@@ -2855,6 +2861,11 @@ public class AVM2Code implements Cloneable {
                                     //{
                                     TraitSlotConst tsc = (TraitSlotConst) t;
                                     if (value != null && !convertData.assignedValues.containsKey(tsc)) {
+                                        if (classMultiname != -1 && (isMethodLocalItem(value)
+                                                || value.getAllSubItemsRecursively().stream().anyMatch(AVM2Code::isMethodLocalItem))) {
+                                            scriptLocalInitializers.add(ti);
+                                            continue loopi;
+                                        }
 
                                         if (!isStatic) {
                                             Set<GraphTargetItem> subItems = value.getAllSubItemsRecursively();
@@ -3028,14 +3039,35 @@ public class AVM2Code implements Cloneable {
 
             if (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
 
-                //Eliminate all setlocals, can sometimes happen
+                Set<Integer> usedScriptRegisters = new HashSet<>();
+                if (!scriptLocalInitializers.isEmpty()) {
+                    AbstractGraphTargetVisitor registerVisitor = new AbstractGraphTargetVisitor() {
+                        @Override
+                        public boolean visit(GraphTargetItem item) {
+                            if (item instanceof LocalRegAVM2Item) {
+                                usedScriptRegisters.add(((LocalRegAVM2Item) item).regIndex);
+                            } else if (item instanceof IncLocalAVM2Item) {
+                                usedScriptRegisters.add(((IncLocalAVM2Item) item).regIndex);
+                            } else if (item instanceof DecLocalAVM2Item) {
+                                usedScriptRegisters.add(((DecLocalAVM2Item) item).regIndex);
+                            }
+                            return true;
+                        }
+                    };
+                    for (GraphTargetItem item : list) {
+                        registerVisitor.visit(item);
+                        item.visitRecursively(registerVisitor);
+                    }
+                }
+
+                // Keep assignments to registers used by initializers that stay in the script.
                 BlockVisitor bv = new BlockVisitor() {
                     @Override
                     public void visitBlock(List<GraphTargetItem> items) {
 
                         for (int i = 0; i < items.size(); i++) {
                             GraphTargetItem item = items.get(i);
-                            if (item instanceof SetLocalAVM2Item) {
+                            if (item instanceof SetLocalAVM2Item && !usedScriptRegisters.contains(((SetLocalAVM2Item) item).regIndex)) {
                                 items.set(i, item.value);
                             }
 
@@ -3116,7 +3148,7 @@ public class AVM2Code implements Cloneable {
             List<GraphTargetItem> newList = new ArrayList<>();
             for (GraphTargetItem ti : list) {
                 if (!(ti instanceof ReturnVoidAVM2Item)) {
-                    if (!(ti instanceof InitPropertyAVM2Item)) {
+                    if (!(ti instanceof InitPropertyAVM2Item) || scriptLocalInitializers.contains(ti)) {
                         newList.add(ti);
                     }
                 }
@@ -3254,6 +3286,12 @@ public class AVM2Code implements Cloneable {
         return multiName.name_index > 0 && uninitializedNameIndices.contains(multiName.name_index);
     }
 
+    private static boolean isMethodLocalItem(GraphTargetItem item) {
+        return item instanceof LocalRegAVM2Item || item instanceof SetLocalAVM2Item
+                || item instanceof IncLocalAVM2Item || item instanceof DecLocalAVM2Item
+                || item instanceof HasTempIndex || item instanceof NewActivationAVM2Item;
+    }
+
     private void uniteLocalsDeclarationTypes(DeclarationAVM2Item[] declaredRegs, List<GraphTargetItem> items) {
         for (int i = 0; i < items.size(); i++) {
             GraphTargetItem currentItem = items.get(i);
@@ -3269,13 +3307,13 @@ public class AVM2Code implements Cloneable {
             for (GraphTargetItem item : itemsOnLine) {
                 if (item instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) item;
-                    if (declaredRegs[setLocal.regIndex] != null) {
+                    if (setLocal.regIndex >= 0 && setLocal.regIndex < declaredRegs.length && declaredRegs[setLocal.regIndex] != null) {
                         setLocal.type = declaredRegs[setLocal.regIndex].type;
                     }
                 }
                 if (item instanceof LocalRegAVM2Item) {
                     LocalRegAVM2Item getLocal = (LocalRegAVM2Item) item;
-                    if (declaredRegs[getLocal.regIndex] != null) {
+                    if (getLocal.regIndex >= 0 && getLocal.regIndex < declaredRegs.length && declaredRegs[getLocal.regIndex] != null) {
                         getLocal.type = declaredRegs[getLocal.regIndex].type;
                     }
                 }

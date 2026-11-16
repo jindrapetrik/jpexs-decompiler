@@ -236,6 +236,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     private String recompileSource(String str) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+        return recompileSource(str, null);
+    }
+
+    private String recompileSource(String str, String scriptInitializer) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         final ABC abc = new ABC(new ABCContainerTag() {
             @Override
             public ABC getABC() {
@@ -263,7 +267,15 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         par.addScript(str, "Test.as", 0, 0, swf.getDocumentClass(), abc);
 
-        abc.script_info.get(0).getPacks(abc, 0, "", new ArrayList<>()).get(0).toSource(swf.getAbcIndex(), writer, abc.script_info.get(0).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false, false);
+        ConvertData conversion = new ConvertData();
+        ScriptInfo script = abc.script_info.get(0);
+        if (scriptInitializer != null) {
+            MethodBody body = abc.findBody(script.init_index);
+            body.max_regs = 2;
+            body.setCode(ASM3Parser.parse(abc, new StringReader(scriptInitializer), null, body, abc.method_info.get(script.init_index)));
+            conversion.deobfuscationMode = 0;
+        }
+        script.getPacks(abc, 0, "", new ArrayList<>()).get(0).toSource(swf.getAbcIndex(), writer, script.traits.traits, conversion, ScriptExportMode.AS, false, false, false);
         writer.finishHilights();
         return writer.toString();
     }
@@ -1676,5 +1688,30 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         String afterPackage = res.substring(packageEnd);
         assertTrue(afterPackage.contains("import flash.utils.getTimer;"), res);
         assertTrue(afterPackage.indexOf("import flash.utils.getTimer;") < afterPackage.indexOf("getTimer();"), res);
+    }
+
+    @Test
+    public void testStaticFieldInitializerUsingScriptLocal() throws Exception {
+        String res = recompileSource("package { public class Test { public static var data:Array; public static var literal:int; } }",
+                "code\n"
+                + "getlocal0\n"
+                + "pushscope\n"
+                + "getlex QName(PackageNamespace(\"\"),\"Test\")\n"
+                + "pushbyte 42\n"
+                + "initproperty QName(PackageNamespace(\"\"),\"literal\")\n"
+                + "pushbyte 7\n"
+                + "newarray 1\n"
+                + "setlocal1\n"
+                + "getlex QName(PackageNamespace(\"\"),\"Test\")\n"
+                + "getlocal1\n"
+                + "initproperty QName(PackageNamespace(\"\"),\"data\")\n"
+                + "returnvoid\n").replace("\r\n", "\n");
+        int packageEnd = res.lastIndexOf("\n}\n");
+        assertTrue(packageEnd >= 0, res);
+        String classSource = res.substring(0, packageEnd);
+        String scriptSource = res.substring(packageEnd);
+        assertTrue(classSource.contains("public static var data:Array;"), res);
+        assertTrue(classSource.contains("public static var literal:int = 42;"), res);
+        assertTrue(scriptSource.contains("var _loc1_:Array = [7];\nTest.data = _loc1_;"), res);
     }
 }
