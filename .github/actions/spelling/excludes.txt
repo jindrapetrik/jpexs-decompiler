@@ -132,17 +132,11 @@ _[a-z]+(?:_[A-Z]+|)\.properties$
 ^open_with\.rc$
 ignore$
 Lexer\.java$
-\.sol$
-\.lnk$
 ^wix/
 ^cert/
 ^versioninfo\.rc$
 ^versioninfo-cli\.rc$
-\.flv$
-\.yml$
-(?:^|/)build\.xml$
 ^Dockerfile$
-(?:^|/)DoAction\.as$
 ^libsrc/ffdec_lib/testdata/motion_object/
 \.swz$
 \.swc$
@@ -155,4 +149,3 @@ Lexer\.java$
 ^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/xfl/f5_smartclip_definitions\.xml$
 ^libsrc/ffdec_lib/src/com/jpexs/decompiler/flash/exporters/script/mxml-components\.properties$
 ^docs/.*_pt_BR\.md$
-(?:^|/)ttf\.doubletype\.license\.txt$

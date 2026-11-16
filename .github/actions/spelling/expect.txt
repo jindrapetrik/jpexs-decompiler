@@ -813,6 +813,7 @@ defaultstate
 defaultsyntaxkit
 defaultvalue
 deff
+definebutton
 definefunc
 definefunction
 definelocal
@@ -1042,6 +1043,7 @@ ecff
 ECHOSC
 ECIMAL
 ecj
+eclipsesource
 Ecriture
 edff
 editation
@@ -1156,6 +1158,7 @@ EXSTYLE
 extaction
 extags
 EXTENDEDKEY
+externalimage
 extitle
 Extrahandling
 EXTRALIGHT
@@ -1181,7 +1184,6 @@ Fdat
 FDE
 fdecompiled
 fdepth
-fdepths
 fdff
 fdformat
 fdir
@@ -1698,7 +1700,6 @@ imagesfolder
 imax
 imdata
 IMDCT
-IME
 ime
 imgd
 implementsop
@@ -1755,7 +1756,6 @@ initscopedepth
 initthrow
 initx
 inity
-INITY
 injectas
 innerfunction
 innershadow
@@ -2819,6 +2819,7 @@ pathpart
 pathsource
 pathvar
 Pawel
+payg
 pbit
 pblend
 pbmi
@@ -3212,6 +3213,7 @@ Sameline
 samepackage
 samepkg
 samplecode
+samplecount
 sampledata
 samplefac
 samplelength
@@ -3393,6 +3395,7 @@ SHOWWINDOW
 shx
 sidata
 sideeffect
+sidespeed
 sidex
 sids
 SIF
@@ -4265,7 +4268,6 @@ ymouse
 ynew
 YNM
 yof
-YOF
 yorig
 yourfile
 Yoyodyne

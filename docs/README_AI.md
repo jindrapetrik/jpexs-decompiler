@@ -25,5 +25,5 @@ This is only the first functional increment. AI editing tools, ActionScript exec
 
 OpenCode restricts external use of free chat models. JPEXS does not bypass HTTP 403 or automatically switch to a paid model. OpenRouter free models may be selected when their metadata indicates zero cost for the applicable request.
 
-See [CHANGELOG_AI.md](CHANGELOG_AI.md), [ARQUITETURA_IA.md](ARQUITETURA_IA.md), and [TESTES_IA.md](TESTES_IA.md) for details and validation status.
+See [CHANGELOG_AI_pt_BR.md](CHANGELOG_AI_pt_BR.md), [ARCHITECTURE_AI_pt_BR.md](ARCHITECTURE_AI_pt_BR.md), and [TESTS_AI_pt_BR.md](TESTS_AI_pt_BR.md) for details and validation status (portuguese-Brasil).
 
