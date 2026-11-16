@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8'?>
+<components>
+  <!-- Flash MX v1 authoring metadata only. Runtime code and skins are restored from the input SWF. -->
+  <component name="CheckBox" legacy="true" exportName="FCheckBoxSymbol" className="FCheckBoxClass" minimumPlayerVersion="6" width="100" height="13" requiredClasses="FUIComponentSymbol" iconId="2">
+    <parameter id="label" name="Label" variable="label" category="" verbose="0" defaultValue="Check Box" type="Default"/>
+    <parameter id="initialValue" name="Initial Value" variable="initialValue" category="" verbose="0" defaultValue="false" type="Boolean"/>
+    <parameter id="labelPlacement" name="Label Placement" variable="labelPlacement" category="" verbose="0" defaultValue="right" enumeration="left,right" type="List"/>
+    <parameter id="changeHandler" name="Change Handler" variable="changeHandler" category="" verbose="0" defaultValue="" type="Default"/>
+  </component>
+  <component name="ComboBox" legacy="true" exportName="FComboBoxSymbol" className="FComboBoxClass" minimumPlayerVersion="6" width="100" height="17" requiredClasses="FUIComponentSymbol" iconId="8">
+    <parameter id="editable" name="Editable" variable="editable" category="" verbose="0" defaultValue="false" type="Boolean"/>
+    <parameter id="labels" name="Labels" variable="labels" category="" verbose="0" defaultValue="" type="Array"/>
+    <parameter id="data" name="Data" variable="data" category="" verbose="0" defaultValue="" type="Array"/>
+    <parameter id="rowCount" name="Row Count" variable="rowCount" category="" verbose="0" defaultValue="8" type="Number"/>
+    <parameter id="changeHandler" name="Change Handler" variable="changeHandler" category="" verbose="0" defaultValue="" type="Default"/>
+  </component>
+  <component name="ListBox" legacy="true" exportName="FListBoxSymbol" className="FListBoxClass" minimumPlayerVersion="6" width="100" height="105" requiredClasses="FUIComponentSymbol" iconId="4">
+    <parameter id="labels" name="Labels" variable="labels" category="" verbose="0" defaultValue="" type="Array"/>
+    <parameter id="data" name="Data" variable="data" category="" verbose="0" defaultValue="" type="Array"/>
+    <parameter id="selectMultiple" name="Select Multiple" variable="selectMultiple" category="" verbose="0" defaultValue="false" type="Boolean"/>
+    <parameter id="changeHandler" name="Change Handler" variable="changeHandler" category="" verbose="0" defaultValue="" type="Default"/>
+  </component>
+  <component name="PushButton" legacy="true" exportName="FPushButtonSymbol" className="FPushButtonClass" minimumPlayerVersion="6" width="100" height="20" requiredClasses="FUIComponentSymbol" iconId="1">
+    <parameter id="label" name="Label" variable="label" category="" verbose="0" defaultValue="Push Button" type="Default"/>
+    <parameter id="clickHandler" name="Click Handler" variable="clickHandler" category="" verbose="0" defaultValue="" type="Default"/>
+  </component>
+  <component name="RadioButton" legacy="true" exportName="FRadioButtonSymbol" className="FRadioButtonClass" minimumPlayerVersion="6" width="100" height="13" requiredClasses="FUIComponentSymbol" iconId="3">
+    <parameter id="label" name="Label" variable="label" category="" verbose="0" defaultValue="Radio Button" type="Default"/>
+    <parameter id="initialState" name="Initial State" variable="initialState" category="" verbose="0" defaultValue="false" type="Boolean"/>
+    <parameter id="groupName" name="Group Name" variable="groupName" category="" verbose="0" defaultValue="radioGroup" type="Default"/>
+    <parameter id="data" name="Data" variable="data" category="" verbose="0" defaultValue="" type="Default"/>
+    <parameter id="labelPlacement" name="Label Placement" variable="labelPlacement" category="" verbose="0" defaultValue="right" enumeration="left,right" type="List"/>
+    <parameter id="changeHandler" name="Change Handler" variable="changeHandler" category="" verbose="0" defaultValue="" type="Default"/>
+  </component>
+  <component name="ScrollBar" legacy="true" exportName="FScrollBarSymbol" className="FScrollBarClass" minimumPlayerVersion="6" width="16" height="100" requiredClasses="FUIComponentSymbol" iconId="5">
+    <parameter id="_targetInstanceName" name="Target TextField" variable="_targetInstanceName" category="" verbose="0" defaultValue="" type="Default"/>
+    <parameter id="horizontal" name="Horizontal" variable="horizontal" category="" verbose="0" defaultValue="false" type="Boolean"/>
+  </component>
+  <component name="ScrollPane" legacy="true" exportName="FScrollPaneSymbol" className="FScrollPaneClass" minimumPlayerVersion="6" width="100" height="100" requiredClasses="FUIComponentSymbol" iconId="7">
+    <parameter id="scrollContent" name="Scroll Content" variable="scrollContent" category="" verbose="0" defaultValue="" type="Default"/>
+    <parameter id="hScroll" name="Horizontal Scroll" variable="hScroll" category="" verbose="0" defaultValue="auto" enumeration="auto,true,false" type="List"/>
+    <parameter id="vScroll" name="Vertical Scroll" variable="vScroll" category="" verbose="0" defaultValue="auto" enumeration="auto,true,false" type="List"/>
+    <parameter id="dragContent" name="Drag Content" variable="dragContent" category="" verbose="0" defaultValue="false" type="Boolean"/>
+  </component>
+  <assets>
+    <asset exportName="FCheckBoxSymbol" path="Component Assets/CheckBox"/>
+    <asset exportName="FComboBoxSymbol" path="Component Assets/ComboBox"/>
+    <asset exportName="FBoundingBoxSymbol" path="Component Assets/Component Skins/Global Skins/FBoundingBox"/>
+    <asset exportName="FHighlightSymbol" path="Component Assets/Component Skins/Global Skins/FHighlight"/>
+    <asset exportName="FLabelSymbol" path="Component Assets/Component Skins/Global Skins/FLabel"/>
+    <asset exportName="DataProviderSymbol" path="Component Assets/Core Assets - Developer Only/FUIComponent Class Tree/DataProvider"/>
+    <asset exportName="FComboBoxItemSymbol" path="Component Assets/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem SubClasses/FComboBoxItem"/>
+    <asset exportName="FListItemSymbol" path="Component Assets/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem SubClasses/FListBoxItem"/>
+    <asset exportName="FSelectableItemSymbol" path="Component Assets/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableItem"/>
+    <asset exportName="FScrollSelectListSymbol" path="Component Assets/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableList SubClasses/FScrollSelectList"/>
+    <asset exportName="FSelectableListSymbol" path="Component Assets/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent SubClasses/FSelectableList"/>
+    <asset exportName="FUIComponentSymbol" path="Component Assets/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent"/>
+    <asset exportName="fcb_states" path="Component Assets/Core Assets - Developer Only/Other Assets/FCheckBox Assets/fcb_states"/>
+    <asset exportName="fcb_hitArea" path="Component Assets/Core Assets - Developer Only/Other Assets/FCheckBox Assets/Skin Elements/fcb_hitArea"/>
+    <asset exportName="fpb_states" path="Component Assets/Core Assets - Developer Only/Other Assets/FPushButton Assets/fpb_states"/>
+    <asset exportName="fpb_hitArea" path="Component Assets/Core Assets - Developer Only/Other Assets/FPushButton Assets/FPushButton Elements/fpb_up/fpb_hitArea"/>
+    <asset exportName="frb_states" path="Component Assets/Core Assets - Developer Only/Other Assets/FRadioButton Assets/frb_states"/>
+    <asset exportName="frb_hitArea" path="Component Assets/Core Assets - Developer Only/Other Assets/FRadioButton Assets/Skin Elements/frb_hitArea"/>
+    <asset exportName="DownArrow" path="Component Assets/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_DownArrow"/>
+    <asset exportName="ScrollThumb" path="Component Assets/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_ScrollThumb"/>
+    <asset exportName="UpArrow" path="Component Assets/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_UpArrow"/>
+    <asset exportName="FListBoxSymbol" path="Component Assets/ListBox"/>
+    <asset exportName="FPushButtonSymbol" path="Component Assets/PushButton"/>
+    <asset exportName="FRadioButtonSymbol" path="Component Assets/RadioButton"/>
+    <asset exportName="FScrollBarSymbol" path="Component Assets/ScrollBar"/>
+    <asset exportName="FScrollPaneSymbol" path="Component Assets/ScrollPane"/>
+  </assets>
+</components>

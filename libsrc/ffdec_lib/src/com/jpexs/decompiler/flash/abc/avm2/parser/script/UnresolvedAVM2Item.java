@@ -570,6 +570,12 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
 
     private boolean isScopeProperty(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClassFullName, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables, ResolveAccelerator accelerator) throws CompilationException {
         boolean isProperty = false;
+        // "super" is a keyword, not a scope property: it must be resolved by
+        // resolveThisOrSuper(), otherwise super.method() compiles to a global
+        // name lookup (getlex "super") instead of callsuper.
+        if (name.size() > 0 && name.get(0).equals("super")) {
+            return false;
+        }
         if (localData != null) { //resolve can be called without localData
             PropertyAVM2Item resolvedx = new PropertyAVM2Item(null, name.isAttribute(0), name.get(0), name.getNamespaceSuffix(0), abc, openedNamespaces, callStack, false, null, line, this.thisType);
             ((PropertyAVM2Item) resolvedx).scopeStack = scopeStack;

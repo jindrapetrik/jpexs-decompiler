@@ -1,0 +1,4 @@
+-cp src
+-main Main
+-swf bin/haxe_cast_mid_expression.swf
+-swf-version 11

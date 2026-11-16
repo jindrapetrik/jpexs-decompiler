@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
@@ -75,6 +76,9 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
     @HideInRawEdit
     public ByteArrayRange actionBytes;
 
+    @Internal
+    private transient volatile ButtonAction buttonAction;
+
     /**
      * Constructor
      *
@@ -104,6 +108,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
         buttonId = sis.readUI16("buttonId");
         characters = sis.readBUTTONRECORDList(swf, this, "characters");
         actionBytes = sis.readByteRangeEx(sis.available(), "actionBytes", DumpInfoSpecialType.ACTION_BYTES, sis.getPos());
+        SWF.uncache(buttonAction);
     }
 
     /**
@@ -142,11 +147,18 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
 
     @Override
     public List<ButtonAction> getSubItems() {
-        return Arrays.asList(new ButtonAction(this));
+        // Tree models use the same action instance for child and index lookups.
+        synchronized (this) {
+            if (buttonAction == null) {
+                buttonAction = new ButtonAction(this);
+            }
+            return Arrays.asList(buttonAction);
+        }
     }
 
     public void setActions(List<Action> actions) {
         actionBytes = Action.actionsToByteArrayRange(actions, true, swf.version);
+        SWF.uncache(buttonAction);
     }
 
     public ByteArrayRange getActionBytes() {
@@ -155,6 +167,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
 
     public void setActionBytes(byte[] actionBytes) {
         this.actionBytes = new ByteArrayRange(actionBytes);
+        SWF.uncache(buttonAction);
     }
 
     public void setModified() {

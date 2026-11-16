@@ -23,9 +23,11 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetDialect;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Pop item from the stack.
@@ -33,6 +35,19 @@ import java.util.List;
  * @author JPEXS
  */
 public class PopItem extends GraphTargetItem {
+
+    private static final AtomicLong NEXT_ORDER = new AtomicLong();
+
+    /**
+     * Creation order: a translation pops the top of the stack first.
+     */
+    public final long order = NEXT_ORDER.getAndIncrement();
+
+    /**
+     * The pushed value this pop reads, once the decompiler resolved it, or
+     * null.
+     */
+    public GraphTargetItem resolvedValue;
 
     /**
      * Constructor.
@@ -46,7 +61,22 @@ public class PopItem extends GraphTargetItem {
     }
 
     @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        if (resolvedValue != null) {
+            visitor.visit(resolvedValue);
+        }
+    }
+
+    @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        if (resolvedValue != null) {
+            if (resolvedValue.getPrecedence() > PRECEDENCE_PRIMARY) {
+                writer.append("(");
+                resolvedValue.toString(writer, localData);
+                return writer.append(")");
+            }
+            return resolvedValue.toString(writer, localData);
+        }
         //Logger.getLogger(PopItem.class.getName()).log(Level.WARNING, "Pop item left in the source code");
         writer.append("§§pop()");
         return writer;
@@ -59,21 +89,33 @@ public class PopItem extends GraphTargetItem {
 
     @Override
     public GraphTargetItem returnType() {
+        if (resolvedValue != null) {
+            return resolvedValue.returnType();
+        }
         return TypeItem.UNBOUNDED;
     }
 
     @Override
     public Object getResult() {
+        if (resolvedValue != null) {
+            return resolvedValue.getResult();
+        }
         return Null.INSTANCE;
     }
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        if (resolvedValue != null) {
+            return resolvedValue.toSource(localData, generator);
+        }
         return generator.generate(localData, this);
     }
 
     @Override
     public boolean hasSideEffect() {
+        if (resolvedValue != null) {
+            return resolvedValue.hasSideEffect();
+        }
         return true; //?
     }
 }

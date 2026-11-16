@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:model="model.*" xmlns:components="components.*"
+               width="620" height="450">
+    <fx:Script><![CDATA[
+        import model.Product;
+        import model.SignatureOnly;
+        import model.Tag;
+        import utils.PriceFormatter;
+        import utils.decorateLabel;
+        [Bindable] private var selected:Product = new Product();
+        private var tags:Vector.<Tag> = new <Tag>[new Tag("demo")];
+        private function identity(value:SignatureOnly):SignatureOnly { return value; }
+        private function formatProduct(value:Product):String {
+            return decorateLabel(value.name + ": " + PriceFormatter.format(value.price));
+        }
+    ]]></fx:Script>
+    <fx:Declarations>
+        <model:Product id="product" name="Coffee" price="49"/>
+    </fx:Declarations>
+    <s:VGroup paddingLeft="20" paddingTop="20" gap="12">
+        <s:Label text="AS3 class dependencies" fontSize="22"/>
+        <s:Label text="{formatProduct(product)}"/>
+        <components:ProductCard product="{product}"/>
+        <components:StatusBadge text="Handwritten AS3 component"/>
+        <components:TinyLabel/>
+        <s:List width="260" height="100">
+            <s:dataProvider><s:ArrayCollection><fx:Object name="Tea" price="35"/></s:ArrayCollection></s:dataProvider>
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:ItemRenderer>
+                        <fx:Script><![CDATA[import utils.RendererFormatter;]]></fx:Script>
+                        <s:Label text="{RendererFormatter.label(data.name)}"/>
+                    </s:ItemRenderer>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:List>
+    </s:VGroup>
+</s:Application>

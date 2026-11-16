@@ -1,0 +1,131 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <media>
+          <DOMCompiledClipItem name="MyComponent" itemID="6af07acf-00000814" linkageExportForAS="true" linkageClassName="MyComponent" sourceLastImported="1794144945" customIconID="0" actionscriptClass="MyComponent" livePreviewScmHRef="7872eo6r4m.swf" livePreviewScmSourceFilename="C:\Users\MyUser\AppData\Local\Adobe\Flash CS6\en_US\Configuration\TMP7872eo6r4m..swf" persistLivePreview11="true" livePreview11ScmHRef="7872eo6r4m10.swf" livePreview11ScmSourceFilename="C:\Users\MyUser\AppData\Local\Adobe\Flash CS6\en_US\Configuration\TMP7871zo6r4m..swf" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true" swcPath="MyComponent.xml" rootSymbolLinkageID="MyComponent" movieRectRight="2260" movieRectBottom="1980" playerVersion="9" actionscriptVersion="3" hashKey="BHSCFEDtklIijprNG9y/X/">
+               <parametersAsXML><![CDATA[   <property id="boxColor">
+      <Inspectable name="myColor" variable="boxColor" category="" verbose="0" defaultValue="#3399FF" type="Color"/>
+   </property>
+   <property id="opacity">
+      <Inspectable name="opacity" variable="opacity" category="" verbose="0" defaultValue="1" type="Number"/>
+   </property>
+   <property id="text">
+      <Inspectable name="text" variable="text" category="" verbose="0" defaultValue="Default text" type="String"/>
+   </property>
+]]></parametersAsXML>
+               <classProperties><![CDATA[<component id="MyComponent" class="MyComponent" livePreviewClass="MyComponent" modified="1794144945989">
+<movieBounds xmin="0" xmax="2260" ymin="0" ymax="1980" />
+<classDefs>
+	<classDef id="fl.livepreview.LivePreviewParent"/>
+	<classDef id="MyComponent"/>
+</classDefs>
+<class id="MyComponent" >
+	<method id="opacity" returnType="Number" isProperty="true" permissions="readwrite">
+		<Inspectable type="Number" defaultValue="1" />
+	</method>
+	<method id="text" returnType="String" isProperty="true" permissions="readwrite">
+		<Inspectable type="String" defaultValue="Default text" />
+	</method>
+	<method id="boxColor" returnType="uint" isProperty="true" permissions="readwrite">
+		<Inspectable name="myColor" type="Color" defaultValue="#3399FF" />
+	</method>
+	<method id="labelField" returnType="TextField" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="MojeKomponenta" returnType="null" isProperty="false">
+	</method>
+	<method id="MyComponent" isConstructor="true" isProperty="false">
+	</method>
+</class><livePreview class="MyComponent">
+<movieBounds xmin="0" xmax="2260" ymin="0" ymax="1980" />
+<classDefs>
+	<classDef id="MyComponent"/>
+	<classDef id="fl.livepreview.LivePreviewParent"/>
+</classDefs>
+<class id="MyComponent" >
+	<method id="opacity" returnType="Number" isProperty="true" permissions="readwrite">
+		<Inspectable type="Number" defaultValue="1" />
+	</method>
+	<method id="text" returnType="String" isProperty="true" permissions="readwrite">
+		<Inspectable type="String" defaultValue="Default text" />
+	</method>
+	<method id="labelField" returnType="TextField" isProperty="true" permissions="readwrite">
+	</method>
+	<method id="MojeKomponenta" returnType="null" isProperty="false">
+	</method>
+	<method id="MyComponent" isConstructor="true" isProperty="false">
+	</method>
+</class></livePreview>
+</component>
+]]></classProperties>
+               <customIcon>
+                    <CustomIcon rowByteCount="72" colorDepth="32" width="18" height="18" frameRight="360" frameBottom="360" isTransparent="true" href="7872eo6r4m11.dat"/>
+               </customIcon>
+               <SwcItem name="MyComponent" version="1794144945" isTopLevel="true"/>
+          </DOMCompiledClipItem>
+     </media>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMCompiledClipInstance libraryItemName="MyComponent" uniqueID="6">
+                                             <matrix>
+                                                  <Matrix tx="116.85" ty="77.85"/>
+                                             </matrix>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='6'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="boxColor">
+      <Inspectable name="myColor" variable="boxColor" category="" verbose="0" defaultValue="#3399FF" type="Color"/>
+   </property>
+   <property id="opacity">
+      <Inspectable name="opacity" variable="opacity" category="" verbose="0" defaultValue="1" type="Number"/>
+   </property>
+   <property id="text">
+      <Inspectable name="text" variable="text" category="" verbose="0" defaultValue="aaa" type="String"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMCompiledClipInstance>
+                                        <DOMCompiledClipInstance libraryItemName="MyComponent" uniqueID="8">
+                                             <matrix>
+                                                  <Matrix tx="293.8" ty="79.85"/>
+                                             </matrix>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='8'>
+</component>
+]]></dataBindingXML>
+                                             <parametersAsXML><![CDATA[   <property id="boxColor">
+      <Inspectable name="myColor" variable="boxColor" category="" verbose="0" defaultValue="#3399FF" type="Color"/>
+   </property>
+   <property id="opacity">
+      <Inspectable name="opacity" variable="opacity" category="" verbose="0" defaultValue="1" type="Number"/>
+   </property>
+   <property id="text">
+      <Inspectable name="text" variable="text" category="" verbose="0" defaultValue="bbb" type="String"/>
+   </property>
+]]></parametersAsXML>
+                                        </DOMCompiledClipInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="15430" publishTime="1794143568"/>
+          <PublishItem publishSize="15430" publishTime="1794143554"/>
+          <PublishItem publishSize="1586" publishTime="1794142768"/>
+          <PublishItem publishSize="1588" publishTime="1794142548"/>
+     </publishHistory>
+     <swcCache>
+          <Swc hashKey="BHSCFEDtklIijprNG9y/X/" href="78n4jo6r57.swc">
+               <classDefinitions>
+                    <ClassDefinition value="fl.livepreview.LivePreviewParent"/>
+                    <ClassDefinition value="MyComponent"/>
+                    <ClassDefinition value="MyComponent"/>
+                    <ClassDefinition value="fl.livepreview.LivePreviewParent"/>
+               </classDefinitions>
+          </Swc>
+     </swcCache>
+</DOMDocument>

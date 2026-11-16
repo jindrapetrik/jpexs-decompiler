@@ -1,0 +1,40 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonDisabled" itemID="4270310e-000002ec" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="ForwardButtonDisabled" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonDisabled" sourceLastModified="1114719558" lastModified="1114719558" lastUniqueIdentifier="12" sourceItemID="4270310e-000002ec">
+  <timeline>
+    <DOMTimeline name="ForwardButtonDisabled">
+      <layers>
+        <DOMLayer name="Icon" color="#FFFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardIcon" name="icon_mc">
+                  <matrix>
+                    <Matrix tx="9" ty="9"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="3" y="2.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Button" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgNormal" name="button_mc">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0.3515625"/>
+                  </color>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

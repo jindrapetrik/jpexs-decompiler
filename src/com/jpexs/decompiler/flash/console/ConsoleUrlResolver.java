@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.UrlResolver;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.ftr.FtrSwfBundle;
 import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
 import com.jpexs.decompiler.flash.profiles.IggySwfProfile;
 import com.jpexs.decompiler.flash.profiles.SwfProfile;
@@ -140,7 +141,7 @@ public class ConsoleUrlResolver implements UrlResolver {
                 }
                 // Try alternative container extensions after the requested SWF.
                 if (currentUrl.toLowerCase(Locale.ENGLISH).endsWith(".swf")) {
-                    for (String extension : new String[]{".gfx", ".iggy"}) {
+                    for (String extension : new String[]{".gfx", ".iggy", ".ftr"}) {
                         File alternative = new File(new File(basePath).getParentFile(), currentUrl.substring(0, currentUrl.length() - 4) + extension);
                         if (alternative.exists()) {
                             try {
@@ -167,7 +168,11 @@ public class ConsoleUrlResolver implements UrlResolver {
         OpenableSourceInfo sourceInfo = new OpenableSourceInfo(is, file, fileTitle);
         SwfProfile profile = null;
         String sourceName = file != null ? file : fileTitle;
-        if (sourceName != null && sourceName.toLowerCase(Locale.ENGLISH).endsWith(".iggy")) {
+        if (sourceName != null && sourceName.toLowerCase(Locale.ENGLISH).endsWith(".ftr")) {
+            try (InputStream source = is) {
+                is = FtrSwfBundle.openSwf(source);
+            }
+        } else if (sourceName != null && sourceName.toLowerCase(Locale.ENGLISH).endsWith(".iggy")) {
             try (InputStream source = is) {
                 IggySwfBundle bundle = file == null ? new IggySwfBundle(source) : new IggySwfBundle(new File(file));
                 is = bundle.getOpenable(bundle.getKeys().iterator().next());

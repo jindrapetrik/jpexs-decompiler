@@ -19,6 +19,8 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
@@ -33,8 +35,19 @@ public class CharacterSetTag extends Tag {
 
     public static final String NAME = "CharacterSet";
    
+    /**
+     * Shift-JIS encoding 1/0
+     * GetSystemMetrics(SM_DBCSENABLED) ? 1 : 0
+     */
+    @SWFType(BasicType.UI16)
+    public int shiftJIS;
+        
+    /**
+     * Mac Roman encoding 1/0
+     */
+    @SWFType(BasicType.UI16)
+    public int macRoman;
     
-    public long unknown;
     
     public CharacterSetTag(SWF swf) {
         super(swf, ID, NAME, null);       
@@ -47,11 +60,13 @@ public class CharacterSetTag extends Tag {
 
     @Override
     public void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        unknown = sis.readUI32("unknown");
+        shiftJIS = sis.readUI16("shiftJIS");
+        macRoman = sis.readUI16("macRoman");
     }
 
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
-        sos.writeUI32(unknown);
+        sos.writeUI16(shiftJIS);
+        sos.writeUI16(macRoman);
     }
 }

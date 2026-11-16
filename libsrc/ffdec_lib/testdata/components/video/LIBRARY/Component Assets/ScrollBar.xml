@@ -1,0 +1,303 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ScrollBar" itemID="45365ac7-000002ef" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="fl.controls.ScrollBar" lastModified="1292423118" lastUniqueIdentifier="60">
+  <timeline>
+    <DOMTimeline name="ScrollBar" currentFrame="1">
+      <layers>
+        <DOMLayer name="assets" color="#808080" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/Shared/focusRectSkin">
+                  <matrix>
+                    <Matrix tx="66.8" ty="223"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="41.05" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollTrack_skin">
+                  <matrix>
+                    <Matrix tx="285" ty="18"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="74"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollTrack_skin">
+                  <matrix>
+                    <Matrix tx="34" ty="18"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="74"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollTrack_skin">
+                  <matrix>
+                    <Matrix tx="121" ty="20"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="74"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollTrack_skin">
+                  <matrix>
+                    <Matrix tx="209" ty="18"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="74"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollArrowUp_downSkin">
+                  <matrix>
+                    <Matrix tx="209" ty="18"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="7"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollArrowDown_downSkin">
+                  <matrix>
+                    <Matrix tx="209" ty="152"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="7"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollThumb_downSkin">
+                  <matrix>
+                    <Matrix tx="209" ty="60"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="6" y="26"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollArrowDown_overSkin">
+                  <matrix>
+                    <Matrix tx="121" ty="154"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="7"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollThumb_overSkin">
+                  <matrix>
+                    <Matrix tx="121" ty="62"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="6" y="26"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollArrowUp_overSkin">
+                  <matrix>
+                    <Matrix tx="121" ty="20"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="7"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollArrowUp_upSkin">
+                  <matrix>
+                    <Matrix tx="34" ty="18"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="7"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollThumb_upSkin">
+                  <matrix>
+                    <Matrix tx="34" ty="60"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="6" y="26"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollArrowDown_upSkin">
+                  <matrix>
+                    <Matrix tx="34" ty="152"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="7"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollArrowDown_disabledSkin">
+                  <matrix>
+                    <Matrix tx="285" ty="152"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="7"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollArrowUp_disabledSkin">
+                  <matrix>
+                    <Matrix tx="285" ty="18"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="7"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollBar_thumbIcon">
+                  <matrix>
+                    <Matrix tx="38" ty="82"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="2.5" y="4.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollBar_thumbIcon">
+                  <matrix>
+                    <Matrix tx="125" ty="84"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="2.5" y="4.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollBar_thumbIcon">
+                  <matrix>
+                    <Matrix tx="213" ty="82"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="2.5" y="4.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="asset names" color="#FF4FFF" locked="true" current="true" isSelected="true" autoNamed="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMRectangleObject objectWidth="388.95" objectHeight="183" x="-1.55" y="30.3" lockFlag="true" topLeftRadius="10" topRightRadius="10" bottomLeftRadius="10" bottomRightRadius="10">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="1.493896484375" tx="1.55" ty="-45.25"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="192.9" y="121.85"/>
+                  </transformationPoint>
+                  <fill>
+                    <SolidColor color="#EEEEEE"/>
+                  </fill>
+                  <stroke>
+                    <SolidStroke scaleMode="normal">
+                      <fill>
+                        <SolidColor color="#CCCCCC"/>
+                      </fill>
+                    </SolidStroke>
+                  </stroke>
+                </DOMRectangleObject>
+                <DOMStaticText width="50.9" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="192.45" ty="183.5"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Disabled</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="16.85" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="36" ty="185.45"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Up</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="28.4" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="118.45" ty="183.5"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Over</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="33.5" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix a="0.9998779296875" d="0.99981689453125" tx="280.45" ty="183.5"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Down</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+                <DOMStaticText width="94.9" height="14.5" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="197.55" ty="225"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Focus Rect Skin</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" lineSpacing="10" size="13" face="ArialMT" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="avatar" color="#4FFF4F" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/ScrollBarSkins/ScrollTrack_skin">
+                  <matrix>
+                    <Matrix d="0.675674438476563"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="7.5" y="74"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="ComponentShim" color="#4F80FF" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMCompiledClipInstance libraryItemName="Component Assets/_private/ComponentShim" uniqueID="60">
+                  <matrix>
+                    <Matrix d="1.00311279296875"/>
+                  </matrix>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='35.35.16.60'>
+</component>
+]]></dataBindingXML>
+                </DOMCompiledClipInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

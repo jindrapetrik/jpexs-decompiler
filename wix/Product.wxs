@@ -105,8 +105,8 @@
     <Property Id="VERB_RESOURCE_ID" Value="1001" />
     <Property Id="SWF_CLASS" Value="ShockwaveFlash.ShockwaveFlash" Secure="yes" />
     <Property Id="APP_EXENAME" Value="ffdec.exe" />
-    <?define FFDEC_EXTENSIONS = SWF;SPL;GFX;SWT;SWC ?>
-    <!-- SWF;SPL;GFX;SWT;SWC -->
+    <?define FFDEC_EXTENSIONS = SWF;SPL;GFX;SWT;SWC;SWZ;ABC;FTR ?>
+    <!-- SWF;SPL;GFX;SWT;SWC;SWZ;ABC;FTR -->
     
     <?foreach EXT in $(var.FFDEC_EXTENSIONS) ?>
         <Property Id="EXT_$(var.EXT)_EXISTS">
@@ -488,6 +488,201 @@
 
             />
         </Component>
+      
+        <!-- Register "Open With" for .swz -->
+        <Component Id="RegSwzOpenWithList" Guid="7C2D68E2-DCA4-4F0D-AEF6-E81BD0F0D9FE">
+            <RegistryValue Root="HKCR" Key=".swz\OpenWithList\[APP_EXENAME]" Value=""/>
+        </Component>
+        <!-- Associate .swz file extension -->
+        <Component Id="RegSwzClassName" Guid="D512F337-5E7E-4A8F-B7EA-F268A0E610F1" Condition="NOT EXT_SWZ_CLASSNAME_EXISTS">
+            <RegistryValue Root="HKCR" Key="[EXT_SWZ_CLASSNAME]" Value="Flash movie"/>        
+        </Component>
+        
+        <Component Id="RegSwzExt" Guid="44103011-338F-40D2-BB86-D4F7ADE2ED46" Condition="NOT EXT_SWZ_EXISTS">
+            <RegistryValue Root="HKCR" Key=".swz" Value="[SWF_CLASS]"/>
+        </Component>
+        
+        <Component Id="RegSwzAssociations" Guid="D81B5162-C045-4C9E-AFD3-740F1A781C88">
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWZ_CLASSNAME]\Shell\[VERB]" 
+                Value="[VERB_NAME]"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWZ_CLASSNAME]\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWZ_CLASSNAME]\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_SWZ_CLASSNAME]\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+            />
+        </Component>
+        
+        <!-- Associate global verb for .swz - if anybody changes default app, it won't remove the verbs -->                        
+        <Component Id="RegSwzSystemFileAssociations" Guid="0BB1591C-81FD-404C-BAC4-86FB34989DFC" Condition="SYSTEM_FILE_ASSOCIATIONS_EXISTS">
+            <RegistryValue 
+                Root="HKCR"
+                Key="SystemFileAssociations\.swz\Shell\[VERB]" 
+                Value="[VERB_NAME]" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swz\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swz\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.swz\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+
+            />
+        </Component>
+      
+        <!-- Register "Open With" for .abc -->
+        <Component Id="RegAbcOpenWithList" Guid="B4A8A246-EA49-439B-BF19-1EF84506813F">
+            <RegistryValue Root="HKCR" Key=".abc\OpenWithList\[APP_EXENAME]" Value=""/>
+        </Component>
+        <!-- Associate .abc file extension -->
+        <Component Id="RegAbcClassName" Guid="9ED5F979-FED3-4D28-9DBD-71274759ED71" Condition="NOT EXT_ABC_CLASSNAME_EXISTS">
+            <RegistryValue Root="HKCR" Key="[EXT_ABC_CLASSNAME]" Value="Flash movie"/>        
+        </Component>
+        
+        <Component Id="RegAbcExt" Guid="32BBB515-02C3-45F7-A3F6-DB516FCF6E4C" Condition="NOT EXT_ABC_EXISTS">
+            <RegistryValue Root="HKCR" Key=".abc" Value="[SWF_CLASS]"/>
+        </Component>
+        
+        <Component Id="RegAbcAssociations" Guid="4D216DEB-22FA-4648-B738-0DECB589094A">
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_ABC_CLASSNAME]\Shell\[VERB]" 
+                Value="[VERB_NAME]"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_ABC_CLASSNAME]\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_ABC_CLASSNAME]\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_ABC_CLASSNAME]\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+            />
+        </Component>
+        
+        <!-- Associate global verb for .abc - if anybody changes default app, it won't remove the verbs -->                        
+        <Component Id="RegAbcSystemFileAssociations" Guid="5842FD66-DC58-4429-BC36-FDD914372DBE" Condition="SYSTEM_FILE_ASSOCIATIONS_EXISTS">
+            <RegistryValue 
+                Root="HKCR"
+                Key="SystemFileAssociations\.abc\Shell\[VERB]" 
+                Value="[VERB_NAME]" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.abc\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.abc\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.abc\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+
+            />
+        </Component>
+      
+        <!-- Register "Open With" for .ftr -->
+        <Component Id="RegFtrOpenWithList" Guid="C517F616-C734-4141-9D84-E2A7E5CE975D">
+            <RegistryValue Root="HKCR" Key=".ftr\OpenWithList\[APP_EXENAME]" Value=""/>
+        </Component>
+        <!-- Associate .ftr file extension -->
+        <Component Id="RegFtrClassName" Guid="42144838-5AB0-4C57-BB26-6033C8E968CB" Condition="NOT EXT_FTR_CLASSNAME_EXISTS">
+            <RegistryValue Root="HKCR" Key="[EXT_FTR_CLASSNAME]" Value="Flash movie"/>        
+        </Component>
+        
+        <Component Id="RegFtrExt" Guid="4AB7F63B-8206-4AAF-AAE2-DB6845192F84" Condition="NOT EXT_FTR_EXISTS">
+            <RegistryValue Root="HKCR" Key=".ftr" Value="[SWF_CLASS]"/>
+        </Component>
+        
+        <Component Id="RegFtrAssociations" Guid="91763191-C45D-4C34-B0E7-7A2C7951C872">
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_FTR_CLASSNAME]\Shell\[VERB]" 
+                Value="[VERB_NAME]"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_FTR_CLASSNAME]\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_FTR_CLASSNAME]\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="[EXT_FTR_CLASSNAME]\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+            />
+        </Component>
+        
+        <!-- Associate global verb for .ftr - if anybody changes default app, it won't remove the verbs -->                        
+        <Component Id="RegFtrSystemFileAssociations" Guid="FD9DD76B-00C5-402E-B7A6-365B0F291E40" Condition="SYSTEM_FILE_ASSOCIATIONS_EXISTS">
+            <RegistryValue 
+                Root="HKCR"
+                Key="SystemFileAssociations\.ftr\Shell\[VERB]" 
+                Value="[VERB_NAME]" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.ftr\Shell\[VERB]" 
+                Name="Icon"
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot;,0"
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.ftr\Shell\[VERB]\Command" 
+                Value="&quot;[INSTALLFOLDER][APP_EXENAME]&quot; &quot;%1&quot;" 
+            />
+            <RegistryValue 
+                Root="HKCR" 
+                Key="SystemFileAssociations\.ftr\Shell\[VERB]"
+                Name="MUIVerb"
+                Value="@[INSTALLFOLDER][APP_EXENAME],-[VERB_RESOURCE_ID]" 
+
+            />
+        </Component>
 <!-- /EXTENSION TEMPLATE HERE: -->
     </ComponentGroup>
 
@@ -578,11 +773,11 @@
       <Component Id="ffdec_lib_license" Guid="D9E0F1A2-B3C4-5D6E-7F8A-9B0C1D2E3F4A">
         <File Id="ffdec_lib.license.txt" Source="../dist/lib/ffdec_lib.license.txt" KeyPath="yes" />
       </Component>
-      <Component Id="flacomdoc" Guid="E0F1A2B3-C4D5-6E7F-8A9B-0C1D2E3F4A5B">
-        <File Id="flacomdoc.jar" Source="../dist/lib/flacomdoc.jar" KeyPath="yes" />
+      <Component Id="fla_convert" Guid="E0F1A2B3-C4D5-6E7F-8A9B-0C1D2E3F4A5B">
+        <File Id="fla_convert.jar" Source="../dist/lib/fla_convert.jar" KeyPath="yes" />
       </Component>
-      <Component Id="flacomdoc_license" Guid="F1A2B3C4-D5E6-7F8A-9B0C-1D2E3F4A5B6C">
-        <File Id="flacomdoc.license.txt" Source="../dist/lib/flacomdoc.license.txt" KeyPath="yes" />
+      <Component Id="fla_convert_license" Guid="F1A2B3C4-D5E6-7F8A-9B0C-1D2E3F4A5B6C">
+        <File Id="fla_convert.license.txt" Source="../dist/lib/fla_convert.license.txt" KeyPath="yes" />
       </Component>
       <Component Id="flamingo" Guid="A2B3C4D5-E6F7-8A9B-0C1D-2E3F4A5B6C7D">
         <File Id="flamingo.jar" Source="../dist/lib/flamingo-6.2.jar" KeyPath="yes" />
@@ -747,15 +942,3 @@
     </ComponentGroup>
   </Package>
 </Wix>
-
-
-
-
-
-
-
-
-
-
-
-

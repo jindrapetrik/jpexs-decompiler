@@ -1,0 +1,38 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/FullScreen Button/Assets/FullScreenOnIcon" itemID="455b9eb8-000002cb" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/FullScreen Button/Assets/FullScreenOnIcon" sourceLastModified="1163632624" lastModified="1163632624" sourceItemID="455b9eb8-000002cb">
+  <timeline>
+    <DOMTimeline name="FullScreenOnIcon">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isFloating="true">
+                  <matrix>
+                    <Matrix tx="-252" ty="-112"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFFFF" alpha="0.650980392156863"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!5283 2422S2|5263 2422!5263 2422|5263 2442!5263 2442|5162 2442!5162 2442|5162 2361!5162 2361|5020 2361!5020 2361|5020 2260!5020 2260|5040 2260!5040 2260|5040 2240!5040 2240|5263 2240!5263 2240|5263 2260!5263 2260|5283 2260!5283 2260|5283
+ 2422"/>
+                    <Edge fillStyle0="1" edges="
+!5040 2422S1|5040 2442!5040 2442|5141 2442!5141 2442|5141 2381!5141 2381|5020 2381!5020 2381|5020 2422!5020 2422|5040 2422"/>
+                    <Edge fillStyle1="1" edges="
+!5202 2341S2|5202 2321!5202 2321|5182 2321!5182 2321|5182 2341!5182 2341|5202 2341"/>
+                    <Edge fillStyle0="1" edges="
+!5202 2321S1|5202 2301!5202 2301|5222 2301!5222 2301|5222 2281!5222 2281|5162 2281!5162 2281|5162 2260!5162 2260|5263 2260"/>
+                    <Edge fillStyle1="1" edges="
+!5222 2301S2|5243 2301!5243 2301|5243 2361!5243 2361|5263 2361!5263 2361|5263 2260!5202 2321|5222 2321!5222 2321|5222 2301!5162 2361|5182 2361!5182 2361|5182 2341!5182 2341|5162 2341!5162 2341|5162 2361"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

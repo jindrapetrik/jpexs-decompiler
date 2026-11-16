@@ -1,0 +1,94 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="BackButton" itemID="4256c8df-00000073" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="BackButton" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef="BackButton" sourceLastModified="1166032226" lastModified="1166032226" lastUniqueIdentifier="2" sourceItemID="4256c8df-00000073" customIconID="0" persistLivePreview11="true" editFrameIndex="2" requiredMinimumPlayerVersion="8" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="BackButton">
+      <layers>
+        <DOMLayer name="script" color="#FFFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();
+this.upLinkageID = "BackButtonNormal";
+this.overLinkageID = "BackButtonOver";
+this.downLinkageID = "BackButtonDown";
+this.disabledLinkageID = "BackButtonDisabled";
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="contents" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonNormal" name="placeholder_mc">
+                  <matrix>
+                    <Matrix d="1.00057983398438"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="10.5" y="10.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonNormal">
+                  <matrix>
+                    <Matrix d="1.00057983398438"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="10.5" y="10.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonOver">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="42"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11" y="11"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonDown">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="81"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonDisabled">
+                  <matrix>
+                    <Matrix d="1.00057983398438" tx="120"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="10.5" y="10.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackBorder" selected="true">
+                  <matrix>
+                    <Matrix tx="2" ty="33"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Forward and Back Buttons/ForwardBackBorder">
+                  <matrix>
+                    <Matrix tx="45.85" ty="33.85"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="21.5" y="11.5"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <customIcon>
+    <CustomIcon rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" href="79c91nm5cj.dat"/>
+  </customIcon>
+</DOMComponentItem>

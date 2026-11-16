@@ -249,6 +249,11 @@ public class AVM2Graph extends Graph {
      * @return True if part can be break candidate, false otherwise
      */
     @Override
+    protected boolean canResolvePopsAfterExitIfs() {
+        return true;
+    }
+
+    @Override
     protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part, List<ThrowState> throwStates) {
         for (ThrowState ts : throwStates) {
             if (ts.targetPart == part) {
@@ -990,6 +995,21 @@ public class AVM2Graph extends Graph {
     }
 
     /**
+     * Checks whether an exception without type and name is a catch of any
+     * value rather than an ASC finally. Haxe compiles catch (e:Dynamic) so,
+     * and its target is the catch body, not a finally prologue.
+     *
+     * @param localData Local data
+     * @param e Exception index
+     * @return True if catch of any value
+     */
+    private boolean isCatchAll(AVM2LocalData localData, int e) {
+        return body.exceptions[e].isFinally()
+                && localData.finallyKinds.containsKey(e)
+                && localData.finallyKinds.get(e) == FINALLY_KIND_UNKNOWN;
+    }
+
+    /**
      * Gets catched exception IDs.
      *
      * @param part Part
@@ -1015,7 +1035,7 @@ public class AVM2Graph extends Graph {
             if (!previouslyCatchedExceptionIds.contains(e)) {
                 if (addr == fixedExStart) { //avm2code.getAddrThroughJumpAndDebugLine(fixedExStart)) {
                     ABCException ex = body.exceptions[e];
-                    if (ex.isFinally()) {
+                    if (ex.isFinally() && !isCatchAll(localData, e)) {
                         if (fixedExEnd >= maxEndAddr) {
                             finallysIndicesToBe.add(e);
                         }
@@ -1448,7 +1468,10 @@ public class AVM2Graph extends Graph {
 
                 TranslateStack st2 = (TranslateStack) stack.clone();
                 st2.clear();
-                st2.add(new ExceptionAVM2Item(ex));
+                ExceptionAVM2Item exItem = new ExceptionAVM2Item(ex);
+                //a finally here is a catch of any value, see isCatchAll
+                exItem.catchAll = ex.isFinally();
+                st2.add(exItem);
 
                 GraphPart catchPart = null;
                 for (GraphPart p : allParts) {
@@ -2584,6 +2607,21 @@ public class AVM2Graph extends Graph {
      * @param path Path
      */
     @Override
+    protected List<GraphTargetItem> getPrintedChildren(GraphTargetItem item) {
+        if (item instanceof SetTypeAVM2Item) {
+            SetTypeAVM2Item setType = (SetTypeAVM2Item) item;
+            if (setType.getCompoundValue() != null) {
+                //A compound assign prints its target and compound value, not the folded value
+                List<GraphTargetItem> printed = new ArrayList<>();
+                printed.add(setType.getObject());
+                printed.add(setType.getCompoundValue());
+                return printed;
+            }
+        }
+        return null;
+    }
+
+    @Override
     protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
         super.finalProcessAfter(list, level, localData, path);
         for (int i = 0; i < list.size(); i++) {
@@ -2732,13 +2770,24 @@ public class AVM2Graph extends Graph {
                         if (thisSwitch.additionalDefaultPosition != defaultIndex) {
                             int previousBodyIndex = thisSwitch.valuesMapping.get(thisSwitch.additionalDefaultPosition);
                             List<GraphTargetItem> defaultBody = thisSwitch.caseCommands.remove(defaultBodyIndex);
-                            thisSwitch.caseCommands.add(previousBodyIndex, defaultBody);
+                            //previousBodyIndex is an index before the removal
+                            int newDefaultBodyIndex = previousBodyIndex > defaultBodyIndex ? previousBodyIndex - 1 : previousBodyIndex;
+                            thisSwitch.caseCommands.add(newDefaultBodyIndex, defaultBody);
                             for (int p = 0; p < thisSwitch.valuesMapping.size(); p++) {
-                                if (thisSwitch.valuesMapping.get(p) >= previousBodyIndex) {
-                                    thisSwitch.valuesMapping.set(p, thisSwitch.valuesMapping.get(p) + 1);
+                                int bodyIndex = thisSwitch.valuesMapping.get(p);
+                                if (bodyIndex == defaultBodyIndex) {
+                                    bodyIndex = newDefaultBodyIndex;
+                                } else {
+                                    if (bodyIndex > defaultBodyIndex) {
+                                        bodyIndex--;
+                                    }
+                                    if (bodyIndex >= newDefaultBodyIndex) {
+                                        bodyIndex++;
+                                    }
                                 }
+                                thisSwitch.valuesMapping.set(p, bodyIndex);
                             }
-                            defaultBodyIndex = previousBodyIndex;
+                            defaultBodyIndex = newDefaultBodyIndex;
                             GraphTargetItem lastCmd = defaultBody.isEmpty() ? null : defaultBody.get(defaultBody.size() - 1);
                             if (lastCmd != null && !(lastCmd instanceof ExitItem) && !(lastCmd instanceof BreakItem) && !(lastCmd instanceof ContinueItem)) {
                                 defaultBody.add(new BreakItem(thisSwitch.dialect, null, null, thisSwitch.loop.id));
@@ -2957,7 +3006,7 @@ public class AVM2Graph extends Graph {
                 Set<Integer> usages = localData.getRegisterUsage(setLocalIp);
                 if (ri.value.getNotCoerced() instanceof ExceptionAVM2Item) {
                     ExceptionAVM2Item ea = (ExceptionAVM2Item) ri.value.getNotCoerced();
-                    if (ea.exception.isFinally()) {
+                    if (ea.exception.isFinally() && !ea.catchAll) {
                         list.remove(i);
                         localData.temporaryRegisters.add(ri.regIndex);
                         i--;
@@ -3282,6 +3331,31 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
+    protected Object backupWalkedLocalData(BaseLocalData localData) {
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        if (aLocalData.parsedExceptions == null || aLocalData.parsedExceptionIds == null) {
+            return null;
+        }
+        //checkTry marks the exceptions it walks as parsed
+        return new Object[]{new ArrayList<>(aLocalData.parsedExceptions), new ArrayList<>(aLocalData.parsedExceptionIds)};
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void restoreWalkedLocalData(BaseLocalData localData, Object backup) {
+        if (backup == null) {
+            return;
+        }
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        Object[] lists = (Object[]) backup;
+        //the lists are shared by the local data copies, so restore them in place
+        aLocalData.parsedExceptions.clear();
+        aLocalData.parsedExceptions.addAll((List<ABCException>) lists[0]);
+        aLocalData.parsedExceptionIds.clear();
+        aLocalData.parsedExceptionIds.addAll((List<Integer>) lists[1]);
+    }
+
+    @Override
     public AVM2LocalData prepareBranchLocalData(BaseLocalData localData) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         AVM2LocalData ret = new AVM2LocalData(aLocalData);
@@ -3582,6 +3656,25 @@ public class AVM2Graph extends Graph {
             }
         }
         super.makeAllCommands(commands, stack);
+    }
+
+    /**
+     * Moves all stack items of if branch to commands. When both branches leave
+     * values on stack (ternar operator candidate), anonymous functions are kept,
+     * for example in: cond ? function():void {...} : null
+     *
+     * @param commands Commands
+     * @param stack Stack
+     * @param branchesLeaveValues Both branches leave the same number of values
+     * on stack (ternar operator candidate)
+     */
+    @Override
+    protected void makeAllBranchCommands(List<GraphTargetItem> commands, TranslateStack stack, boolean branchesLeaveValues) {
+        if (branchesLeaveValues) {
+            super.makeAllCommands(commands, stack);
+            return;
+        }
+        makeAllCommands(commands, stack);
     }
 
     @Override

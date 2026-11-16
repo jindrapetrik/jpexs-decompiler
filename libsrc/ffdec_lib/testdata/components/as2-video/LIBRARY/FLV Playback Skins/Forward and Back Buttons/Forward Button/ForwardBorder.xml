@@ -1,0 +1,33 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardBorder" itemID="4270363a-000005a4" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardBorder" sourceLastModified="1117169994" lastModified="1117169994" sourceItemID="00000000-7fffffff">
+  <timeline>
+    <DOMTimeline name="ForwardBorder">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="-0.013427734375" d="0" tx="-26" ty="10.95"/>
+                        </matrix>
+                        <GradientEntry color="#666666" ratio="0"/>
+                        <GradientEntry color="#333333" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!440 340|440 120!440 120[440 79 411 49!411 49[381 20 340 20!340 20|20 20!20 20|20 440!20 440|340 440!340 440[381 440 411 410!411 410[440 381 440 340"/>
+                    <Edge fillStyle0="1" edges="!460 340|460 120!460 120[460 70 425 35!425 35[390 0 340 0!340 0|0 0!0 0|0 460!0 460|340 460!340 460[390 460 425 425!425 425[460 390 460 340"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

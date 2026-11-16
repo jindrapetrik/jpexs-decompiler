@@ -248,15 +248,20 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXAttrIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXElemIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConstructSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
@@ -309,6 +314,8 @@ import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.ForItem;
+import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -1944,6 +1951,37 @@ public class AVM2Code implements Cloneable {
 
             if (ins.definition instanceof KillIns) {
                 int killedReg = ins.operands[0];
+                //i++ of a slot (a script variable) through a temporary register:
+                //getglobalscope, getslot N, increment, setlocal R, getlocal R,
+                //getglobalscope, swap, setslot N, kill R
+                if (output.size() >= 2
+                        && (output.get(output.size() - 1) instanceof SetSlotAVM2Item)
+                        && (output.get(output.size() - 2) instanceof SetLocalAVM2Item)) {
+                    SetSlotAVM2Item setSlot = (SetSlotAVM2Item) output.get(output.size() - 1);
+                    SetLocalAVM2Item setLoc = (SetLocalAVM2Item) output.get(output.size() - 2);
+                    if (setLoc.regIndex == killedReg
+                            && (setSlot.value instanceof LocalRegAVM2Item)
+                            && ((LocalRegAVM2Item) setSlot.value).regIndex == killedReg) {
+                        GraphTargetItem value = setLoc.value;
+                        GraphTargetItem notCoerced = value.getNotCoerced();
+                        boolean increment = notCoerced instanceof IncrementAVM2Item;
+                        boolean decrement = notCoerced instanceof DecrementAVM2Item;
+                        GraphTargetItem inside = (increment || decrement) ? notCoerced.value.getNotCoerced() : null;
+                        if ((inside instanceof GetSlotAVM2Item)
+                                && ((GetSlotAVM2Item) inside).slotIndex == setSlot.slotIndex
+                                && !setSlot.scope.hasSideEffect()
+                                && Objects.equals(((GetSlotAVM2Item) inside).scope.getThroughRegister(), setSlot.scope.getThroughRegister())) {
+                            GraphTargetItem type = InstructionDefinition.getNumberType(value);
+                            output.remove(output.size() - 1);
+                            output.remove(output.size() - 1);
+                            output.add(increment
+                                    ? new PostIncrementAVM2Item(setSlot.getSrc(), setSlot.getLineStartItem(), inside, type)
+                                    : new PostDecrementAVM2Item(setSlot.getSrc(), setSlot.getLineStartItem(), inside, type));
+                            ip++;
+                            continue;
+                        }
+                    }
+                }
                 if (output.size() >= 2 && !stack.isEmpty()) {
                     if ((stack.peek() instanceof LocalRegAVM2Item) && (((LocalRegAVM2Item) stack.peek()).regIndex == killedReg)) {
                         if (output.get(output.size() - 1) instanceof SetPropertyAVM2Item) {
@@ -2259,16 +2297,44 @@ public class AVM2Code implements Cloneable {
             isNull = true;
         }
 
+        //ASC2 declares a typed local without initializer as pushundefined; setlocal (var chain:Vector.<T>;),
+        //and so is an untyped var x;. Only a coerce in the next assignment tells the type
+        boolean isUndefined = !(assignment instanceof LocalRegAVM2Item) && !(assignment instanceof GetSlotAVM2Item)
+                && assignment.value != null && (assignment.value instanceof UndefinedAVM2Item);
+        boolean isCoerced = (assignment instanceof LocalRegAVM2Item)
+                || (assignment.value instanceof ConvertAVM2Item) || (assignment.value instanceof CoerceAVM2Item);
+        if (isUndefined) {
+            vtype = TypeItem.UNBOUNDED;
+        }
+        //var cv:uint; is pushbyte 0; setlocal, typed int, then each assignment converts to uint
+        boolean isNumericDefault = !(assignment instanceof LocalRegAVM2Item) && !(assignment instanceof GetSlotAVM2Item)
+                && ((assignment.value instanceof IntegerValueAVM2Item && Integer.valueOf(0).equals(((IntegerValueAVM2Item) assignment.value).value))
+                || (assignment.value instanceof NanAVM2Item));
+
         if (declaredRegisters[reg] == null) {
             declaredRegisters[reg] = new DeclarationAVM2Item(assignment, vtype);
             if (assignment instanceof SetTypeAVM2Item) {
                 ((SetTypeAVM2Item) assignment).setDeclaration(declaredRegisters[reg]);
             }
             declaredRegisters[reg].typeIsNull = isNull;
+            declaredRegisters[reg].typeIsUndefined = isUndefined;
+            declaredRegisters[reg].typeIsNumericDefault = isNumericDefault;
             return declaredRegisters[reg];
         }
 
-        if (declaredRegisters[reg].typeIsNull) {
+        if (declaredRegisters[reg].typeIsNumericDefault && !isNumericDefault) {
+            declaredRegisters[reg].typeIsNumericDefault = false;
+            if (isCoerced && (vtype.equals(TypeItem.INT) || vtype.equals(TypeItem.UINT) || vtype.equals(TypeItem.NUMBER))) {
+                declaredRegisters[reg].type = vtype;
+            }
+        }
+
+        if (declaredRegisters[reg].typeIsUndefined) {
+            if (!isUndefined) {
+                declaredRegisters[reg].typeIsUndefined = false;
+                declaredRegisters[reg].type = isCoerced ? vtype : TypeItem.UNBOUNDED;
+            }
+        } else if (declaredRegisters[reg].typeIsNull) {
             declaredRegisters[reg].type = vtype;
             declaredRegisters[reg].typeIsNull = isNull;
         } else if (declaredRegisters[reg].type == TypeItem.UNBOUNDED) {
@@ -2434,6 +2500,11 @@ public class AVM2Code implements Cloneable {
         }
         for (int i = 0; i < items.size(); i++) {
             GraphTargetItem currentItem = items.get(i);
+            if (currentItem instanceof ForItem) {
+                //The first commands run before the loop expression, declare their registers first,
+                //otherwise a register used in the expression (i--) is marked as declared without declaration
+                injectDeclarations(usedDeobfuscations, level + 1, paramNames, ((ForItem) currentItem).firstCommands, minreg, declaredRegisters, declaredSlots, declaredSlotsDec, declaredProperties, declaredPropsDec, abc, body);
+            }
             List<GraphTargetItem> itemsOnLine = new ArrayList<>();
             itemsOnLine.add(currentItem);
             currentItem.visitRecursivelyNoBlock(new AbstractGraphTargetRecursiveVisitor() {
@@ -2447,9 +2518,9 @@ public class AVM2Code implements Cloneable {
                 ForEachInAVM2Item fei = (ForEachInAVM2Item) currentItem;
                 if (fei.expression.object instanceof LocalRegAVM2Item) {
                     int reg = ((LocalRegAVM2Item) fei.expression.object).regIndex;
-                    if (declaredRegisters[reg] == null) {
-                        fei.expression.object = handleDeclareReg(minreg, fei.expression.object, declaredRegisters, declaredSlots, reg);
-                    }
+                    //Also when declared before (var x:XML; ... for each (x in list)), so the
+                    //coerce after nextvalue types a declaration that only saw null so far
+                    fei.expression.object = handleDeclareReg(minreg, fei.expression.object, declaredRegisters, declaredSlots, reg);
                 }
             }
             if (currentItem instanceof ForInAVM2Item) {
@@ -2603,6 +2674,40 @@ public class AVM2Code implements Cloneable {
     private static interface BlockVisitor {
 
         public void visitBlock(List<GraphTargetItem> items);
+    }
+
+    /**
+     * Moves the code after an early return of a constructor into the negated
+     * condition when super() follows it, since AS3 does not allow super() after
+     * a return. Haxe starts its constructors with
+     * if (flash.Boot.skip_constructor) return;
+     *
+     * @param list Constructor commands
+     */
+    private static void moveSuperOutOfEarlyReturn(List<GraphTargetItem> list) {
+        int superPos = -1;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) instanceof ConstructSuperAVM2Item) {
+                superPos = i;
+                break;
+            }
+        }
+        for (int i = 0; i < superPos; i++) {
+            if (!(list.get(i) instanceof IfItem)) {
+                continue;
+            }
+            IfItem ifi = (IfItem) list.get(i);
+            if (ifi.onFalse.isEmpty() && ifi.onTrue.size() == 1 && (ifi.onTrue.get(0) instanceof ReturnVoidAVM2Item)) {
+                List<GraphTargetItem> rest = new ArrayList<>();
+                while (list.size() > i + 1) {
+                    rest.add(0, list.remove(list.size() - 1));
+                }
+                list.remove(i);
+                moveSuperOutOfEarlyReturn(rest);
+                list.add(new IfItem(ifi.dialect, ifi.getSrc(), ifi.getLineStartItem(), ifi.expression.invert(null), rest, new ArrayList<>()));
+                return;
+            }
+        }
     }
 
     /**
@@ -2847,6 +2952,9 @@ public class AVM2Code implements Cloneable {
         }
         if ((list.size() > lastPos) && (list.get(lastPos) instanceof ReturnVoidAVM2Item)) {
             list.remove(lastPos);
+        }
+        if (initializerType == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER) {
+            moveSuperOutOfEarlyReturn(list);
         }
         if (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
             if ((list.size() > lastPos) && (list.get(lastPos) instanceof ReturnValueAVM2Item)) {

@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
+import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
@@ -2665,7 +2666,9 @@ public class ABCExplorerDialog extends AppDialog {
             int mainIndex = mainTabbedPane.getSelectedIndex();
             int cpIndex = cpTabbedPane.getSelectedIndex();
             ABCCleaner cleaner = new ABCCleaner();
-            cleaner.clean(abc);
+            try (MainPanel.EditScope edit = Main.getMainFrame().getPanel().beginEdit("history.clean.abc", abc)) {
+                cleaner.clean(abc);
+            }
             if (cpIndex > -1) {
                 cpTabbedPane.setSelectedIndex(cpIndex);
             }

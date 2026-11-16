@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:mx="library://ns.adobe.com/flex/mx" width="480" height="300" layout="vertical">
+    <fx:Script><![CDATA[
+        [Bindable]
+        private var message:String = "An MX application with descriptor components";
+        private function updateMessage():void {
+            message = "The MX application button was clicked";
+        }
+    ]]></fx:Script>
+    <mx:Label id="mxApplicationLabel" text="{message}"/>
+    <mx:Button id="mxApplicationButton" label="Update MX application message" click="updateMessage()"/>
+</mx:Application>

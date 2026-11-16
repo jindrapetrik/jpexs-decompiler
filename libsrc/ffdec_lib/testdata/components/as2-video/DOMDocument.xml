@@ -1,0 +1,219 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="900" height="600" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="80.8511702896415" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <folders>
+          <DOMFolderItem name=" FLV Playback Skins" itemID="4295fba7-00000752"/>
+          <DOMFolderItem name=" FLV Playback Skins/_SquareButton" itemID="42702128-00000118"/>
+          <DOMFolderItem name=" FLV Playback Skins/Buffering Bar" itemID="42929821-0000093a"/>
+          <DOMFolderItem name=" FLV Playback Skins/Forward and Back Buttons" itemID="42710846-0000008a"/>
+          <DOMFolderItem name=" FLV Playback Skins/Forward and Back Buttons/Back Button" itemID="42710852-0000008f"/>
+          <DOMFolderItem name=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets" itemID="4270309a-000002df"/>
+          <DOMFolderItem name=" FLV Playback Skins/Forward and Back Buttons/Forward Button" itemID="42710854-00000090"/>
+          <DOMFolderItem name=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets" itemID="427030f2-000002ea"/>
+          <DOMFolderItem name=" FLV Playback Skins/Mute Button" itemID="42710848-0000008b"/>
+          <DOMFolderItem name=" FLV Playback Skins/Mute Button/Assets" itemID="427073c1-00000068"/>
+          <DOMFolderItem name=" FLV Playback Skins/Pause Button" itemID="4271084d-0000008d"/>
+          <DOMFolderItem name=" FLV Playback Skins/Pause Button/Assets" itemID="42707819-0000041f"/>
+          <DOMFolderItem name=" FLV Playback Skins/Play Button" itemID="4271084b-0000008c"/>
+          <DOMFolderItem name=" FLV Playback Skins/Play Button/Assets" itemID="42707703-00000333"/>
+          <DOMFolderItem name=" FLV Playback Skins/Seek Bar" itemID="429236f6-00000091"/>
+          <DOMFolderItem name=" FLV Playback Skins/Stop Button" itemID="4271084f-0000008e"/>
+          <DOMFolderItem name=" FLV Playback Skins/Stop Button/Assets" itemID="42707942-00000658"/>
+          <DOMFolderItem name=" FLV Playback Skins/Volume Bar" itemID="4292371e-00000094"/>
+     </folders>
+     <symbols>
+          <Include href=" FLV Playback Skins/_SquareButton/SquareBgDown.xml" loadImmediate="false" itemID="4270372f-000005a7" lastModified="1157562211"/>
+          <Include href=" FLV Playback Skins/_SquareButton/SquareBgNormal.xml" loadImmediate="false" itemID="4270387d-000005af" lastModified="1157562212"/>
+          <Include href=" FLV Playback Skins/_SquareButton/SquareBgOver.xml" loadImmediate="false" itemID="427038bb-000005b1" lastModified="1157562215"/>
+          <Include href=" FLV Playback Skins/Buffering Bar/BufferingPattern.xml" loadImmediate="false" itemID="4294fc77-0000072b" lastModified="1157562216"/>
+          <Include href=" FLV Playback Skins/Buffering Bar/BufferingPatternSymbol.xml" itemID="4294fc6c-0000072a" lastModified="1157562221"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgDown.xml" loadImmediate="false" itemID="4270306f-000002db" lastModified="1157562248"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgNormal.xml" loadImmediate="false" itemID="42703088-000002dd" lastModified="1157562250"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackBgOver.xml" loadImmediate="false" itemID="42703095-000002de" lastModified="1157562251"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/Assets/BackIcon.xml" loadImmediate="false" itemID="42703081-000002dc" lastModified="1157562252"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackBorder.xml" loadImmediate="false" itemID="4270361c-000005a3" lastModified="1157562253"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonDisabled.xml" itemID="426edbf5-000000d7" lastModified="1157562254"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonDown.xml" itemID="42702894-00000238" lastModified="1157562255"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonNormal.xml" itemID="42702853-00000234" lastModified="1157562255"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Back Button/BackButtonOver.xml" itemID="4270288c-00000236" lastModified="1157562261"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgDown.xml" loadImmediate="false" itemID="427030bc-000002e1" lastModified="1117169965"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgNormal.xml" loadImmediate="false" itemID="427030c8-000002e3" lastModified="1117169969"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardBgOver.xml" loadImmediate="false" itemID="427030d6-000002e5" lastModified="1117169975"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/Assets/ForwardIcon.xml" loadImmediate="false" itemID="427030e6-000002e7" lastModified="1117169979"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardBorder.xml" loadImmediate="false" itemID="4270363a-000005a4" lastModified="1117169994"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonDisabled.xml" itemID="4270310e-000002ec" lastModified="1114719558"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonDown.xml" itemID="4270311b-000002ee" lastModified="1114719563"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonNormal.xml" itemID="42703122-000002f0" lastModified="1114719567"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/Forward Button/ForwardButtonOver.xml" itemID="42703131-000002f2" lastModified="1114719571"/>
+          <Include href=" FLV Playback Skins/Forward and Back Buttons/ForwardBackBorder.xml" loadImmediate="false" itemID="42710868-00000091" lastModified="1157562239"/>
+          <Include href=" FLV Playback Skins/Mute Button/Assets/MuteOffIcon.xml" loadImmediate="false" itemID="427074e8-00000138" lastModified="1165901843"/>
+          <Include href=" FLV Playback Skins/Mute Button/Assets/MuteOnIcon.xml" loadImmediate="false" itemID="427073fd-0000006a" lastModified="1165901845"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOff.xml" itemID="429df785-000001b8" lastModified="1165901890"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOffDisabled.xml" itemID="42707491-00000130" lastModified="1165901890"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOffDown.xml" itemID="4270749a-00000132" lastModified="1165901889"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOffNormal.xml" itemID="4270749f-00000134" lastModified="1165901888"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOffOver.xml" itemID="427074a6-00000136" lastModified="1165901888"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOn.xml" itemID="429df986-0000042a" lastModified="1165901895"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOnDisabled.xml" itemID="42707390-00000065" lastModified="1165901886"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOnDown.xml" itemID="4270745b-0000006e" lastModified="1165901885"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOnNormal.xml" itemID="4270743c-0000006c" lastModified="1165901885"/>
+          <Include href=" FLV Playback Skins/Mute Button/MuteButtonOnOver.xml" itemID="42707464-00000070" lastModified="1165901884"/>
+          <Include href=" FLV Playback Skins/Pause Button/Assets/PauseIcon.xml" loadImmediate="false" itemID="42707855-00000421" lastModified="1157562300"/>
+          <Include href=" FLV Playback Skins/Pause Button/PauseButtonDisabled.xml" itemID="427077f0-00000416" lastModified="1157562301"/>
+          <Include href=" FLV Playback Skins/Pause Button/PauseButtonDown.xml" itemID="427077f9-00000418" lastModified="1157562301"/>
+          <Include href=" FLV Playback Skins/Pause Button/PauseButtonNormal.xml" itemID="42707801-0000041a" lastModified="1157562302"/>
+          <Include href=" FLV Playback Skins/Pause Button/PauseButtonOver.xml" itemID="42707807-0000041c" lastModified="1157562304"/>
+          <Include href=" FLV Playback Skins/Play Button/Assets/PlayIcon.xml" loadImmediate="false" itemID="427076f8-00000330" lastModified="1157562305"/>
+          <Include href=" FLV Playback Skins/Play Button/PlayButtonDisabled.xml" itemID="427075c8-0000032e" lastModified="1157562308"/>
+          <Include href=" FLV Playback Skins/Play Button/PlayButtonDown.xml" itemID="42707797-00000337" lastModified="1157562308"/>
+          <Include href=" FLV Playback Skins/Play Button/PlayButtonNormal.xml" itemID="42707763-00000335" lastModified="1157562309"/>
+          <Include href=" FLV Playback Skins/Play Button/PlayButtonOver.xml" itemID="427077a3-00000339" lastModified="1157562312"/>
+          <Include href=" FLV Playback Skins/Seek Bar/SeekBarHandle.xml" itemID="426eda86-000000c9" lastModified="1157562313"/>
+          <Include href=" FLV Playback Skins/Seek Bar/SeekBarHandleHit.xml" itemIcon="1" loadImmediate="false" itemID="4296aef4-0000013d" lastModified="1157562313"/>
+          <Include href=" FLV Playback Skins/Seek Bar/SeekBarProgress.xml" itemID="4296ba97-00000213" lastModified="1157562317"/>
+          <Include href=" FLV Playback Skins/Stop Button/Assets/StopIcon.xml" loadImmediate="false" itemID="42707935-00000655" lastModified="1157562318"/>
+          <Include href=" FLV Playback Skins/Stop Button/StopButtonDisabled.xml" itemID="427078e9-00000653" lastModified="1157562319"/>
+          <Include href=" FLV Playback Skins/Stop Button/StopButtonDown.xml" itemID="427079ba-000006cf" lastModified="1157562319"/>
+          <Include href=" FLV Playback Skins/Stop Button/StopButtonNormal.xml" itemID="4270799b-000006cd" lastModified="1157562320"/>
+          <Include href=" FLV Playback Skins/Stop Button/StopButtonOver.xml" itemID="427079c8-000006d1" lastModified="1157562323"/>
+          <Include href=" FLV Playback Skins/Volume Bar/VolumeBarFullness.xml" loadImmediate="false" itemID="42bce8ff-00003847" lastModified="1157562324"/>
+          <Include href=" FLV Playback Skins/Volume Bar/VolumeBarFullnessFill.xml" itemID="429d6119-00005fe7" lastModified="1157562341"/>
+          <Include href=" FLV Playback Skins/Volume Bar/VolumeBarFullnessMask.xml" loadImmediate="false" itemID="42bce953-00003849" lastModified="1157562342"/>
+          <Include href=" FLV Playback Skins/Volume Bar/VolumeBarHandle.xml" itemID="4295075b-000001cd" lastModified="1157562344"/>
+          <Include href=" FLV Playback Skins/Volume Bar/VolumeBarHandleHit.xml" itemIcon="1" loadImmediate="false" itemID="4296af24-0000013f" lastModified="1117171492"/>
+          <Include href="BackButton.xml" itemID="4256c8df-00000073" lastModified="1166032226"/>
+          <Include href="BufferingBar.xml" itemID="4294fc18-00000729" lastModified="1166032235"/>
+          <Include href="ForwardButton.xml" itemID="4256c8d9-00000071" lastModified="1166032256"/>
+          <Include href="MuteButton.xml" itemID="429df9ee-000006f0" lastModified="1166032273"/>
+          <Include href="PauseButton.xml" itemID="4249d26f-000000fc" lastModified="1166032280"/>
+          <Include href="PlayButton.xml" itemID="4249d20e-000000f7" lastModified="1166032286"/>
+          <Include href="PlayPauseButton.xml" itemID="42519c72-00000090" lastModified="1166032293"/>
+          <Include href="SeekBar.xml" itemID="429df456-00000347" lastModified="1166032307"/>
+          <Include href="StopButton.xml" itemID="4249d131-000000e3" lastModified="1166032314"/>
+          <Include href="VolumeBar.xml" itemID="42950911-00000320" lastModified="1166032325"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMComponentInstance libraryItemName="BackButton" name="sampleBackButton" uniqueID="2">
+                                             <matrix>
+                                                  <Matrix tx="28.5" ty="28.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="10.5" y="10.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='2'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="BufferingBar" name="sampleBufferingBar" uniqueID="4">
+                                             <matrix>
+                                                  <Matrix tx="199.45" ty="35.55"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="248.35" y="4.45"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='4'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="ForwardButton" name="sampleForwardButton" centerPoint3DX="459.95" centerPoint3DY="40" uniqueID="6">
+                                             <matrix>
+                                                  <Matrix tx="448.45" ty="28.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="10.5" y="10.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='6'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="MuteButton" name="sampleMuteButton" uniqueID="8">
+                                             <matrix>
+                                                  <Matrix tx="28.5" ty="178.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='8'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="PauseButton" name="samplePauseButton" uniqueID="10">
+                                             <matrix>
+                                                  <Matrix tx="238.45" ty="178.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='10'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="PlayButton" name="samplePlayButton" uniqueID="12">
+                                             <matrix>
+                                                  <Matrix tx="448.45" ty="178.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='12'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="PlayPauseButton" name="samplePlayPauseButton" uniqueID="14">
+                                             <matrix>
+                                                  <Matrix tx="658.45" ty="178.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.5"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='14'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="SeekBar" name="sampleSeekBar" uniqueID="16">
+                                             <matrix>
+                                                  <Matrix tx="-10.5" ty="335.55"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="50.5" y="4.45"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='16'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="StopButton" name="sampleStopButton" uniqueID="18">
+                                             <matrix>
+                                                  <Matrix tx="238.45" ty="328.55"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="11.5" y="11.45"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='18'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                        <DOMComponentInstance libraryItemName="VolumeBar" name="sampleVolumeBar" selected="true" uniqueID="20">
+                                             <matrix>
+                                                  <Matrix tx="433.95" ty="335"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25.75" y="4.95"/>
+                                             </transformationPoint>
+                                             <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='20'>
+</component>
+]]></dataBindingXML>
+                                        </DOMComponentInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory/>
+</DOMDocument>

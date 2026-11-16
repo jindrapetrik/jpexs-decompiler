@@ -360,6 +360,7 @@ public class ExportDialog extends AppDialog {
                 case PDF:
                 case SWF:
                 case SVG:
+                case AS3:
                     break;
                 default:
                     aaVisible = true;
@@ -372,6 +373,7 @@ public class ExportDialog extends AppDialog {
                 case PDF:
                 case SWF:
                 case SVG:
+                case AS3:
                     break;
                 default:
                     aaVisible = true;

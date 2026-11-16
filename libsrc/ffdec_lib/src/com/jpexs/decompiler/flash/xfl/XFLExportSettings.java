@@ -32,4 +32,12 @@ public class XFLExportSettings {
      * Export script
      */
     public boolean exportScript = true;
+
+    /**
+     * Motion/classic tween detection effort, from 0 (disabled) to 100 (highest).
+     * Every enabled value limits search work and retains unmatched sampled
+     * keyframes. Does not affect shape tween detection. Defaults to the highest
+     * search effort; GUI and CLI callers supply their own defaults.
+     */
+    public int tweenDetectionQuality = 100;
 }

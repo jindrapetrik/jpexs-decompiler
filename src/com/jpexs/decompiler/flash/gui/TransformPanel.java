@@ -1069,7 +1069,7 @@ public class TransformPanel extends JPanel {
         }
     }
 
-    class RegistrationPointPanel extends JPanel {
+    public static class RegistrationPointPanel extends JPanel {
 
         private Rectangle[][] rects = new Rectangle[3][3];
         private RegistrationPointPosition[][] positions = new RegistrationPointPosition[][]{

@@ -179,7 +179,7 @@ public class ShapeExporter {
                         case AS3:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                 SHAPE shp = st.getShapes();
-                                AS3ShapeExporter exporter = new AS3ShapeExporter(st.getWindingRule(), st.getShapeNum(), null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), 0, 0);
+                                AS3ShapeExporter exporter = new AS3ShapeExporter(st.getWindingRule(), st.getShapeNum(), null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), 0, 0, false);
                                 exporter.export();
                                 fos.write(Utf8Helper.getBytes(exporter.getShapeData()));
                             }

@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow/fsb_downArrow_arrow" itemID="3bd4aa27-00001ea5" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/Skin Elements/fsb_downArrow/fsb_downArrow_arrow" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd4aa27-00001ea5">
+  <timeline>
+    <DOMTimeline name="fsb_downArrow_arrow">
+      <layers>
+        <DOMLayer name="element" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!127 8[128 6 128 5!128 5[128 0 123 0!123 0|5 0!5 0[0 0 0 5!0 5[0 8 1 9!1 9|60 77!60 77[62 78 64 78!64 78[66 78 67 77!67 77|127 9!127 9|127 8"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

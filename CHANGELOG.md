@@ -1,6 +1,122 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [26.5.0] - 2026-11-14
+### Features
+- mxml export ([#763])
+- fla export: export as3 components
+- fla export: export as2 components
+- fla export: export as1 components
+- fla export: export flash 5 smart clips
+- add swz files reading support
+- fla export: convert tlf texts
+- as1/2 direct editor: group subsequent pushes ([#2770])
+- simple editor: add shapes editor ([#2777])
+- simple editor: add replace content of the selected frames ([#2769])
+- simple editor: add show / hide depth switch
+- simple editor: add lock depth switch
+- simple editor: add lock/hide all depths switch
+- as3 sprite export ([PR299])
+- cli: keep only the -selectclass classes in -swf2swc ([PR309])
+- simple editor: order layers on timeline from topmost
+- simple editor: reorder layers by dragging
+- simple editor: add or remove layers
+- simple editor: add advanced add/remove/clear/convert frame
+- simple editor: improve dragging to stage from library
+- simple editor: add deleting objects on stage with del key
+- simple editor: select multiple layers
+- simple editor: scroll to selection
+- simple editor: double click to go to parent layer
+- simple editor: add masking property
+- simple editor: edit 9-slice scaling grid
+- simple editor: add buttons for adding shape, movie clip, button
+- simple editor: add layer icon
+- simple editor: add scripts layer icon
+- simple editor: add edit button
+- simple editor: add placing images from library to stage
+- play streamed sound on sprite/swf previews ([#2558])
+- use NameCharacter to set character name (shape,sprite,button,sound)
+- add details about CharacterSet tag (macromedia generator)
+- add undo/redo of all edits, not just in the simple editor
+- add simple editor button under previews
+- add option to change ui font ([#2695])
+- add font chooser dialog for advanced settings fonts ([#1316])
+- add AppImage release for GNU/Linux ([#2197])
+- read/write directUI fluster FTR files ([#2495])
+- simple editor: show classic tween, option to add or remove tween
+- fla export: add option to use folders
+
+### Bug Fixes
+- fla export: export 8bit PCM samples, fix samplecount
+- as3: keep anonymous function in ternar operator branch
+- correct GraphPartMarkedArrayList.subList bounds
+- as3: keep switch cases lost when moving default body
+- loop exit to parent precontinue is a break, not a goto
+- loop exit which only returns is not the break when there is other exit
+- as3: declare register assigned in for loop first command
+- fla export: preserve morphs and other tweens ([#2583], [#2169], [#2151], [#2161], [#2706])
+- fla export: fix morphshape detection - point order ([#2169])
+- fla export: fix shapes with close intersections ([#2669])
+- fla export: fix shapes overlapping fills ([#1011])
+- fla export: fix export cancellation
+- fla export: preserve fills along coincident shape edges ([#2532])
+- fix collect depth as sprite tag placement
+- as3: regexp literal that would be a comment
+- as3: attribute with runtime name lost the @
+- as3: imports for script initializer code after the package block
+- as3: slot increment through a temporary register
+- fla export: preserve fills in shapes with multiple style groups ([#2772])
+- fla export: prevent old Flash editors crashes on degenerate shape edges ([#281])
+- fla export: preserve existing files on export failure
+- fla export: propagate exceptions
+- font normalizer: fix device fonts (without layout)
+- fla export: preserve sampled motion for legacy targets
+- fla export: preserve dynamic text auto size
+- fla export: restore timeline tab order
+- fla export: restore class-based sound events
+- fla export: preserve publish settings and XMP metadata
+- fix nullpointer on missing font
+- handle ActionPush read out of bounds
+- handle invalid count of items in ActionConstantPool ([#2775])
+- as1/2: handle too short ActionTry ([#2775])
+- as1/2 deobfuscation: include ActionInitObject and ActionInitArray ([#2775])
+- fix navigation to hex dump and taglist for frame scripts
+- fix transforming placeobject which has no matrix (has move)
+- fix rotation tween interpolation and add transformation point selection ([#2776])
+- as3: type a for-each var declared before the loop from its coerce ([PR297])
+- as3: type locals declared without a coerce from their coerced assignments ([PR298])
+- fix definebuttons action position in the tag tree ([#2779])
+- fla export: fix empty static text ([#2780])
+- simple editor: fix frame adding / removing on timeline
+- as3: drop the dup temp of a compound assign whose value branches ([PR296])
+- as3: drop the dup temp of a compound assign compiled with initproperty ([PR300])
+- as3: wrap a constructor's code after an early return before super() ([PR301])
+- as3: undo the parsed exceptions of a discarded precontinue walk ([PR302])
+- as3: print a coerce to a subtype as an explicit cast ([PR304])
+- as3: keep the body of a catch compiled without type and name ([PR305])
+- as3: import the types of static vars set in the script initializer ([PR306])
+- as3: qualify a field found through the scope chain that a local shadows ([PR307])
+- as3: print returnvoid in a function returning a value as return undefined ([PR308])
+- as3: break an inner loop whose exit is the continue of a for each ([PR310])
+- as3: read values pushed before a cast check instead of printing §§pop ([PR311])
+- swc: store the SWC library.swf uncompressed ([PR312])
+- shape bitmap exporter: differentiate start and end cap style
+- simple editor: fix timeline frames border, empty frames drawing
+- fix nullpointer in CalcellableWorker
+- fix pixel hinting
+- simple editor: select newly created swf tab
+- fix nullpointer on timeline
+- fix add/remove character on non-unicode fonts
+- as3: compile super.method() as callsuper ([#2784], [PR315])
+- fix nullpointer on nonswf item
+
+### Performance Improvements
+- fla export: add tween detection quality setting
+- fla export: speed up mask frame tracking ([#2136], [#2154])
+- cache gfx externalimage error image
+- optimize blur
+- optimize blend composite
+
 ## [26.4.0] - 2026-10-19
 ### Features
 - add multiple tags dialog ([#2755])
@@ -4251,6 +4367,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[26.5.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.4.0...version26.5.0
 [26.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.3.0...version26.4.0
 [26.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.2.1...version26.3.0
 [26.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.2.0...version26.2.1
@@ -4436,6 +4553,32 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#763]: https://www.free-decompiler.com/flash/issues/763
+[#2770]: https://www.free-decompiler.com/flash/issues/2770
+[#2777]: https://www.free-decompiler.com/flash/issues/2777
+[#2769]: https://www.free-decompiler.com/flash/issues/2769
+[#2558]: https://www.free-decompiler.com/flash/issues/2558
+[#2695]: https://www.free-decompiler.com/flash/issues/2695
+[#1316]: https://www.free-decompiler.com/flash/issues/1316
+[#2197]: https://www.free-decompiler.com/flash/issues/2197
+[#2495]: https://www.free-decompiler.com/flash/issues/2495
+[#2583]: https://www.free-decompiler.com/flash/issues/2583
+[#2169]: https://www.free-decompiler.com/flash/issues/2169
+[#2151]: https://www.free-decompiler.com/flash/issues/2151
+[#2161]: https://www.free-decompiler.com/flash/issues/2161
+[#2706]: https://www.free-decompiler.com/flash/issues/2706
+[#2669]: https://www.free-decompiler.com/flash/issues/2669
+[#1011]: https://www.free-decompiler.com/flash/issues/1011
+[#2532]: https://www.free-decompiler.com/flash/issues/2532
+[#2772]: https://www.free-decompiler.com/flash/issues/2772
+[#281]: https://www.free-decompiler.com/flash/issues/281
+[#2775]: https://www.free-decompiler.com/flash/issues/2775
+[#2776]: https://www.free-decompiler.com/flash/issues/2776
+[#2779]: https://www.free-decompiler.com/flash/issues/2779
+[#2780]: https://www.free-decompiler.com/flash/issues/2780
+[#2784]: https://www.free-decompiler.com/flash/issues/2784
+[#2136]: https://www.free-decompiler.com/flash/issues/2136
+[#2154]: https://www.free-decompiler.com/flash/issues/2154
 [#2755]: https://www.free-decompiler.com/flash/issues/2755
 [#2754]: https://www.free-decompiler.com/flash/issues/2754
 [#2760]: https://www.free-decompiler.com/flash/issues/2760
@@ -4549,7 +4692,6 @@ Major version of SWF to XML export changed to 2.
 [#2627]: https://www.free-decompiler.com/flash/issues/2627
 [#2581]: https://www.free-decompiler.com/flash/issues/2581
 [#2592]: https://www.free-decompiler.com/flash/issues/2592
-[#2154]: https://www.free-decompiler.com/flash/issues/2154
 [#2591]: https://www.free-decompiler.com/flash/issues/2591
 [#2596]: https://www.free-decompiler.com/flash/issues/2596
 [#2608]: https://www.free-decompiler.com/flash/issues/2608
@@ -4618,8 +4760,6 @@ Major version of SWF to XML export changed to 2.
 [#2525]: https://www.free-decompiler.com/flash/issues/2525
 [#1826]: https://www.free-decompiler.com/flash/issues/1826
 [#2416]: https://www.free-decompiler.com/flash/issues/2416
-[#2532]: https://www.free-decompiler.com/flash/issues/2532
-[#1011]: https://www.free-decompiler.com/flash/issues/1011
 [#2165]: https://www.free-decompiler.com/flash/issues/2165
 [#2476]: https://www.free-decompiler.com/flash/issues/2476
 [#2404]: https://www.free-decompiler.com/flash/issues/2404
@@ -4819,7 +4959,6 @@ Major version of SWF to XML export changed to 2.
 [#2133]: https://www.free-decompiler.com/flash/issues/2133
 [#2135]: https://www.free-decompiler.com/flash/issues/2135
 [#1194]: https://www.free-decompiler.com/flash/issues/1194
-[#2136]: https://www.free-decompiler.com/flash/issues/2136
 [#2139]: https://www.free-decompiler.com/flash/issues/2139
 [#2156]: https://www.free-decompiler.com/flash/issues/2156
 [#2145]: https://www.free-decompiler.com/flash/issues/2145
@@ -5629,7 +5768,6 @@ Major version of SWF to XML export changed to 2.
 [#264]: https://www.free-decompiler.com/flash/issues/264
 [#265]: https://www.free-decompiler.com/flash/issues/265
 [#266]: https://www.free-decompiler.com/flash/issues/266
-[#281]: https://www.free-decompiler.com/flash/issues/281
 [#257]: https://www.free-decompiler.com/flash/issues/257
 [#259]: https://www.free-decompiler.com/flash/issues/259
 [#260]: https://www.free-decompiler.com/flash/issues/260
@@ -5807,6 +5945,23 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR299]: https://github.com/jindrapetrik/jpexs-decompiler/pull/299
+[PR309]: https://github.com/jindrapetrik/jpexs-decompiler/pull/309
+[PR297]: https://github.com/jindrapetrik/jpexs-decompiler/pull/297
+[PR298]: https://github.com/jindrapetrik/jpexs-decompiler/pull/298
+[PR296]: https://github.com/jindrapetrik/jpexs-decompiler/pull/296
+[PR300]: https://github.com/jindrapetrik/jpexs-decompiler/pull/300
+[PR301]: https://github.com/jindrapetrik/jpexs-decompiler/pull/301
+[PR302]: https://github.com/jindrapetrik/jpexs-decompiler/pull/302
+[PR304]: https://github.com/jindrapetrik/jpexs-decompiler/pull/304
+[PR305]: https://github.com/jindrapetrik/jpexs-decompiler/pull/305
+[PR306]: https://github.com/jindrapetrik/jpexs-decompiler/pull/306
+[PR307]: https://github.com/jindrapetrik/jpexs-decompiler/pull/307
+[PR308]: https://github.com/jindrapetrik/jpexs-decompiler/pull/308
+[PR310]: https://github.com/jindrapetrik/jpexs-decompiler/pull/310
+[PR311]: https://github.com/jindrapetrik/jpexs-decompiler/pull/311
+[PR312]: https://github.com/jindrapetrik/jpexs-decompiler/pull/312
+[PR315]: https://github.com/jindrapetrik/jpexs-decompiler/pull/315
 [PR266]: https://github.com/jindrapetrik/jpexs-decompiler/pull/266
 [PR288]: https://github.com/jindrapetrik/jpexs-decompiler/pull/288
 [PR269]: https://github.com/jindrapetrik/jpexs-decompiler/pull/269

@@ -55,6 +55,7 @@ import java.util.concurrent.TimeoutException;
 import macromedia.asc.util.Decimal128;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -82,6 +83,24 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     private void decompilePCode(String pCode, String expected) throws Exception {
+        decompilePCode(pCode, expected, true);
+    }
+
+    /**
+     * Decompiles p-code without deobfuscation, keeping debugline instructions
+     * (line based structures like for loops need them).
+     */
+    private void decompilePCodeWithLines(String pCode, String expected) throws Exception {
+        boolean autoDeobfuscate = Configuration.autoDeobfuscate.get();
+        Configuration.autoDeobfuscate.set(false);
+        try {
+            decompilePCode(pCode, expected, false);
+        } finally {
+            Configuration.autoDeobfuscate.set(autoDeobfuscate);
+        }
+    }
+
+    private void decompilePCode(String pCode, String expected, boolean deobfuscate) throws Exception {
         pCode = "code\r\n"
                 + "getlocal0\r\n"
                 + "pushscope\r\n"
@@ -161,8 +180,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         ScriptInfo si = new ScriptInfo(new Traits());
         abc.script_info.add(si);
 
-        code.removeTraps(null, 0, b, abc, 0, -1, true, pCode);
-        code.removeLabelsAndDebugLine(b);
+        if (deobfuscate) {
+            code.removeTraps(null, 0, b, abc, 0, -1, true, pCode);
+            code.removeLabelsAndDebugLine(b);
+        }
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         String actual = b.toSource(new LinkedHashSet<>(), 10, new ArrayList<>(), swf.getAbcIndex(), 0, new HashSet<>(), -1);
         actual = actual.replace("\r\n", "\n");
@@ -838,6 +859,200 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testSwitchCasesWithOnlyBreak() throws Exception {
+        decompilePCode("jump checks\n"
+                + "   caseA:\n"
+                + "            label\n"
+                + "            jump finish\n"
+                + "   caseB:\n"
+                + "            label\n"
+                + "            jump finish\n"
+                + "   caseDefault:\n"
+                + "            label\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"play\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump finish\n"
+                + "   checks:\n"
+                + "            getlocal1\n"
+                + "            setlocal2\n"
+                + "            pushstring \"A\"\n"
+                + "            getlocal2\n"
+                + "            ifstrictne checkB\n"
+                + "            pushbyte 0\n"
+                + "            jump doSwitch\n"
+                + "   checkB:\n"
+                + "            pushstring \"B\"\n"
+                + "            getlocal2\n"
+                + "            ifstrictne noMatch\n"
+                + "            pushbyte 1\n"
+                + "            jump doSwitch\n"
+                + "   noMatch:\n"
+                + "            pushbyte 2\n"
+                + "   doSwitch:\n"
+                + "            kill 2\n"
+                + "            lookupswitch caseDefault, [caseA, caseB, caseDefault]\n"
+                + "   finish:\n",
+                "         switch(param1)\n"
+                + "         {\n"
+                + "            default:\n"
+                + "               trace(\"play\");\n"
+                + "               break;\n"
+                + "            case \"A\":\n"
+                + "            case \"B\":\n"
+                + "         }\n");
+    }
+
+    @Test
+    public void testBreakAfterInnerLoopBreakBeforeIf() throws Exception {
+        //the code after the middle loop is a precontinue of the outer loop,
+        //it must stay the break target of the middle loop (no goto)
+        decompilePCode("pushbyte 0\n"
+                + "            setlocal 4\n"
+                + "            jump iCond\n"
+                + "   iBody:\n"
+                + "            label\n"
+                + "            pushbyte 0\n"
+                + "            setlocal2\n"
+                + "            jump jCond\n"
+                + "   jBody:\n"
+                + "            label\n"
+                + "            getlocal1\n"
+                + "            getlocal2\n"
+                + "            getproperty MultinameL([PackageNamespace(\"\")])\n"
+                + "            pushnull\n"
+                + "            ifne jNext\n"
+                + "            pushbyte 0\n"
+                + "            setlocal3\n"
+                + "            jump kCond\n"
+                + "   kBody:\n"
+                + "            label\n"
+                + "            getlocal1\n"
+                + "            getlocal3\n"
+                + "            getproperty MultinameL([PackageNamespace(\"\")])\n"
+                + "            pushnull\n"
+                + "            ifeq kNext\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"found\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump afterK\n"
+                + "   kNext:\n"
+                + "            getlocal3\n"
+                + "            increment_i\n"
+                + "            setlocal3\n"
+                + "   kCond:\n"
+                + "            getlocal3\n"
+                + "            pushbyte 10\n"
+                + "            iflt kBody\n"
+                + "   afterK:\n"
+                + "            jump afterJ\n"
+                + "   jNext:\n"
+                + "            getlocal2\n"
+                + "            increment_i\n"
+                + "            setlocal2\n"
+                + "   jCond:\n"
+                + "            getlocal2\n"
+                + "            pushbyte 10\n"
+                + "            iflt jBody\n"
+                + "   afterJ:\n"
+                + "            getlocal2\n"
+                + "            pushbyte 10\n"
+                + "            ifnlt notFound\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"then\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump iNext\n"
+                + "   notFound:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"else\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   iNext:\n"
+                + "            getlocal 4\n"
+                + "            increment_i\n"
+                + "            setlocal 4\n"
+                + "   iCond:\n"
+                + "            getlocal 4\n"
+                + "            pushbyte 10\n"
+                + "            iflt iBody\n",
+                "         var _loc4_:* = 0;\n"
+                + "         while(_loc4_ < 10)\n"
+                + "         {\n"
+                + "            var _loc2_:* = 0;\n"
+                + "            while(_loc2_ < 10)\n"
+                + "            {\n"
+                + "               if(param1[_loc2_] == null)\n"
+                + "               {\n"
+                + "                  var _loc3_:* = 0;\n"
+                + "                  while(_loc3_ < 10)\n"
+                + "                  {\n"
+                + "                     if(param1[_loc3_] != null)\n"
+                + "                     {\n"
+                + "                        trace(\"found\");\n"
+                + "                        break;\n"
+                + "                     }\n"
+                + "                     _loc3_++;\n"
+                + "                  }\n"
+                + "                  break;\n"
+                + "               }\n"
+                + "               _loc2_++;\n"
+                + "            }\n"
+                + "            if(_loc2_ < 10)\n"
+                + "            {\n"
+                + "               trace(\"then\");\n"
+                + "            }\n"
+                + "            else\n"
+                + "            {\n"
+                + "               trace(\"else\");\n"
+                + "            }\n"
+                + "            _loc4_++;\n"
+                + "         }\n");
+    }
+
+    @Test
+    public void testLoopExitWithReturnAndOtherExit() throws Exception {
+        //the return exit can be printed in place, the other exit is the break
+        decompilePCode("getlocal1\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"done\")\n"
+                + "            iftrue after\n"
+                + "            jump head\n"
+                + "   back:\n"
+                + "            label\n"
+                + "   head:\n"
+                + "            getlocal1\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"available\")\n"
+                + "            iftrue body\n"
+                + "            returnvoid\n"
+                + "   body:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"body\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            getlocal1\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"more\")\n"
+                + "            iftrue back\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"S\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   after:\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"after\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n",
+                "         if(!param1.done)\n"
+                + "         {\n"
+                + "            do\n"
+                + "            {\n"
+                + "               if(!param1.available)\n"
+                + "               {\n"
+                + "                  return;\n"
+                + "               }\n"
+                + "               trace(\"body\");\n"
+                + "            }\n"
+                + "            while(param1.more);\n"
+                + "            trace(\"S\");\n"
+                + "         }\n"
+                + "         trace(\"after\");\n");
+    }
+
+    @Test
     public void testObfuscatedSwitch() throws Exception {
         decompilePCode("getlocal0\n"
                 + "            pushbyte 0\n"
@@ -1286,5 +1501,115 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         if (!res.contains("\"OK\"")) {
             fail("reachable if onTrue removed");
         }
+    }
+
+    @Test
+    public void testForFirstCommandDeclaration() throws Exception {
+        //var i:int = param1.length; while (i--) trace(i);
+        //the assignment and the condition are on the same line, so it is decompiled as for
+        decompilePCodeWithLines("debug 1, \"i\", 1, 10\n"
+                + "            debugline 10\n"
+                + "            getlocal1\n"
+                + "            getproperty QName(PackageNamespace(\"\"),\"length\")\n"
+                + "            convert_i\n"
+                + "            setlocal2\n"
+                + "            jump cond\n"
+                + "   body:\n"
+                + "            label\n"
+                + "            debugline 11\n"
+                + "            findproperty QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            getlocal2\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "   cond:\n"
+                + "            getlocal2\n"
+                + "            dup\n"
+                + "            decrement_i\n"
+                + "            convert_i\n"
+                + "            setlocal2\n"
+                + "            convert_b\n"
+                + "            iftrue body\n",
+                "         for(var i:int = int(param1.length); Boolean(i--); )\n"
+                + "         {\n"
+                + "            trace(i);\n"
+                + "         }\n");
+    }
+
+    @Test
+    public void testRegExpLiteralIsNotComment() throws Exception {
+        //as literals, new RegExp("") would be the comment // and new RegExp("*a")
+        //the start of the comment /*; a trailing backslash would escape the closing /
+        decompilePCode("findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"RegExp\")\n"
+                + "            pushstring \"\"\n"
+                + "            constructprop QName(PackageNamespace(\"\"),\"RegExp\"), 1\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"RegExp\")\n"
+                + "            pushstring \"*a\"\n"
+                + "            constructprop QName(PackageNamespace(\"\"),\"RegExp\"), 1\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"RegExp\")\n"
+                + "            pushstring \"a\\\\\"\n"
+                + "            constructprop QName(PackageNamespace(\"\"),\"RegExp\"), 1\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"RegExp\")\n"
+                + "            pushstring \"a+\"\n"
+                + "            constructprop QName(PackageNamespace(\"\"),\"RegExp\"), 1\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 4\n",
+                "         trace(new RegExp(\"\"),new RegExp(\"*a\"),new RegExp(\"a\\\\\"),/a+/);\n");
+    }
+
+    @Test
+    public void testAttributeWithRuntimeName() throws Exception {
+        //x..@[name] and x.@[name] lost the @ and became x..[name] and x[name]
+        decompilePCode("findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            getlocal1\n"
+                + "            pushstring \"a\"\n"
+                + "            getdescendants MultinameLA([PackageNamespace(\"\")])\n"
+                + "            getlocal1\n"
+                + "            pushstring \"b\"\n"
+                + "            getproperty MultinameLA([PackageNamespace(\"\")])\n"
+                + "            getlocal1\n"
+                + "            pushstring \"c\"\n"
+                + "            getproperty MultinameL([PackageNamespace(\"\")])\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 3\n",
+                "         trace(param1..@[\"a\"],param1.@[\"b\"],param1[\"c\"]);\n");
+    }
+
+    @Test
+    public void testSlotIncrementWithTempRegister() throws Exception {
+        //ASC compiles i++ of a script variable (a slot of the global scope)
+        //with a temporary register, killed at the end
+        decompilePCodeWithLines("getglobalscope\n"
+                + "            getslot 1\n"
+                + "            increment_i\n"
+                + "            setlocal2\n"
+                + "            getlocal2\n"
+                + "            getglobalscope\n"
+                + "            swap\n"
+                + "            setslot 1\n"
+                + "            kill 2\n"
+                + "            getglobalscope\n"
+                + "            getslot 1\n"
+                + "            decrement_i\n"
+                + "            setlocal2\n"
+                + "            getlocal2\n"
+                + "            getglobalscope\n"
+                + "            swap\n"
+                + "            setslot 1\n"
+                + "            kill 2\n",
+                "         global.§§slot[1]++;\n"
+                + "         global.§§slot[1]--;\n");
+    }
+
+    @Test
+    public void testScriptInitializerImports() throws Exception {
+        //top-level code after the package block, with no other trait outside
+        //the package, lost the import of a name from another package
+        String res = recompileSource("package { public class Test { } }\n"
+                + "import flash.utils.getTimer;\n"
+                + "getTimer();");
+        res = res.replace("\r\n", "\n");
+        int packageEnd = res.lastIndexOf("\n}\n");
+        assertTrue(packageEnd != -1, res);
+        String afterPackage = res.substring(packageEnd);
+        assertTrue(afterPackage.contains("import flash.utils.getTimer;"), res);
+        assertTrue(afterPackage.indexOf("import flash.utils.getTimer;") < afterPackage.indexOf("getTimer();"), res);
     }
 }

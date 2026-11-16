@@ -655,6 +655,17 @@ public class BezierEdge implements Serializable {
                     - (points.get(1).getY() - points.get(0).getY())
                     * (points.get(2).getX() - points.get(0).getX());
             if (det == 0) {
+                Point2D start = points.get(0);
+                Point2D control = points.get(1);
+                Point2D end = points.get(2);
+                // A collinear curve can travel beyond its endpoints or return
+                // to its start. Replacing it with the endpoint chord loses that path.
+                if (control.getX() < Math.min(start.getX(), end.getX())
+                        || control.getX() > Math.max(start.getX(), end.getX())
+                        || control.getY() < Math.min(start.getY(), end.getY())
+                        || control.getY() > Math.max(start.getY(), end.getY())) {
+                    return;
+                }
                 points.remove(1);
                 revPoints.remove(1);
                 calcParams();

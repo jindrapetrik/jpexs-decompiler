@@ -209,6 +209,12 @@ public class FontNormalizer {
                 systemH = gv.getGlyphOutline(0).getBounds2D().getHeight();
             }
             
+            // Device fonts may have no embedded outlines. Their height cannot
+            // be measured; a NaN scale would reduce every text size to zero.
+            if (h == null || !Double.isFinite(h) || h <= 0
+                    || !Double.isFinite(systemH) || systemH <= 0) {
+                continue;
+            }
             newScale = systemH / h;
             willModify = true;
 

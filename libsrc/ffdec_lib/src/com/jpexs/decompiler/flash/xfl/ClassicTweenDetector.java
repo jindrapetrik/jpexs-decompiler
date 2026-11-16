@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
+import com.jpexs.decompiler.flash.timeline.TweenRange;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +39,8 @@ import org.xml.sax.InputSource;
 final class ClassicTweenDetector {
 
     private static final Pattern FRAME = Pattern.compile("<DOMFrame\\b[^>]*>.*?</DOMFrame>", Pattern.DOTALL);
+    private static final Pattern INDEX = Pattern.compile("\\bindex=\"([0-9]+)\"");
+    private static final Pattern DURATION = Pattern.compile("\\bduration=\"([0-9]+)\"");
     private static final String[] COLOR_ATTRIBUTES = {"redMultiplier", "greenMultiplier",
         "blueMultiplier", "alphaMultiplier", "redOffset", "greenOffset", "blueOffset", "alphaOffset"};
     private static final double MATRIX_TOLERANCE = 2.0 / 65536;
@@ -57,6 +60,13 @@ final class ClassicTweenDetector {
         double[] matrix = new double[4];
         List<FilterTweenDetector.Filter> filters = Collections.emptyList();
     }
+    
+    static List<TweenRange> detectRanges(String frames, Set<Integer> instanceStarts, double frameRate,
+            Map<String, double[]> registrationPoints, int quality) throws XMLStreamException {
+        List<TweenRange> ranges = new ArrayList<>();
+        detect(frames, instanceStarts, frameRate, registrationPoints, quality, ranges);
+        return ranges;
+    }
 
     static String detect(String frames) throws XMLStreamException {
         return detect(frames, Collections.emptySet());
@@ -68,6 +78,22 @@ final class ClassicTweenDetector {
 
     static String detect(String frames, Set<Integer> instanceStarts, double motionFrameRate,
             Map<String, double[]> registrationPoints) throws XMLStreamException {
+        return detect(frames, instanceStarts, motionFrameRate, registrationPoints, 100);
+    }
+
+    static String detect(String frames, Set<Integer> instanceStarts, double motionFrameRate,
+            Map<String, double[]> registrationPoints, int quality) throws XMLStreamException {
+        return detect(frames, instanceStarts, motionFrameRate, registrationPoints, quality, null);
+    }   
+
+    private static String detect(String frames, Set<Integer> instanceStarts, double motionFrameRate,
+            Map<String, double[]> registrationPoints, int quality, List<TweenRange> ranges) throws XMLStreamException {
+        if (quality < 0 || quality > 100) {
+            throw new IllegalArgumentException("Tween detection quality must be between 0 and 100");
+        }
+        if (quality == 0) {
+            return frames;
+        }
         // Do not remove frames carrying clip actions, including script CDATA
         // which may itself contain XML-looking text.
         if (!frames.contains("<DOMSymbolInstance") || frames.contains("<Actionscript")) {
@@ -123,29 +149,51 @@ final class ClassicTweenDetector {
                 }
             }
         }
+        TweenDetectionBudget budget = new TweenDetectionBudget(quality, samples.size());
+        List<Sample> searchSamples = budget.track(samples);
         boolean changed = false;
         StringBuilder result = new StringBuilder();
+        MotionTweenDetector.FitCache motionCache = null;
+        int cachedRunEnd = -1;
         for (int start = 0; start < samples.size();) {
+            if (ranges != null && Thread.currentThread().isInterrupted()) {
+                return frames;
+            }
             Sample first = samples.get(start);
             int limit = runEnds[start];
             Integer acceleration = null;
             String motion = null;
-            int end = limit;
+            int end = budget.lastCandidate(samples, start, limit);
+            if (limit != cachedRunEnd) {
+                motionCache = new MotionTweenDetector.FitCache(budget);
+                cachedRunEnd = limit;
+            }
             // At least two intermediate samples are required to distinguish a
             // tween from an arbitrary change between adjacent keyframes.
-            while (end >= start + 3) {
-                acceleration = fit(samples, start, end);
-                if (acceleration != null) {
-                    break;
-                }
-                double[] registrationPoint = registrationPoints.get(first.identity.getAttribute("libraryItemName"));
-                if (motionFrameRate > 0 && registrationPoint != null) {
-                    motion = MotionTweenDetector.fit(samples, start, end, motionFrameRate, registrationPoint);
-                    if (motion != null) {
+            try {
+                while (end >= start + 3) {
+                    acceleration = fit(searchSamples, start, end);
+                    if (acceleration != null) {
                         break;
                     }
+                    double[] registrationPoint = registrationPoints.get(first.identity.getAttribute("libraryItemName"));
+                    if (motionFrameRate > 0 && registrationPoint != null) {
+                        motion = MotionTweenDetector.fit(searchSamples, start, end, motionFrameRate, registrationPoint, motionCache);
+                        if (motion != null) {
+                            break;
+                        }
+                    }
+                    end--;
                 }
-                end--;
+            } catch (TweenDetectionBudget.Exhausted ex) {
+                if (ranges != null) {
+                    return frames;
+                }
+                // Discard the incomplete fit and keep every remaining source keyframe.
+                for (int i = start; i < samples.size(); i++) {
+                    result.append(samples.get(i).xml).append('\n');
+                }
+                return changed ? compatibleLayerTweens(result.toString(), samples) : frames;
             }
             if (motion != null) {
                 changed = true;
@@ -155,6 +203,11 @@ final class ClassicTweenDetector {
                         "<AnimationCore\\b[^>]*\\bduration=\"([0-9]+)\"").matcher(motion);
                 if (coreDuration.find()) {
                     duration = Integer.parseInt(coreDuration.group(1)) / 1000;
+                }
+                if (ranges != null) {
+                    ranges.add(new TweenRange(first.index, first.index + duration - 1));
+                    start = end + 1;
+                    continue;
                 }
                 String xml = first.xml.replaceFirst(" duration=\"[0-9]+\"", "").replaceFirst("keyMode=\"[0-9]+\"",
                         "keyMode=\"" + XFLConverter.KEY_MODE_MOTION_TWEEN + "\"");
@@ -173,20 +226,72 @@ final class ClassicTweenDetector {
                 }
                 start = end + 1;
             } else if (acceleration == null) {
-                result.append(first.xml).append('\n');
+                if (ranges == null) {
+                    result.append(first.xml).append('\n');
+                }
                 start++;
             } else {
                 changed = true;
                 int duration = samples.get(end).index - first.index;
+                if (ranges != null) {
+                    ranges.add(new TweenRange(first.index, first.index + duration - 1));
+                    start = end;
+                    continue;
+                }
                 String xml = first.xml.replaceFirst(" duration=\"[0-9]+\"", "").replaceFirst("keyMode=\"[0-9]+\"",
                         "keyMode=\"" + XFLConverter.KEY_MODE_CLASSIC_TWEEN + "\"");
                 xml = xml.replaceFirst("<DOMFrame", "<DOMFrame tweenType=\"motion\" motionTweenScale=\"true\""
-                        + " acceleration=\"" + acceleration + "\" duration=\"" + duration + "\"");
+                        + " acceleration=\"" + acceleration + "\""
+                        + (first.matrix[1] != 0 || first.matrix[2] != 0 || samples.get(end).matrix[1] != 0 || samples.get(end).matrix[2] != 0
+                                ? " motionTweenRotate=\"auto\"" : "")
+                        + " duration=\"" + duration + "\"");
                 result.append(xml).append('\n');
                 start = end; // Keep the actual endpoint as a keyframe.
             }
         }
-        return changed ? result.toString() : frames;
+        return changed ? compatibleLayerTweens(result.toString(), samples) : frames;
+    }
+
+    private static String compatibleLayerTweens(String result, List<Sample> samples) {
+        if (!result.contains("tweenType=\"motion object\"")
+                || (!result.contains("tweenType=\"motion\"") && !result.contains("tweenType=\"shape\""))) {
+            return result;
+        }
+        // Flash treats motion-object animation as a layer-wide mode and drops
+        // classic/shape tweens, including after saving and reopening the FLA.
+        // Keep those tweens and restore the original samples for modern spans.
+        StringBuffer compatible = new StringBuffer();
+        Matcher frames = FRAME.matcher(result);
+        int source = 0;
+        while (frames.find()) {
+            String header = frames.group().substring(0, frames.group().indexOf('>'));
+            if (!header.contains("tweenType=\"motion object\"")) {
+                continue;
+            }
+            Matcher index = INDEX.matcher(header);
+            Matcher duration = DURATION.matcher(header);
+            if (!index.find() || !duration.find()) {
+                throw new IllegalStateException("Missing motion span bounds");
+            }
+            int start = Integer.parseInt(index.group(1));
+            int end = start + Integer.parseInt(duration.group(1));
+            while (source < samples.size() && samples.get(source).index < start) {
+                source++;
+            }
+            StringBuilder original = new StringBuilder();
+            while (source < samples.size() && samples.get(source).index < end) {
+                Sample sample = samples.get(source++);
+                String xml = sample.xml;
+                if (sample.index + sample.duration > end) {
+                    xml = xml.replaceFirst(" duration=\"[0-9]+\"", "")
+                            .replaceFirst("<DOMFrame", "<DOMFrame duration=\"" + (end - sample.index) + "\"");
+                }
+                original.append(xml).append('\n');
+            }
+            frames.appendReplacement(compatible, Matcher.quoteReplacement(original.toString()));
+        }
+        frames.appendTail(compatible);
+        return compatible.toString();
     }
 
     private static Sample readSample(Element frame, String xml) {
@@ -264,7 +369,7 @@ final class ClassicTweenDetector {
         // explicit; rejecting only motion-object fitting is insufficient.
         for (int f = start; f <= end; f++) {
             if (samples.get(f).matrix[1] != 0 || samples.get(f).matrix[2] != 0) {
-                return null;
+                return fitRotated(samples, start, end);
             }
         }
         for (int f = start; f < end; f++) {
@@ -350,6 +455,71 @@ final class ClassicTweenDetector {
             }
         }
         return -ease; // XFL acceleration has the opposite sign to SWF progress easing.
+    }
+
+    private static Integer fitRotated(List<Sample> samples, int start, int end) {
+        Sample first = samples.get(start);
+        Sample last = samples.get(end);
+        double rotation = last.values[4] - first.values[4];
+        if (Math.abs(rotation) >= Math.PI) {
+            return null;
+        }
+        for (int f = start; f <= end; f++) {
+            Sample sample = samples.get(f);
+            if (sample.values[3] <= 0 || f < end && sample.duration != 1
+                    || Math.abs(sample.matrix[0] * sample.matrix[2] + sample.matrix[1] * sample.matrix[3])
+                    > 4.0 / 65536 * sample.values[2] * sample.values[3]) {
+                return null; // Reflections and independent skew axes need another model.
+            }
+        }
+        Integer best = null;
+        double bestError = Double.POSITIVE_INFINITY;
+        for (int ease = -100; ease <= 100; ease++) {
+            double error = 0;
+            boolean valid = true;
+            for (int f = start + 1; f < end && valid; f++) {
+                Sample sample = samples.get(f);
+                double t = (sample.index - first.index) / (double) (last.index - first.index);
+                double p = t + ease / 100.0 * t * (1 - t);
+                double sx = first.values[2] + (last.values[2] - first.values[2]) * p;
+                double sy = first.values[3] + (last.values[3] - first.values[3]) * p;
+                double degrees = Math.toDegrees(first.values[4] + rotation * p);
+                double sin = nativeSin(degrees);
+                double cos = nativeSin(90 - degrees);
+                double[] matrix = {sx * cos, sx * sin, -sy * sin, sy * cos};
+                for (int i = 0; i < matrix.length; i++) {
+                    double difference = matrix[i] - sample.matrix[i];
+                    valid &= Math.abs(difference) <= MATRIX_TOLERANCE;
+                    error += difference * difference / (MATRIX_TOLERANCE * MATRIX_TOLERANCE);
+                }
+                for (int i = 0; i < first.values.length; i++) {
+                    if (i >= 2 && i < 6) {
+                        continue;
+                    }
+                    double predicted = first.values[i] + (last.values[i] - first.values[i]) * p;
+                    double difference = i < 2 ? Math.round(predicted * 20) - Math.round(sample.values[i] * 20)
+                            : predicted - sample.values[i];
+                    double tolerance = i < 2 ? 1 : i < 10 ? MULTIPLIER_TOLERANCE : 1;
+                    valid &= Math.abs(difference) <= tolerance;
+                    error += difference * difference / (tolerance * tolerance);
+                }
+            }
+            if (valid && error < bestError) {
+                bestError = error;
+                best = -ease;
+            }
+        }
+        return best;
+    }
+
+    // CS6's classic interpolation uses quarter-degree sine entries but weights
+    // the next entry with the fractional degree, rather than four times that
+    // fraction. A mathematical sin/cos fit would reject its compiled matrices.
+    private static double nativeSin(double degrees) {
+        degrees = (degrees % 360 + 360) % 360;
+        double lower = Math.floor(degrees * 4) / 4;
+        double a = Math.sin(Math.toRadians(lower));
+        return a + (degrees - lower) * (Math.sin(Math.toRadians(lower + .25)) - a);
     }
 
     private static double number(Element element, String name, double defaultValue) {

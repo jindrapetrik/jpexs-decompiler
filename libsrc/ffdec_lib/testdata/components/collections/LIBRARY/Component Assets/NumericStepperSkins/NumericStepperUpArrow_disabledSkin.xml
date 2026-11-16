@@ -1,0 +1,76 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/NumericStepperSkins/NumericStepperUpArrow_disabledSkin" itemID="45097b6f-0000011c" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="NumericStepperUpArrow_disabledSkin" scaleGridLeft="5.25" scaleGridRight="15.75" scaleGridTop="9" scaleGridBottom="10" lastModified="1168289594" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="NumericStepperUpArrow_disabledSkin">
+      <layers>
+        <DOMLayer name="icon" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/NumericStepperSkins/NumericStepperUpArrow_icon" symbolType="graphic" loop="single frame">
+                  <matrix>
+                    <Matrix tx="5.95" ty="4"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0.30078125"/>
+                  </color>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="skin" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.013427734375" c="0.013458251953125" d="0" tx="9.95" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#E6E6E6" alpha="0.2" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!399.5 220|399.5 80!399.5 80[#18F.92 #15.44 342 20!342 20|-0.5 20!-0.5 20|-0.5 225!-0.5 225|0 225!0 225|0 220!0 220|399.5 220"/>
+                  </edges>
+                </DOMShape>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <LinearGradient>
+                            <matrix>
+                              <Matrix a="0" b="-0.013427734375" c="0.013427734375" d="0" tx="10" ty="11"/>
+                            </matrix>
+                            <GradientEntry color="#585F63" alpha="0.298039215686275" ratio="0"/>
+                            <GradientEntry color="#B7BABC" alpha="0.298039215686275" ratio="1"/>
+                          </LinearGradient>
+                        </FillStyle>
+                        <FillStyle index="2">
+                          <SolidColor color="#858B8E" alpha="0.298039215686275"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!400 220|400 80!400 80[400 #15.44 342.5 20!342.5 20|0 20!0 20|0 0!0 0|340 0!340 0[420 0 420 80!420 80|420 220"/>
+                        <Edge fillStyle1="2" edges="!420 220|420 240!420 240|0 240!0 240|0 220!0 220|400 220"/>
+                        <Edge fillStyle0="2" fillStyle1="1" edges="!420 220|400 220"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

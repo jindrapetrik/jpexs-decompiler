@@ -16,11 +16,14 @@
  */
 package com.jpexs.decompiler.flash.easygui;
 
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -44,14 +47,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -73,6 +79,11 @@ public class LibraryTreeTable extends JTreeTable {
             public void keyPressed(KeyEvent e) {
                 int selectedRow = getSelectedRow();
                 JTree tree = getTree();
+
+                if (e.getKeyCode() == KeyEvent.VK_F2) {
+                    renameSelectedCharacter();
+                    e.consume();
+                }
 
                 if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     TreePath path = tree.getPathForRow(selectedRow);
@@ -123,6 +134,44 @@ public class LibraryTreeTable extends JTreeTable {
         this.easySwfPanel = easySwfPanel;
 
         addMouseListener(new MouseAdapter() {
+            private void showPopup(MouseEvent e) {
+                if (!e.isPopupTrigger()) {
+                    return;
+                }
+                int row = rowAtPoint(e.getPoint());
+                if (row < 0) {
+                    return;
+                }
+                changeSelection(row, 0, false, false);
+                Object object = ((DefaultMutableTreeNode) getValueAt(row, 0)).getUserObject();
+                if (!canRename(object)) {
+                    return;
+                }
+                CharacterTag character = (CharacterTag) object;
+                JPopupMenu menu = new JPopupMenu();
+                JMenuItem rename = new JMenuItem(EasyStrings.translate("library.rename"));
+                rename.addActionListener(event -> renameSelectedCharacter());
+                menu.add(rename);
+                if (!(character instanceof ImageTag)) {
+                    JCheckBoxMenuItem scaling = new JCheckBoxMenuItem(EasyStrings.translate("library.enable9SliceScaling"),
+                            character.getScalingGridTag() != null);
+                    scaling.addActionListener(event -> easySwfPanel.changeScalingGrid(character,
+                            scaling.isSelected() ? ScalingGridOperation.initialSplitter((BoundedTag) character) : null));
+                    menu.add(scaling);
+                }
+                menu.show(LibraryTreeTable.this, e.getX(), e.getY());
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                showPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                showPopup(e);
+            }
+
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
@@ -132,13 +181,37 @@ public class LibraryTreeTable extends JTreeTable {
                     }
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode) getValueAt(selectedRow, 0);
                     Object obj = node.getUserObject();
-                    if (obj instanceof Timelined) {
+                    if (obj instanceof ShapeTag) {
+                        easySwfPanel.editShape((ShapeTag) obj);
+                    } else if (obj instanceof Timelined) {
                         easySwfPanel.setTimelined((Timelined) obj);
                     }
                 }
             }
         });
 
+    }
+
+    private static boolean canRename(Object object) {
+        return object instanceof ImageTag || object instanceof ShapeTag
+                || object instanceof DefineSpriteTag || object instanceof ButtonTag;
+    }
+
+    private void renameSelectedCharacter() {
+        int row = getSelectedRow();
+        if (row < 0) {
+            return;
+        }
+        Object object = ((DefaultMutableTreeNode) getValueAt(row, 0)).getUserObject();
+        if (!canRename(object)) {
+            return;
+        }
+        CharacterTag character = (CharacterTag) object;
+        String name = ViewMessages.showInputDialog(easySwfPanel.getMainPanel(), EasyStrings.translate("library.rename.prompt"),
+                EasyStrings.translate("library.rename"), EasyTagNameResolver.getCustomName(character));
+        if (name != null) {
+            easySwfPanel.renameCharacter(character, name);
+        }
     }
 
     public void setSwf(SWF swf) {
@@ -149,98 +222,35 @@ public class LibraryTreeTable extends JTreeTable {
         setTreeTableModel(new LibraryTreeTableModel(swf));
     }
 
+    void refreshCharacterName(CharacterTag character) {
+        LibraryTreeTableModel model = (LibraryTreeTableModel) getTree().getModel();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+        for (int folderIndex = 0; folderIndex < root.getChildCount(); folderIndex++) {
+            DefaultMutableTreeNode folder = (DefaultMutableTreeNode) root.getChildAt(folderIndex);
+            for (int index = 0; index < folder.getChildCount(); index++) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) folder.getChildAt(index);
+                if (node.getUserObject() == character) {
+                    int selectedRow = getSelectedRow();
+                    model.nodeChanged(node);
+                    if (selectedRow >= 0) {
+                        SwingUtilities.invokeLater(() -> {
+                            if (getTree().getModel() == model) {
+                                changeSelection(selectedRow, 0, false, false);
+                            }
+                        });
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
     private static class LibraryTreeCellRenderer extends DefaultTreeCellRenderer {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JLabel label = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-            /*if (!leaf) {
-                if (expanded) {
-                    label.setIcon(View.getIcon("folderopen16"));
-                } else {
-                    label.setIcon(View.getIcon("folder16"));
-                }
-            }*/
-            if (value instanceof DefaultMutableTreeNode) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-                Object object = node.getUserObject();
-                if (object instanceof LibraryFolder) {
-                    String folderName = ((LibraryFolder) object).getName();
-                    String prefix = "folder";
-                    switch (folderName) {
-                        case "images":
-                            label.setIcon(View.getIcon(prefix + "images16"));
-                            break;
-                        case "graphics":
-                            label.setIcon(View.getIcon(prefix + "shapes16"));
-                            break;
-                        case "shapeTweens":
-                            label.setIcon(View.getIcon(prefix + "morphshapes16"));
-                            break;
-                        case "texts":
-                            label.setIcon(View.getIcon(prefix + "texts16"));
-                            break;
-                        case "fonts":
-                            label.setIcon(View.getIcon(prefix + "fonts16"));
-                            break;
-                        case "movieClips":
-                            label.setIcon(View.getIcon(prefix + "sprites16"));
-                            break;
-                        case "buttons":
-                            label.setIcon(View.getIcon(prefix + "buttons16"));
-                            break;
-                        case "sounds":
-                            label.setIcon(View.getIcon(prefix + "sounds16"));
-                            break;
-                        case "videos":
-                            label.setIcon(View.getIcon(prefix + "movies16"));
-                            break;
-                        default:
-                            label.setIcon(View.getIcon("folder16"));
-                            break;
-                    }
-                }
-                if (object instanceof ImageTag) {
-                    ImageTag it = (ImageTag) object;
-                    label.setIcon(View.getIcon("image16"));
-                }
-                if (object instanceof ShapeTag) {
-                    ShapeTag st = (ShapeTag) object;
-                    label.setIcon(View.getIcon("shape16"));
-                }
-                if (object instanceof MorphShapeTag) {
-                    MorphShapeTag mst = (MorphShapeTag) object;
-                    label.setIcon(View.getIcon("morphshape16"));
-                }
-                if (object instanceof TextTag) {
-                    TextTag t = (TextTag) object;
-                    label.setIcon(View.getIcon("text16"));
-                }
-                if (object instanceof FontTag) {
-                    FontTag f = (FontTag) object;
-                    label.setIcon(View.getIcon("font16"));
-                }
-                if (object instanceof DefineSpriteTag) {
-                    DefineSpriteTag st = (DefineSpriteTag) object;
-                    label.setIcon(View.getIcon("sprite16"));
-                }
-                if (object instanceof ButtonTag) {
-                    ButtonTag bt = (ButtonTag) object;
-                    label.setIcon(View.getIcon("button16"));
-                }
-                if (object instanceof SoundTag) {
-                    SoundTag st = (SoundTag) object;
-                    label.setIcon(View.getIcon("sound16"));
-                }
-                if (object instanceof DefineVideoStreamTag) {
-                    DefineVideoStreamTag vt = (DefineVideoStreamTag) object;
-                    label.setIcon(View.getIcon("movie16"));
-                }
-                if (object instanceof Tag) {
-                    EasyTagNameResolver tagNameResolver = new EasyTagNameResolver();
-                    label.setText(tagNameResolver.getTagName((Tag) object));
-                }
-            }
+            styleLibraryNode(label, value);
             if (View.isOceanic()) {
                 if (selected) {
                     label.setBackground(getBackgroundSelectionColor());
@@ -250,6 +260,89 @@ public class LibraryTreeTable extends JTreeTable {
                 label.setOpaque(true);
             }
             return label;
+        }
+    }
+
+    static void styleLibraryNode(JLabel label, Object value) {
+        if (value instanceof DefaultMutableTreeNode) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            Object object = node.getUserObject();
+            if (object instanceof LibraryFolder) {
+                String folderName = ((LibraryFolder) object).getName();
+                String prefix = "folder";
+                switch (folderName) {
+                    case "images":
+                        label.setIcon(View.getIcon(prefix + "images16"));
+                        break;
+                    case "graphics":
+                        label.setIcon(View.getIcon(prefix + "shapes16"));
+                        break;
+                    case "shapeTweens":
+                        label.setIcon(View.getIcon(prefix + "morphshapes16"));
+                        break;
+                    case "texts":
+                        label.setIcon(View.getIcon(prefix + "texts16"));
+                        break;
+                    case "fonts":
+                        label.setIcon(View.getIcon(prefix + "fonts16"));
+                        break;
+                    case "movieClips":
+                        label.setIcon(View.getIcon(prefix + "sprites16"));
+                        break;
+                    case "buttons":
+                        label.setIcon(View.getIcon(prefix + "buttons16"));
+                        break;
+                    case "sounds":
+                        label.setIcon(View.getIcon(prefix + "sounds16"));
+                        break;
+                    case "videos":
+                        label.setIcon(View.getIcon(prefix + "movies16"));
+                        break;
+                    default:
+                        label.setIcon(View.getIcon("folder16"));
+                        break;
+                }
+            }
+            if (object instanceof ImageTag) {
+                ImageTag it = (ImageTag) object;
+                label.setIcon(View.getIcon("image16"));
+            }
+            if (object instanceof ShapeTag) {
+                ShapeTag st = (ShapeTag) object;
+                label.setIcon(View.getIcon("shape16"));
+            }
+            if (object instanceof MorphShapeTag) {
+                MorphShapeTag mst = (MorphShapeTag) object;
+                label.setIcon(View.getIcon("morphshape16"));
+            }
+            if (object instanceof TextTag) {
+                TextTag t = (TextTag) object;
+                label.setIcon(View.getIcon("text16"));
+            }
+            if (object instanceof FontTag) {
+                FontTag f = (FontTag) object;
+                label.setIcon(View.getIcon("font16"));
+            }
+            if (object instanceof DefineSpriteTag) {
+                DefineSpriteTag st = (DefineSpriteTag) object;
+                label.setIcon(View.getIcon("sprite16"));
+            }
+            if (object instanceof ButtonTag) {
+                ButtonTag bt = (ButtonTag) object;
+                label.setIcon(View.getIcon("button16"));
+            }
+            if (object instanceof SoundTag) {
+                SoundTag st = (SoundTag) object;
+                label.setIcon(View.getIcon("sound16"));
+            }
+            if (object instanceof DefineVideoStreamTag) {
+                DefineVideoStreamTag vt = (DefineVideoStreamTag) object;
+                label.setIcon(View.getIcon("movie16"));
+            }
+            if (object instanceof Tag) {
+                EasyTagNameResolver tagNameResolver = new EasyTagNameResolver();
+                label.setText(tagNameResolver.getTagName((Tag) object));
+            }
         }
     }
 
@@ -270,86 +363,87 @@ public class LibraryTreeTable extends JTreeTable {
         }                
     }
     
-    private static class LibraryTreeTableModel implements TreeTableModel {
+    static DefaultMutableTreeNode createLibraryRoot(Iterable<? extends Tag> tags) {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("SWF");
 
-        private DefaultMutableTreeNode root;
+        DefaultMutableTreeNode imagesNode = new DefaultMutableTreeNode(new LibraryFolder("images"));
+        DefaultMutableTreeNode graphicsNode = new DefaultMutableTreeNode(new LibraryFolder("graphics"));
+        DefaultMutableTreeNode shapeTweensNode = new DefaultMutableTreeNode(new LibraryFolder("shapeTweens"));
+        DefaultMutableTreeNode textsNode = new DefaultMutableTreeNode(new LibraryFolder("texts"));
+        DefaultMutableTreeNode fontsNode = new DefaultMutableTreeNode(new LibraryFolder("fonts"));
+        DefaultMutableTreeNode movieClipsNode = new DefaultMutableTreeNode(new LibraryFolder("movieClips"));
+        DefaultMutableTreeNode buttonsNode = new DefaultMutableTreeNode(new LibraryFolder("buttons"));
+        DefaultMutableTreeNode soundsNode = new DefaultMutableTreeNode(new LibraryFolder("sounds"));
+        DefaultMutableTreeNode videosNode = new DefaultMutableTreeNode(new LibraryFolder("videos"));
+
+        for (Tag t : tags) {
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(t);
+            if (t instanceof ImageTag) {
+                imagesNode.add(node);
+            }
+            if (t instanceof ShapeTag) {
+                graphicsNode.add(node);
+            }
+            if (t instanceof MorphShapeTag) {
+                shapeTweensNode.add(node);
+            }
+            if (t instanceof TextTag) {
+                textsNode.add(node);
+            }
+            if (t instanceof FontTag) {
+                fontsNode.add(node);
+            }
+            if (t instanceof DefineSpriteTag) {
+                movieClipsNode.add(node);
+            }
+            if (t instanceof ButtonTag) {
+                buttonsNode.add(node);
+            }
+            if (t instanceof SoundTag) {
+                soundsNode.add(node);
+            }
+            if (t instanceof DefineVideoStreamTag) {
+                videosNode.add(node);
+            }
+        }
+
+        if (!imagesNode.isLeaf()) {
+            root.add(imagesNode);
+        }
+        if (!graphicsNode.isLeaf()) {
+            root.add(graphicsNode);
+        }
+        if (!shapeTweensNode.isLeaf()) {
+            root.add(shapeTweensNode);
+        }
+        if (!textsNode.isLeaf()) {
+            root.add(textsNode);
+        }
+        if (!fontsNode.isLeaf()) {
+            root.add(fontsNode);
+        }
+        if (!movieClipsNode.isLeaf()) {
+            root.add(movieClipsNode);
+        }
+        if (!buttonsNode.isLeaf()) {
+            root.add(buttonsNode);
+        }
+        if (!soundsNode.isLeaf()) {
+            root.add(soundsNode);
+        }
+        if (!videosNode.isLeaf()) {
+            root.add(videosNode);
+        }
+        return root;
+    }
+
+    private static class LibraryTreeTableModel extends DefaultTreeModel implements TreeTableModel {
+
+        private final DefaultMutableTreeNode root;
 
         public LibraryTreeTableModel(SWF swf) {
-            DefaultMutableTreeNode root = new DefaultMutableTreeNode("SWF");
-
-            DefaultMutableTreeNode imagesNode = new DefaultMutableTreeNode(new LibraryFolder("images"));
-            DefaultMutableTreeNode graphicsNode = new DefaultMutableTreeNode(new LibraryFolder("graphics"));
-            DefaultMutableTreeNode shapeTweensNode = new DefaultMutableTreeNode(new LibraryFolder("shapeTweens"));
-            DefaultMutableTreeNode textsNode = new DefaultMutableTreeNode(new LibraryFolder("texts"));
-            DefaultMutableTreeNode fontsNode = new DefaultMutableTreeNode(new LibraryFolder("fonts"));
-            DefaultMutableTreeNode movieClipsNode = new DefaultMutableTreeNode(new LibraryFolder("movieClips"));
-            DefaultMutableTreeNode buttonsNode = new DefaultMutableTreeNode(new LibraryFolder("buttons"));
-            DefaultMutableTreeNode soundsNode = new DefaultMutableTreeNode(new LibraryFolder("sounds"));
-            DefaultMutableTreeNode videosNode = new DefaultMutableTreeNode(new LibraryFolder("videos"));
-
-            this.root = root;
-
-            if (swf == null) {
-                return;
-            }
-            for (Tag t : swf.getTags()) {
-                DefaultMutableTreeNode node = new DefaultMutableTreeNode(t);
-                if (t instanceof ImageTag) {
-                    imagesNode.add(node);
-                }
-                if (t instanceof ShapeTag) {
-                    graphicsNode.add(node);
-                }
-                if (t instanceof MorphShapeTag) {
-                    shapeTweensNode.add(node);
-                }
-                if (t instanceof TextTag) {
-                    textsNode.add(node);
-                }
-                if (t instanceof FontTag) {
-                    fontsNode.add(node);
-                }
-                if (t instanceof DefineSpriteTag) {
-                    movieClipsNode.add(node);
-                }
-                if (t instanceof ButtonTag) {
-                    buttonsNode.add(node);
-                }
-                if (t instanceof SoundTag) {
-                    soundsNode.add(node);
-                }
-                if (t instanceof DefineVideoStreamTag) {
-                    videosNode.add(node);
-                }
-            }
-
-            if (!imagesNode.isLeaf()) {
-                root.add(imagesNode);
-            }
-            if (!graphicsNode.isLeaf()) {
-                root.add(graphicsNode);
-            }
-            if (!shapeTweensNode.isLeaf()) {
-                root.add(shapeTweensNode);
-            }
-            if (!textsNode.isLeaf()) {
-                root.add(textsNode);
-            }
-            if (!fontsNode.isLeaf()) {
-                root.add(fontsNode);
-            }
-            if (!movieClipsNode.isLeaf()) {
-                root.add(movieClipsNode);
-            }
-            if (!buttonsNode.isLeaf()) {
-                root.add(buttonsNode);
-            }
-            if (!soundsNode.isLeaf()) {
-                root.add(soundsNode);
-            }
-            if (!videosNode.isLeaf()) {
-                root.add(videosNode);
-            }
+            super(createLibraryRoot(swf == null ? ReadOnlyTagList.EMPTY : swf.getTags()));
+            root = (DefaultMutableTreeNode) super.getRoot();
         }
 
         @Override
@@ -450,14 +544,6 @@ public class LibraryTreeTable extends JTreeTable {
         @Override
         public int getIndexOfChild(Object parent, Object child) {
             return ((DefaultMutableTreeNode) parent).getIndex((DefaultMutableTreeNode) child);
-        }
-
-        @Override
-        public void addTreeModelListener(TreeModelListener l) {
-        }
-
-        @Override
-        public void removeTreeModelListener(TreeModelListener l) {
         }
 
     }

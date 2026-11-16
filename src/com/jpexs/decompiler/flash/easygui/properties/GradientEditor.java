@@ -16,8 +16,11 @@
  */
 package com.jpexs.decompiler.flash.easygui.properties;
 
+import com.jpexs.decompiler.flash.easygui.EasyStrings;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.generictageditors.ChangeListener;
+import com.jpexs.decompiler.flash.types.GRADIENT;
+import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
@@ -28,17 +31,25 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
+import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
 import java.awt.Window;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
@@ -55,6 +66,22 @@ public class GradientEditor extends JPanel implements PropertyEditor {
 
     private List<ChangeListener> listeners = new ArrayList<>();
     private final FILTER filter;
+    private GRADIENT gradient;
+    private final ShapeColorEditor stopColorEditor;
+    private final GradientEditorPanel inlineStops;
+    private final JLabel mixedNotice = new JLabel("-");
+    private boolean indeterminate;
+    private boolean linearRGB;
+
+    public void setIndeterminate(boolean indeterminate) {
+        this.indeterminate = indeterminate;
+        mixedNotice.setVisible(indeterminate);
+        repaint();
+    }
+
+    public boolean isIndeterminate() {
+        return indeterminate;
+    }
 
     private static void drawCheckerboard(Graphics g, int tileSize, Rectangle rect) {
         drawCheckerboard(g, tileSize, rect.x, rect.y, rect.width, rect.height);
@@ -82,14 +109,62 @@ public class GradientEditor extends JPanel implements PropertyEditor {
     }
 
     public GradientEditor(FILTER filter) {
+        this(filter, null);
+    }
+
+    public GradientEditor(GRADIENT gradient) {
+        this(null, gradient);
+    }
+
+    public static GradientEditor createInline(GRADIENT gradient) {
+        return new GradientEditor(null, gradient, true, true);
+    }
+
+    public static JPanel createPreview(GRADIENT gradient) {
+        return new GradientEditor(null, gradient, false);
+    }
+
+    private GradientEditor(FILTER filter, GRADIENT gradient) {
+        this(filter, gradient, true);
+    }
+
+    private GradientEditor(FILTER filter, GRADIENT gradient, boolean editable) {
+        this(filter, gradient, editable, false);
+    }
+
+    private GradientEditor(FILTER filter, GRADIENT gradient, boolean editable, boolean inline) {
         this.filter = filter;
-        setLayout(new BorderLayout());
+        this.gradient = gradient;
+        setLayout(new BorderLayout(0, 4));
+        if (inline) {
+            inlineStops = new GradientEditorPanel(true);
+            stopColorEditor = new ShapeColorEditor(color -> {
+                colors.set(inlineStops.selectedColorIndex, color);
+                inlineStops.repaint();
+                fireChange();
+            });
+            add(stopColorEditor, BorderLayout.NORTH);
+            JPanel strip = new JPanel(new BorderLayout(4, 0));
+            strip.add(inlineStops, BorderLayout.CENTER);
+            mixedNotice.setVisible(false);
+            strip.add(mixedNotice, BorderLayout.EAST);
+            add(strip, BorderLayout.CENTER);
+            reset();
+            return;
+        }
+        inlineStops = null;
+        stopColorEditor = null;
         JPanel miniGradientPanel = new JPanel() {
 
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
                 drawCheckerboard(g, 4, 0, 0, getWidth(), getHeight());
+                if (indeterminate) {
+                    g.setColor(Color.black);
+                    g.drawString("-", getWidth() / 2, getHeight() - 3);
+                    return;
+                }
 
                 float[] ratiosArr = new float[ratios.size()];
                 for (int i = 0; i < ratios.size(); i++) {
@@ -107,7 +182,9 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         miniGradientPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) {
+                if (editable && GradientEditor.this.isEnabled() && SwingUtilities.isLeftMouseButton(e)) {
+                    List<Color> originalColors = new ArrayList<>(colors);
+                    List<Float> originalRatios = new ArrayList<>(ratios);
                     JDialog dialog = new JDialog();
                     dialog.setUndecorated(true);
                     dialog.setResizable(false);
@@ -132,10 +209,10 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                         @Override
                         public void windowDeactivated(WindowEvent e) {
                             if (!colorDialogDisplayed) {
-                                dialog.setVisible(false);
-                                List<ChangeListener> listeners2 = new ArrayList<>(listeners);
-                                for (ChangeListener l : listeners2) {
-                                    l.change(GradientEditor.this);
+                                dialog.dispose();
+                                repaint();
+                                if (!originalColors.equals(colors) || !originalRatios.equals(ratios)) {
+                                    fireChange();
                                 }
                             }
                         }
@@ -149,11 +226,73 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         reset();
     }
 
+    public void setGradient(GRADIENT gradient) {
+        this.gradient = gradient;
+        setLinearRGB(gradient.interpolationMode == GRADIENT.INTERPOLATION_LINEAR_RGB_MODE);
+        setIndeterminate(false);
+        reset();
+    }
+
+    public void setLinearRGB(boolean linearRGB) {
+        this.linearRGB = linearRGB;
+        repaint();
+    }
+
+    public void paintSwatch(Graphics2D graphics, Rectangle bounds, boolean radial, float focalPoint) {
+        float[] positions = new float[ratios.size()];
+        for (int i = 0; i < positions.length; i++) {
+            positions[i] = ratios.get(i);
+        }
+        graphics.setPaint(gradientPaint(bounds, positions, colors.toArray(new Color[0]), radial, focalPoint));
+        graphics.fill(bounds);
+    }
+
+    private Paint gradientPaint(Rectangle bounds, float[] positions, Color[] stops, boolean radial, float focalPoint) {
+        if (stops.length == 1) {
+            return stops[0];
+        }
+        // Separate SWF hard stops only for painting, as Java2D requires strictly increasing fractions.
+        float step = 0.000001f;
+        for (int i = 0; i < positions.length; i++) {
+            float upper = 1 - step * (positions.length - i - 1);
+            float lower = i == 0 ? 0 : positions[i - 1] + step;
+            positions[i] = Math.max(lower, Math.min(upper, positions[i]));
+        }
+        MultipleGradientPaint.ColorSpaceType colorSpace = linearRGB
+                ? MultipleGradientPaint.ColorSpaceType.LINEAR_RGB : MultipleGradientPaint.ColorSpaceType.SRGB;
+        if (radial) {
+            AffineTransform transform = AffineTransform.getTranslateInstance(bounds.getCenterX(), bounds.getCenterY());
+            transform.scale(bounds.width / 2.0, bounds.height / 2.0);
+            float focus = Math.max(-0.99f, Math.min(0.99f, focalPoint));
+            return new RadialGradientPaint(new Point2D.Float(), 1, new Point2D.Float(focus, 0), positions, stops,
+                    MultipleGradientPaint.CycleMethod.NO_CYCLE, colorSpace, transform);
+        }
+        return new LinearGradientPaint(new Point2D.Float(bounds.x, bounds.y),
+                new Point2D.Float(bounds.x + bounds.width, bounds.y), positions, stops,
+                MultipleGradientPaint.CycleMethod.NO_CYCLE, colorSpace, new AffineTransform());
+    }
+
+    private void fireChange() {
+        int selected = inlineStops == null ? 0 : inlineStops.selectedColorIndex;
+        for (ChangeListener listener : new ArrayList<>(listeners)) {
+            listener.change(this);
+        }
+        if (inlineStops != null) {
+            inlineStops.selectedColorIndex = Math.min(selected, colors.size() - 1);
+            inlineStops.refreshStopColor();
+        }
+    }
+
     private void loadParams(RGBA[] rgbaColors, int[] intRatios) {
         colors = new ArrayList<>();
         ratios = new ArrayList<>();
         int lastRatio = -1;
         for (int i = 0; i < rgbaColors.length; i++) {
+            if (inlineStops != null) {
+                ratios.add(intRatios[i] / 255f);
+                colors.add(rgbaColors[i].toColor());
+                continue;
+            }
             if ((i > 0) && (intRatios[i - 1] == intRatios[i])) {
                 if (lastRatio < 255) {
                     lastRatio++;
@@ -172,7 +311,12 @@ public class GradientEditor extends JPanel implements PropertyEditor {
             }
         }
 
-        if (colors.size() == 1) {
+        if (colors.isEmpty()) {
+            colors.add(Color.black);
+            colors.add(Color.white);
+            ratios.add(0f);
+            ratios.add(1f);
+        } else if (colors.size() == 1 && inlineStops == null) {
             colors.add(colors.get(0));
             ratios.set(0, 0f);
             ratios.add(1f);
@@ -198,6 +342,15 @@ public class GradientEditor extends JPanel implements PropertyEditor {
             GRADIENTGLOWFILTER glow = (GRADIENTGLOWFILTER) filter;
             glow.gradientColors = gradientColors;
             glow.gradientRatio = gradientRatio;
+        } else if (gradient != null) {
+            gradient.gradientRecords = new GRADRECORD[ratios.size()];
+            for (int i = 0; i < ratios.size(); i++) {
+                GRADRECORD record = new GRADRECORD();
+                record.inShape3 = true;
+                record.ratio = gradientRatio[i];
+                record.color = gradientColors[i];
+                gradient.gradientRecords[i] = record;
+            }
         }
         return true;
     }
@@ -210,8 +363,20 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         } else if (filter instanceof GRADIENTGLOWFILTER) {
             GRADIENTGLOWFILTER glow = (GRADIENTGLOWFILTER) filter;
             loadParams(glow.gradientColors, glow.gradientRatio);
+        } else if (gradient != null) {
+            RGBA[] gradientColors = new RGBA[gradient.gradientRecords.length];
+            int[] gradientRatios = new int[gradient.gradientRecords.length];
+            for (int i = 0; i < gradient.gradientRecords.length; i++) {
+                gradientColors[i] = new RGBA(gradient.gradientRecords[i].color);
+                gradientRatios[i] = gradient.gradientRecords[i].ratio;
+            }
+            loadParams(gradientColors, gradientRatios);
         } else {
             throw new RuntimeException("Invalid FILTER");
+        }
+        if (inlineStops != null) {
+            inlineStops.selectedColorIndex = Math.min(inlineStops.selectedColorIndex, colors.size() - 1);
+            inlineStops.refreshStopColor();
         }
     }
 
@@ -225,6 +390,7 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         int dragIndex = -1;
         boolean draggedOut = false;
         boolean newlySelected = true;
+        private boolean stopsChanged;
 
         private Color interpolate(Color c1, Color c2, float t) {
             int r = (int) (c1.getRed() + t * (c2.getRed() - c1.getRed()));
@@ -235,13 +401,31 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         }
 
         public GradientEditorPanel() {
-            Dimension dim = new Dimension(300, 50);
+            this(false);
+        }
+
+        GradientEditorPanel(boolean inline) {
+            Dimension dim = new Dimension(inline ? 170 : 300, 50);
             setMinimumSize(dim);
             setPreferredSize(dim);
+            if (inline) {
+                setFocusable(true);
+                getAccessibleContext().setAccessibleName(EasyStrings.translate("property.shape.color.stops"));
+                addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        if (isEnabled() && (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_RIGHT)) {
+                            int direction = e.getKeyCode() == KeyEvent.VK_LEFT ? -1 : 1;
+                            selectedColorIndex = Math.max(0, Math.min(colors.size() - 1, selectedColorIndex + direction));
+                            refreshStopColor();
+                        }
+                    }
+                });
+            }
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (SwingUtilities.isLeftMouseButton(e)) {
+                    if (!inline && SwingUtilities.isLeftMouseButton(e)) {
                         if (newlySelected) {
                             return;
                         }
@@ -270,7 +454,12 @@ public class GradientEditor extends JPanel implements PropertyEditor {
 
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    if (SwingUtilities.isLeftMouseButton(e)) {
+                    if (isEnabled() && SwingUtilities.isLeftMouseButton(e)) {
+                        if (inline) {
+                            stopColorEditor.finishEditing();
+                            requestFocusInWindow();
+                        }
+                        stopsChanged = false;
                         List<Rectangle> rects = getColorRects();
                         for (int r = 0; r < rects.size(); r++) {
                             Rectangle rect = rects.get(r);
@@ -278,11 +467,15 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                                 newlySelected = selectedColorIndex != r;
                                 selectedColorIndex = r;
                                 dragIndex = r;
+                                refreshStopColor();
                                 repaint();
                                 return;
                             }
                         }
 
+                        if (colors.size() >= (gradient == null ? 255 : 15)) {
+                            return;
+                        }
                         float newRatio = (e.getX() - COLOR_SIZE / 2) / (float) (getWidth() - COLOR_SIZE);
                         if (newRatio >= 0 && newRatio <= 1) {
                             synchronized (GradientEditorPanel.this) {
@@ -293,7 +486,7 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                                 Float ratio2 = null;
                                 for (int i = 0; i < ratios.size(); i++) {
                                     float ratio = ratios.get(i);
-                                    if (ratio >= newRatio) {
+                                    if (ratio > newRatio || (!inline && ratio == newRatio)) {
                                         if (newRatio == ratio) {
                                             if (Float.compare(newRatio, 0f) > 0) {
                                                 newRatio -= 0.0000001;
@@ -316,7 +509,11 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                                     ratio2 = 1f;
                                 }
                                 ratios.add(newIndex, newRatio);
-                                float ratioDelta = (newRatio - ratio1) / (ratio2 - ratio1);
+                                if (color1 == null) {
+                                    color1 = color2;
+                                    ratio1 = 0f;
+                                }
+                                float ratioDelta = ratio2.equals(ratio1) ? 0 : (newRatio - ratio1) / (ratio2 - ratio1);
                                 Color newColor = interpolate(color1, color2, ratioDelta);
 
                                 colors.add(newIndex, newColor);
@@ -325,6 +522,8 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                                 selectedColorIndex = newIndex;
 
                                 newlySelected = true;
+                                stopsChanged = true;
+                                refreshStopColor();
                                 repaint();
                             }
                         }
@@ -338,12 +537,19 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                         synchronized (GradientEditorPanel.this) {
                             colors.remove(dragIndex);
                             ratios.remove(dragIndex);
+                            selectedColorIndex = Math.min(dragIndex, colors.size() - 1);
                         }
+                        stopsChanged = true;
                         repaint();
                     }
 
                     dragIndex = -1;
                     draggedOut = false;
+                    refreshStopColor();
+                    if (inline && stopsChanged) {
+                        stopsChanged = false;
+                        fireChange();
+                    }
                 }
             });
 
@@ -355,7 +561,7 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                     if (newRatio < 0 || newRatio > 1) {
                         return;
                     }
-                    if (dragIndex > -1) {
+                    if (isEnabled() && dragIndex > -1) {
 
                         if (isFixedZeroAlphaIndex(dragIndex)) {
                             return;
@@ -364,13 +570,17 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                         draggedOut = colors.size() > 2 && e.getY() > getHeight();
 
                         synchronized (GradientEditorPanel.this) {
+                            if (Float.compare(newRatio, ratios.get(dragIndex)) == 0) {
+                                repaint();
+                                return;
+                            }
                             int newIndex = -1;
                             for (int i = 0; i < ratios.size(); i++) {
                                 if (i == dragIndex) {
                                     continue;
                                 }
                                 float ratio = ratios.get(i);
-                                if (ratio >= newRatio) {
+                                if (ratio > newRatio || (!inline && ratio == newRatio)) {
                                     if (newRatio == ratio) {
                                         if (Float.compare(newRatio, 0f) > 0) {
                                             newRatio -= 0.0000001;
@@ -400,6 +610,8 @@ public class GradientEditor extends JPanel implements PropertyEditor {
                             colors.remove(dragIndex);
 
                             dragIndex = newIndex;
+                            selectedColorIndex = newIndex;
+                            stopsChanged = true;
                         }
                         repaint();
                     }
@@ -412,6 +624,13 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         final int ARROW_HEIGHT = 4;
 
         int selectedColorIndex = 0;
+
+        private void refreshStopColor() {
+            if (stopColorEditor != null) {
+                stopColorEditor.setColor(colors.get(selectedColorIndex));
+                repaint();
+            }
+        }
 
         private boolean isFixedZeroAlphaIndex(int index) {
             if (filter instanceof GRADIENTGLOWFILTER && index == 0 && colors.get(0).getAlpha() == 0) {
@@ -436,6 +655,9 @@ public class GradientEditor extends JPanel implements PropertyEditor {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g;
+            if (getWidth() <= 2 * COLOR_SIZE || getHeight() <= BOTTOM_HEIGHT) {
+                return;
+            }
 
             drawCheckerboard(g, 5, COLOR_SIZE / 2, 0, getWidth() - COLOR_SIZE, getHeight() - BOTTOM_HEIGHT);
 
@@ -450,10 +672,15 @@ public class GradientEditor extends JPanel implements PropertyEditor {
 
                 colorsArr = colors.toArray(new Color[colors.size()]);
             }
-            g2d.setPaint(new LinearGradientPaint(COLOR_SIZE / 2, 0, getWidth() - COLOR_SIZE, 0, ratiosArr, colorsArr));
-            g2d.fill(new Rectangle(COLOR_SIZE / 2, 0, getWidth() - COLOR_SIZE, getHeight() - BOTTOM_HEIGHT));
+            Rectangle bar = new Rectangle(COLOR_SIZE / 2, 0, getWidth() - COLOR_SIZE, getHeight() - BOTTOM_HEIGHT);
+            if (inlineStops == this) {
+                g2d.setPaint(gradientPaint(bar, ratiosArr, colorsArr, false, 0));
+            } else {
+                g2d.setPaint(new LinearGradientPaint(COLOR_SIZE / 2, 0, getWidth() - COLOR_SIZE, 0, ratiosArr, colorsArr));
+            }
+            g2d.fill(bar);
             g2d.setPaint(Color.black);
-            g2d.draw(new Rectangle(COLOR_SIZE / 2, 0, getWidth() - COLOR_SIZE, getHeight() - BOTTOM_HEIGHT));
+            g2d.draw(bar);
 
             List<Rectangle> rects = getColorRects();
 

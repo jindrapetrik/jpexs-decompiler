@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="components.*" width="400" height="200">
+    <components:CompactPanel id="compactPanel"/>
+</s:Application>

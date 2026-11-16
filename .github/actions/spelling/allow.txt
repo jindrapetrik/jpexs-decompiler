@@ -1,5 +1,15 @@
+awt
+awt's
+dvd
+dvd's
+fourcc
+fourcc's
 github
+haxe
+haxe's
 https
+idct
+idct's
 ssh
 ubuntu
 workarounds

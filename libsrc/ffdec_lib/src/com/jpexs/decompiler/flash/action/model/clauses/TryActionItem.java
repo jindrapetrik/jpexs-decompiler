@@ -303,12 +303,14 @@ public class TryActionItem extends ActionItem implements Block {
                                 new ActionDefineLocal(),
                                 ebody);
                         fullCatchBody.add(0, new ActionPop());
-                        int toFinishSize = Action.actionsToBytes(asGenerator.toActionList(fullCatchBody), false, asGenerator.getSwfVersion()).length;
+                        List<Action> fullCatchBodyA = asGenerator.toActionList(fullCatchBody);
+                        fullCatchBody = new ArrayList<>(fullCatchBodyA);
+                        int toFinishSize = Action.actionsToBytes(fullCatchBodyA, false, asGenerator.getSwfVersion()).length;
                         ActionJump finishJump = new ActionJump(toFinishSize, charset);
                         ifBody.add(finishJump);
                         List<Action> ifBodyA = asGenerator.toActionList(ifBody);
                         int ifBodySize = Action.actionsToBytes(ifBodyA, false, asGenerator.getSwfVersion()).length;
-                        fullCatchBody.addAll(0, ifBody);
+                        fullCatchBody.addAll(0, ifBodyA);
                         fullCatchBody.addAll(0,
                                 GraphTargetItem.toSourceMerge(localData, generator,
                                         etype,

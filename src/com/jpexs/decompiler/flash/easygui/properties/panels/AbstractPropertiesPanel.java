@@ -62,10 +62,14 @@ public abstract class AbstractPropertiesPanel extends JPanel {
     }
 
     protected void addCard(JPanel cardPanel, String id, String icon, JPanel contents, GridBagConstraints gbc, boolean last) {
+        addCard(cardPanel, id, icon, contents, gbc, last, EasyStrings.translate("properties." + titleIdentifier + ".header." + id));
+    }
+
+    protected void addCard(JPanel cardPanel, String id, String icon, JPanel contents, GridBagConstraints gbc, boolean last, String title) {
         //JPanel cardPanel = new JPanel();
 
         JPanel headerPanel = new JPanel(new BorderLayout());
-        JLabel label = new JLabel(EasyStrings.translate("properties." + titleIdentifier + ".header." + id));
+        JLabel label = new JLabel(title);
         if (icon != null) {
             label.setIcon(View.getIcon(icon));
         }

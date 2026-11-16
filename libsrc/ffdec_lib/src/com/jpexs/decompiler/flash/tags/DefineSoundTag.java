@@ -247,6 +247,9 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
 
     @Override
     public String getFlaExportName() {
+        if (!getClassNames().isEmpty()) {
+            return "sound_" + getClassNames().iterator().next();
+        }
         return "sound" + getCharacterId();
     }
 

@@ -1,0 +1,54 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/SliderSkins/SliderThumb_disabledSkin" itemID="44b6b7cb-00000026" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="SliderThumb_disabledSkin" lastModified="1168290382">
+  <timeline>
+    <DOMTimeline name="SliderThumb_disabledSkin">
+      <layers>
+        <DOMLayer name="skin" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.0079345703125" c="0.0079345703125" d="0" ty="6.5"/>
+                        </matrix>
+                        <GradientEntry color="#5B5D5E" alpha="0.298039215686275" ratio="0"/>
+                        <GradientEntry color="#B7BABC" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0" b="-0.0067138671875" c="0.0067138671875" d="0" ty="6.5"/>
+                        </matrix>
+                        <GradientEntry color="#CCCCCC" alpha="0.2" ratio="0"/>
+                        <GradientEntry color="#FFFFFF" alpha="0.298039215686275" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!22 0|-22 0!-22 0|-130 200!-130 200|-90 260!-90 260|90 260!90 260|130 200!130 200|22 0"/>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!110 200|70 240!70 240|-70 240!-70 240|-110 200!-110 200|-21 20!-21 20|21 20!21 20|110 200"/>
+                    <Edge cubics="!21 20(;21,20 -21,20 -21,20p21 20 -21 20);"/>
+                    <Edge cubics="!110 200(;110,200 21,20 21,20p110 200 21 20);"/>
+                    <Edge cubics="!70 240(70,240;70,240 110,200 110,200p70 240 110 200);"/>
+                    <Edge cubics="!-70 240(-70,240;-70,240 70,240 70,240p-70 240 70 240);"/>
+                    <Edge cubics="!-110 200(;-110,200 -70,240 -70,240p-110 200 -70 240);"/>
+                    <Edge cubics="!-21 20(-21,20;-21,20 -110,200 -110,200p-21 20 -110 200)-110,200;"/>
+                    <Edge cubics="!130 200(;130,200 22,0 22,0q130 200 22 0);"/>
+                    <Edge cubics="!90 260(;90,260 130,200 130,200q90 260 130 200);"/>
+                    <Edge cubics="!-22 0(;-22,0 -130,200 -130,200q-22 0 -130 200);"/>
+                    <Edge cubics="!-130 200(;-130,200 -90,260 -90,260q-130 200 -90 260);"/>
+                    <Edge cubics="!-90 260(;-90,260 90,260 90,260q-90 260 90 260)90,260;"/>
+                    <Edge cubics="!22 0(;22,0 -22,0 -22,0q22 0 -22 0);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.easygui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -52,7 +53,6 @@ public class EasyPanel extends JPanel {
         for (SWF swf : swfs) {
             tabSwitcher.addTab(swf, swf.getShortPathTitle(), View.getIcon("flash16"));
         }
-        easySwfPanel.clearUndos();
     }
 
     public void setSwf(SWF swf) {
@@ -88,14 +88,59 @@ public class EasyPanel extends JPanel {
     public SWF getSwf() {
         return tabSwitcher.getSelectedValue();
     }
+
+    public boolean isShapeEditing() {
+        return easySwfPanel.isShapeEditing();
+    }
+
+    public ShapeTool getShapeTool() {
+        return easySwfPanel.getShapeTool();
+    }
+
+    public void setShapeTool(ShapeTool tool) {
+        easySwfPanel.setShapeTool(tool);
+    }
+
+    public void replaceShape(boolean updateBounds) {
+        easySwfPanel.replaceShape(updateBounds);
+    }
+
+    public void exportShape() {
+        easySwfPanel.exportShape();
+    }
     
     public void setTimelined(Timelined tim) {
         setSwf(tim.getSwf());
         easySwfPanel.setTimelined(tim);
     }
+    
+    public void editShape(ShapeTag shape) {
+        setSwf(shape.getSwf());
+        easySwfPanel.editShape(shape);
+    }
 
     public void dispose() {
         setSwfs(new ArrayList<>());
         easySwfPanel.dispose();
+    }
+
+    public void historyChanged() {
+        easySwfPanel.historyChanged();
+    }
+
+    public void prepareHistoryReplay(SWF swf) {
+        easySwfPanel.setSwf(swf);
+    }
+
+    public void finishHistoryReplay() {
+        easySwfPanel.finishHistoryReplay();
+    }
+
+    public void refreshAfterHistory(SWF swf) {
+        easySwfPanel.refreshAfterHistory(swf);
+    }
+
+    public void swfClosed(SWF swf) {
+        easySwfPanel.swfClosed(swf);
     }
 }

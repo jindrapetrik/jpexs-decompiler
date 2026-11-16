@@ -26,12 +26,19 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.Set;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -57,6 +64,7 @@ public class TimelinePanel extends JPanel {
     public static final int FRAME_HEIGHT = 18;
 
     private final JScrollPane timelineBodyScrollPane;
+    private final TimelineLayerDrag layerDrag;
 
     public TimelinePanel(EasySwfPanel swfPanel, UndoManager undoManager) {
         timelineBodyPanel = new TimelineBodyPanel(swfPanel, undoManager);
@@ -65,23 +73,68 @@ public class TimelinePanel extends JPanel {
 
         timelineBodyScrollPane = new FasterScrollPane(timelineBodyPanel);
 
-        depthPanel = new TimelineDepthPanel();
+        depthPanel = new TimelineDepthPanel(swfPanel, false, timelineBodyPanel.getLayerSelection());
+        depthPanel.forwardMouseWheelTo(timelineBodyScrollPane);
+        layerDrag = new TimelineLayerDrag(depthPanel, timelineBodyScrollPane, 1,
+                timelineBodyPanel::setDropRow, timelineBodyPanel::moveLayers);
 
-        timelineBodyPanel.addChangeListener(new Runnable() {
+        depthPanel.addMouseListener(new MouseAdapter() {
             @Override
-            public void run() {
-                timeline = timelined.getTimeline();
-                depthPanel.setTimeline(timeline);
-                timePanel.setTimeline(timeline);                
+            public void mouseClicked(MouseEvent event) {
+                if (SwingUtilities.isLeftMouseButton(event) && !event.isPopupTrigger()
+                        && !layerDrag.wasDragged() && !depthPanel.isOverControls(event)) {
+                    int depth = depthPanel.getDepthAt(event);
+                    if (depth > 0) {
+                        timelineBodyPanel.selectLayerFrames(depth, event.isControlDown(), event.isShiftDown());
+                    }
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent event) {
+                showLayerMenu(event);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent event) {
+                showLayerMenu(event);
+            }
+
+            private void showLayerMenu(MouseEvent event) {
+                if (!event.isPopupTrigger() || timelined == null || depthPanel.isOverControls(event)) {
+                    return;
+                }
+                int depth = depthPanel.getDepthAt(event);
+                if (depth == 0 && (depthPanel.getDepthCount() != 0 || !depthPanel.isActionsRowAt(event))) {
+                    return;
+                }
+                JPopupMenu menu = new JPopupMenu();
+                JMenuItem add = new JMenuItem(EasyStrings.translate("timeline.shape.addLayer"));
+                add.setEnabled(timelineBodyPanel.canAddLayer());
+                add.addActionListener(action -> timelineBodyPanel.addLayer(depth));
+                menu.add(add);
+                if (depth > 0) {
+                    Set<Integer> depths = depthPanel.getLayerSelection().contextDepths(depth);
+                    JMenuItem remove = new JMenuItem(EasyStrings.translate(depths.size() == 1 ? "timeline.shape.removeLayer" : "timeline.shape.removeLayers"));
+                    remove.setEnabled(timelineBodyPanel.canRemoveLayers(depths));
+                    remove.addActionListener(action -> timelineBodyPanel.removeLayers(depths));
+                    menu.add(remove);
+                }
+                menu.show(depthPanel, event.getX(), event.getY());
             }
         });
+
+        timelineBodyPanel.addChangeListener(this::refresh);
 
         timePanel = new TimelineTimePanel(depthPanel);
 
         gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(depthPanel.getHeader(), gbc);
+
+        gbc.gridx = 1;
         gbc.weightx = 1;
         add(timePanel, gbc);
 
@@ -104,6 +157,7 @@ public class TimelinePanel extends JPanel {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 timePanel.scroll(e.getValue());
+                timelineBodyPanel.clearMaskHover();
             }
         });
         timelineBodyScrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
@@ -111,6 +165,7 @@ public class TimelinePanel extends JPanel {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 depthPanel.scroll(e.getValue());
+                timelineBodyPanel.clearMaskHover();
             }
         });
 
@@ -170,8 +225,23 @@ public class TimelinePanel extends JPanel {
         timelineBodyPanel.frameSelect(frame, depths, false);
     }
 
+    void setStageSelection(int frame, List<Integer> depths) {
+        setFrame(frame, depths);
+        if (!depths.isEmpty()) {
+            int depth = depths.get(depths.size() - 1);
+            Rectangle row = timelineBodyPanel.getFrameBounds(frame, depth);
+            row.x = timelineBodyScrollPane.getViewport().getViewPosition().x;
+            row.width = 1;
+            timelineBodyPanel.scrollRectToVisible(row);
+        }
+    }
+
     public void refresh() {
-        timelineBodyPanel.refresh();
+        layerDrag.cancel();
+        timeline = timelined == null ? null : timelined.getTimeline();
+        timelineBodyPanel.setTimeline(timeline);
+        depthPanel.setTimeline(timeline);
+        timePanel.setTimeline(timeline);
     }
 
     public void addChangeListener(Runnable l) {
@@ -184,15 +254,8 @@ public class TimelinePanel extends JPanel {
 
     public void setTimelined(Timelined timelined) {
         this.timelined = timelined;
-        if (timelined == null) {
-            timelineBodyPanel.setTimeline(null);
-            depthPanel.setTimeline(null);
-            timePanel.setTimeline(null);
-        } else {
-            timelineBodyPanel.setTimeline(timelined.getTimeline());
-            depthPanel.setTimeline(timelined.getTimeline());
-            timePanel.setTimeline(timelined.getTimeline());
-            
+        refresh();
+        if (timelined != null) {
             SWF swf = timelined.getSwf();
             SwfSpecificCustomConfiguration conf = swf == null ? null : Configuration.getSwfSpecificCustomConfiguration(swf);
             

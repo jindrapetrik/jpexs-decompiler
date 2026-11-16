@@ -1,0 +1,27 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ProgressBarSkins/ProgressBar_indeterminateSkin" itemID="44b3e7f2-0000000f" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="ProgressBar_indeterminateSkin" lastModified="1168289661">
+  <timeline>
+    <DOMTimeline name="ProgressBar_indeterminateSkin">
+      <layers>
+        <DOMLayer name="skin" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#009DFF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!1596 0|-1 798.5!-1 798.5|-1 598.5!-1 598.5|1196 0!1196 0|1596 0!1599 398.5|796 800!796 800|396 800!396 800|1599 198.5!1599 198.5|1599 398.5!1599 800|1196 800!1196 800|1599 598.5!1599 598.5|1599 800!796 0|-1 398.5!-1 398.5|-1 198.5!-1
+ 198.5|396 0!396 0|796 0"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

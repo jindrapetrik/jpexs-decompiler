@@ -1,0 +1,81 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ScrollBarSkins/ScrollThumb_downSkin" itemID="4399c5a6-000092e7" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="ScrollThumb_downSkin" scaleGridLeft="-1" scaleGridRight="8.05" scaleGridTop="5" scaleGridBottom="48" lastModified="1168290280" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="ScrollThumb_downSkin">
+      <layers>
+        <DOMLayer name="skin" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#FF0000" alpha="0"/>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!320 0|320 1040!320 1040|260 1040!260 1040|260 0!260 0|320 0"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <LinearGradient>
+                            <matrix>
+                              <Matrix a="0" b="-0.013427734375" c="0.013427734375" d="0" tx="2" ty="41.25"/>
+                            </matrix>
+                            <GradientEntry color="#0075BF" ratio="0"/>
+                            <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                          </LinearGradient>
+                        </FillStyle>
+                        <FillStyle index="2">
+                          <LinearGradient>
+                            <matrix>
+                              <Matrix a="0" b="-0.013427734375" c="0.013427734375" d="0" tx="2" ty="41"/>
+                            </matrix>
+                            <GradientEntry color="#0075BF" ratio="0"/>
+                            <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                          </LinearGradient>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle0="1" edges="!260 927|260 80!260 80[260 0 180 0!180 0|20 0!20 0|20 20!20 20|183 20!183 20[240 22 240 80!240 80|240 927"/>
+                        <Edge fillStyle0="1" fillStyle1="2" edges="!240 927|260 927"/>
+                        <Edge fillStyle0="2" edges="!240 927|240 960!240 960[240 1019 183 1020!183 1020|20 1020!20 1020|20 1040!20 1040|180 1040!180 1040[260 1040 260 960!260 960|260 927"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <LinearGradient>
+                            <matrix>
+                              <Matrix a="0" b="-0.013427734375" c="0.013427734375" d="0" tx="32.85" ty="31"/>
+                            </matrix>
+                            <GradientEntry color="#99D7FE" ratio="0"/>
+                            <GradientEntry color="#D9F0FE" ratio="1"/>
+                          </LinearGradient>
+                        </FillStyle>
+                      </fills>
+                      <edges>
+                        <Edge fillStyle1="1" edges="!240 960[240 1020 183 1021!183 1021|20 1019.5!20 1019.5|20 20!20 20|183 21!183 21[240 23 240 81!240 81|240 960"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

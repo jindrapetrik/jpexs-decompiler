@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.InvalidActionException;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.CastOpActionItem;
 import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
@@ -47,6 +48,7 @@ import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -153,10 +155,13 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
      * @param version Version
      * @throws IOException On I/O error
      */
-    public ActionTry(int actionLength, SWFInputStream sis, int version) throws IOException {
+    public ActionTry(int actionLength, SWFInputStream sis, int version) throws IOException, InvalidActionException {
         super(0x8F, actionLength, sis.getCharset());
         long startPos = sis.getPos();
         this.version = version;
+        if (actionLength < 7) {
+            throw new InvalidActionException();            
+        }
         reserved = (int) sis.readUB(5, "reserved");
         catchInRegisterFlag = sis.readUB(1, "catchInRegisterFlag") == 1;
         finallyBlockFlag = sis.readUB(1, "finallyBlockFlag") == 1;

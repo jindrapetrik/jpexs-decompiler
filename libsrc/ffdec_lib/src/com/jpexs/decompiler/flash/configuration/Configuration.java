@@ -336,6 +336,7 @@ public final class Configuration {
     @ConfigurationDefaultString("Monospaced-Plain-12")
     @ConfigurationCategory("display")
     @ConfigurationName("gui.sourceFont")
+    @ConfigurationFont
     public static ConfigurationItem<String> sourceFontString = null;
 
     @ConfigurationDefaultDouble(0.5)
@@ -966,7 +967,7 @@ public final class Configuration {
     public static ConfigurationItem<String> lastFlaExportVersion = null;
 
     @ConfigurationDefaultBoolean(true)
-    public static ConfigurationItem<Boolean> lastFlaExportCompressed = null;
+    public static ConfigurationItem<Boolean> lastFlaExportCompressed = null;   
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
@@ -1310,6 +1311,20 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> useNativeFileDialogs = null;
+    
+    @ConfigurationDefaultInt(50)
+    @ConfigurationInternal
+    public static ConfigurationItem<Integer> lastFlaExportTweenDetectionQuality = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("display")
+    @ConfigurationName("gui.font")
+    @ConfigurationFont
+    public static ConfigurationItem<String> uiFontString = null;
+
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> useFoldersInFlaExport = null;
 
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
@@ -1332,6 +1347,11 @@ public final class Configuration {
 
     public static Font getSourceFont() {
         return FontHelper.stringToFont(sourceFontString.get());
+    }
+
+    public static Font getUiFont() {
+        String fontString = uiFontString.get();
+        return fontString == null || fontString.isEmpty() ? null : FontHelper.stringToFont(fontString);
     }
 
     /**

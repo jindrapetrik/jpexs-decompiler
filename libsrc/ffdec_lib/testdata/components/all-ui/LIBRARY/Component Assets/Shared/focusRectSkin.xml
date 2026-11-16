@@ -1,0 +1,33 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/Shared/focusRectSkin" itemID="44d8b6f8-00000055" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="focusRectSkin" scaleGridLeft="4.9" scaleGridRight="76.95" scaleGridTop="4.95" scaleGridBottom="16.95" lastModified="1168290361">
+  <timeline>
+    <DOMTimeline name="focusRectSkin">
+      <layers>
+        <DOMLayer name="border" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="1.52587890625e-005" b="0.01318359375" c="-0.013427734375" d="1.52587890625e-005" tx="41.05" ty="11"/>
+                        </matrix>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#009DFF" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!1640.5 80[#668.86 0 1560.5 0!1560.5 0|80.5 0!80.5 0[#0.7A 0 0.5 80!0.5 80|0.5 360!0.5 360[#0.7A 440 80.5 440!80.5 440|1560.5 440!1560.5 440[#668.86 440 1640.5 360!1640.5 360|1640.5 80!1620.5 360[#654.84 #1A2.BC 1563 420!1563 420|78 420
+!78 420[#14.7B #1A2.BC 20.5 360!20.5 360|20.5 80!20.5 80[#14.7B #15.44 78 20!78 20|1563 20!1563 20[#654.84 #15.44 1620.5 80!1620.5 80|1620.5 360"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -425,6 +425,17 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
         super.setModified(value);
     }
 
+    /**
+     * Replaces the timeline's tag list and invalidates its cached views.
+     * @param tags Tags in timeline order
+     */
+    public synchronized void replaceTags(List<Tag> tags) {
+        this.subTags = new ArrayList<>(tags);
+        readOnlyTags = null;
+        setModified(true);
+        resetTimeline();
+    }
+
     @Override
     public synchronized ReadOnlyTagList getTags() {
         if (readOnlyTags == null) {
@@ -526,6 +537,17 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
         getTimeline().toHtmlCanvas(result, unitDivisor, null);
+    }
+
+    @Override
+    public void toAS3(StringBuilder result, double unitDivisor) {
+        result.append("\tprivate function ").append(SWF.getTypePrefix(this)).append(getCharacterId()).append("():Sprite {\r\n");
+        result.append("\t\treturn new Sprite();\r\n");
+        result.append("\t}\r\n\r\n");
+
+        result.append("\tprivate function ").append(SWF.getTypePrefix(this)).append(getCharacterId()).append("_frame(sprite:Sprite, frame:int, ratio:Number, time:int):void {\r\n");
+        getTimeline().toAS3(result, unitDivisor, null);
+        result.append("\t}\r\n\r\n");
     }
 
     @Override

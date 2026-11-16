@@ -1,0 +1,444 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/ ScrollPane" itemID="3bd472e0-00000286" linkageExportForAS="true" linkageIdentifier="FScrollPaneSymbol" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/ ScrollPane" sourceLastModified="1015556309" lastModified="1015556309" lastUniqueIdentifier="1" sourceItemID="3bd472e0-00000286" tooltip="Scroll Pane" customIconID="7" descriptionType="reference" livePreviewScmHRef="ikbw9nmjzz.swf" livePreviewScmSourceFilename="D:\depot\main\frameworks\UIcontrols\live_previews\scrollPane_live.swf" persistLivePreview11="true" symbolDescription="UI Components/FScrollPane" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name=" ScrollPane">
+      <layers>
+        <DOMLayer name="Actions" color="#FF4F4F" locked="true" current="true" isSelected="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip 2
+
+// ::: FScrollPaneClass
+
+
+function FScrollPaneClass()
+{
+	this.init();
+	this.width = this._width;
+	this.height = this._height;
+	this._xscale = this._yscale = 100;
+	this.contentWidth = this.contentHeight = 0;
+
+	if (this.hScroll==undefined) {
+		this.hScroll=this.vScroll="auto";
+		this.dragContent = false;
+	}
+
+	this.offset = new Object();
+	function boolToString(str)
+	{
+		if (str=="false") return false;
+		if (str=="true") return true;
+		else return str;
+	}
+	this.vScroll = boolToString(this.vScroll);
+	this.hScroll = boolToString(this.hScroll);
+	
+	this.attachMovie("FScrollBarSymbol", "hScrollBar_mc", 100, {hostStyle:this.styleTable});
+	this.hScrollBar_mc.setHorizontal(true);
+	this.hScrollBar_mc.setSmallScroll(5);
+	this.hScrollBar_mc.setChangeHandler("onScroll", this);
+	
+	this.attachMovie("FScrollBarSymbol", "vScrollBar_mc", 99, {hostStyle:this.styleTable});
+	this.vScrollBar_mc.setSmallScroll(5);
+	this.vScrollBar_mc.setChangeHandler("onScroll", this);
+	
+	this.setSize(this.width, this.height);
+	if (this.scrollContent!="") {
+		this.setScrollContent(this.scrollContent);
+	}
+	this.setDragContent(this.dragContent);
+}
+
+FScrollPaneClass.prototype = new FUIComponentClass();
+
+Object.registerClass("FScrollPaneSymbol", FScrollPaneClass);
+
+
+// ::: PUBLIC METHODS
+
+FScrollPaneClass.prototype.getScrollContent = function()
+{
+	return this.content_mc;
+}
+
+FScrollPaneClass.prototype.getPaneWidth = function()
+{
+	return this.width;
+}
+
+FScrollPaneClass.prototype.getPaneHeight = function()
+{
+	return this.height;
+}
+
+FScrollPaneClass.prototype.getScrollPosition = function()
+{
+	var xPos = (this.hScrollBar_mc==undefined) ? 0 : this.hScrollBar_mc.getScrollPosition();
+	var yPos = (this.vScrollBar_mc==undefined) ? 0 : this.vScrollBar_mc.getScrollPosition();
+	
+	return {x:xPos, y:yPos};
+}
+
+FScrollPaneClass.prototype.setScrollContent = function(target)
+{
+
+	this.offset.x = 0;
+	this.offset.y = 0;
+
+	// remove or hide the old movie clip
+	if ( this.content_mc != undefined ) {
+		if (target!=this.content_mc) {
+			this.content_mc._visible = false;
+			this.content_mc.removeMovieClip();
+			this.content_mc.unloadMovie();
+		} 
+	}
+	// create the movie clip
+	
+	if (typeof(target)=="string") {
+		this.attachMovie(target, "tmp_mc", 3);
+		this.content_mc = this.tmp_mc;
+	} else if (target==undefined) {
+		this.content_mc.unloadMovie();
+	} else {
+		this.content_mc = target;
+	}
+
+	this.localToGlobal(this.offset);
+	this.content_mc._parent.globalToLocal(this.offset);
+	this.content_mc._x = this.offset.x;
+	this.content_mc._y = this.offset.y;
+
+	var contentBounds = this.content_mc.getBounds(this);
+	this.offset.x = -contentBounds.xMin;
+	this.offset.y = -contentBounds.yMin;
+	
+	this.localToGlobal(this.offset);
+	this.content_mc._parent.globalToLocal(this.offset);
+	this.content_mc._x = this.offset.x;
+	this.content_mc._y = this.offset.y;
+
+	this.contentWidth = this.content_mc._width;
+	this.contentHeight = this.content_mc._height;
+	
+	// set up the mask
+	this.content_mc.setMask(this.mask_mc);
+	this.setSize(this.width, this.height);
+	
+}
+
+FScrollPaneClass.prototype.setSize = function(w, h)
+{
+	if (arguments.length<2 || isNaN(w) || isNaN(h)) return;
+	super.setSize(w,h);
+	this.width = Math.max(w, 60);
+	this.height = Math.max(h, 60);
+	this.boundingBox_mc._xscale = 100;
+	this.boundingBox_mc._yscale = 100;
+
+	// adjust the border size
+	this.boundingBox_mc._width = this.width;
+	this.boundingBox_mc._height = this.height;
+
+	this.setHandV();
+	this.initScrollBars();
+	
+	// set up the mask
+	if (this.mask_mc==undefined) {
+		this.attachMovie("FBoundingBoxSymbol", "mask_mc", 3000);
+	}
+	this.mask_mc._xscale = 100;
+	this.mask_mc._yscale = 100;
+	this.mask_mc._width = this.hWidth;
+	this.mask_mc._height = this.vHeight;
+	
+	this.mask_mc._alpha = 0;
+}
+
+FScrollPaneClass.prototype.setScrollPosition = function(x,y)
+{
+	x = Math.max(this.hScrollBar_mc.minPos, x);
+	x = Math.min(this.hScrollBar_mc.maxPos, x);
+	y = Math.max(this.vScrollBar_mc.minPos, y);
+	y = Math.min(this.vScrollBar_mc.maxPos, y);
+	this.hScrollBar_mc.setScrollPosition(x);
+	this.vScrollBar_mc.setScrollPosition(y);
+}
+
+FScrollPaneClass.prototype.refreshPane = function()
+{
+	this.setScrollContent(this.content_mc);
+}
+
+FScrollPaneClass.prototype.loadScrollContent = function(url, handler, location)
+{
+	this.content_mc.removeMovieClip();
+	this.content_mc.unloadMovie();
+	this.content_mc._visible = 0;
+	this.loadContent.duplicateMovieClip("loadTemp", 3);
+	this.dupeFlag = true;
+	this.contentLoaded = function()
+	{
+		this.loadReady = false;
+		this.content_mc = this.loadTemp;
+		this.refreshPane();
+		this.executeCallBack();
+	}
+	this.setChangeHandler(handler, location);
+	this.loadTemp.loadMovie(url);
+}
+
+FScrollPaneClass.prototype.setHScroll = function(prop)
+{
+	this.hScroll = prop;
+	this.setSize(this.width, this.height);
+}
+
+FScrollPaneClass.prototype.setVScroll = function(prop)
+{
+	this.vScroll = prop;
+	this.setSize(this.width, this.height);
+}
+
+FScrollPaneClass.prototype.setDragContent = function(dragFlag)
+{
+	if (dragFlag) {
+		this.boundingBox_mc.useHandCursor = true;
+		this.boundingBox_mc.onPress = function()		
+		{
+			this._parent.startDragLoop();
+		}
+		this.boundingBox_mc.tabEnabled = false;
+		this.boundingBox_mc.onRelease = this.boundingBox_mc.onReleaseOutside = function()
+		{
+			this._parent.pressFocus();
+			this._parent.onMouseMove = null;
+		}
+	} else {
+		delete this.boundingBox_mc.onPress;
+		this.boundingBox_mc.useHandCursor = false;
+	}
+}
+
+// A secret public method - wasn't documented or tested, but works.
+// see the setSmallScroll method of FScrollBar for details.
+FScrollPaneClass.prototype.setSmallScroll = function(x,y)
+{
+	this.hScrollBar_mc.setSmallScroll(x);
+	this.vScrollBar_mc.setSmallScroll(y);
+}
+
+
+// ::: 'PRIVATE' METHODS
+
+
+FScrollPaneClass.prototype.setHandV = function()
+{
+	if ( (this.contentHeight-this.height>2 && this.vScroll!=false) || this.vScroll==true ) {
+		this.hWidth = this.width-this.vScrollBar_mc._width;
+	} else {
+		this.hWidth = this.width;
+	}
+	if ((this.contentWidth-this.width>2 && this.hScroll!=false) || this.hScroll==true ) {
+		this.vHeight = this.height-this.hScrollBar_mc._height;
+	} else {
+		this.vHeight = this.height;
+	}
+}
+		
+
+FScrollPaneClass.prototype.startDragLoop = function()
+{
+	this.tabFocused=false;
+	this.myOnSetFocus();
+	this.lastX = this._xmouse;
+	this.lastY = this._ymouse;
+	this.onMouseMove = function() {
+		this.scrollXMove = this.lastX-this._xmouse;
+		this.scrollYMove = this.lastY-this._ymouse;
+		this.scrollXMove += this.hScrollBar_mc.getScrollPosition();
+		this.scrollYMove += this.vScrollBar_mc.getScrollPosition();
+		this.setScrollPosition(this.scrollXMove, this.scrollYMove);
+		if (this.scrollXMove< this.hScrollBar_mc.maxPos && this.scrollXMove>this.hScrollBar_mc.minPos) {
+			this.lastX = this._xmouse;
+		}
+		if (this.scrollYMove< this.vScrollBar_mc.maxPos && this.scrollYMove>this.vScrollBar_mc.minPos) {
+			this.lastY = this._ymouse;
+		}
+		
+		this.updateAfterEvent();
+	}
+}
+
+FScrollPaneClass.prototype.initScrollBars = function()
+{
+	this.hScrollBar_mc._y = this.height-this.hScrollBar_mc._height;
+	this.hScrollBar_mc.setSize(this.hWidth);
+	this.hScrollBar_mc.setScrollProperties(this.hWidth, 0, this.contentWidth-this.hWidth);
+	this.vScrollBar_mc._visible = (this.hWidth==this.width) ? false : true;
+	
+	this.vScrollBar_mc._x = this.width-this.vScrollBar_mc._width;	
+	this.vScrollBar_mc.setSize(this.vHeight);
+	this.vScrollBar_mc.setScrollProperties(this.vHeight, 0, this.contentHeight-this.vHeight);
+	this.hScrollBar_mc._visible = (this.vHeight==this.height) ? false : true;
+}
+
+FScrollPaneClass.prototype.onScroll = function(component)
+{
+	var pos = component.getScrollPosition();
+	var XorY = (component._name=="hScrollBar_mc") ? "x" : "y";
+	if (component._name=="hScrollBar_mc") {
+		this.content_mc._x = -pos+this.offset.x;
+	} else {
+		this.content_mc._y = -pos+this.offset.y;
+	}
+}
+
+FScrollPaneClass.prototype.myOnKeyDown = function()
+{
+	var posX = this.hScrollBar_mc.getScrollPosition();
+	var posY = this.vScrollBar_mc.getScrollPosition();
+	
+	if (this.hScrollBar_mc.maxPos > this.hScrollBar_mc.minPos) {
+		if (Key.isDown(Key.LEFT)) {
+			this.setScrollPosition(posX-3, posY);
+		} else if (Key.isDown(Key.RIGHT)) {
+			this.setScrollPosition(posX+3, posY);
+		}
+	}
+	if (this.vScrollBar_mc.maxPos > this.vScrollBar_mc.minPos) {
+		if (Key.isDown(Key.UP)) {
+			this.setScrollPosition(posX, posY-3);
+		} else if (Key.isDown(Key.DOWN)) {
+			this.setScrollPosition(posX, posY+3);
+		} else if (Key.isDown(Key.PGDN)) {
+			this.setScrollPosition(posX, posY+this.vScrollBar_mc.pageSize);
+		} else if (Key.isDown(Key.PGUP)) {
+			this.setScrollPosition(posX, posY-this.vScrollBar_mc.pageSize);
+		}
+	}
+}
+
+#endinitclip
+this.deadPreview._visible = false;
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Name" color="#FFFF4F" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/ScrollPane Name" name="deadPreview">
+                  <matrix>
+                    <Matrix tx="2" ty="2.25"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Bounding Box" color="#4FFF4F" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Component Skins/Global Skins/FBoundingBox" name="boundingBox_mc" selected="true">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollPane Assets/LoadContent" name="loadContent">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <Actionscript>
+                    <script><![CDATA[onClipEvent(load)
+{
+	if (this._parent.loadReady) {
+		this._parent.contentLoaded();
+		delete this._parent.loadReady;
+	} else if (this._name != "loadContent") {
+		this._parent.loadReady = true;
+	}
+}]]></script>
+                  </Actionscript>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="SuperClass" color="#FF4FFF" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent" name="superClassAsset" uniqueID="2">
+                  <matrix>
+                    <Matrix tx="3" ty="3"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='1.2'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Assets" color="#4F80FF" locked="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/ ScrollBar" name="scrollBarAsset" uniqueID="1">
+                  <matrix>
+                    <Matrix a="0.1875" d="0.0299835205078125"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0"/>
+                  </color>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='1.1'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="_targetInstanceName">
+      <Inspectable name="Target TextField" variable="_targetInstanceName" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+   <property id="horizontal">
+      <Inspectable name="Horizontal" variable="horizontal" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="scrollContent">
+      <Inspectable name="Scroll Content" variable="scrollContent" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+   <property id="hScroll">
+      <Inspectable name="Horizontal Scroll" variable="hScroll" category="" verbose="0" defaultValue="auto" enumeration="auto,true,false" type="List"/>
+   </property>
+   <property id="vScroll">
+      <Inspectable name="Vertical Scroll" variable="vScroll" category="" verbose="0" defaultValue="auto" enumeration="auto,true,false" type="List"/>
+   </property>
+   <property id="dragContent">
+      <Inspectable name="Drag Content" variable="dragContent" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

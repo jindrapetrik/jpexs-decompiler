@@ -1,0 +1,31 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/RadioButton Name" itemID="3bd7762d-000000cd" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/RadioButton Name" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd7762d-000000cd">
+  <timeline>
+    <DOMTimeline name="RadioButton Name">
+      <layers>
+        <DOMLayer name="asset" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#D4D0D8"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!1894 94|239 94!239 94|239 76!239 76|238.5 76!238.5 76|238.5 97!238.5 97|239 97!239 97|239 115!239 115|408 115!408 115|408 114!408 114|1894 114!1894 114|1894 94!161 95[161 120 143 138!143 138[126 155 101 155!101 155[76 155 59 138!59 138
+[41 120 41 95!41 95[41 70 59 53!59 53[76 35 101 35!101 35[126 35 144 53!144 53[161 72 161 95"/>
+                    <Edge fillStyle1="1" edges="
+!141 95[141 112 129 123!129 123[118 135 101 135!101 135[85 135 73 123!73 123[61 112 61 95!61 95[61 79 73 67!73 67[85 55 101 55!101 55[118 55 129 67!129 67[141 79 141 95"/>
+                    <Edge fillStyle0="1" edges="
+!158 39[132 15 101 15!101 15[68 15 45 39!45 39[21 62 21 95!21 95[21 130 45 152!45 152[66 175 101 175!101 175[134 175 158 152!158 152[181 129 181 95!181 95[181 64 158 39"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

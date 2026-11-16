@@ -1,0 +1,4 @@
+-cp src
+-main Main
+-swf bin/haxe_ctor_skip_constructor.swf
+-swf-version 11

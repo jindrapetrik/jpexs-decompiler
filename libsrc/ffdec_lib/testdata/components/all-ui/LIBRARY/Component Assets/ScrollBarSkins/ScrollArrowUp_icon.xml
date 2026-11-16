@@ -1,0 +1,24 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ScrollBarSkins/ScrollArrowUp_icon" itemID="456df209-00000192" symbolType="graphic" lastModified="1168290248" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="ScrollArrowUp_icon">
+      <layers>
+        <DOMLayer name="icon" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Component Assets/Shared/arrowIcon">
+                  <matrix>
+                    <Matrix a="-1" d="-1" tx="7" ty="4"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="3.5" y="2"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

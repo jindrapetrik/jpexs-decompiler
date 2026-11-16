@@ -1324,6 +1324,19 @@ public class DefineEditTextTag extends TextTag {
         render(TextRenderMode.HTML5_CANVAS, null, null, result, new Matrix(), null, unitDivisor, 0, 0, 1);
     }
 
+    @Override
+    public void toAS3(StringBuilder result, double unitDivisor) {
+        result.append("\tprivate function ").append(SWF.getTypePrefix(this)).append(getCharacterId()).append("():TextField {\r\n");
+        result.append("\t\tvar textField:TextField = new TextField();\r\n");
+
+        if (border) {
+            result.append("\t\ttextField.border = true;\r\n");
+        }
+
+        result.append("\t\treturn textField;\r\n");
+        result.append("\t}\r\n\r\n");
+    }
+
     private void render(TextRenderMode renderMode, SerializableImage image, SVGExporter svgExporter, StringBuilder htmlCanvasBuilder, Matrix transformation, ColorTransform colorTransform, double zoom, int selectionStart, int selectionEnd, int aaScale) {
         Map<Integer, FontTag> normalizedFonts = new HashMap<>();
         if (image != null && image.getGraphics() instanceof RequiresNormalizedFonts) {

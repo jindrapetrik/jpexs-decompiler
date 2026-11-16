@@ -110,6 +110,8 @@ public class AS3ShapeExporter extends ShapeExporterBase {
      */
     protected int fillHeight = 0;
 
+    protected boolean forSprite = false;
+
     /**
      * Gets shape data.
      *
@@ -132,24 +134,32 @@ public class AS3ShapeExporter extends ShapeExporterBase {
      * @param deltaX Delta X
      * @param deltaY Delta Y
      */
-    public AS3ShapeExporter(int windingRule, int shapeNum, RGB basicFill, double unitDivisor, SWF swf, SHAPE shape, ColorTransform colorTransform, int deltaX, int deltaY) {
+    public AS3ShapeExporter(int windingRule, int shapeNum, RGB basicFill, double unitDivisor, SWF swf, SHAPE shape, ColorTransform colorTransform, int deltaX, int deltaY, boolean forSprite) {
         super(windingRule, shapeNum, swf, shape, colorTransform);
         this.swf = swf;
         this.unitDivisor = unitDivisor;
         this.basicFill = basicFill;
         this.deltaX = deltaX;
         this.deltaY = deltaY;
+        this.forSprite = forSprite;
     }
 
     @Override
     public void beginShape() {
         shapeData = new StringBuilder();
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("var shape:Shape = new Shape();\r\n");
     }
 
     @Override
     public void endShape() {
-        shapeData.append("addChild(shape);\r\n");
+        if (forSprite) {
+            shapeData.append("\t\treturn shape;\r\n");
+        } else {
+            shapeData.append("addChild(shape);\r\n");
+        }
     }
 
     @Override
@@ -192,6 +202,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
 
     @Override
     public void beginFill(RGB color) {
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("shape.graphics.beginFill(");
         shapeData.append(colorToHexString(color)).append(", ");
         shapeData.append(colorToAlpha(color));
@@ -200,6 +213,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
 
     @Override
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("shape.graphics.beginGradientFill(");
 
         switch (type) {
@@ -281,8 +297,14 @@ public class AS3ShapeExporter extends ShapeExporterBase {
 
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("shape.graphics.beginBitmapFill(");
-        shapeData.append("bitmapData").append(bitmapId);
+        shapeData.append("image").append(bitmapId);
+        if (forSprite) {
+            shapeData.append("()");
+        }
         shapeData.append(", ");
 
         shapeData.append("new Matrix(");
@@ -304,6 +326,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
 
     @Override
     public void endFill() {
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("shape.graphics.endFill();\r\n");
     }
 
@@ -311,6 +336,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
     public void lineStyle(double thickness, RGB color, boolean pixelHinting, String scaleMode, int startCaps, int endCaps, int joints, float miterLimit, boolean noClose) {
         thickness /= SWF.unitDivisor;
 
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("shape.graphics.lineStyle(");
         shapeData.append(thickness).append(", ");
         shapeData.append(colorToHexString(color)).append(", ");
@@ -358,6 +386,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
 
     @Override
     public void lineGradientStyle(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("shape.graphics.lineGradientStyle(");
 
         switch (type) {
@@ -439,8 +470,14 @@ public class AS3ShapeExporter extends ShapeExporterBase {
 
     @Override
     public void lineBitmapStyle(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("shape.graphics.lineBitmapStyle(");
-        shapeData.append("bitmapData").append(bitmapId);
+        shapeData.append("image").append(bitmapId);
+        if (forSprite) {
+            shapeData.append("()");
+        }
         shapeData.append(", ");
 
         shapeData.append("new Matrix(");
@@ -464,6 +501,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
     public void moveTo(double x, double y) {
         x += deltaX;
         y += deltaY;
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("shape.graphics.moveTo(");
         shapeData.append(Helper.doubleStr(x / unitDivisor)).append(", ")
                 .append(Helper.doubleStr(y / unitDivisor));
@@ -474,6 +514,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
     public void lineTo(double x, double y) {
         x += deltaX;
         y += deltaY;
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("shape.graphics.lineTo(");
         shapeData.append(Helper.doubleStr(x / unitDivisor)).append(", ")
                 .append(Helper.doubleStr(y / unitDivisor));
@@ -486,6 +529,9 @@ public class AS3ShapeExporter extends ShapeExporterBase {
         anchorX += deltaX;
         controlY += deltaY;
         anchorY += deltaY;
+        if (forSprite) {
+            shapeData.append("\t\t");
+        }
         shapeData.append("shape.graphics.curveTo(");
         shapeData.append(Helper.doubleStr(controlX / unitDivisor)).append(", ")
                 .append(Helper.doubleStr(controlY / unitDivisor)).append(", ")

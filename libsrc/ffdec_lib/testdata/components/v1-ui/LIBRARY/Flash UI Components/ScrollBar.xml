@@ -1,0 +1,465 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/ ScrollBar" itemID="3bd472e7-00000287" linkageExportForAS="true" linkageIdentifier="FScrollBarSymbol" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/ ScrollBar" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd472e7-00000287" tooltip="Scroll Bar" customIconID="5" descriptionType="reference" livePreviewScmHRef="ikbvtnmjzz.swf" livePreviewScmSourceFilename="C:\depot\main\frameworks\UIcontrols\live_previews\scrollBar_live.swf" persistLivePreview11="true" symbolDescription="UI Components/FScrollBar" editFrameIndex="1" requiredMinimumPlayerVersion="0" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name=" ScrollBar">
+      <layers>
+        <DOMLayer name="Actions : Class" color="#4FFF4F" locked="true" current="true" isSelected="true" autoNamed="false" visible="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip 1
+
+/*
+		FScrollBarClass
+		EXTENDS FUIComponentClass
+	
+*/
+
+
+FScrollBarClass = function()
+{
+	if (this._height==4) {
+		return	;
+	}
+	this.init();
+
+	this.minPos = this.maxPos = this.pageSize = this.largeScroll = 0;
+	this.smallScroll = 1;
+
+
+	this.width = (this.horizontal) ? this._width : this._height;
+	this._xscale = this._yscale = 100;
+	this.setScrollPosition(0);
+	this.tabEnabled = false;
+	if ( this._targetInstanceName.length > 0 ) {
+		this.setScrollTarget(this._parent[this._targetInstanceName]);
+	}
+	this.tabChildren = false;
+	this.setSize(this.width);
+}
+
+FScrollBarClass.prototype = new FUIComponentClass();
+
+
+
+//  ::: PUBLIC METHODS
+
+FScrollBarClass.prototype.setHorizontal = function(flag)
+{
+	if (this.horizontal && !flag) {
+		this._xscale = 100;
+		this._rotation = 0;
+	} else if (flag && !this.horizontal) {
+		this._xscale = -100;
+		this._rotation = -90;
+	}
+
+	this.horizontal = flag;
+}
+
+// updates the thumb, turns the bar on and off
+FScrollBarClass.prototype.setScrollProperties = function(pSize, mnPos, mxPos)
+{
+	if (!this.enable) {
+		return ;
+	}
+	this.pageSize = pSize;
+	this.minPos = Math.max(mnPos, 0);
+	this.maxPos = Math.max(mxPos,0);
+	this.scrollPosition = Math.max(this.minPos, this.scrollPosition);
+	this.scrollPosition = Math.min(this.maxPos, this.scrollPosition);
+	
+	if (this.maxPos-this.minPos<=0) { // turn it off
+		this.scrollThumb_mc.removeMovieClip();
+		this.upArrow_mc.gotoAndStop(3);
+		this.downArrow_mc.gotoAndStop(3);
+		this.downArrow_mc.onPress = this.downArrow_mc.onRelease = this.downArrow_mc.onDragOut = null;
+		this.upArrow_mc.onPress = this.upArrow_mc.onRelease = this.upArrow_mc.onDragOut = null;
+		this.scrollTrack_mc.onPress = this.scrollTrack_mc.onRelease = null;
+		this.scrollTrack_mc.onDragOut = this.scrollTrack_mc.onRollOut = null;
+		this.scrollTrack_mc.useHandCursor = false;
+	} else { // turn it on
+		var tmp = this.getScrollPosition();
+		this.upArrow_mc.gotoAndStop(1);
+		this.downArrow_mc.gotoAndStop(1);
+		this.upArrow_mc.onPress = this.upArrow_mc.onDragOver = this.startUpScroller;
+		this.upArrow_mc.onRelease = this.upArrow_mc.onDragOut = this.stopScrolling;
+		this.downArrow_mc.onPress = this.downArrow_mc.onDragOver = this.startDownScroller;
+		this.downArrow_mc.onRelease = this.downArrow_mc.onDragOut = this.stopScrolling;
+		this.scrollTrack_mc.onPress = this.scrollTrack_mc.onDragOver = this.startTrackScroller; 
+		this.scrollTrack_mc.onRelease = this.stopScrolling;
+		this.scrollTrack_mc.onDragOut = this.stopScrolling;
+		this.scrollTrack_mc.onRollOut = this.stopScrolling;
+		this.scrollTrack_mc.useHandCursor = false;
+		this.attachMovie("ScrollThumb", "scrollThumb_mc", 3);
+		this.scrollThumb_mc._x = 0;
+		this.scrollThumb_mc._y = this.upArrow_mc._height;
+		this.scrollThumb_mc.onPress = this.startDragThumb;
+		this.scrollThumb_mc.controller = this;
+		this.scrollThumb_mc.onRelease = this.scrollThumb_mc.onReleaseOutside = this.stopDragThumb;
+		this.scrollThumb_mc.useHandCursor=false;
+		this.thumbHeight = this.pageSize / (this.maxPos-this.minPos+this.pageSize) * this.trackSize;
+		this.thumbMid_mc = this.scrollThumb_mc.mc_sliderMid;
+		this.thumbTop_mc = this.scrollThumb_mc.mc_sliderTop;
+		this.thumbBot_mc = this.scrollThumb_mc.mc_sliderBot;
+		this.thumbHeight = Math.max (this.thumbHeight, 6); // 6 is the smallest a thumb should be
+		this.midHeight = this.thumbHeight - this.thumbTop_mc._height - this.thumbBot_mc._height;
+		this.thumbMid_mc._yScale = this.midHeight * 100 / this.thumbMid_mc._height;
+		this.thumbMid_mc._y =  this.thumbTop_mc._height;
+		this.thumbBot_mc._y = this.thumbTop_mc._height + this.midHeight;
+		this.scrollTop = this.scrollThumb_mc._y;
+		this.trackHeight = this.trackSize - this.thumbHeight;
+		this.scrollBot = this.trackHeight + this.scrollTop; 
+		tmp = Math.min(tmp, this.maxPos);
+		this.setScrollPosition(Math.max(tmp, this.minPos));
+	}
+}
+
+FScrollBarClass.prototype.getScrollPosition = function ()
+{
+	return this.scrollPosition;
+}
+
+FScrollBarClass.prototype.setScrollPosition = function(pos)
+{
+	this.scrollPosition = pos;
+	if (this.scrollThumb_mc!=undefined) {
+		pos = Math.min(pos, this.maxPos);
+		pos = Math.max(pos, this.minPos);
+	}
+	this.scrollThumb_mc._y = ((pos-this.minPos) * this.trackHeight / (this.maxPos-this.minPos)) + this.scrollTop;
+	this.executeCallBack();
+}
+
+FScrollBarClass.prototype.setLargeScroll = function(lScroll)
+{
+	this.largeScroll = lScroll;	
+}
+
+FScrollBarClass.prototype.setSmallScroll = function(sScroll)
+{
+	this.smallScroll = sScroll;	
+}
+
+FScrollBarClass.prototype.setEnabled = function(enabledFlag)
+{
+	var wasEnabled = this.enable;
+	if (enabledFlag && !wasEnabled) {
+		this.enable = enabledFlag;
+		if (this.textField!=undefined) {
+			this.setScrollTarget(this.textField);
+		} else {
+			this.setScrollProperties(this.pageSize,
+							this.cachedMinPos, this.cachedMaxPos);
+			this.setScrollPosition(this.cachedPos);
+		}
+		this.clickFilter = undefined;
+	} else if (!enabledFlag && wasEnabled) { 
+		this.textField.removeListener(this);
+		this.cachedPos = this.getScrollPosition();
+		this.cachedMinPos = this.minPos;
+		this.cachedMaxPos = this.maxPos;
+		if (this.clickFilter==undefined) {
+			this.setScrollProperties(this.pageSize,0,0);
+		} else {
+			this.clickFilter=true;
+		}
+		this.enable = enabledFlag;
+	}
+}
+
+
+// stretches the track, creates + positions arrows
+FScrollBarClass.prototype.setSize = function(hgt)
+{
+	if (this._height==1) return;
+	this.width = hgt;
+	this.scrollTrack_mc._yscale = 100;
+	this.scrollTrack_mc._yscale = 100 * this.width / this.scrollTrack_mc._height;
+	if (this.upArrow_mc==undefined) {
+		this.attachMovie("UpArrow", "upArrow_mc", 1);   //1 is arbitrary
+		this.attachMovie("DownArrow", "downArrow_mc", 2);   //2 is arbitrary
+		this.downArrow_mc.controller = this.upArrow_mc.controller = this;
+		this.upArrow_mc.useHandCursor = this.downArrow_mc.useHandCursor = false;
+		this.upArrow_mc._x = this.upArrow_mc._y = 0;
+		this.downArrow_mc._x = 0;
+	}
+	this.scrollTrack_mc.controller = this;
+	this.downArrow_mc._y = this.width - this.downArrow_mc._height;
+	this.trackSize = this.width - (2 * this.downArrow_mc._height);
+	if (this.textField!=undefined) {
+		this.onTextChanged();
+	} else {
+		this.setScrollProperties(this.pageSize, this.minPos, this.maxPos);
+	}
+}
+
+
+//   ::: PRIVATE METHODS
+
+FScrollBarClass.prototype.scrollIt = function (inc, mode)
+{
+	var delt = this.smallScroll;
+	if (inc!="one") {
+		delt = (this.largeScroll==0) ? this.pageSize : this.largeScroll;
+	} 
+	var newPos = this.getScrollPosition() + (mode*delt);
+	if (newPos>this.maxPos) {
+		newPos = this.maxPos;
+	} else if (newPos<this.minPos) {
+		newPos = this.minPos;
+	}
+	this.setScrollPosition(newPos);
+}
+
+FScrollBarClass.prototype.startDragThumb = function()
+{
+	this.lastY = this._ymouse;
+	this.onMouseMove = this.controller.dragThumb;
+}
+
+FScrollBarClass.prototype.dragThumb = function()
+{
+	this.scrollMove = this._ymouse - this.lastY;
+	this.scrollMove += this._y;
+	if (this.scrollMove<this.controller.scrollTop) {
+		this.scrollMove = this.controller.scrollTop;
+	}
+	else if (this.scrollMove>this.controller.scrollBot) {
+		this.scrollMove = this.controller.scrollBot;
+	}
+	this._y = this.scrollMove;
+	var c = this.controller;
+	c.scrollPosition = Math.round( (c.maxPos-c.minPos) * (this._y - c.scrollTop) / c.trackHeight) + c.minPos;
+
+	this.controller.isScrolling = true;
+	updateAfterEvent();
+	this.controller.executeCallBack();
+}
+
+FScrollBarClass.prototype.stopDragThumb = function()
+{
+	this.controller.isScrolling = false;
+	this.onMouseMove = null;
+}
+
+FScrollBarClass.prototype.startTrackScroller = function()
+{
+	this.controller.trackScroller();
+	this.controller.scrolling = setInterval(this.controller, "scrollInterval", 500, "page", -1);
+}
+
+FScrollBarClass.prototype.scrollInterval = function(inc,mode)
+{
+	clearInterval(this.scrolling);
+	if (inc=="page") {
+		this.trackScroller();
+	} else {
+		this.scrollIt(inc,mode);
+	}
+	this.scrolling = setInterval(this, "scrollInterval", 35, inc, mode);
+}
+
+FScrollBarClass.prototype.trackScroller = function()
+{
+	if (this.scrollThumb_mc._y+this.thumbHeight<this._ymouse) {
+		this.scrollIt("page",1);
+	} else if (this.scrollThumb_mc._y>this._ymouse) {
+		this.scrollIt("page",-1);
+	}
+}
+
+FScrollBarClass.prototype.stopScrolling = function()
+{
+	this.controller.downArrow_mc.gotoAndStop(1);
+	this.controller.upArrow_mc.gotoAndStop(1);
+	clearInterval(this.controller.scrolling);
+}
+
+FScrollBarClass.prototype.startUpScroller = function()
+{
+	this.controller.upArrow_mc.gotoAndStop(2);
+	this.controller.scrollIt("one",-1);
+	this.controller.scrolling = setInterval(this.controller, "scrollInterval",500, "one", -1);
+}
+
+FScrollBarClass.prototype.startDownScroller = function()
+{
+	this.controller.downArrow_mc.gotoAndStop(2);
+	this.controller.scrollIt("one",1);
+	this.controller.scrolling = setInterval(this.controller, "scrollInterval", 500, "one", 1);
+}
+
+
+//
+// Begin Special text scroller functions
+//
+
+
+FScrollBarClass.prototype.setScrollTarget = function(tF)
+{
+	if (tF == undefined) {
+		this.textField.removeListener(this);
+		delete this.textField[ (this.horizontal) ? "hScroller" : "vScroller" ]; 
+		if (!(this.textField.hScroller==undefined) && !(this.textField.vScroller==undefined)) {
+			this.textField.unwatch("text");
+			this.textField.unwatch("htmltext");
+		}
+	}
+	this.textField = undefined;
+	if (!(tF instanceof TextField)) return;
+	this.textField = tF;
+	this.textField[ (this.horizontal) ? "hScroller" : "vScroller" ] = this; 
+	this.onTextChanged();
+	this.onChanged = function()
+	{
+		this.onTextChanged();
+	}
+	this.onScroller = function()
+	{
+		if (!this.isScrolling) {
+			if (!this.horizontal) {
+				this.setScrollPosition(this.textField.scroll);
+			} else { 
+				this.setScrollPosition(this.textField.hscroll);
+			}
+		}
+	}
+	this.textField.addListener(this);
+	this.textField.watch("text", this.callback);
+	this.textField.watch("htmlText", this.callback);
+}
+
+FScrollBarClass.prototype.callback = function(prop, oldVal, newVal)
+{
+	clearInterval(this.hScroller.synchScroll);
+	clearInterval(this.vScroller.synchScroll);
+	this.hScroller.synchScroll = setInterval(this.hScroller, "onTextChanged", 50);
+	this.vScroller.synchScroll = setInterval(this.vScroller, "onTextChanged", 50);
+	return newVal;
+}
+
+
+FScrollBarClass.prototype.onTextChanged = function()
+{
+	if (!this.enable || this.textField==undefined) return;
+	clearInterval(this.synchScroll);
+	if (this.horizontal) {
+		var pos = this.textField.hscroll;
+		this.setScrollProperties(this.textField._width, 0, this.textField.maxhscroll);
+		this.setScrollPosition(Math.min(pos, this.textField.maxhscroll));
+	} else {
+		var pos = this.textField.scroll;
+		var pageSize = this.textField.bottomScroll - this.textField.scroll;
+		this.setScrollProperties(pageSize, 1, this.textField.maxscroll);
+		this.setScrollPosition(Math.min(pos, this.textField.maxscroll));
+	}
+}
+
+FScrollBarClass.prototype.executeCallBack = function()
+{
+	if (this.textField==undefined) {
+		super.executeCallBack();
+	} else {
+		if ( this.horizontal ) {
+			this.textField.hscroll = this.getScrollPosition();
+		} else {
+			this.textField.scroll = this.getScrollPosition();
+		}
+	}
+}
+
+
+
+
+
+Object.registerClass("FScrollBarSymbol", FScrollBarClass);
+
+#endinitclip
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Bounding Box" color="#4F80FF" locked="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Component Skins/FScrollBar Skins/fsb_ScrollTrack" name="scrollTrack_mc">
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="SuperClass" color="#9933CC" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMComponentInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/FUIComponent Class Tree/FUIComponent" name="superClassAsset" uniqueID="1">
+                  <matrix>
+                    <Matrix a="0.020050048828125" d="0.0106048583984375" tx="2" ty="2"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <dataBindingXML><![CDATA[<component metaDataFetched='true' schemaUrl='' schemaOperation='' sceneRootLabel='Scene 1' oldCopiedComponentPath='1.1.1'>
+</component>
+]]></dataBindingXML>
+                  <parametersAsXML><![CDATA[   <property id="">
+      <Inspectable name="" variable="" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+]]></parametersAsXML>
+                </DOMComponentInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Assets" color="#FF4F4F" locked="true" autoNamed="false" visible="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_DownArrow" name="dArrowAsset">
+                  <matrix>
+                    <Matrix a="0.1875" d="0.184722900390625" tx="2" ty="2.2"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_ScrollThumb" name="thumbAsset">
+                  <matrix>
+                    <Matrix a="0.125" d="0.0530242919921875" tx="2" ty="2.4"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Flash UI Components/Core Assets - Developer Only/Other Assets/FScrollBar Assets/fsb_UpArrow" name="upArrowAsset">
+                  <matrix>
+                    <Matrix a="0.125" d="0.124160766601563" tx="2" ty="2.3"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point/>
+                  </transformationPoint>
+                  <color>
+                    <Color/>
+                  </color>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <parametersAsXML><![CDATA[   <property id="_targetInstanceName">
+      <Inspectable name="Target TextField" variable="_targetInstanceName" category="" verbose="0" defaultValue="" type="Default"/>
+   </property>
+   <property id="horizontal">
+      <Inspectable name="Horizontal" variable="horizontal" category="" verbose="0" defaultValue="false" type="Boolean"/>
+   </property>
+]]></parametersAsXML>
+</DOMComponentItem>

@@ -213,6 +213,14 @@ public class MainFrameClassicMenu extends MainFrameMenu {
     }
 
     @Override
+    protected void setHistoryAction(boolean redo, boolean enabled, String tooltip) {
+        JMenuItem item = (JMenuItem) menuElements.get(historyPath(redo));
+        item.setEnabled(enabled);
+        item.setToolTipText(tooltip);
+        setMenuEnabled(historyListPath(redo), enabled);
+    }
+
+    @Override
     public void setMenuEnabled(String path, boolean enabled) {
         path = mapping(path);
         if (path.equals("_") || path.startsWith("_/")) {

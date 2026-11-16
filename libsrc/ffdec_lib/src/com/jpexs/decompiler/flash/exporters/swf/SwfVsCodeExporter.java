@@ -36,7 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * Exports SWF to FlashDevelop project.
+ * Exports SWF to a VS Code project.
  *
  * @author JPEXS
  */
@@ -68,7 +68,7 @@ public class SwfVsCodeExporter {
     }
 
     /**
-     * Exports SWF to FlashDevelop project.
+     * Exports SWF to a VS Code project.
      *
      * @param swf SWF to export
      * @param outDir Output file
@@ -81,7 +81,7 @@ public class SwfVsCodeExporter {
     }
 
     /**
-     * Exports SWF to FlashDevelop project.
+     * Exports SWF to a VS Code project.
      *
      * @param swf SWF to export
      * @param outDir Output file
@@ -120,7 +120,7 @@ public class SwfVsCodeExporter {
         String[] airVersions = airVersion.split("\\.");
 
         project = "{\n"
-                + "\t\"config\": \"air\",\n"
+                + "\t\"config\": \"" + (air ? "air" : "flex") + "\",\n"
                 + "\t\"compilerOptions\": {\n"
                 + "\t\t\"source-path\": [\n"
                 + "\t\t\t\"src\"\n"
@@ -138,7 +138,7 @@ public class SwfVsCodeExporter {
                 + "\t\t\"swf-version\": " + swf.version + "\n"
                 //
                 + "\t},\n"
-                + "\t\"application\": \"src/" + simpleNameNoSpaces + "-app.xml\",\n"
+                + (air ? "\t\"application\": \"src/" + simpleNameNoSpaces + "-app.xml\",\n" : "")
                 + "\t\"mainClass\": \"" + documentClass + "\"\n"
                 + "}";
 
@@ -403,8 +403,10 @@ public class SwfVsCodeExporter {
         File srcDir = outDir.toPath().resolve("src").toFile();
         srcDir.mkdirs();
 
-        try (FileOutputStream fos = new FileOutputStream(srcDir.toPath().resolve(simpleNameNoSpaces + "-app.xml").toFile())) {
-            fos.write(Utf8Helper.getBytes(app));
+        if (air) {
+            try (FileOutputStream fos = new FileOutputStream(srcDir.toPath().resolve(simpleNameNoSpaces + "-app.xml").toFile())) {
+                fos.write(Utf8Helper.getBytes(app));
+            }
         }
 
         File libsDir = outDir.toPath().resolve("libs").toFile();

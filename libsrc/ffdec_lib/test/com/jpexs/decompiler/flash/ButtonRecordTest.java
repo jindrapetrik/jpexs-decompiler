@@ -16,10 +16,13 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.action.swf1.ActionPlay;
+import com.jpexs.decompiler.flash.action.swf1.ActionStop;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
+import com.jpexs.decompiler.flash.tags.base.ButtonAction;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
@@ -28,6 +31,7 @@ import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
@@ -45,6 +49,22 @@ import org.testng.annotations.Test;
 public class ButtonRecordTest {
 
     private static final byte[] ACTIONS = {0x06, 0x07, 0x00}; // Play, Stop, End.
+
+    @Test
+    public void testDefineButtonKeepsActionItemWhenEdited() throws InterruptedException {
+        DefineButtonTag button = new DefineButtonTag(new SWF());
+        button.setActionBytes(ACTIONS);
+        ButtonAction action = button.getSubItems().get(0);
+        assertTrue(action.getActions().get(0) instanceof ActionPlay);
+        assertSame(button.getSubItems().get(0), action);
+
+        button.setActions(Collections.singletonList(new ActionStop()));
+        assertSame(button.getSubItems().get(0), action);
+        assertTrue(action.getActions().get(0) instanceof ActionStop);
+
+        button.setActionBytes(ACTIONS);
+        assertTrue(action.getActions().get(0) instanceof ActionPlay);
+    }
 
     @DataProvider(name = "buttonFormats")
     public Object[][] buttonFormats() {

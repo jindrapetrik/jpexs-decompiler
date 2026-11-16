@@ -60,7 +60,7 @@ public class MORPHGRADIENT implements Serializable {
     public static RGBA morphColor(RGBA c1, RGBA c2, int ratio) {
         int r = (int) (c1.red + (c2.red - c1.red) * ratio / 65535.0 + 0.5);
         int g = (int) (c1.green + (c2.green - c1.green) * ratio / 65535.0 + 0.5);
-        int b = (int) (c1.blue + (c2.blue - c1.blue + 0.5) * ratio / 65535.0 + 0.5);
+        int b = (int) (c1.blue + (c2.blue - c1.blue) * ratio / 65535.0 + 0.5);
         int a = (int) (c1.alpha + (c2.alpha - c1.alpha) * ratio / 65535.0f + 0.5);
         if (r > 255) {
             r = 255;

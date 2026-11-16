@@ -1,0 +1,78 @@
+<DOMComponentItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="StopButton" itemID="4249d131-000000e3" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="StopButton" sourceFlashFilepath="C:\Program Files (x86)\Adobe\Adobe Flash CS6\Common\Configuration\Components\Video.fla" sourceLibraryItemHRef="StopButton" sourceLastModified="1166032314" lastModified="1166032314" lastUniqueIdentifier="5" sourceItemID="4249d131-000000e3" customIconID="0" persistLivePreview11="true" editFrameIndex="2" requiredMinimumPlayerVersion="8" requiredMinimumASVersion="0" parametersAreLocked="true">
+  <timeline>
+    <DOMTimeline name="StopButton">
+      <layers>
+        <DOMLayer name="script" color="#FFFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[stop();
+this.upLinkageID = "StopButtonNormal";
+this.overLinkageID = "StopButtonOver";
+this.downLinkageID = "StopButtonDown";
+this.disabledLinkageID = "StopButtonDisabled";
+]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="contents" color="#4FFF4F" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Stop Button/StopButtonNormal" name="placeholder_mc">
+                  <matrix>
+                    <Matrix d="0.998321533203125"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.45"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Stop Button/StopButtonNormal">
+                  <matrix>
+                    <Matrix d="0.998321533203125"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.45"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Stop Button/StopButtonOver">
+                  <matrix>
+                    <Matrix d="0.998321533203125" tx="42" ty="0.05"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.45"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Stop Button/StopButtonDown">
+                  <matrix>
+                    <Matrix d="0.998321533203125" tx="81" ty="0.05"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.45"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName=" FLV Playback Skins/Stop Button/StopButtonDisabled">
+                  <matrix>
+                    <Matrix d="0.998321533203125" tx="121" ty="0.05"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="11.5" y="11.45"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+  <customIcon>
+    <CustomIcon rowByteCount="76" colorDepth="32" width="19" height="19" frameRight="285" frameBottom="285" isTransparent="true" href="79ccynm5cj.dat"/>
+  </customIcon>
+</DOMComponentItem>

@@ -1,0 +1,82 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ColorPickerSkins/ColorPicker_textFieldSkin" itemID="451857c7-000001dc" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageClassName="ColorPicker_textFieldSkin" scaleGridLeft="7.2" scaleGridRight="66.15" scaleGridTop="5.7" scaleGridBottom="26.8" lastModified="1168287236">
+  <timeline>
+    <DOMTimeline name="ColorPicker_textFieldSkin">
+      <layers>
+        <DOMLayer name="border" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0.0460205078125" d="0.021636962890625" tx="37.8" ty="17.75"/>
+                        </matrix>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                        <GradientEntry color="#009DFF" ratio="1"/>
+                        <GradientEntry color="#009DFF" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0.04571533203125" d="0.021331787109375" tx="37.55" ty="17.5"/>
+                        </matrix>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                        <GradientEntry color="#009DFF" ratio="1"/>
+                        <GradientEntry color="#009DFF" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!1490 21|1490 11!1490 11[#5D2.09 #6.E5 1493 4!1493 4[#5D7.CE #1.21 1499.5 1"/>
+                    <Edge fillStyle0="2" edges="!1499.5 1|12 1!12 1[#7.E8 #1.06 5 4!5 4[#2.07 #6.E4 2 11!2 11|2 699.5"/>
+                    <Edge fillStyle0="2" fillStyle1="1" edges="!2 699.5[#2.21 #2B7.CE 5 693!5 693[#7.E5 #2B2.09 12 690!12 690|22 690"/>
+                    <Edge fillStyle0="2" edges="!22 690|22 21!22 21|1490 21"/>
+                    <Edge fillStyle0="1" edges="!1490 21|1490 690!1490 690|22 690"/>
+                    <Edge fillStyle1="1" edges="!1499.5 1|1500 1!1500 1[#5E0.1A #1.0A 1507 4!1507 4[#5E5.F8 #6.E9 1510 11!1510 11|1510 700!1510 700[#5E5.F7 #2C0.1B 1507 707!1507 707[#5E0.1B #2C5.F7 1500 710!1500 710|12 710!12 710[#7.E5 #2C5.F7 5 707!5 707[#2.09 #2C0.1B 2 700!2 700
+|2 699.5"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="fill" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <LinearGradient>
+                        <matrix>
+                          <Matrix a="0.0460205078125" d="0.021636962890625" tx="37.2" ty="17.2"/>
+                        </matrix>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#0075BF" ratio="0"/>
+                        <GradientEntry color="#009DFF" ratio="0.992156862745098"/>
+                        <GradientEntry color="#009DFF" ratio="1"/>
+                        <GradientEntry color="#009DFF" ratio="1"/>
+                      </LinearGradient>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="
+!1488 -10|0 -10!0 -10[#FFFFFB.E5 #FFFFF6.09 -7 -7!-7 -7[#FFFFF6.09 #FFFFFB.E5 -10 0!-10 0|-10 689!-10 689[-9.96875 #2B5.1B -7 696!-7 696[-4.09375 #2BA.F9 0 699!0 699|1488 699!1488 699[#5D4.1A #2BA.F6 1495 696!1495 696[#5D9.F7 #2B5.16
+ 1498 689!1498 689|1498 0!1498 0[#5D9.F7 #FFFFFB.E5 1495 -7!1495 -7[#5D4.1B #FFFFF6.09 1488 -10!1478 679|10 679!10 679|10 10!10 10|1478 10!1478 10|1478 679"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

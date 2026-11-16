@@ -54,6 +54,7 @@ import com.jpexs.decompiler.flash.tags.base.BinaryDataInterface;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -110,6 +111,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -256,6 +258,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private JButton replaceSpriteButton;
 
+    private JButton imageSimpleEditorButton;
+
+    private JButton displayEditSimpleEditorButton;
+
+    private DrawableTag simpleEditorTag;
+
     private JButton replaceMovieButton;
 
     private JButton prevFontsButton;
@@ -354,6 +362,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private final int MORPH_END = 2;
     private int morphDisplayMode = MORPH_ANIMATE;
 
+    private SwfEdit.TagState beforePointEdit;
     private List<SHAPERECORD> oldShapeRecords;
     private RECT oldShapeBounds;
     private RECT oldShapeEdgeBounds;
@@ -467,7 +476,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void createParametersPanel() {
         displayWithPreview = new JPanel(new CardLayout());
 
-        textPanel = new TextPanel(mainPanel, null);
+        textPanel = new TextPanel(mainPanel, true);
         displayWithPreview.add(textPanel, CARDTEXTPANEL);
 
         fontPanel = new FontPanel(mainPanel);
@@ -484,6 +493,21 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private JPanel createImageButtonsPanel() {
+        imageTransformButton = new JButton(mainPanel.translate("button.transform"), View.getIcon("freetransform16"));
+        imageTransformButton.setMargin(new Insets(3, 3, 3, 10));
+        imageTransformButton.addActionListener(this::transformImageButtonActionPerformed);
+        imageTransformButton.setVisible(false);
+
+        imageTransformSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
+        imageTransformSaveButton.setMargin(new Insets(3, 3, 3, 10));
+        imageTransformSaveButton.addActionListener(this::saveImageTransformButtonActionPerformed);
+        imageTransformSaveButton.setVisible(false);
+
+        imageTransformCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
+        imageTransformCancelButton.setMargin(new Insets(3, 3, 3, 10));
+        imageTransformCancelButton.addActionListener(this::cancelImageTransformButtonActionPerformed);
+        imageTransformCancelButton.setVisible(false);
+
         replaceSoundButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("importsound16"));
         replaceSoundButton.setMargin(new Insets(3, 3, 3, 10));
         replaceSoundButton.addActionListener(new ActionListener() {
@@ -540,6 +564,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         nextFontsButton.setVisible(false);
 
         ButtonsPanel imageButtonsPanel = new ButtonsPanel();
+        imageButtonsPanel.add(imageTransformButton);
+        imageButtonsPanel.add(imageTransformSaveButton);
+        imageButtonsPanel.add(imageTransformCancelButton);
         imageButtonsPanel.add(replaceSoundButton);
         //imageButtonsPanel.add(replaceShapeButton);
         //imageButtonsPanel.add(replaceShapeUpdateBoundsButton);
@@ -549,7 +576,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageButtonsPanel.add(replaceMovieButton);
         imageButtonsPanel.add(prevFontsButton);
         imageButtonsPanel.add(nextFontsButton);
+        imageSimpleEditorButton = createSimpleEditorButton();
+        imageButtonsPanel.add(imageSimpleEditorButton);
         return imageButtonsPanel;
+    }
+
+    private JButton createSimpleEditorButton() {
+        JButton button = new JButton(mainPanel.translate("menu.file.view.easy"), View.getIcon("easy16"));
+        button.setMargin(new Insets(3, 3, 3, 10));
+        button.addActionListener(e -> mainPanel.showInEasyView(simpleEditorTag));
+        button.setVisible(false);
+        return button;
     }
 
     private JPanel createBinaryButtonsPanel() {
@@ -704,28 +741,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         mediaPreviewCards.add(soundWaveformPanel, SOUND_PREVIEW_CARD);
         previewCnt.add(mediaPreviewCards, BorderLayout.CENTER);
 
-        JPanel buttonsPanel = new JPanel(new FlowLayout());
-
-        imageTransformButton = new JButton(mainPanel.translate("button.transform"), View.getIcon("freetransform16"));
-        imageTransformButton.setMargin(new Insets(3, 3, 3, 10));
-        imageTransformButton.addActionListener(this::transformImageButtonActionPerformed);
-
-        imageTransformSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
-        imageTransformSaveButton.setMargin(new Insets(3, 3, 3, 10));
-        imageTransformSaveButton.addActionListener(this::saveImageTransformButtonActionPerformed);
-
-        imageTransformCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
-        imageTransformCancelButton.setMargin(new Insets(3, 3, 3, 10));
-        imageTransformCancelButton.addActionListener(this::cancelImageTransformButtonActionPerformed);
-
-        buttonsPanel.add(imageTransformButton);
-        buttonsPanel.add(imageTransformSaveButton);
-        buttonsPanel.add(imageTransformCancelButton);
-
-        imageTransformSaveButton.setVisible(false);
-        imageTransformCancelButton.setVisible(false);
-
-        previewCnt.add(imagePlayControls = new PlayerControls(mainPanel, imagePanel, buttonsPanel), BorderLayout.SOUTH);
+        previewCnt.add(imagePlayControls = new PlayerControls(mainPanel, imagePanel, null), BorderLayout.SOUTH);
         imagePlayControls.setMedia(imagePanel);
         previewPanel.add(previewCnt, BorderLayout.CENTER);
         JLabel prevIntLabel = new HeaderLabel(mainPanel.translate("swfpreview.internal"));
@@ -896,8 +912,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
 
             SolFile solFile = new SolFile(cookieFilenameField.getText(), amfVersion, amfValues);
-            try (FileOutputStream fos = new FileOutputStream(cookie.getSolFile())) {
-                solFile.writeTo(fos);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            solFile.writeTo(output);
+            try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.sharedObject", cookie.getOpenable())) {
+                edit.trackCookie(cookie);
+                SwfEdit.writeCookie(cookie.getSolFile().toPath().toAbsolutePath().normalize(), output.toByteArray());
             }
         } catch (AmfParseException ex) {
             cookieEditor.gotoLine((int) ex.line);
@@ -2439,7 +2458,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         );
         ILINESTYLE lineStyle = (ILINESTYLE) selectedLineStyle;
         Shape lineArea = linePath.getCurrentPoint() == null ? null : createLineStyleArea(linePath, lineStyle);
-        displayEditImagePanel.setHilightedLine(lineArea, linePath, lineStyle.getWidth());
+        displayEditImagePanel.setHilightedLine(lineArea, linePath, lineStyle);
         return true;
     }
 
@@ -2599,7 +2618,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             return new ImagePanel.LineHilight(
                     createLineStyleArea(linePath, currentLineStyle),
                     linePath,
-                    currentLineStyle.getWidth()
+                    currentLineStyle
             );
         }));
         return true;
@@ -2720,7 +2739,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         });
         replaceMorphShapeUpdateBoundsButton.setVisible(false);
 
-        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("importshape16"));
+        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("importshapeupdatebounds16"));
         replaceShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
         replaceShapeUpdateBoundsButton.addActionListener(new ActionListener() {
             @Override
@@ -2791,6 +2810,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditButtonsPanel.add(replaceMorphShapeButton);
         displayEditButtonsPanel.add(replaceMorphShapeUpdateBoundsButton);
         displayEditButtonsPanel.add(morphShowPanel);
+        displayEditSimpleEditorButton = createSimpleEditorButton();
+        displayEditButtonsPanel.add(displayEditSimpleEditorButton);
         return displayEditButtonsPanel;
     }
 
@@ -2833,8 +2854,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if ((timelined instanceof Tag) && ((Tag) timelined).isReadOnly()) {
             imageTransformButton.setVisible(false);
         }
-        imageTransformSaveButton.setVisible(false);
-        imageTransformCancelButton.setVisible(false);
+        setImageTransformOperationButtonsVisible(false);
         imagePanel.setAltSelectionEnabled(true);
         imagePanel.setTimelined(timelined, swf, frame, showObjectsUnderCursor, autoPlay, frozen, alwaysDisplay, muted, mutable, allowZoom, frozenButtons, canHaveRuler);
         if (canHaveRuler) {
@@ -2939,6 +2959,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     public void clear() {
+        setSimpleEditorTag(null);
         imagePanel.clearAll();
         displayEditImagePanel.clearAll();
         soundWaveformPanel.setPlayer(null);
@@ -3094,6 +3115,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             private void changed() {
                 displayEditSaveButton.setEnabled(true);
                 displayEditCancelButton.setEnabled(true);
+                updateSimpleEditorButtonsVisibility();
                 displayEditTransformButton.setVisible(false);
                 mainPanel.setEditingStatus();
                 if (Configuration.editorMode.get()) {
@@ -3190,8 +3212,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         setDisplayEditPropertiesVisible(true);
         displayEditSplitPane.setDividerLocation(0.6);
         displayEditGenericPanel.setVisible(!readOnly);
-        displayEditOperationSaveButton.setVisible(false);
-        displayEditOperationCancelButton.setVisible(false);
+        setDisplayEditOperationButtonsVisible(false);
 
         if (Configuration.editorMode.get()) {
             displayEditGenericPanel.setEditMode(!tag.isReadOnly(), tag);
@@ -3365,11 +3386,32 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void setDisplayEditOperationButtonsVisible(boolean visible) {
         displayEditOperationSaveButton.setVisible(visible);
         displayEditOperationCancelButton.setVisible(visible);
+        updateSimpleEditorButtonsVisibility();
+    }
+
+    private void setImageTransformOperationButtonsVisible(boolean visible) {
+        imageTransformSaveButton.setVisible(visible);
+        imageTransformCancelButton.setVisible(visible);
+        updateSimpleEditorButtonsVisibility();
     }
 
     private void reloadDisplayEditAttributes() {
         boolean edit = Configuration.editorMode.get() && !readOnly && !displayEditTag.isReadOnly();
         displayEditGenericPanel.setEditMode(edit, displayEditTag);
+    }
+
+    void setSimpleEditorTag(DrawableTag tag) {
+        simpleEditorTag = tag;
+        updateSimpleEditorButtonsVisibility();
+    }
+
+    private void updateSimpleEditorButtonsVisibility() {
+        imageSimpleEditorButton.setVisible(simpleEditorTag instanceof DefineSpriteTag
+                && !imageTransformCancelButton.isVisible());
+        boolean editingAttributes = displayEditCancelButton.isVisible()
+                && (!Configuration.editorMode.get() || displayEditCancelButton.isEnabled());
+        displayEditSimpleEditorButton.setVisible((simpleEditorTag instanceof ShapeTag || simpleEditorTag instanceof ButtonTag)
+                && !displayEditOperationCancelButton.isVisible() && !editingAttributes);
     }
 
     public void setImageReplaceButtonVisible(boolean showImage, boolean showAlpha, boolean showShape, boolean showSound, boolean showMovie, boolean showMorphShape, boolean showSprite) {
@@ -3491,13 +3533,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void saveMetadataButtonActionPerformed(ActionEvent evt) {
-        metadataTag.xmlMetadata = metadataEditor.getText().replaceAll(">\r?\n<", "> <");
-        metadataTag.setModified(true);
-        metadataEditor.setEditable(Configuration.editorMode.get());
-        setMetadataModified(false);
-        updateMetadataButtonsVisibility();
-        mainPanel.repaintTree();
-        mainPanel.clearEditingStatus();
+        try (MainPanel.EditScope edit = mainPanel.beginEdit("history.edit.metadata", metadataTag.getSwf())) {
+            metadataTag.xmlMetadata = metadataEditor.getText().replaceAll(">\r?\n<", "> <");
+            metadataTag.setModified(true);
+            metadataEditor.setEditable(Configuration.editorMode.get());
+            setMetadataModified(false);
+            updateMetadataButtonsVisibility();
+            mainPanel.repaintTree();
+            mainPanel.clearEditingStatus();
+        }
     }
 
     private void cancelMetadataButtonActionPerformed(ActionEvent evt) {
@@ -3530,36 +3574,38 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void saveGenericTag(boolean refreshTree) {
-        if (genericTagPanel.save()) {
-            Tag tag = genericTagPanel.getTag();
-            SWF swf = tag.getSwf();
-            swf.clearImageCache();
-            if (tag instanceof ShapeTag) {
-                ShapeTag shape = (ShapeTag) tag;
-                shape.shapes.clearCachedOutline();
+        try (MainPanel.EditScope edit = mainPanel.beginItemEdit("history.edit.item", genericTagPanel.getTag())) {
+            if (genericTagPanel.save()) {
+                Tag tag = genericTagPanel.getTag();
+                SWF swf = tag.getSwf();
+                swf.clearImageCache();
+                if (tag instanceof ShapeTag) {
+                    ShapeTag shape = (ShapeTag) tag;
+                    shape.shapes.clearCachedOutline();
+                }
+                swf.clearShapeCache();
+                swf.updateCharacters();
+                tag.getTimelined().resetTimeline();
+                swf.assignClassesToSymbols();
+                swf.assignExportNamesToSymbols();
+                if (Configuration.editorMode.get()) {
+                    genericEditButton.setVisible(false);
+                    genericSaveButton.setVisible(true);
+                    genericSaveButton.setEnabled(false);
+                    genericCancelButton.setVisible(true);
+                    genericCancelButton.setEnabled(false);
+                } else {
+                    genericEditButton.setVisible(true);
+                    genericSaveButton.setVisible(false);
+                    genericCancelButton.setVisible(false);
+                }
+                genericTagPanel.setEditMode(false, null);
+                if (refreshTree) {
+                    mainPanel.refreshTree(swf);
+                }
+                mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
+                mainPanel.clearEditingStatus();
             }
-            swf.clearShapeCache();
-            swf.updateCharacters();
-            tag.getTimelined().resetTimeline();
-            swf.assignClassesToSymbols();
-            swf.assignExportNamesToSymbols();
-            if (Configuration.editorMode.get()) {
-                genericEditButton.setVisible(false);
-                genericSaveButton.setVisible(true);
-                genericSaveButton.setEnabled(false);
-                genericCancelButton.setVisible(true);
-                genericCancelButton.setEnabled(false);
-            } else {
-                genericEditButton.setVisible(true);
-                genericSaveButton.setVisible(false);
-                genericCancelButton.setVisible(false);
-            }
-            genericTagPanel.setEditMode(false, null);
-            if (refreshTree) {
-                mainPanel.refreshTree(swf);
-            }
-            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
-            mainPanel.clearEditingStatus();
         }
     }
 
@@ -3614,259 +3660,249 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return false;
     }
 
-    private void saveDisplayEditTag(boolean refreshTree) {
-        boolean operationMode = displayEditMode == EDIT_TRANSFORM || displayEditMode == EDIT_POINTS;
-        if (displayEditMode == EDIT_TRANSFORM) {
-            Matrix matrix = displayEditImagePanel.getNewMatrix();
-            if (displayEditTag instanceof PlaceObjectTypeTag) {
-                PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) displayEditTag;
-                Matrix origMatrix = new Matrix(placeTag.getMatrix());
-                placeTag.setMatrix(matrix.concatenate(origMatrix).toMATRIX());
-                placeTag.setPlaceFlagHasMatrix(true);
+    static void applyPlaceObjectTransform(PlaceObjectTypeTag placeTag, int frame, Matrix matrix) {
+        MATRIX originalMatrix = placeTag.getMatrix();
+        if (originalMatrix == null) {
+            // Move tags can inherit their matrix from an earlier placement at the same depth.
+            DepthState depthState = placeTag.getTimelined().getTimeline().getDepthState(frame, placeTag.getDepth());
+            if (depthState != null) {
+                originalMatrix = depthState.matrix;
             }
-            if (displayEditTag instanceof ShapeTag) {
-                ShapeTag shape = (ShapeTag) displayEditTag;
-
-                RECT newShapeBounds = transformRECT(matrix, shape.shapeBounds);
-                if (checkRectLarge(newShapeBounds)) {
-                    return;
-                }
-                RECT newEdgeBounds = null;
-                if (shape instanceof DefineShape4Tag) {
-                    DefineShape4Tag shape4 = (DefineShape4Tag) shape;
-                    newEdgeBounds = transformRECT(matrix, shape4.edgeBounds);
-                    if (checkRectLarge(newEdgeBounds)) {
-                        return;
-                    }
-                }
-
-                ShapeTransformer shapeTransformer = new ShapeTransformer();
-                
-                oldShapeRecords = Helper.deepCopy(shape.shapes.shapeRecords);
-                shapeTransformer.transformSHAPE(matrix, shape.shapes, shape.getShapeNum());
-                if (checkShapeLarge(shape.shapes.shapeRecords)) {
-                    shape.shapes.shapeRecords = oldShapeRecords;
-                    return;
-                }
-                oldShapeRecords = null;
-                shapeTransformer.transformStyles(matrix, shape.shapes.fillStyles, shape.shapes.lineStyles, shape.getShapeNum());
-
-                shape.shapeBounds = newShapeBounds;
-                if (shape instanceof DefineShape4Tag) {
-                    DefineShape4Tag shape4 = (DefineShape4Tag) shape;
-                    shape4.edgeBounds = newEdgeBounds;
-                }
-                shape.shapes.clearCachedOutline();
-                shape.getSwf().clearShapeCache();
-            }
-
-            if (displayEditTag instanceof MorphShapeTag) {
-                MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
-
-                if (morphDisplayMode == MORPH_START) {
-                    RECT newShapeBounds = transformRECT(matrix, morphShape.startBounds);
-                    if (checkRectLarge(newShapeBounds)) {
-                        return;
-                    }
-                    RECT newEdgeBounds = null;
-                    if (morphShape instanceof DefineMorphShape2Tag) {
-                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
-                        newEdgeBounds = transformRECT(matrix, morphShape2.startEdgeBounds);
-                    }
-
-                    ShapeTransformer shapeTransformer = new ShapeTransformer();
-                    
-                    oldShapeRecords = Helper.deepCopy(morphShape.startEdges.shapeRecords);
-                    shapeTransformer.transformSHAPE(matrix, morphShape.startEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
-                    if (checkShapeLarge(morphShape.startEdges.shapeRecords)) {
-                        morphShape.startEdges.shapeRecords = oldShapeRecords;
-                        return;
-                    }
-                    oldShapeRecords = null;
-                    morphShape.startBounds = newShapeBounds;
-                    if (morphShape instanceof DefineMorphShape2Tag) {
-                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
-                        morphShape2.startEdgeBounds = newEdgeBounds;
-                    }
-                    shapeTransformer.transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), true, false);
-                }
-
-                if (morphDisplayMode == MORPH_END) {
-                    RECT newShapeBounds = transformRECT(matrix, morphShape.endBounds);
-                    if (checkRectLarge(newShapeBounds)) {
-                        return;
-                    }
-                    RECT newEdgeBounds = null;
-                    if (morphShape instanceof DefineMorphShape2Tag) {
-                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
-                        newEdgeBounds = transformRECT(matrix, morphShape2.endEdgeBounds);
-                    }
-                    
-                    ShapeTransformer shapeTransformer = new ShapeTransformer();
-
-                    oldShapeRecords = Helper.deepCopy(morphShape.endEdges.shapeRecords);
-                    shapeTransformer.transformSHAPE(matrix, morphShape.endEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
-                    if (checkShapeLarge(morphShape.endEdges.shapeRecords)) {
-                        morphShape.endEdges.shapeRecords = oldShapeRecords;
-                        return;
-                    }
-                    oldShapeRecords = null;
-                    morphShape.endBounds = newShapeBounds;
-                    if (morphShape instanceof DefineMorphShape2Tag) {
-                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
-                        morphShape2.endEdgeBounds = newEdgeBounds;
-                    }
-                    shapeTransformer.transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), false, true);
-                }
-                morphShape.getSwf().clearShapeCache();
-            }
-            displayEditTag.setModified(true);
-            if (displayEditTag instanceof PlaceObjectTypeTag) {
-                PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) displayEditTag;
-                displayEditImagePanel.selectDepth(placeTag.getDepth());
-            }
-            displayEditImagePanel.freeTransformDepth(-1);
-            displayEditTag.getTimelined().resetTimeline();
-            displayEditTransformScrollPane.setVisible(false);
-            displayEditGenericPanel.setVisible(true);
         }
-        if (displayEditMode == EDIT_POINTS) {
-            List<SHAPERECORD> shapeRecords = null;
-            if (displayEditTag instanceof ShapeTag) {
-                ShapeTag shape = (ShapeTag) displayEditTag;
-                if (checkShapeLarge(shape.shapes.shapeRecords)) {
-                    return;
-                }
-            }
-            if (displayEditTag instanceof MorphShapeTag) {
-                MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
-                if (morphDisplayMode == MORPH_START) {
-                    if (checkShapeLarge(morphShape.getStartEdges().shapeRecords)) {
-                        return;
-                    }
-                }
-                if (morphDisplayMode == MORPH_END) {
-                    if (checkShapeLarge(morphShape.getEndEdges().shapeRecords)) {
-                        return;
-                    }
-                }
-            }
-            displayEditImagePanel.setHilightedPoints(null);
-            displayEditTag.setModified(true);
-            if (displayEditTag instanceof ShapeTag) {
-                ShapeTag shape = (ShapeTag) displayEditTag;
-                shape.updateBounds();
-                if (checkRectLarge(shape.shapeBounds)) {
-                    return;
-                }
-                if (shape instanceof DefineShape4Tag) {
-                    DefineShape4Tag shape4 = (DefineShape4Tag) shape;
-                    if (checkRectLarge(shape4.edgeBounds)) {
-                        return;
-                    }
-                }
-            }
-            if (displayEditTag instanceof MorphShapeTag) {
-                MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
-                if (morphDisplayMode == MORPH_START) {
-                    morphShape.updateStartBounds();
-                    if (checkRectLarge(morphShape.endBounds)) {
-                        return;
-                    }
-                    if (morphShape instanceof DefineMorphShape2Tag) {
-                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
-                        if (checkRectLarge(morphShape2.endEdgeBounds)) {
-                            return;
-                        }
-                    }
-                }
-                if (morphDisplayMode == MORPH_END) {
-                    morphShape.updateEndBounds();
-                    if (checkRectLarge(morphShape.startBounds)) {
-                        return;
-                    }
-                    if (morphShape instanceof DefineMorphShape2Tag) {
-                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
-                        if (checkRectLarge(morphShape2.startEdgeBounds)) {
-                            return;
-                        }
-                    }
-                }
-            }
-            oldShapeRecords = null;
-            oldShapeBounds = null;
-            oldShapeEdgeBounds = null;
-            oldEndShapeRecords = null;
-            oldEndShapeBounds = null;
-            oldEndShapeEdgeBounds = null;
-        }
-        Tag hilightTag = null;
-        SWF swf = null;
-        if (displayEditMode == EDIT_RAW) {
-            if (displayEditGenericPanel.save()) {
-                Tag tag = displayEditGenericPanel.getTag();
-                swf = tag.getSwf();
-                tag.getTimelined().resetTimeline();
-                hilightTag = tag;
-            }
-            displayEditGenericPanel.setEditMode(false, null);
-            refreshDisplayEditPreview();
-        }
+        placeTag.setMatrix(matrix.concatenate(new Matrix(originalMatrix)).toMATRIX());
+        placeTag.setPlaceFlagHasMatrix(true);
+    }
 
+    private boolean validateDisplayPointEdit() {
         if (displayEditTag instanceof ShapeTag) {
-            replaceShapeButton.setVisible(true);
-            replaceShapeUpdateBoundsButton.setVisible(true);
-            displayEditEditPointsButton.setVisible(true);
+            ShapeTag shape = (ShapeTag) displayEditTag;
+            if (checkShapeLarge(shape.shapes.shapeRecords)) {
+                return false;
+            }
+            shape.updateBounds();
+            return !checkRectLarge(shape.shapeBounds) && (!(shape instanceof DefineShape4Tag)
+                    || !checkRectLarge(((DefineShape4Tag) shape).edgeBounds));
         }
-
-        if (displayEditTag instanceof MorphShapeTag) {
-            replaceMorphShapeButton.setVisible(true);
-            replaceMorphShapeUpdateBoundsButton.setVisible(true);
-            displayEditEditPointsButton.setVisible(true);
+        MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
+        if (checkShapeLarge(morphShape.startEdges.shapeRecords) || checkShapeLarge(morphShape.endEdges.shapeRecords)) {
+            return false;
         }
-
-        if (displayEditTag instanceof DefineSpriteTag) {
-            replaceSpriteButton.setVisible(true);
-        }
-
-        if (displayEditTag instanceof MorphShapeTag) {
-            morphShowPanel.setVisible(true);
-            displayEditEditPointsButton.setVisible(true);
-        }
-
-        displayEditTransformButton.setVisible(true);
-        if (Configuration.editorMode.get()) {
-            displayEditEditButton.setVisible(false);
-            displayEditSaveButton.setVisible(true);
-            displayEditSaveButton.setEnabled(false);
-            displayEditCancelButton.setVisible(true);
-            displayEditCancelButton.setEnabled(false);
-            displayEditAutoPreviewCheckBox.setVisible(true);
-            displayEditTransformButton.setVisible(true);
+        if (morphDisplayMode == MORPH_START) {
+            morphShape.updateStartBounds();
         } else {
-            displayEditEditButton.setVisible(true);
-            displayEditSaveButton.setVisible(false);
-            displayEditCancelButton.setVisible(false);
-            displayEditAutoPreviewCheckBox.setVisible(false);
+            morphShape.updateEndBounds();
         }
+        if (checkRectLarge(morphShape.startBounds) || checkRectLarge(morphShape.endBounds)) {
+            return false;
+        }
+        if (morphShape instanceof DefineMorphShape2Tag) {
+            DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+            return !checkRectLarge(morphShape2.startEdgeBounds) && !checkRectLarge(morphShape2.endEdgeBounds);
+        }
+        return true;
+    }
 
-        if (displayEditMode == EDIT_RAW && refreshTree && swf != null) {
-            mainPanel.refreshTree(swf);
+    private void saveDisplayEditTag(boolean refreshTree) {
+        if (displayEditMode == EDIT_RAW) {
+            ((GenericTagTreePanel) displayEditGenericPanel).restorePreview();
         }
-        mainPanel.clearEditingStatus();
-        mainPanel.repaintTree();
-        if (hilightTag != null) {
-            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), hilightTag);
+        if (displayEditMode == EDIT_POINTS && !validateDisplayPointEdit()) {
+            return;
         }
-        if (operationMode) {
-            displayEditMode = EDIT_RAW;
-            reloadDisplayEditAttributes();
-            displayEditGenericPanel.setVisible(true);
-            setDisplayEditOperationButtonsVisible(false);
-            setDisplayEditPropertiesVisible(true);
+        try (MainPanel.EditScope edit = mainPanel.beginItemEdit(displayEditMode == EDIT_TRANSFORM
+                ? "history.transform.item" : "history.edit.item", displayEditTag)) {
+            boolean operationMode = displayEditMode == EDIT_TRANSFORM || displayEditMode == EDIT_POINTS;
+            if (displayEditMode == EDIT_TRANSFORM) {
+                Matrix matrix = displayEditImagePanel.getNewMatrix();
+                if (displayEditTag instanceof PlaceObjectTypeTag) {
+                    applyPlaceObjectTransform((PlaceObjectTypeTag) displayEditTag, displayEditFrame, matrix);
+                }
+                if (displayEditTag instanceof ShapeTag) {
+                    ShapeTag shape = (ShapeTag) displayEditTag;
+
+                    RECT newShapeBounds = transformRECT(matrix, shape.shapeBounds);
+                    if (checkRectLarge(newShapeBounds)) {
+                        return;
+                    }
+                    RECT newEdgeBounds = null;
+                    if (shape instanceof DefineShape4Tag) {
+                        DefineShape4Tag shape4 = (DefineShape4Tag) shape;
+                        newEdgeBounds = transformRECT(matrix, shape4.edgeBounds);
+                        if (checkRectLarge(newEdgeBounds)) {
+                            return;
+                        }
+                    }
+
+                    ShapeTransformer shapeTransformer = new ShapeTransformer();
+
+                    oldShapeRecords = Helper.deepCopy(shape.shapes.shapeRecords);
+                    shapeTransformer.transformSHAPE(matrix, shape.shapes, shape.getShapeNum());
+                    if (checkShapeLarge(shape.shapes.shapeRecords)) {
+                        shape.shapes.shapeRecords = oldShapeRecords;
+                        return;
+                    }
+                    oldShapeRecords = null;
+                    shapeTransformer.transformStyles(matrix, shape.shapes.fillStyles, shape.shapes.lineStyles, shape.getShapeNum());
+
+                    shape.shapeBounds = newShapeBounds;
+                    if (shape instanceof DefineShape4Tag) {
+                        DefineShape4Tag shape4 = (DefineShape4Tag) shape;
+                        shape4.edgeBounds = newEdgeBounds;
+                    }
+                    shape.shapes.clearCachedOutline();
+                    shape.getSwf().clearShapeCache();
+                }
+
+                if (displayEditTag instanceof MorphShapeTag) {
+                    MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
+
+                    if (morphDisplayMode == MORPH_START) {
+                        RECT newShapeBounds = transformRECT(matrix, morphShape.startBounds);
+                        if (checkRectLarge(newShapeBounds)) {
+                            return;
+                        }
+                        RECT newEdgeBounds = null;
+                        if (morphShape instanceof DefineMorphShape2Tag) {
+                            DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                            newEdgeBounds = transformRECT(matrix, morphShape2.startEdgeBounds);
+                        }
+
+                        ShapeTransformer shapeTransformer = new ShapeTransformer();
+
+                        oldShapeRecords = Helper.deepCopy(morphShape.startEdges.shapeRecords);
+                        shapeTransformer.transformSHAPE(matrix, morphShape.startEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
+                        if (checkShapeLarge(morphShape.startEdges.shapeRecords)) {
+                            morphShape.startEdges.shapeRecords = oldShapeRecords;
+                            return;
+                        }
+                        oldShapeRecords = null;
+                        morphShape.startBounds = newShapeBounds;
+                        if (morphShape instanceof DefineMorphShape2Tag) {
+                            DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                            morphShape2.startEdgeBounds = newEdgeBounds;
+                        }
+                        shapeTransformer.transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), true, false);
+                    }
+
+                    if (morphDisplayMode == MORPH_END) {
+                        RECT newShapeBounds = transformRECT(matrix, morphShape.endBounds);
+                        if (checkRectLarge(newShapeBounds)) {
+                            return;
+                        }
+                        RECT newEdgeBounds = null;
+                        if (morphShape instanceof DefineMorphShape2Tag) {
+                            DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                            newEdgeBounds = transformRECT(matrix, morphShape2.endEdgeBounds);
+                        }
+
+                        ShapeTransformer shapeTransformer = new ShapeTransformer();
+
+                        oldShapeRecords = Helper.deepCopy(morphShape.endEdges.shapeRecords);
+                        shapeTransformer.transformSHAPE(matrix, morphShape.endEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
+                        if (checkShapeLarge(morphShape.endEdges.shapeRecords)) {
+                            morphShape.endEdges.shapeRecords = oldShapeRecords;
+                            return;
+                        }
+                        oldShapeRecords = null;
+                        morphShape.endBounds = newShapeBounds;
+                        if (morphShape instanceof DefineMorphShape2Tag) {
+                            DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                            morphShape2.endEdgeBounds = newEdgeBounds;
+                        }
+                        shapeTransformer.transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), false, true);
+                    }
+                    morphShape.getSwf().clearShapeCache();
+                }
+                displayEditTag.setModified(true);
+                if (displayEditTag instanceof PlaceObjectTypeTag) {
+                    PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) displayEditTag;
+                    displayEditImagePanel.selectDepth(placeTag.getDepth());
+                }
+                displayEditImagePanel.freeTransformDepth(-1);
+                displayEditTag.getTimelined().resetTimeline();
+                displayEditTransformScrollPane.setVisible(false);
+                displayEditGenericPanel.setVisible(true);
+            }
+            if (displayEditMode == EDIT_POINTS) {
+                edit.useOriginalTagState(displayEditTag, beforePointEdit);
+                displayEditImagePanel.setHilightedPoints(null);
+                displayEditTag.setModified(true);
+                beforePointEdit = null;
+                oldShapeRecords = null;
+                oldShapeBounds = null;
+                oldShapeEdgeBounds = null;
+                oldEndShapeRecords = null;
+                oldEndShapeBounds = null;
+                oldEndShapeEdgeBounds = null;
+            }
+            Tag hilightTag = null;
+            SWF swf = null;
+            if (displayEditMode == EDIT_RAW) {
+                if (displayEditGenericPanel.save()) {
+                    Tag tag = displayEditGenericPanel.getTag();
+                    swf = tag.getSwf();
+                    tag.getTimelined().resetTimeline();
+                    hilightTag = tag;
+                }
+                displayEditGenericPanel.setEditMode(false, null);
+                refreshDisplayEditPreview();
+            }
+
+            if (displayEditTag instanceof ShapeTag) {
+                replaceShapeButton.setVisible(true);
+                replaceShapeUpdateBoundsButton.setVisible(true);
+                displayEditEditPointsButton.setVisible(true);
+            }
+
+            if (displayEditTag instanceof MorphShapeTag) {
+                replaceMorphShapeButton.setVisible(true);
+                replaceMorphShapeUpdateBoundsButton.setVisible(true);
+                displayEditEditPointsButton.setVisible(true);
+            }
+
+            if (displayEditTag instanceof DefineSpriteTag) {
+                replaceSpriteButton.setVisible(true);
+            }
+
+            if (displayEditTag instanceof MorphShapeTag) {
+                morphShowPanel.setVisible(true);
+                displayEditEditPointsButton.setVisible(true);
+            }
+
+            displayEditTransformButton.setVisible(true);
+            if (Configuration.editorMode.get()) {
+                displayEditEditButton.setVisible(false);
+                displayEditSaveButton.setVisible(true);
+                displayEditSaveButton.setEnabled(false);
+                displayEditCancelButton.setVisible(true);
+                displayEditCancelButton.setEnabled(false);
+                displayEditAutoPreviewCheckBox.setVisible(true);
+                displayEditTransformButton.setVisible(true);
+            } else {
+                displayEditEditButton.setVisible(true);
+                displayEditSaveButton.setVisible(false);
+                displayEditCancelButton.setVisible(false);
+                displayEditAutoPreviewCheckBox.setVisible(false);
+            }
+
+            if (displayEditMode == EDIT_RAW && refreshTree && swf != null) {
+                mainPanel.refreshTree(swf);
+            }
+            mainPanel.clearEditingStatus();
+            mainPanel.repaintTree();
+            if (hilightTag != null) {
+                mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), hilightTag);
+            }
+            if (operationMode) {
+                displayEditMode = EDIT_RAW;
+                reloadDisplayEditAttributes();
+                displayEditGenericPanel.setVisible(true);
+                setDisplayEditOperationButtonsVisible(false);
+                setDisplayEditPropertiesVisible(true);
+            }
+            updateEffectivePlaceObjectPanel();
+            setEffectivePlaceObjectVisible(readOnly || displayEditTag.isReadOnly() || !Configuration.editorMode.get());
         }
-        updateEffectivePlaceObjectPanel();
-        setEffectivePlaceObjectVisible(readOnly || displayEditTag.isReadOnly() || !Configuration.editorMode.get());
     }
 
     private void saveDisplayEditTagButtonActionPerformed(ActionEvent evt) {
@@ -3883,7 +3919,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditTransformButton.setVisible(false);
         displayEditSaveButton.setVisible(true);
         displayEditCancelButton.setVisible(true);
-        displayEditAutoPreviewCheckBox.setVisible(true);        
+        displayEditAutoPreviewCheckBox.setVisible(true);
+        updateSimpleEditorButtonsVisibility();
         replaceShapeButton.setVisible(false);
         replaceMorphShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
@@ -3917,6 +3954,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void editPointsDisplayEditTagButtonActionPerformed(ActionEvent evt) {
+        // Point gestures update the live tag before Save is pressed.
+        beforePointEdit = new SwfEdit.TagState(displayEditTag);
         displayEditMode = EDIT_POINTS;
         setDisplayEditPropertiesVisible(false);
         displayEditGenericPanel.setVisible(false);
@@ -3984,6 +4023,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         int y = 0;
 
         List<DisplayPoint> points = new ArrayList<>();
+        List<Integer> pathStarts = new ArrayList<>();
         boolean wasMoveTo = false;
         StyleChangeRecord lastStyleChangeRecord = null;
         for (SHAPERECORD rec : selectedRecords) {
@@ -4013,6 +4053,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 lastStyleChangeRecord = scr;
                 if (scr.stateMoveTo) {
                     DisplayPoint point = new DisplayPoint(scr.moveDeltaX, scr.moveDeltaY);
+                    pathStarts.add(points.size());
                     points.add(point);
                     wasMoveTo = true;
                 }
@@ -4021,7 +4062,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             x = rec.changeX(x);
             y = rec.changeY(y);
         }
-        displayEditImagePanel.setHilightedPoints(points);
+        displayEditImagePanel.setHilightedPoints(points, pathStarts);
     }
 
     private void transformDisplayEditTagButtonActionPerformed(ActionEvent evt) {
@@ -4083,48 +4124,49 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void saveImageTransform(boolean refreshTree) {
-        Matrix matrix = imagePanel.getNewMatrix();
+        try (MainPanel.EditScope edit = mainPanel.beginItemEdit("history.transform.item", mainPanel.getCurrentTree().getCurrentTreeItem())) {
+            Matrix matrix = imagePanel.getNewMatrix();
 
-        imageTransformScrollPane.setVisible(false);
-        imagePanel.freeTransformDepth(-1);
-        imageTransformButton.setVisible(true);
-        imageTransformCancelButton.setVisible(false);
-        imageTransformSaveButton.setVisible(false);
+            imageTransformScrollPane.setVisible(false);
+            imagePanel.freeTransformDepth(-1);
+            imageTransformButton.setVisible(true);
+            setImageTransformOperationButtonsVisible(false);
 
-        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
-        if (item instanceof TagScript) {
-            item = ((TagScript) item).getTag();
-        }
-
-        CharacterTag character = (CharacterTag) item;
-        if (character instanceof ButtonTag) {
-            ButtonTag button = (ButtonTag) character;
-            for (BUTTONRECORD rec : button.getRecords()) {
-                MATRIX placeMatrix = rec.placeMatrix;
-                rec.placeMatrix = new Matrix(placeMatrix).preConcatenate(matrix).toMATRIX();
-                rec.setModified(true);
+            TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
+            if (item instanceof TagScript) {
+                item = ((TagScript) item).getTag();
             }
-            button.setModified(true);
-            button.resetTimeline();
-        } else if (character instanceof DefineSpriteTag) {
-            DefineSpriteTag sprite = (DefineSpriteTag) character;
-            for (Tag t : sprite.getTags()) {
-                if (t instanceof PlaceObjectTypeTag) {
-                    PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
-                    MATRIX placeMatrix = pt.getMatrix();
-                    if (placeMatrix != null) {
-                        pt.setMatrix(new Matrix(placeMatrix).preConcatenate(matrix).toMATRIX());
-                        pt.setModified(true);
+
+            CharacterTag character = (CharacterTag) item;
+            if (character instanceof ButtonTag) {
+                ButtonTag button = (ButtonTag) character;
+                for (BUTTONRECORD rec : button.getRecords()) {
+                    MATRIX placeMatrix = rec.placeMatrix;
+                    rec.placeMatrix = new Matrix(placeMatrix).preConcatenate(matrix).toMATRIX();
+                    rec.setModified(true);
+                }
+                button.setModified(true);
+                button.resetTimeline();
+            } else if (character instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) character;
+                for (Tag t : sprite.getTags()) {
+                    if (t instanceof PlaceObjectTypeTag) {
+                        PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                        MATRIX placeMatrix = pt.getMatrix();
+                        if (placeMatrix != null) {
+                            pt.setMatrix(new Matrix(placeMatrix).preConcatenate(matrix).toMATRIX());
+                            pt.setModified(true);
+                        }
                     }
                 }
+                sprite.resetTimeline();
+                replaceSpriteButton.setVisible(true);
             }
-            sprite.resetTimeline();
-            replaceSpriteButton.setVisible(true);
-        }
-        mainPanel.clearEditingStatus();
-        if (refreshTree) {
-            mainPanel.refreshTree(item.getOpenable());
-            mainPanel.reload(true);
+            mainPanel.clearEditingStatus();
+            if (refreshTree) {
+                mainPanel.refreshTree(item.getOpenable());
+                mainPanel.reload(true);
+            }
         }
     }
 
@@ -4136,8 +4178,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageTransformScrollPane.setVisible(false);
         imagePanel.freeTransformDepth(-1);
         imageTransformButton.setVisible(true);
-        imageTransformCancelButton.setVisible(false);
-        imageTransformSaveButton.setVisible(false);
+        setImageTransformOperationButtonsVisible(false);
         mainPanel.clearEditingStatus();
         mainPanel.reload(true);
 
@@ -4286,8 +4327,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         replaceSpriteButton.setVisible(false);
         imageTransformButton.setVisible(false);
-        imageTransformSaveButton.setVisible(true);
-        imageTransformCancelButton.setVisible(true);
+        setImageTransformOperationButtonsVisible(true);
         imageTransformScrollPane.setVisible(true);
         mainPanel.setEditingStatus();
 
@@ -4322,6 +4362,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
 
         if (displayEditMode == EDIT_POINTS) {
+            beforePointEdit = null;
             displayEditImagePanel.setHilightedPoints(null);
             if (displayEditTag instanceof ShapeTag) {
                 ShapeTag shape = (ShapeTag) displayEditTag;
@@ -4395,6 +4436,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             setDisplayEditOperationButtonsVisible(false);
             setDisplayEditPropertiesVisible(true);
         }
+        updateSimpleEditorButtonsVisibility();
         updateEffectivePlaceObjectPanel();
         setEffectivePlaceObjectVisible(readOnly || displayEditTag.isReadOnly() || !Configuration.editorMode.get());
     }

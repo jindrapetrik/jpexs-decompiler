@@ -1,0 +1,55 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Component Assets/ColorPickerSkins/ColorPicker_downSkin" itemID="44902589-00000a03" linkageExportForAS="true" linkageExportInFirstFrame="false" linkageIdentifier="ColorPicker_downSkin" linkageClassName="ColorPicker_downSkin" scaleGridLeft="3" scaleGridRight="14" scaleGridTop="3" scaleGridBottom="16" lastModified="1168287193">
+  <timeline>
+    <DOMTimeline name="ColorPicker_downSkin">
+      <layers>
+        <DOMLayer name="skin" color="#FF4FFF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape isFloating="true">
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#CCCCCC"/>
+                    </FillStyle>
+                    <FillStyle index="2">
+                      <SolidColor color="#E5E6E7"/>
+                    </FillStyle>
+                    <FillStyle index="3">
+                      <SolidColor color="#FFFFFF"/>
+                    </FillStyle>
+                    <FillStyle index="4">
+                      <SolidColor color="#9A9B9D"/>
+                    </FillStyle>
+                    <FillStyle index="5">
+                      <SolidColor color="#333333" alpha="0"/>
+                    </FillStyle>
+                    <FillStyle index="6">
+                      <SolidColor/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" fillStyle1="2" edges="!420 20S3|420 420!420 420|20 420"/>
+                    <Edge fillStyle0="1" fillStyle1="3" edges="!20 420S3|0 420"/>
+                    <Edge fillStyle0="1" edges="!0 420S1|0 440!0 440|440 440!440 440|440 0!440 0|420 0"/>
+                    <Edge fillStyle0="1" fillStyle1="3" edges="!420 0S3|420 20"/>
+                    <Edge fillStyle0="2" fillStyle1="3" edges="!420 20S3|20 20!20 20|20 420!380 40|400 40!400 40|400 320!400 320|380 320"/>
+                    <Edge fillStyle0="2" fillStyle1="5" edges="!380 320S3|280 320!280 320|280 380"/>
+                    <Edge fillStyle0="2" fillStyle1="3" edges="!280 380S3|280 400!280 400|40 400!40 400|40 380"/>
+                    <Edge fillStyle0="2" fillStyle1="4" edges="!40 380S3|40 40!40 40|380 40"/>
+                    <Edge fillStyle0="3" fillStyle1="4" edges="!380 40S3|380 60"/>
+                    <Edge fillStyle0="3" fillStyle1="5" edges="!380 60S3|380 320"/>
+                    <Edge fillStyle0="4" fillStyle1="3" edges="!40 380S3|60 380"/>
+                    <Edge fillStyle0="5" fillStyle1="3" edges="!60 380S3|280 380"/>
+                    <Edge fillStyle0="2" fillStyle1="6" edges="!389.5 351S3|349.5 391!349.5 391|309 351!309 351|389.5 351"/>
+                    <Edge fillStyle1="3" edges="!0 420S2|0 0!0 0|420 0"/>
+                    <Edge fillStyle0="5" fillStyle1="4" edges="!380 60S3|60 60!60 60|60 380"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/PushButton Name" itemID="3bd76fb5-000000bc" sourceFlashFilepath="C:\Documents and Settings\Admin\Application Data\Macromedia\Flash MX\Configuration\Components\Flash UI Components.fla" sourceLibraryItemHRef="Flash UI Components/Core Assets - Developer Only/Other Assets/Name Symbols/PushButton Name" sourceLastModified="1015556309" lastModified="1015556309" sourceItemID="3bd76fb5-000000bc">
+  <timeline>
+    <DOMTimeline name="PushButton Name">
+      <layers>
+        <DOMLayer name="asset" color="#4F80FF" current="true" isSelected="true" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#D4D0D8"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!1775 196|174 196!174 196|174 217!174 217|324.5 217!324.5 217|324.5 216!324.5 216|1675 216!1675 216|1675 217!1675 217|1775 217!1775 217|1775 196"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

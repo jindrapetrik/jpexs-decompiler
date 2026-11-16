@@ -697,7 +697,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testForAnd() {
         decompileMethod("classic_air", "testForAnd", "var x:Boolean = false;\r\n"
-                + "var i:* = 0;\r\n"
+                + "var i:uint = 0;\r\n"
                 + "var len:int = 5;\r\n"
                 + "var a:int = 4;\r\n"
                 + "var b:int = 7;\r\n"
@@ -918,7 +918,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testForGoto() {
-        decompileMethod("classic_air", "testForGoto", "var i:* = 0;\r\n"
+        decompileMethod("classic_air", "testForGoto", "var i:uint = 0;\r\n"
                 + "var c:int = 0;\r\n"
                 + "var len:int = 5;\r\n"
                 + "for(i = 0; i < len; i++)\r\n"

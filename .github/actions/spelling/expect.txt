@@ -42,10 +42,12 @@ abctraits
 abcuint
 abff
 ABIOS
+ABlank
 ABORTWARNING
 abovenormal
 abreak
 Abstaende
+AButton
 abx
 acaylt
 ACCESSDENIED
@@ -98,9 +100,11 @@ aforinif
 afp
 agentlib
 agentpath
+AGroup
 ags
 Aguilera
 ahoj
+AHollow
 aip
 aircontrols
 aircore
@@ -131,6 +135,7 @@ alterneigh
 altersingle
 altglyph
 altsigner
+AMask
 ames
 amf
 AMuch
@@ -155,8 +160,13 @@ apgeneratedsrcdir
 APICOM
 apiprivate
 apiversioning
+APlan
 apng
+appdata
+appdir
 apperr
+appimage
+appimagetool
 applytype
 appmenu
 APPWINDOW
@@ -187,6 +197,7 @@ asdec
 asdoc
 ASender
 ASF
+AShared
 asinterface
 Asize
 asms
@@ -209,6 +220,7 @@ atleast
 atmax
 atmin
 ATRAC
+ATrailing
 ATTRIBUTENAME
 ATTRIBUTEVALUE
 ATTRNAMEVAR
@@ -240,6 +252,7 @@ avimainheader
 avioldindex
 AVIPALCHANGE
 AVIPCM
+AVirtual
 AVISF
 avistreamheader
 AVIX
@@ -421,6 +434,7 @@ buildlog
 BUILDNUMBER
 bulkimport
 bundleswc
+buttonadd
 buttoncondaction
 buttonicon
 BUTTONRECORD
@@ -596,6 +610,7 @@ CLERKEXISTS
 CLERKNOTFOUND
 CLexer
 CLFS
+clickable
 CLIENTCREATESTRUCT
 clientid
 CLIENTSITE
@@ -652,6 +667,7 @@ commonpart
 commonset
 commonshape
 compareresources
+compc
 compilerarg
 COMPILERKIND
 COMPILERPATH
@@ -762,6 +778,7 @@ datas
 datfiles
 dbcc
 dbch
+DBCSENABLED
 dbd
 dbff
 Dbi
@@ -1219,6 +1236,7 @@ fieldalign
 fifi
 fiftyseven
 fileattributes
+filechooser
 fileformat
 fileoffset
 fileschanged
@@ -1270,7 +1288,6 @@ FIXEDPARAMETER
 fji
 fjump
 fla
-flacomdoc
 flagval
 flashdebugger
 flashdevelop
@@ -1343,7 +1360,6 @@ forkmode
 FORMATETC
 forminfo
 fos
-fourcc
 FOURTYEIGHT
 FOURTYFOUR
 foutdir
@@ -1382,6 +1398,7 @@ frm
 Frob
 fromsoft
 fromto
+frontmost
 fsb
 fscommand
 fscope
@@ -1401,6 +1418,7 @@ ftime
 ftimeline
 Ftm
 ftn
+ftr
 ftrait
 fuer
 fui
@@ -1581,6 +1599,7 @@ hget
 hgetbits
 hhea
 hhk
+hicolor
 hicon
 hideobject
 highlightings
@@ -1629,6 +1648,7 @@ HScale
 hscroll
 hshift
 hsize
+HSlider
 hsstell
 htab
 HTBOTTOM
@@ -1676,7 +1696,7 @@ icting
 ictx
 idat
 idata
-IDCT
+idct
 Iddle
 IDecoder
 IDecompile
@@ -2715,7 +2735,6 @@ nparams
 npe
 npp
 nps
-npw
 NRotate
 nsano
 NScale
@@ -3467,6 +3486,7 @@ sft
 sftable
 sfunc
 sgt
+shapeadd
 shapecache
 shapefixer
 shapenum
@@ -3601,6 +3621,7 @@ SPLITPANE
 SPN
 spos
 spr
+spriteadd
 spriteinvalid
 spritesfolder
 spti
@@ -4042,6 +4063,7 @@ undefineds
 undomanager
 undos
 Unescapes
+unescaping
 unexpand
 Ungrabs
 unichr
@@ -4298,14 +4320,12 @@ XFixed
 xfl
 XFloat
 Xfm
-XHalf
 XHeight
 xhtmlsyntaxkit
 xing
 XInstance
 XInteger
 XIntercept
-XInternal
 xlen
 xlist
 xlr

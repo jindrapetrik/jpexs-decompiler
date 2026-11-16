@@ -653,11 +653,15 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * @throws IOException On I/O error
      */
     public Tag getOriginalTag() throws InterruptedException, IOException {
-        byte[] data = getOriginalData();
-        SWFInputStream tagDataStream = new SWFInputStream(swf, data, getDataPos(), data.length);
-        TagStub copy = new TagStub(swf, getId(), "Unresolved", getOriginalRange(), tagDataStream);
+        SWFInputStream tagDataStream = new SWFInputStream(swf, originalRange.getArray(), 0, originalRange.getPos() + originalRange.getLength());
+        tagDataStream.seek(getDataPos());
+        TagStub copy = new TagStub(swf, getOriginalId(), "Unresolved", originalRange, tagDataStream);
         copy.forceWriteAsLong = forceWriteAsLong;
         return SWFInputStream.resolveTag(copy, 0, false, true, false, false);
+    }
+
+    private int getOriginalId() {
+        return ((originalRange.get(0) & 0xff) | ((originalRange.get(1) & 0xff) << 8)) >> 6;
     }
 
     /**
@@ -675,6 +679,13 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      */
     public void undo() throws InterruptedException, IOException {
         if (originalRange == null) { //If the tag is newly created in GUI it has no original data
+            return;
+        }
+        if (getOriginalId() != getId()) {
+            Tag original = getOriginalTag();
+            Timelined parent = timelined == null ? swf : timelined;
+            original.setTimelined(parent);
+            parent.replaceTag(this, original);
             return;
         }
         SWFInputStream tagDataStream = new SWFInputStream(swf, originalRange.getArray(), 0, (int) originalRange.getPos() + originalRange.getLength());
@@ -753,6 +764,14 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      */
     public final ByteArrayRange getOriginalRange() {
         return originalRange;
+    }
+
+    /**
+     * Sets the original bytes used to restore a tag after editing or replacement.
+     * @param originalRange Original tag bytes including the header, or null for a new tag
+     */
+    public final void setOriginalRange(ByteArrayRange originalRange) {
+        this.originalRange = originalRange;
     }
 
     /**

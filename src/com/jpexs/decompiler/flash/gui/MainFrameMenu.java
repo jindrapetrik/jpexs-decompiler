@@ -25,8 +25,12 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
+import com.jpexs.decompiler.flash.easygui.EasyStrings;
+import com.jpexs.decompiler.flash.easygui.UndoManager;
+import com.jpexs.decompiler.flash.exporters.script.MxmlExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfFlashDevelopExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
+import com.jpexs.decompiler.flash.exporters.swf.SwfMxmlProjectExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
 import com.jpexs.decompiler.flash.gui.ai.AIContextManager;
 import com.jpexs.decompiler.flash.gui.ai.AISettingsDialog;
@@ -82,7 +86,10 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 /**
  * @author JPEXS
@@ -164,7 +171,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
                         openable.saveTo(baos);
                         saved = bundle.putOpenable(openable.getFileTitle(), new ByteArrayInputStream(baos.toByteArray()));
                     } catch (IOException ex) {
-                        Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                        if (bundle instanceof FtrSwfBundle) {
+                            Main.handleSaveError(ex);
+                        } else {
+                            Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
+                        }
                     }
                 } else {
                     ViewMessages.showMessageDialog(mainFrame.getWindow(), translate("error.readonly.cannotSave"), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -298,6 +309,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             SWF swf = (SWF) openable;
             if (swf.binaryData != null) {
                 // embedded swf
+                mainFrame.getPanel().forgetEmbeddedMovieHistory(swf);
                 swf.binaryData.setInnerSwf(null);
                 swf.clearTagSwfs();
                 binaryDataClosedSwfs.add(swf);
@@ -497,6 +509,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         return false;
+    }
+
+    protected void exportMxmlActionPerformed(ActionEvent evt, SwfMxmlProjectExporter.ProjectType type) {
+        if (openable instanceof SWF) {
+            mainFrame.getPanel().exportMxml((SWF) openable, type);
+        }
     }
 
     protected void exportFlashDevelopActionPerformed(ActionEvent evt) {
@@ -1100,6 +1118,56 @@ public abstract class MainFrameMenu implements MenuBuilder {
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     }
 
+    static String historyPath(boolean redo) {
+        return redo ? "/file/history/redo" : "/file/history/undo";
+    }
+
+    static String historyListPath(boolean redo) {
+        return historyPath(redo) + "List";
+    }
+
+    static String historyListKey(boolean redo) {
+        return redo ? "menu.history.redo.list" : "menu.history.undo.list";
+    }
+
+    static final int HISTORY_VISIBLE_ROWS = 12;
+
+    static String historyEntryLabel(UndoManager.ReplayPlan plan, int index) {
+        return (index + 1) + ". " + plan.getOperation(index).getDescription();
+    }
+
+    private void showHistoryList(boolean redo) {
+        MainPanel panel = mainFrame.getPanel();
+        UndoManager.ReplayPlan plan = panel.getEditHistory(redo);
+        if (plan.size() == 0) {
+            return;
+        }
+        String[] labels = new String[plan.size()];
+        for (int index = 0; index < labels.length; index++) {
+            labels[index] = historyEntryLabel(plan, index);
+        }
+        JList<String> list = new JList<>(labels);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setVisibleRowCount(Math.min(HISTORY_VISIBLE_ROWS, labels.length));
+        list.setSelectedIndex(0);
+        if (ViewMessages.showConfirmDialog(panel, new JScrollPane(list), translate(historyListKey(redo)),
+                JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            panel.replayEdit(plan, list.getSelectedIndex() + 1);
+        }
+    }
+
+    void updateHistoryActions(String undo, String redo) {
+        setHistoryAction(false, undo != null, historyTooltip("undo", undo));
+        setHistoryAction(true, redo != null, historyTooltip("redo", redo));
+    }
+
+    private static String historyTooltip(String action, String description) {
+        return description == null ? EasyStrings.translate(action + ".cannot")
+                : EasyStrings.translate(action).replace("%action%", description);
+    }
+
+    protected abstract void setHistoryAction(boolean redo, boolean enabled, String tooltip);
+
     public void updateComponents() {
         updateComponents(openable);
     }
@@ -1122,11 +1190,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean canExportFlashDevelop = false;
         boolean canExportIdea = false;
         boolean canExportVsCode = false;
+        boolean canExportMxml = false;
         if (swf != null) {
             isAs3 = swf.isAS3();
             canExportFlashDevelop = SwfFlashDevelopExporter.canExportSwf(swf);
             canExportIdea = SwfIntelliJIdeaExporter.canExportSwf(swf);
             canExportVsCode = SwfVsCodeExporter.canExportSwf(swf);
+            canExportMxml = MxmlExporter.canExportSwf(swf);
         }
         if (abcSelected) {
             isAs3 = true;
@@ -1199,12 +1269,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/export/exportAll", openableSelected && !isWorking);
         setMenuEnabled("_/exportFla", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportFla", allSameSwf && openableSelected && !isWorking);
-        //setMenuEnabled("_/exportFlashDevelop", swfSelected && !isWorking && canExportFlashDevelop);
-        setMenuEnabled("/file/export/exportMore/exportFlashDevelop", allSameSwf && openableSelected && isAs3 && !isWorking && canExportFlashDevelop);
-        //setMenuEnabled("_/exportIdea", swfSelected && !isWorking && canExportIdea);
-        setMenuEnabled("/file/export/exportMore/exportIdea", allSameSwf && openableSelected && isAs3 && !isWorking && canExportIdea);
-        //setMenuEnabled("_/exportVsCode", swfSelected && !isWorking && canExportVsCode);
-        setMenuEnabled("/file/export/exportMore/exportVsCode", allSameSwf && openableSelected && isAs3 && !isWorking && canExportVsCode);
+        boolean projectExportAvailable = allSameSwf && swfSelected && !isWorking;
+        setProjectExportEnabled("/file/export/exportMore/exportFlashDevelop", projectExportAvailable && canExportFlashDevelop, projectExportAvailable && canExportMxml);
+        setProjectExportEnabled("/file/export/exportMore/exportIdea", projectExportAvailable && canExportIdea, projectExportAvailable && canExportMxml);
+        setProjectExportEnabled("/file/export/exportMore/exportVsCode", projectExportAvailable && canExportVsCode, projectExportAvailable && canExportMxml);
+        setMenuEnabled("/file/export/exportMore/exportMxmlMXML", projectExportAvailable && canExportMxml);
         setMenuEnabled("/file/export/exportMore/exportJava", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportMore/exportSwc", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportMore/exportExe", swfSelected && !isWorking);
@@ -1317,6 +1386,19 @@ public abstract class MainFrameMenu implements MenuBuilder {
         manager.addKeyEventDispatcher(keyEventDispatcher = this::dispatchKeyEvent);
     }
 
+    private void setProjectExportEnabled(String path, boolean as3, boolean mxml) {
+        setMenuEnabled(path, as3 || mxml);
+        setMenuEnabled(path + "/as3", as3);
+        setMenuEnabled(path + "/mxml", mxml);
+    }
+
+    private void addProjectExportMenu(String path, String title, String icon, ActionListener as3Action, SwfMxmlProjectExporter.ProjectType type) {
+        addMenuItem(path, title, icon, null, PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem(path + "/as3", "AS3", "as16", as3Action, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem(path + "/mxml", "MXML", "exportxml16", evt -> exportMxmlActionPerformed(evt, type), PRIORITY_MEDIUM, null, true, null, false);
+        finishMenu(path);
+    }
+
     public void createMenuBar() {
         initMenu();
 
@@ -1364,6 +1446,20 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addSeparator("/file");
 
+        if (!supportsAppMenu()) {
+            addMenuItem("/file/history", translate("menu.history"), "undo16", null, 0, null, false, null, false);
+            addMenuItem(historyPath(false), translate("menu.history.undo"), "undo16",
+                    e -> mainFrame.getPanel().replayEdit(false), PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem(historyPath(true), translate("menu.history.redo"), "redo16",
+                    e -> mainFrame.getPanel().replayEdit(true), PRIORITY_MEDIUM, null, true, null, false);
+            addSeparator("/file/history");
+            addMenuItem(historyListPath(false), translate(historyListKey(false)) + "...", "undo16",
+                    e -> showHistoryList(false), PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem(historyListPath(true), translate(historyListKey(true)) + "...", "redo16",
+                    e -> showHistoryList(true), PRIORITY_MEDIUM, null, true, null, false);
+            finishMenu("/file/history");
+        }
+
         addMenuItem("/file/export", translate("menu.export"), null, null, 0, null, false, null, false);
         addMenuItem("/file/export/exportFla", translate("menu.file.export.fla"), "exportfla32", this::exportFlaActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/file/export/exportAll", translate("menu.file.export.all"), "exportall16", this::exportAllActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+SHIFT+E"), false);
@@ -1371,9 +1467,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addMenuItem("/file/export/exportMore", translate("menu.export.file"), "export16", null, PRIORITY_MEDIUM, null, false, null, false);
         addMenuItem("/file/export/exportMore/exportXml", "XML", "exportxml16", this::exportXmlActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/export/exportMore/exportFlashDevelop", "Flash Develop", "exportflashdevelop16", this::exportFlashDevelopActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/export/exportMore/exportIdea", "IntelliJ Idea", "exportidea16", this::exportIdeaActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/export/exportMore/exportVsCode", "Visual Studio Code", "exportvscode16", this::exportVsCodeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addProjectExportMenu("/file/export/exportMore/exportFlashDevelop", "FlashDevelop", "exportflashdevelop16", this::exportFlashDevelopActionPerformed, SwfMxmlProjectExporter.ProjectType.FLASH_DEVELOP);
+        addProjectExportMenu("/file/export/exportMore/exportIdea", "IntelliJ IDEA", "exportidea16", this::exportIdeaActionPerformed, SwfMxmlProjectExporter.ProjectType.INTELLIJ_IDEA);
+        addProjectExportMenu("/file/export/exportMore/exportVsCode", "VS Code", "exportvscode16", this::exportVsCodeActionPerformed, SwfMxmlProjectExporter.ProjectType.VS_CODE);
+        addMenuItem("/file/export/exportMore/exportMxmlMXML", "MXML", "exportxml16",
+                evt -> exportMxmlActionPerformed(evt, SwfMxmlProjectExporter.ProjectType.MXML), PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/export/exportMore/exportJava", "Java", "exportjava16", this::exportJavaActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/export/exportMore/exportSwc", "SWC", "bundleswc16", this::exportSwcActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/export/exportMore/exportExe", "EXE", "saveasexe16", this::saveAsExeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
@@ -1919,8 +2017,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
     public boolean stepOverActionPerformed(ActionEvent evt) {
 
         try {
-
-            DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
+            DebuggerSession session = Main.getCurrentDebugSession();
+            if (session == null) {
+                return true;
+            }
+            
+            DebuggerCommands cmd = session.getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
 
@@ -1934,7 +2036,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public boolean stepIntoActionPerformed(ActionEvent evt) {
         try {
-            DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
+            DebuggerSession session = Main.getCurrentDebugSession();
+            if (session == null) {
+                return true;
+            }
+            DebuggerCommands cmd = session.getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
 
@@ -1949,7 +2055,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public boolean stepOutActionPerformed(ActionEvent evt) {
         try {
-            DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
+            DebuggerSession session = Main.getCurrentDebugSession();
+            if (session == null) {
+                return true;
+            }
+            DebuggerCommands cmd = session.getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
             cmd.stepOut();
@@ -1963,7 +2073,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     public boolean continueActionPerformed(ActionEvent evt) {
         try {
-            DebuggerCommands cmd = Main.getCurrentDebugSession().getCommands();
+            DebuggerSession session = Main.getCurrentDebugSession();
+            if (session == null) {
+                return true;
+            }
+            DebuggerCommands cmd = session.getCommands();
             mainFrame.getPanel().clearDebuggerColors();
             Main.startWork(AppStrings.translate("work.debugging") + "...", null, true);
             cmd.sendContinue();

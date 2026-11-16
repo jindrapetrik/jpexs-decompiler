@@ -98,18 +98,15 @@ public class ActionPush extends Action implements ConstantPoolAwareAction {
     public ActionPush(int actionLength, SWFInputStream sis) throws IOException {
         super(0x96, actionLength, sis.getCharset());
         values = new ArrayList<>();
-        DumpInfo di = sis.dumpInfo;
-        sis = sis.getLimitedStream(actionLength);
-        sis.dumpInfo = di;
-        try {
-            while (sis.available() > 0) {
-                Object value = readSingleValue(sis);
-                if (value != null) {
-                    values.add(value);
-                }
+        long posBefore = sis.getPos();
+        long posAfter = posBefore + actionLength;        
+        //In the flash player, the length is checked only between the values
+        // not during value reading
+        while (sis.getPos() < posAfter) {
+            Object value = readSingleValue(sis);
+            if (value != null) {
+                values.add(value);
             }
-        } catch (EndOfStreamException ex) {
-            //ignored
         }
     }
 
