@@ -813,7 +813,7 @@ defaultstate
 defaultsyntaxkit
 defaultvalue
 deff
-definebutton
+definebuttons
 definefunc
 definefunction
 definelocal
@@ -944,7 +944,6 @@ dotsq
 dotssprite
 dottedchain
 doubletoatom
-doubletype
 Doubrovkine
 dowhile
 downloadnow
@@ -1183,7 +1182,7 @@ fctx
 Fdat
 FDE
 fdecompiled
-fdepth
+fdepths
 fdff
 fdformat
 fdir
@@ -1699,7 +1698,7 @@ imagesfolder
 imax
 imdata
 IMDCT
-ime
+IME
 imgd
 implementsop
 importasset
@@ -1753,6 +1752,7 @@ initradius
 initscope
 initscopedepth
 initthrow
+INITY
 injectas
 innerfunction
 innershadow
@@ -4257,6 +4257,7 @@ YMK
 ymouse
 ynew
 YNM
+YOF
 yorig
 yourfile
 Yoyodyne
