@@ -1260,7 +1260,6 @@ FIXEDPARAMETER
 fji
 fjump
 fla
-flacomdoc
 flagval
 flashdebugger
 flashdevelop
@@ -1754,8 +1753,6 @@ initradius
 initscope
 initscopedepth
 initthrow
-initx
-inity
 injectas
 innerfunction
 innershadow
@@ -2299,7 +2296,6 @@ mgardi
 MGTPE
 mhreljac
 mhs
-Microsystem's
 mindex
 minfo
 mingc
@@ -3333,7 +3329,6 @@ SETHOTKEY
 setinstancemetadata
 setlanguage
 setloc
-setlocals
 setlocalx
 setmember
 setprop
@@ -3879,8 +3874,6 @@ tuto
 TVar
 twalljava
 tweeked
-Tweener
-tweening
 tweenquality
 tweens
 twindagger
@@ -4177,7 +4170,6 @@ XFixed
 xfl
 XFloat
 Xfm
-XHalf
 XHeight
 xhtmlsyntaxkit
 xing
@@ -4257,8 +4249,6 @@ ydelta
 YEnd
 yestoall
 YFloat
-Ygohh
-YHalf
 YInstance
 YInteger
 ylen
@@ -4267,7 +4257,6 @@ YMK
 ymouse
 ynew
 YNM
-yof
 yorig
 yourfile
 Yoyodyne
