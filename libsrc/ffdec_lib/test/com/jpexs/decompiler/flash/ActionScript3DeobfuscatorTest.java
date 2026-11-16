@@ -1691,6 +1691,24 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testScriptInitializerImportsNamesEndingInHashDigits() throws Exception {
+        String res = recompileSource("package { public class Test { } }",
+                "code\n"
+                + "getlocal0\n"
+                + "pushscope\n"
+                + "pushnull\n"
+                + "coerce QName(PackageNamespace(\"haxe.io\"),\"#3\")\n"
+                + "pop\n"
+                + "pushnull\n"
+                + "coerce QName(PackageNamespace(\"haxe.io\"),\"Bytes#4\")\n"
+                + "pop\n"
+                + "returnvoid\n");
+        assertTrue(res.contains("import haxe.io.\u00a7#3\u00a7;"), res);
+        assertTrue(res.contains("import haxe.io.\u00a7Bytes#4\u00a7;"), res);
+        assertTrue(!res.contains("import haxe.io.;"), res);
+    }
+
+    @Test
     public void testStaticFieldInitializerUsingScriptLocal() throws Exception {
         String res = recompileSource("package { public class Test { public static var data:Array; public static var literal:int; } }",
                 "code\n"
