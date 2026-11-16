@@ -128,6 +128,7 @@ It uses modified code of these libraries:
 * [Animated GIF Encoder] (Frames to GIF export)
 * [gnujpdf] (PDF export) - LGPL
 * [openjdk8 Stroker] (Shapes - Miter clip drawing) - GPL
+* openjdk8 Area (XFL export of shapes) - GPLv2
 * [Apache Flex SDK] (Decimal numbers support - Decimal128 class) - Apache License 2.0
 * [webp4j] (WEBP format export/import) - MIT
 
