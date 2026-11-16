@@ -117,7 +117,7 @@ IdentifierNs = {Identifier} ":" {Identifier}
 /* XML */
 LetterColon = [:jletter] | ":"
 XMLIdentifier = {Identifier} | {IdentifierNs}
-XMLAttribute = {WhiteSpace}* {XMLIdentifier} {WhiteSpace}* "=" {WhiteSpace}* (\" {InputCharacter}* \" | "'" {InputCharacter}* "'") {WhiteSpace}*
+XMLAttribute = {WhiteSpace}* {XMLIdentifier} {WhiteSpace}* "=" {WhiteSpace}* (\" [^\"]* \" | "'" [^']* "'") {WhiteSpace}*
 XMLBeginOneTag = "<" {XMLIdentifier} {XMLAttribute}* {WhiteSpace}* "/"? ">" | "<{" {XMLIdentifier} "}" {XMLAttribute}* {WhiteSpace}* "/"? ">"
 XMLBeginTag = "<" {XMLIdentifier} {WhiteSpace}+ | "<{" {XMLIdentifier} "}" {WhiteSpace}
 XMLEndTag = "</" {XMLIdentifier} {WhiteSpace}* ">" | "</{" {XMLIdentifier} "}" {WhiteSpace}* ">"
@@ -396,7 +396,7 @@ VerbatimString = "@\"" {VerbatimStringCharacter}* "\""
                                        return token(TokenType.STRING, tokenStart, tokenLength);
                                    }
                                  }
-   .|\n                          { tokenLength += yylength(); }
+   [^]                           { tokenLength += yylength(); }
 }
 
 <STRING> {

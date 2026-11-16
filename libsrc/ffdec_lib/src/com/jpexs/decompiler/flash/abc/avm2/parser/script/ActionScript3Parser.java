@@ -1630,20 +1630,9 @@ public class ActionScript3Parser {
     private GraphTargetItem xml(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables, ABC abc) throws IOException, AVM2ParseException, InterruptedException {
         List<String> openedTags = new ArrayList<>();
         List<GraphTargetItem> xmlParts = xmltag(allOpenedNamespaces, thisType, pkg, new Reference<>(false), openedTags, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables, abc);
-        lexer.setEnableWhiteSpace(true);
         lexer.begin(ActionScriptLexer.YYINITIAL);
-        ParsedSymbol s = lex();
-        while (s.isType(SymbolType.XML_WHITESPACE)) {
-            addS(xmlParts, new StringBuilder(s.value.toString()));
-            s = lex();
-        }
-        lexer.setEnableWhiteSpace(false);
-        lexer.pushback(s);
-        GraphTargetItem ret = add(xmlParts);
-        ret = new XMLAVM2Item(ret);
-        //lexer.yybegin(ActionScriptLexer.YYINITIAL);
         //TODO: Order of additions as in official compiler
-        return ret;
+        return new XMLAVM2Item(add(xmlParts));
     }
     
     public boolean checkBasicXmlOnly(String txt) {

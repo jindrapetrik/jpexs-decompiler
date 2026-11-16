@@ -134,6 +134,15 @@ import com.jpexs.decompiler.flash.abc.types.Float4;
     private int count(String str, String target) {
         return (str.length() - str.replace(target, "").length()) / target.length();
     }
+
+    private void advanceXmlAttributeLines(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (ch == '\n' || (ch == '\r' && (i + 1 == text.length() || text.charAt(i + 1) != '\n'))) {
+                yyline++;
+            }
+        }
+    }
 %}
 
 /* main character classes */
@@ -201,11 +210,11 @@ XmlOpenTagEnd = ">"
 XmlCloseTag = "</" {XmlName} {XmlS}* ">"
 
 /* attribute */
-XmlAttribute = {XmlName} "="
+XmlAttribute = {XmlName} {XmlS}? "=" {XmlS}?
 
 /* string and character literals */
-XmlDQuoteStringChar = [^\r\n\"]
-XmlSQuoteStringChar = [^\r\n\']
+XmlDQuoteStringChar = [^\"]
+XmlSQuoteStringChar = [^\']
 
 
 
@@ -509,8 +518,10 @@ RegExp = \/([^\r\n/\\]|\\.)+\/[a-z]*
 
 <XMLOPENTAG> {   
    {XmlAttribute}                 {
+                                    String text = yytext();
+                                    advanceXmlAttributeLines(text);
                                     yybegin(XMLOPENTAGATTRIB);
-                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRIBUTENAME, yytext()));
+                                    pushback(new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRIBUTENAME, text));
                                     if (string.length() > 0){
                                        pushback(new ParsedSymbol(startPos, SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
                                        string.setLength(0);
@@ -552,12 +563,16 @@ RegExp = \/([^\r\n/\\]|\\.)+\/[a-z]*
 
 <XMLOPENTAGATTRIB> {
     \"{XmlDQuoteStringChar}*\"      {
+                                        String text = yytext();
+                                        advanceXmlAttributeLines(text);
                                         yybegin(XMLOPENTAG);
-                                        return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE, yytext());
+                                        return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE, text);
                                     }
     \'{XmlSQuoteStringChar}*\'      {
+                                        String text = yytext();
+                                        advanceXmlAttributeLines(text);
                                         yybegin(XMLOPENTAG);
-                                        return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE_SINGLEQUOTED, yytext());
+                                        return new ParsedSymbol(yychar(), SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE_SINGLEQUOTED, text);
                                     }
     "{"                             {
                                       yybegin(YYINITIAL);
