@@ -74,6 +74,16 @@ public class XFLConverterTest {
     public void init() {
         Configuration.useFoldersInFlaExport.set(false);
     }
+
+    @Test
+    public void edgeCoordinateSnapsNumericalNoiseToFixedPointGrid() {
+        assertEquals(XFLConverter.numEdgeToString(49.999999999999986), "50");
+        assertEquals(XFLConverter.numEdgeToString(Math.nextDown(-1297.0)), "-1297");
+        assertEquals(XFLConverter.numEdgeToString(-1e-13), "0");
+        assertEquals(XFLConverter.numEdgeToString(Math.nextDown(10.5)), "#A.80");
+        assertEquals(XFLConverter.numEdgeToString(49 + 255 / 256.0), "#31.FF");
+        assertEquals(XFLConverter.numEdgeToString(49.999), "#31.FF");
+    }
     
     @DataProvider(name = "provideFiles")
     public Object[][] provideFiles() {

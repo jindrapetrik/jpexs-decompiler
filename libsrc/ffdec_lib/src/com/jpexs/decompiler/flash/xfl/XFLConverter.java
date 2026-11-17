@@ -355,7 +355,13 @@ public class XFLConverter {
         }
     }
 
-    private static String numEdgeToString(double value) {
+    static String numEdgeToString(double value) {
+        // Adding relative edge coordinates can drift just below an XFL grid point.
+        // Snap numerical noise before truncating the fractional byte.
+        double nearestGridPoint = Math.rint(value * 256) / 256;
+        if (Math.abs(value - nearestGridPoint) <= Math.max(1e-9, 4 * Math.ulp(value))) {
+            value = nearestGridPoint;
+        }
         if (value == Math.floor(value)) {
             long lval = (long) value;
             return "" + lval;
@@ -945,7 +951,7 @@ public class XFLConverter {
             List<String> layers = new ArrayList<>();
             for (SHAPEWITHSTYLE layer : ShapePaints.splitLayers(source, shapeNum)) {
                 layers.addAll(convertShapeLayer(lastImportedId, characterNameMap, swf, mat, shapeNum,
-                        layer.shapeRecords, layer.fillStyles, layer.lineStyles, false, characterId, small, true));
+                        layer.shapeRecords, layer.fillStyles, layer.lineStyles, false, characterId, small, true, 0));
             }
             return layers;
         }
@@ -955,15 +961,16 @@ public class XFLConverter {
             source.fillStyles = fillStyles;
             source.lineStyles = lineStyles;
             return getShapePaintLayers(lastImportedId, characterNameMap, swf, mat, shapeNum, source,
-                    characterId, small, ShapeTag.WIND_EVEN_ODD);
+                    characterId, small, ShapeTag.WIND_EVEN_ODD, 0);
         }
         return convertShapeLayer(lastImportedId, characterNameMap, swf, mat, shapeNum,
-                shapeRecords, fillStyles, lineStyles, morphshape, characterId, small, true);
+                shapeRecords, fillStyles, lineStyles, morphshape, characterId, small, true, 0);
     }
 
     private static List<String> convertShapeLayer(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap,
             SWF swf, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles,
-            LINESTYLEARRAY lineStyles, boolean morphshape, int characterId, boolean small, boolean separatePaints) throws XMLStreamException {
+            LINESTYLEARRAY lineStyles, boolean morphshape, int characterId, boolean small, boolean separatePaints,
+            double tinyFillLoopSpan) throws XMLStreamException {
         if (mat == null) {
             mat = new MATRIX();
         }
@@ -996,11 +1003,11 @@ public class XFLConverter {
                 // planes to keep FLA editor from discarding a fill when merging edges.
                 // Normalize after enlarging small shapes to retain fine details.
                 return getShapePaintLayers(lastImportedId, characterNameMap, swf, mat, shapeNum, source,
-                        characterId, false, character.getWindingRule());
+                        characterId, false, character.getWindingRule(), small ? SMALL_DIVISOR : 1);
             }
         }
 
-        shapeRecordsAdvanced = fixer.fix(shapeRecords, shapeNum, fillStyles, lineStyles, small);
+        shapeRecordsAdvanced = fixer.fix(shapeRecords, shapeNum, fillStyles, lineStyles, small, tinyFillLoopSpan);
 
         List<ShapeRecordAdvanced> edges = new ArrayList<>();
         int lineStyleCount = 0;
@@ -1217,13 +1224,15 @@ public class XFLConverter {
     }
 
     private static List<String> getShapePaintLayers(Reference<Integer> lastImportedId, Map<CharacterTag, String> characterNameMap,
-            SWF swf, MATRIX mat, int shapeNum, SHAPEWITHSTYLE source, int characterId, boolean small, int windingRule) throws XMLStreamException {
+            SWF swf, MATRIX mat, int shapeNum, SHAPEWITHSTYLE source, int characterId, boolean small, int windingRule,
+            double tinyFillLoopSpan) throws XMLStreamException {
         List<String> paints = new ArrayList<>();
         for (SHAPEWITHSTYLE paint : ShapePaints.paints(swf, shapeNum, source, windingRule)) {
             // Rounding normalized contours to twips can create coincident edges.
             // Each paint already has its own plane, so serialize it without separating it again.
             List<String> converted = convertShapeLayer(lastImportedId, characterNameMap, swf, mat, shapeNum,
-                    paint.shapeRecords, paint.fillStyles, paint.lineStyles, false, characterId, small, false);
+                    paint.shapeRecords, paint.fillStyles, paint.lineStyles, false, characterId, small, false,
+                    paint.fillStyles.fillStyles.length == 0 ? 0 : tinyFillLoopSpan);
             for (int i = converted.size() - 1; i >= 0; i--) {
                 paints.add(converted.get(i));
             }
