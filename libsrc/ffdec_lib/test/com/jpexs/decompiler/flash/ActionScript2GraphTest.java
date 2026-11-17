@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
@@ -50,6 +51,10 @@ public class ActionScript2GraphTest {
         DoActionTag tag = new DoActionTag(swf);
         ActionScript2Parser parser = new ActionScript2Parser(swf, tag);
         List<Action> compiledActions = parser.actionsFromString(source, Utf8Helper.charsetName);
+        return decompile(swf, tag, compiledActions);
+    }
+
+    private String decompile(SWF swf, DoActionTag tag, List<Action> compiledActions) throws Exception {
         byte[] actionBytes = Action.actionsToBytes(compiledActions, true, swf.version);
         ActionList actions = ActionListReader.readActionListTimeout(tag, new ArrayList<>(),
                 new SWFInputStream(swf, actionBytes), swf.version, 0, actionBytes.length, "", 1);
@@ -117,6 +122,49 @@ public class ActionScript2GraphTest {
         String result = compileAndDecompile(source);
         Assert.assertEquals(result, expected);
         Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
+    @Test
+    public void testNestedForInWithSwitch() throws Exception {
+        // Exhausting the inner enumeration jumps to the outer loop's next key.
+        String pcode = "DefineFunction2 \"select\", 2, 5, false, false, true, false, true, false, true, false, false, 1, \"stacks\", 2, \"button\" {\n"
+                + "Push register1\nEnumerate2\n"
+                + "outer: StoreRegister 0\nPush null\nEquals2\nIf end\n"
+                + "Push register0\nStoreRegister 4\nPop\n"
+                + "Push register1, register4\nGetMember\nPush \"items\"\nGetMember\nEnumerate2\n"
+                + "inner: StoreRegister 0\nPush null\nEquals2\nIf nextOuter\n"
+                + "Push register0\nStoreRegister 3\nPop\n"
+                + "Push register1, register4\nGetMember\nPush \"type\"\nGetMember\n"
+                + "StoreRegister 0\nPush \"LIST\"\nStrictEquals\nIf lists\n"
+                + "Push register0, \"TOGGLE\"\nStrictEquals\nIf toggles\nJump nextInner\n"
+                + "lists: Push register2, register3\nEquals2\nPushDuplicate\nNot\nIf listGuard\nPop\n"
+                + "Push register2, register1, register4\nGetMember\nPush \"selected\"\nGetMember\nEquals2\nNot\n"
+                + "listGuard: Not\nIf nextList\n"
+                + "Push register3\nTrace\n"
+                + "listDrainInner: Push null\nEquals2\nNot\nIf listDrainInner\n"
+                + "listDrainOuter: Push null\nEquals2\nNot\nIf listDrainOuter\nPush true\nReturn\n"
+                + "nextList: Jump nextInner\n"
+                + "toggles: Push register2, register3\nEquals2\nNot\nIf nextInner\n"
+                + "Push register4\nTrace\n"
+                + "toggleDrainInner: Push null\nEquals2\nNot\nIf toggleDrainInner\n"
+                + "toggleDrainOuter: Push null\nEquals2\nNot\nIf toggleDrainOuter\nPush true\nReturn\n"
+                + "nextInner: Jump inner\nnextOuter: Jump outer\nend: Push false\nReturn\n}\n";
+        SWF swf = new SWF();
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result;
+        boolean autoDeobfuscate = Configuration.autoDeobfuscate.get();
+        Configuration.autoDeobfuscate.set(true);
+        try {
+            result = decompile(swf, new DoActionTag(swf), actions);
+        } finally {
+            Configuration.autoDeobfuscate.set(autoDeobfuscate);
+        }
+        Assert.assertTrue(result.contains("for(var _loc4_ in stacks)"), result);
+        Assert.assertTrue(result.contains("for(var _loc3_ in stacks[_loc4_].items)"), result);
+        Assert.assertTrue(result.contains("case \"LIST\":"), result);
+        Assert.assertTrue(result.contains("case \"TOGGLE\":"), result);
+        Assert.assertFalse(result.contains("§§enumerat"), result);
+        Assert.assertTrue(compileAndDecompile(result).contains("for(var _loc3_ in stacks[_loc4_].items)"), result);
     }
 
 }

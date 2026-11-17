@@ -518,6 +518,25 @@ public class ActionGraph extends Graph {
                 t = -1;
             }
         }
+        structureForInLoops(list, localData);
+
+        for (int t = 0; t < list.size(); t++) {
+            GraphTargetItem it = list.get(t);
+            if (it instanceof PushItem) {
+                it = it.value;
+            }
+            if (it instanceof EnumeratedValueActionItem) {
+                list.remove(t);
+                t--;
+            }
+        }
+
+        //Handle for loops at the end:
+        super.finalProcess(parent, list, level, localData, path);
+        removeUnreachableGotosAfterTerminalControl(list);
+    }
+
+    private void structureForInLoops(List<GraphTargetItem> list, FinalProcessLocalData localData) {
         for (int t = 1/*not first*/; t < list.size(); t++) {
             GraphTargetItem it = list.get(t);
             List<GraphTargetItem> checkedBody = null;
@@ -645,22 +664,6 @@ public class ActionGraph extends Graph {
                 }
             }
         }
-
-        for (int t = 0; t < list.size(); t++) {
-            GraphTargetItem it = list.get(t);
-            if (it instanceof PushItem) {
-                it = it.value;
-            }
-            if (it instanceof EnumeratedValueActionItem) {
-                list.remove(t);
-                t--;
-            }
-        }
-
-        //Handle for loops at the end:
-        super.finalProcess(parent, list, level, localData, path);
-        removeUnreachableGotosAfterTerminalControl(list);
-
     }
 
     private void removeUnreachableGotosAfterTerminalControl(List<GraphTargetItem> list) {
@@ -683,6 +686,9 @@ public class ActionGraph extends Graph {
     @Override
     protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
         super.finalProcessAfter(list, level, localData, path);
+        // An inner enumeration may become a conditional while only after
+        // the graph pass has moved its continue of the outer loop.
+        structureForInLoops(list, localData);
         Set<String> usedLabels = new HashSet<>();
         collectUsedLabels(list, usedLabels);
         for (int i = list.size() - 1; i >= 0; i--) {
@@ -831,8 +837,12 @@ public class ActionGraph extends Graph {
                         if (item instanceof TemporaryRegister) {
                             return true;
                         }
-                        //can has definition in for in...
+                        // A for-in header can declare its iteration register directly.
                         if ((ti instanceof ForInActionItem) && (item == ((ForInActionItem) ti).variableName)) {
+                            if (item instanceof StoreRegisterActionItem) {
+                                StoreRegisterActionItem sr = (StoreRegisterActionItem) item;
+                                sr.define = definedRegisters.add(sr.register.number);
+                            }
                             return true;
                         }
                         if (item instanceof StoreRegisterActionItem) {
