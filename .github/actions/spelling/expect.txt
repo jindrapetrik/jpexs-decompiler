@@ -1091,6 +1091,7 @@ enlog
 enm
 ent
 enternew
+enumerat
 eofclose
 eofval
 eoi
