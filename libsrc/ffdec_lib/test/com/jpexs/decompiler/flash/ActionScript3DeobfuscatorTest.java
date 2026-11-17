@@ -1688,12 +1688,12 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "         return _loc2_;\n");
     }
 
-    @DataProvider(name = "prefixUpdates")
-    public Object[][] prefixUpdates() {
+    @DataProvider(name = "updateOperators")
+    public Object[][] updateOperators() {
         return new Object[][]{{"++"}, {"--"}};
     }
 
-    @Test(dataProvider = "prefixUpdates")
+    @Test(dataProvider = "updateOperators")
     public void testChainedIndexedAssignmentWithTypedPrefixUpdate(String operator) throws Exception {
         String update = "id = table[key] = " + operator + "uid;";
         String source = recompileSource("package {"
@@ -1715,6 +1715,16 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     @DataProvider(name = "postUpdates")
     public Object[][] postUpdates() {
         return new Object[][]{{"increment", "++"}, {"decrement", "--"}};
+    }
+
+    @Test(dataProvider = "updateOperators")
+    public void testIntegerPropertyPostUpdateInShortCircuit(String operator) throws Exception {
+        String condition = "counter < 2147483647 && counter" + operator + " == 0";
+        String result = recompileSource("package { public class Test {"
+                + "private var counter:int;"
+                + "public function test():Boolean { return " + condition + "; }"
+                + "} }");
+        assertTrue(result.contains("return " + condition + ";"), result);
     }
 
     @Test(dataProvider = "postUpdates")
