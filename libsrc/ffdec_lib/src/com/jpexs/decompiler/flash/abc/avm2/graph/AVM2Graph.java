@@ -1261,6 +1261,11 @@ public class AVM2Graph extends Graph {
                 //in all catches is probably continue/return/break or something
                 //we need to search a part which is first outside the try..block
                 afterPart = searchFirstPartOutSideTryCatch(localData, catchedExceptions.get(0), loops, allParts);
+                // A return in a nested try may leave through an enclosing finally.
+                // Its shared body is not the continuation of the nested catch.
+                if (localData.finallyBodyParts.containsValue(afterPart)) {
+                    afterPart = null;
+                }
                 //System.err.println("oursidetrycatch: " + afterPart);
             }
 

@@ -837,6 +837,27 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testNestedCatchReturningThroughFinally() throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test(flag:Boolean):void {"
+                + "try {"
+                + "if (flag) { trace(\"string\"); } else {"
+                + "try { trace(\"inner\"); return; }"
+                + "catch (e:Error) { trace(\"inner catch\"); }"
+                + "}"
+                + "trace(\"after inner\");"
+                + "} catch (e:Error) { trace(\"outer catch\"); }"
+                + "finally { trace(\"finally\"); }"
+                + "} } }").replace("\r\n", "\n");
+        assertTrue(!result.contains("§§"), result);
+        assertEquals(result.split("trace\\(\"finally\"\\);", -1).length - 1, 1, result);
+        assertTrue(result.contains("trace(\"inner\");\n                  return;"), result);
+        assertTrue(result.contains("catch(e:Error)\n               {\n                  trace(\"inner catch\");\n               }"), result);
+        assertTrue(result.contains("finally\n         {\n            trace(\"finally\");\n         }"), result);
+        assertTrue(result.indexOf("trace(\"after inner\");") > result.indexOf("trace(\"inner catch\");"), result);
+    }
+
+    @Test
     public void testFinallyWithSplitExceptionHandler() throws Exception {
         decompilePCodeWithLines(
                 "   protected_start:\n"
