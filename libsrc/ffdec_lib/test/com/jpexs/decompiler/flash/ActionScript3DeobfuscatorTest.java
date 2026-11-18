@@ -858,6 +858,22 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testCatchReturningThroughUnconditionalFinallyReturn() throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test():void {"
+                + "try { trace(\"try\"); }"
+                + "catch (e:ArgumentError) { trace(e); return; }"
+                + "finally { return; }"
+                + "} } }").replace("\r\n", "\n");
+        assertTrue(!result.contains("§§"), result);
+        assertTrue(!result.contains("unpopped"), result);
+        assertTrue(!result.matches("(?s).*addr[0-9a-f]+:.*"), result);
+        assertTrue(result.contains("trace(\"try\");"), result);
+        assertTrue(result.contains("catch(e:ArgumentError)\n         {\n            trace(e);\n         }"), result);
+        assertTrue(result.contains("finally\n         {\n            return;\n         }"), result);
+    }
+
+    @Test
     public void testFinallyWithSplitExceptionHandler() throws Exception {
         decompilePCodeWithLines(
                 "   protected_start:\n"

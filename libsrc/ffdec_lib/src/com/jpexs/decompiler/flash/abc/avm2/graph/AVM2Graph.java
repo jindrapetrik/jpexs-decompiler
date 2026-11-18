@@ -1504,6 +1504,10 @@ public class AVM2Graph extends Graph {
                     stopPart2.add(defaultPart);
                     stopPartKind2.add(StopPartKind.OTHER);
                 }
+                if (finallyPart != null) {
+                    stopPart2.add(finallyPart);
+                    stopPartKind2.add(StopPartKind.OTHER);
+                }
 
                 for (GraphPart p : catchAfterParts) {
                     stopPart2.add(p);
@@ -1511,6 +1515,13 @@ public class AVM2Graph extends Graph {
                 }
 
                 List<GraphTargetItem> currentCatchCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, catchPart, stopPart2, stopPartKind2, loops, throwStates, staticOperation, path);
+                // An unconditional exit in finally makes its dispatch switch unreachable.
+                // Discard the selector left by the catch before entering that finally.
+                if (finallyPart != null && localData.finallyKinds.get(finallyIndex) == FINALLY_KIND_STACK_BASED
+                        && !localData.ignoredSwitches.containsKey(finallyIndex)
+                        && !st2.isEmpty() && st2.peek() instanceof IntegerValueAVM2Item) {
+                    st2.pop();
+                }
                 st2.finishBlock(currentCatchCommands, true);
                 int tempExceptionPos = 0;
                 if (!currentCatchCommands.isEmpty() && currentCatchCommands.get(0) instanceof WithAVM2Item) {
