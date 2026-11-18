@@ -32,6 +32,7 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.ForItem;
@@ -1218,6 +1219,7 @@ public class Graph {
             }
         }
         expandGotos(ret);
+        mergeDuplicatedConditionals(ret, ret);
         processIfs(ret);
         propagateBreaks(ret);
         finalProcessStack(stack, ret, path);
@@ -2948,6 +2950,80 @@ public class Graph {
                 for (List<GraphTargetItem> sub : blk.getSubs()) {
                     processScriptEnd(sub);
                 }
+            }
+        }
+    }
+
+    private void mergeDuplicatedConditionals(List<GraphTargetItem> list, List<GraphTargetItem> root) {
+        for (GraphTargetItem item : list) {
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    mergeDuplicatedConditionals(sub, root);
+                }
+            }
+        }
+        for (int i = 0; i + 3 < list.size(); i++) {
+            if (!(list.get(i) instanceof SetTemporaryItem)
+                    || !(list.get(i + 1) instanceof PushItem)
+                    || !(list.get(i + 1).value instanceof DuplicateSourceItem)
+                    || !(list.get(i + 2) instanceof IfItem) || !(list.get(i + 3) instanceof IfItem)) {
+                continue;
+            }
+            SetTemporaryItem saved = (SetTemporaryItem) list.get(i);
+            DuplicateSourceItem pushed = (DuplicateSourceItem) list.get(i + 1).value;
+            IfItem first = (IfItem) list.get(i + 2);
+            IfItem second = (IfItem) list.get(i + 3);
+            GraphTargetItem firstCondition = first.expression;
+            GraphTargetItem secondCondition = second.expression;
+            boolean firstNegated = false;
+            boolean secondNegated = false;
+            while (firstCondition instanceof NotItem) {
+                firstCondition = firstCondition.value;
+                firstNegated = !firstNegated;
+            }
+            while (secondCondition instanceof NotItem) {
+                secondCondition = secondCondition.value;
+                secondNegated = !secondNegated;
+            }
+            if (!(firstCondition instanceof DuplicateItem) || !(secondCondition instanceof PopItem)
+                    || ((PopItem) secondCondition).resolvedValue != null || firstNegated == secondNegated
+                    || !first.onFalse.isEmpty() || !second.onFalse.isEmpty() || containsPopItems(first.onTrue)) {
+                continue;
+            }
+            DuplicateItem duplicate = (DuplicateItem) firstCondition;
+            if (saved.value == null || saved.tempIndex != pushed.tempIndex || saved.tempIndex != duplicate.tempIndex
+                    || saved.value.getThroughDuplicate() != pushed.getThroughDuplicate()
+                    || saved.value.getThroughDuplicate() != duplicate.getThroughDuplicate()) {
+                continue;
+            }
+            boolean pushesValue = false;
+            for (GraphTargetItem command : first.onTrue) {
+                pushesValue |= command instanceof PushItem;
+                pushesValue |= command.getAllSubItemsRecursively().stream().anyMatch(PushItem.class::isInstance);
+            }
+            if (pushesValue) {
+                continue;
+            }
+
+            // Both tests consume copies of one condition. The saved stack value
+            // survives the first branch and selects its complementary branch.
+            GraphTargetItem originalCondition = first.expression;
+            first.expression = firstNegated ? saved.value.invert(first.expression.getSrc()) : saved.value;
+            first.onFalse = second.onTrue;
+            first.onFalsePart = second.onTruePart;
+            list.remove(i + 3);
+            list.remove(i + 1);
+
+            Set<Integer> readTemps = new HashSet<>();
+            Set<GraphTargetItem> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+            for (GraphTargetItem item : root) {
+                collectTempReads(item, readTemps, visited);
+            }
+            if (readTemps.contains(saved.tempIndex)) {
+                first.expression = originalCondition;
+            } else {
+                list.remove(i);
+                i--;
             }
         }
     }

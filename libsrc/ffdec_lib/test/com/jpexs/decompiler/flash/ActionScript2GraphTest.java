@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -62,6 +63,47 @@ public class ActionScript2GraphTest {
         Action.actionsToSource(new HashMap<>(), tag, actions, "", writer, swf.getCharset());
         writer.finishHilights();
         return writer.toString().trim().replace("\r\n", "\n");
+    }
+
+    @DataProvider(name = "duplicatedConditionalPolarity")
+    public Object[][] duplicatedConditionalPolarity() {
+        return new Object[][]{{"", "Not\n", "!"}, {"Not\n", "", ""}};
+    }
+
+    @Test(dataProvider = "duplicatedConditionalPolarity")
+    public void testDuplicatedConditionIfElse(String firstNot, String secondNot, String negation) throws Exception {
+        String pcode = "Push 0, \"check\"\nCallFunction\nPushDuplicate\n"
+                + firstNot + "If second\n"
+                + "Push \"condition\", false\nSetVariable\nPush \"first\"\nTrace\n"
+                + "second: " + secondNot + "If done\nPush \"second\"\nTrace\n"
+                + "done: Push \"after\"\nTrace\n";
+        SWF swf = new SWF();
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        String expected = "if(" + negation + "check())\n{\n"
+                + "   condition = false;\n   trace(\"first\");\n}\nelse\n{\n"
+                + "   trace(\"second\");\n}\ntrace(\"after\");";
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
+    @Test
+    public void testNestedDuplicatedConditionIfElse() throws Exception {
+        String pcode = "Push 0, \"hasVersion\"\nCallFunction\nPushDuplicate\nIf fallback\n"
+                + "Push \"version\"\nTrace\n"
+                + "fallback: Not\nIf done\n"
+                + "Push 0, \"hasSystem\"\nCallFunction\nPushDuplicate\nIf last\n"
+                + "Push \"6\"\nTrace\n"
+                + "last: Not\nIf done\nPush \"5\"\nTrace\n"
+                + "done: Push \"after\"\nTrace\n";
+        SWF swf = new SWF();
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        String expected = "if(!hasVersion())\n{\n   trace(\"version\");\n}\n"
+                + "else if(!hasSystem())\n{\n   trace(\"6\");\n}\n"
+                + "else\n{\n   trace(\"5\");\n}\ntrace(\"after\");";
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
     }
 
     @Test
