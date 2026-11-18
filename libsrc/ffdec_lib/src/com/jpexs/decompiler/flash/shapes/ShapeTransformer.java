@@ -53,16 +53,26 @@ public class ShapeTransformer {
         for (FILLSTYLE fs : fillStyles.fillStyles) {
             fillStyleToTransform.add(fs);
         }
-        
-        double strokeScale = Math.max(Math.abs(matrix.scaleX), Math.abs(matrix.scaleY));
+                
         if (shapeNum >= 4) {
             for (LINESTYLE2 ls : lineStyles.lineStyles2) {
                 if (ls.hasFillFlag) {
                     fillStyleToTransform.add(ls.fillType);
                 }
+                double strokeScale;
+                if (ls.noHScaleFlag && !ls.noVScaleFlag) { //vertical scaling
+                    strokeScale = Math.abs(matrix.scaleY);
+                } else if (ls.noVScaleFlag && !ls.noHScaleFlag) { //horizontal scaling
+                    strokeScale = Math.abs(matrix.scaleX);
+                } else if (ls.noHScaleFlag && ls.noVScaleFlag) { //no scaling
+                    strokeScale = 1;
+                } else {
+                    strokeScale = Math.max(Math.abs(matrix.scaleX), Math.abs(matrix.scaleY));
+                }
                 ls.width *= strokeScale;
             }            
         } else {
+            double strokeScale = Math.max(Math.abs(matrix.scaleX), Math.abs(matrix.scaleY));
             for (LINESTYLE ls : lineStyles.lineStyles) {
                 ls.width *= strokeScale;
             }
