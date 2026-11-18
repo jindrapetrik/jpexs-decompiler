@@ -123,7 +123,7 @@ public class LoopDetector {
 
         new GraphPrecontinueDetector().detectPrecontinues(heads, allParts, loops, throwStates);
 
-        findBreaks(loops, backEdges, throwStates, ignoredEdges, switchBreaks);
+        findBreaks(loops, backEdges, throwStates, ignoredEdges, switchParts, switchBreaks);
 
         loops.sort(new LoopDetector.LoopComparator());
 
@@ -417,7 +417,7 @@ public class LoopDetector {
      *
      * @param loops Loops
      */
-    private void findBreaks(List<Loop> loops, Set<GraphPartEdge> backEdges, List<ThrowState> throwStates, Set<GraphPartEdge> ignoredEdges, List<GraphPart> switchBreaks) {
+    private void findBreaks(List<Loop> loops, Set<GraphPartEdge> backEdges, List<ThrowState> throwStates, Set<GraphPartEdge> ignoredEdges, List<List<GraphPart>> switchParts, List<GraphPart> switchBreaks) {
         PrevNextWalker pnw = new BasicPrevNextWalker();
         //PrevNextWalker tpnw = new ThrowPrevNextWalker(throwStates); //new BasicPrevNextWalker();                        
 
@@ -508,7 +508,17 @@ public class LoopDetector {
                 }
             }
 
-            parentBreaks.addAll(switchBreaks); //these are not real parent, but should work(?)
+            for (int i = 0; i < switchBreaks.size(); i++) {
+                GraphPart switchBreak = switchBreaks.get(i);
+                Set<GraphPart> dispatchParts = new LinkedHashSet<>(loop.loopBody);
+                for (GraphPart casePart : switchParts.get(i)) {
+                    dispatchParts.retainAll(casePart.refs);
+                }
+                // A switch dispatched inside this loop can share the loop's exit.
+                if (dispatchParts.isEmpty()) {
+                    parentBreaks.add(switchBreak);
+                }
+            }
 
             PrevNextWalker walker = loopWalkers.get(loop);
             List<ThrowState> subThrowStates = loopThrowStates.get(loop);

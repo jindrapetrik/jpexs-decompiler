@@ -837,6 +837,53 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testSwitchInLoopWithForwardedBreakTarget() throws Exception {
+        decompilePCodeWithLines("pushfalse\nsetlocal2\njump repeat\n"
+                + "loop: label\njump dispatch\n"
+                + "caseZero: label\ngetlocal2\niffalse alternate\n"
+                + "pushbyte 1\nsetlocal1\npushtrue\nsetlocal2\njump repeat\n"
+                + "alternate: getlocal1\npushbyte 0\nequals\niffalse switchEnd\n"
+                + "pushbyte 1\nsetlocal1\npushtrue\nsetlocal2\njump repeat\n"
+                + "caseOne: label\nfindpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"one\"\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\njump switchEnd\n"
+                + "defaultCase: label\njump switchEnd\n"
+                + "dispatch: getlocal1\nlookupswitch defaultCase, [caseZero, caseOne]\n"
+                + "switchEnd: jump afterLoop\nrepeat: jump loop\n"
+                + "afterLoop: findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"after\"\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n",
+                "         var _loc2_:Boolean = false;\n"
+                + "         loop0:\n"
+                + "         while(true)\n"
+                + "         {\n"
+                + "            switch(param1)\n"
+                + "            {\n"
+                + "               case 0:\n"
+                + "                  if(_loc2_)\n"
+                + "                  {\n"
+                + "                     param1 = 1;\n"
+                + "                     _loc2_ = true;\n"
+                + "                  }\n"
+                + "                  else\n"
+                + "                  {\n"
+                + "                     if(param1 != 0)\n"
+                + "                     {\n"
+                + "                        break loop0;\n"
+                + "                     }\n"
+                + "                     param1 = 1;\n"
+                + "                     _loc2_ = true;\n"
+                + "                  }\n"
+                + "                  break;\n"
+                + "               case 1:\n"
+                + "                  trace(\"one\");\n"
+                + "                  break loop0;\n"
+                + "               default:\n"
+                + "                  break loop0;\n"
+                + "            }\n"
+                + "         }\n"
+                + "         trace(\"after\");\n");
+    }
+
+    @Test
     public void testNestedCatchReturningThroughFinally() throws Exception {
         String result = recompileSource("package { public class Test {"
                 + "public function test(flag:Boolean):void {"
