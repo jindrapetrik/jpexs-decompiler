@@ -1377,6 +1377,7 @@ public abstract class Action implements GraphSourceItem {
                 String cntName = cnt.getName();
                 List<List<GraphTargetItem>> outs = new ArrayList<>();
                 HashMap<String, GraphTargetItem> variables2 = prepareVariables(cnt, variables);
+                ActionRegisterUsage registerUsage = action instanceof ActionWith || action instanceof ActionTry ? graph.getRegisterUsage() : null;
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
                         outs.add(new ArrayList<>());
@@ -1394,10 +1395,10 @@ public abstract class Action implements GraphSourceItem {
                         }
                         int startIp = adr2ip(actions, endAddr);
                         try {                            
-                            out = ActionGraph.translateViaGraph(usedDeobfuscations, graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
+                            out = ActionGraph.translateViaGraph(usedDeobfuscations, graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp, registerUsage);
                         } catch (SecondPassException spe) {
                             variables2 = prepareVariables(cnt, variables);
-                            out = ActionGraph.translateViaGraph(usedDeobfuscations, graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
+                            out = ActionGraph.translateViaGraph(usedDeobfuscations, graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp, registerUsage);
                         }
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex) {
                         logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);

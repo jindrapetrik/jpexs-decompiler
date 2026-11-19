@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.action.as2.ActionScript2ClassDetector;
 import com.jpexs.decompiler.flash.action.as2.Trait;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -26,9 +27,11 @@ import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
+import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTarget2ActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
+import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
@@ -59,6 +62,7 @@ import com.jpexs.decompiler.graph.GraphPartChangeException;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
@@ -69,6 +73,7 @@ import com.jpexs.decompiler.graph.ThrowState;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
@@ -76,6 +81,7 @@ import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LabelItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
@@ -107,6 +113,8 @@ public class ActionGraph extends Graph {
      * Labels whose unreachable goto was removed.
      */
     private final Set<String> labelsOfRemovedGotos = new HashSet<>();
+
+    private ActionRegisterUsage registerUsage;
 
     /**
      * Inside DoInitAction
@@ -234,6 +242,22 @@ public class ActionGraph extends Graph {
 
     }
 
+    @Override
+    protected void beforeGetLoops(BaseLocalData localData, String path, Set<GraphPart> allParts, List<ThrowState> throwStates) throws InterruptedException {
+        if (registerUsage == null) {
+            registerUsage = new ActionRegisterUsage(getGraphCode(), startIp);
+        }
+    }
+
+    /**
+     * Gets register usage shared with with/try subgraphs of this scope.
+     *
+     * @return Register usage
+     */
+    public ActionRegisterUsage getRegisterUsage() {
+        return registerUsage;
+    }
+
     /**
      * Translates via Graph - decompiles.
      *
@@ -256,12 +280,40 @@ public class ActionGraph extends Graph {
      * @throws InterruptedException On interrupt
      */
     public static List<GraphTargetItem> translateViaGraph(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {
+        return translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, secondPassData,
+                insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp, null);
+    }
+
+    /**
+     * Translates a graph, optionally sharing register usage of its enclosing
+     * scope when translating a with/try section.
+     *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param needsUninitializedClassFieldsDetection Needs uninitialized class fields detection
+     * @param uninitializedClassTraits Uninitialized class traits
+     * @param secondPassData Second pass data
+     * @param insideDoInitAction Is inside DoInitAction
+     * @param insideFunction Is inside a function or container
+     * @param registerNames Register names
+     * @param variables Variables
+     * @param functions Functions
+     * @param code Code
+     * @param version SWF version
+     * @param staticOperation Static operation
+     * @param path Script path
+     * @param charset Charset
+     * @param startIp Start IP
+     * @param registerUsage Register usage of the complete enclosing scope
+     * @return Translated items
+     * @throws InterruptedException On interruption
+     */
+    public static List<GraphTargetItem> translateViaGraph(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp, ActionRegisterUsage registerUsage) throws InterruptedException {
         ActionSecondPassContext context = ActionSecondPassContext.current();
         if (context != null && secondPassData == null) {
             ActionSecondPassContext.GraphKey key = context.getKey(code, startIp, path);
             if (context.isCollecting()) {
                 try {
-                    return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+                    return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp, registerUsage);
                 } catch (SecondPassException spe) {
                     context.put(key, spe.getData());
                     return spe.getFirstPassResult();
@@ -274,7 +326,7 @@ public class ActionGraph extends Graph {
                 HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
                 context.startCollecting();
                 try {
-                    translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+                    translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp, registerUsage);
                 } finally {
                     context.startRendering();
                 }
@@ -287,11 +339,12 @@ public class ActionGraph extends Graph {
             secondPassData = collectedData;
         }
 
-        return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, secondPassData, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+        return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, secondPassData, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp, registerUsage);
     }
 
-    private static List<GraphTargetItem> translateViaGraphOnce(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {
+    private static List<GraphTargetItem> translateViaGraphOnce(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp, ActionRegisterUsage registerUsage) throws InterruptedException {
         ActionGraph g = new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset, startIp);
+        g.registerUsage = registerUsage;
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits, usedDeobfuscations, new ArrayList<>(), new ArrayList<>());
         g.init(localData);
         return g.translate(localData, staticOperation, path);
@@ -332,6 +385,54 @@ public class ActionGraph extends Graph {
             }
         }
         return !isSwitch;
+    }
+
+    @Override
+    protected GraphTargetItem getShortCircuitRightSide(List<GraphTargetItem> commands) {
+        if (commands.size() == 3 && commands.get(0) instanceof PopItem
+                && (commands.get(1) instanceof SetVariableActionItem || commands.get(1) instanceof SetMemberActionItem)
+                && commands.get(2) instanceof PushItem) {
+            SetTypeActionItem assignment = (SetTypeActionItem) commands.get(1);
+            GraphTargetItem result = commands.get(2).value;
+            if (assignment.getCompoundOperator() == null && assignment.getValue() instanceof StoreRegisterActionItem
+                    && result instanceof DirectValueActionItem && ((DirectValueActionItem) result).value instanceof RegisterNumber) {
+                StoreRegisterActionItem store = (StoreRegisterActionItem) assignment.getValue();
+                if (!store.define && store.register.number == ((RegisterNumber) ((DirectValueActionItem) result).value).number) {
+                    // A reused register is still an assignment result. Keep its
+                    // write in the expression in case it is read again later.
+                    if (commands.get(1) instanceof SetVariableActionItem) {
+                        GraphTargetItem name = ((SetVariableActionItem) commands.get(1)).name;
+                        if (!(name instanceof DirectValueActionItem) || !((DirectValueActionItem) name).isString()
+                                || !IdentifiersDeobfuscation.isValidName(false, name.toStringNoQuotes(LocalData.empty), "this", "super")) {
+                            // set(name, value) does not return the assigned value.
+                            List<GraphTargetItem> expressions = new ArrayList<>();
+                            expressions.add(commands.get(1));
+                            expressions.add(result);
+                            return new CommaExpressionItem(dialect, null, result.getLineStartItem(), expressions);
+                        }
+                    }
+                    List<GraphSourceItemPos> reads = registerUsage == null ? null : registerUsage.getReads(store.getSrc());
+                    if (store.register.name == null && reads != null && reads.size() == 1
+                            && reads.get(0).item == result.getSrc() && reads.get(0).pos == result.getPos()) {
+                        // Only this consumed read uses the write. Return a copy:
+                        // the caller may still decide this is not a logical operator.
+                        GraphTargetItem original = commands.get(1);
+                        if (original instanceof SetVariableActionItem) {
+                            SetVariableActionItem variable = (SetVariableActionItem) original;
+                            SetVariableActionItem replacement = new SetVariableActionItem(original.getSrc(), original.getLineStartItem(), variable.name, store.value);
+                            replacement.forceUseSet = variable.forceUseSet;
+                            return replacement;
+                        }
+                        SetMemberActionItem member = (SetMemberActionItem) original;
+                        SetMemberActionItem replacement = new SetMemberActionItem(original.getSrc(), original.getLineStartItem(), member.object, member.objectName, store.value);
+                        replacement.isSetter = member.isSetter;
+                        return replacement;
+                    }
+                    return commands.get(1);
+                }
+            }
+        }
+        return super.getShortCircuitRightSide(commands);
     }
 
     @Override

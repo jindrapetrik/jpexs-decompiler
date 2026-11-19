@@ -65,6 +65,136 @@ public class ActionScript2GraphTest {
         return writer.toString().trim().replace("\r\n", "\n");
     }
 
+    @DataProvider(name = "shortCircuitRegisterAssignments")
+    public Object[][] shortCircuitRegisterAssignments() {
+        return new Object[][]{
+            {"Not\n", "&&", "Push \"o\"\n", "SetVariable\n", "o"},
+            {"", "||", "Push \"o\"\n", "SetVariable\n", "o"},
+            {"Not\n", "&&", "Push \"target\"\nGetVariable\nPush \"value\"\n", "SetMember\n", "target.value"},
+            {"", "||", "Push \"target\"\nGetVariable\nPush \"value\"\n", "SetMember\n", "target.value"}
+        };
+    }
+
+    private String shortCircuitRegisterAssignment(String invert, String target, String assignment, String followingCondition) {
+        return "Push \"seed\"\nStoreRegister 0\nPop\n"
+                + "Push \"ready\"\nGetVariable\nPushDuplicate\n" + invert + "If join\nPop\n"
+                + target + "Push 0, \"collide\"\nCallFunction\nStoreRegister 0\n" + assignment
+                + "Push register0\njoin: " + followingCondition
+                + "Not\nIf done\nPush register0\nTrace\ndone: Push register0\nTrace\n";
+    }
+
+    @Test(dataProvider = "shortCircuitRegisterAssignments")
+    public void testShortCircuitRegisterAssignment(String invert, String operator, String target, String assignment, String name) throws Exception {
+        SWF swf = new SWF();
+        String pcode = shortCircuitRegisterAssignment(invert, target, assignment, "");
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        String expected = "var _loc0_ = \"seed\";\nif(ready " + operator + " (" + name + " = _loc0_ = collide()))\n"
+                + "{\n   trace(_loc0_);\n}\ntrace(_loc0_);";
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
+    @Test(dataProvider = "shortCircuitRegisterAssignments")
+    public void testShortCircuitSingleReadRemovesOnlyItsRegisterWrite(String invert, String operator, String target, String assignment, String name) throws Exception {
+        SWF swf = new SWF();
+        String pcode = shortCircuitRegisterAssignment(invert, target, assignment, "")
+                .replace("Push \"ready\"", "Push register0\nTrace\nPush \"ready\"")
+                .replace("If done\nPush register0\nTrace\ndone: Push register0\nTrace", "If done\nPush \"yes\"\nTrace\ndone: Push \"after\"\nTrace");
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        String expected = "var _loc0_ = \"seed\";\ntrace(_loc0_);\nif(ready " + operator + " (" + name + " = collide()))\n"
+                + "{\n   trace(\"yes\");\n}\ntrace(\"after\");";
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
+    @Test
+    public void testShortCircuitRegisterReadAfterOverwriteUsesTheNewWrite() throws Exception {
+        SWF swf = new SWF();
+        String pcode = shortCircuitRegisterAssignment("Not\n", "Push \"o\"\n", "SetVariable\n", "")
+                .replace("If done\nPush register0\nTrace", "If done\nPush \"yes\"\nTrace")
+                .replace("done: Push register0", "done: Push \"new value\"\nStoreRegister 0\nPop\nPush register0");
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        String expected = "var _loc0_ = \"seed\";\nif(ready && (o = collide()))\n"
+                + "{\n   trace(\"yes\");\n}\n_loc0_ = \"new value\";\ntrace(_loc0_);";
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
+    @Test
+    public void testShortCircuitRegisterReadAcrossLoopBackEdgeKeepsWrite() throws Exception {
+        SWF swf = new SWF();
+        String pcode = shortCircuitRegisterAssignment("Not\n", "Push \"o\"\n", "SetVariable\n", "")
+                .replace("Push \"ready\"", "loop: Push \"ready\"")
+                + "Push \"again\"\nGetVariable\nIf loop\n";
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        Assert.assertTrue(result.contains("o = _loc0_ = collide()"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
+    @DataProvider(name = "registerContainers")
+    public Object[][] registerContainers() {
+        String read = "Push register0\nTrace\n";
+        return new Object[][]{
+            {"Push \"obj\"\nGetVariable\nWith {\n", "}\n", "", false},
+            {"Push \"obj\"\nGetVariable\nWith {\n", "}\n", read, true},
+            {"Try {\n", "} Finally {\nPush \"finished\"\nTrace\n}\n", "", false},
+            {"Try {\n", "} Finally {\n" + read + "}\n", "", true},
+            {"Try \"e\" {\n", "} Catch {\nPush \"failed\"\nTrace\n}\n", "", false},
+            {"Try \"e\" {\n", "} Catch {\n" + read + "}\n", "", true},
+            {"Try \"e\" {\nPush \"failure\"\nThrow\n} Catch {\n", "}\n", "", false},
+            {"Try \"e\" {\nPush \"failure\"\nThrow\n} Catch {\n", "}\n", read, true},
+            {"Try {\nPush \"tried\"\nTrace\n} Finally {\n", "}\n", "", false},
+            {"Try {\nPush \"tried\"\nTrace\n} Finally {\n", "}\n", read, true},
+            {"Push \"obj\"\nGetVariable\nWith {\nTry {\n", "} Finally {\nPush \"finished\"\nTrace\n}\n}\n", "", false},
+            {"Try {\nPush \"obj\"\nGetVariable\nWith {\n", "}\n} Finally {\n" + read + "}\n", "", true},
+            {"DefineFunction \"test\", 0 {\nTry {\n", "Push undefined\nReturn\n} Finally {\n" + read + "}\n}\n", "", true}
+        };
+    }
+
+    @Test(dataProvider = "registerContainers")
+    public void testShortCircuitRegisterUsageAcrossContainer(String prefix, String suffix, String after, boolean keepRegister) throws Exception {
+        SWF swf = new SWF();
+        String body = shortCircuitRegisterAssignment("Not\n", "Push \"o\"\n", "SetVariable\n", "")
+                .replace("If done\nPush register0\nTrace\ndone: Push register0\nTrace", "If done\nPush \"yes\"\nTrace\ndone: Push \"after\"\nTrace");
+        String pcode = prefix + body + suffix + after;
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        Assert.assertEquals(result.contains("o = _loc0_ = collide()"), keepRegister, result);
+        Assert.assertTrue(result.contains(keepRegister ? "o = _loc0_ = collide()" : "o = collide()"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertEquals(result.split("collide\\(\\)", -1).length - 1, 1, result);
+        Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
+    @Test
+    public void testShortCircuitRegisterAssignmentWithFollowingCondition() throws Exception {
+        SWF swf = new SWF();
+        String pcode = shortCircuitRegisterAssignment("Not\n", "Push \"o\"\n", "SetVariable\n",
+                "PushDuplicate\nNot\nIf conditionDone\nPop\nPush \"o\"\nGetVariable\nPush \"valid\"\nGetMember\nconditionDone: ");
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        String expected = "var _loc0_ = \"seed\";\nif(ready && (o = _loc0_ = collide()) && o.valid)\n"
+                + "{\n   trace(_loc0_);\n}\ntrace(_loc0_);";
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
+    @Test
+    public void testShortCircuitDynamicVariableAssignmentKeepsRegisterResult() throws Exception {
+        SWF swf = new SWF();
+        String pcode = shortCircuitRegisterAssignment("Not\n", "Push \"name\"\nGetVariable\n", "SetVariable\n", "");
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        String expected = "var _loc0_ = \"seed\";\nif(ready && ((set(name,_loc0_ = collide()),_loc0_)))\n"
+                + "{\n   trace(_loc0_);\n}\ntrace(_loc0_);";
+        Assert.assertEquals(result, expected);
+    }
+
     @DataProvider(name = "repeatedShortCircuitConditions")
     public Object[][] repeatedShortCircuitConditions() {
         return new Object[][]{{"", "||"}, {"Not\n", "&&"}};

@@ -4147,6 +4147,30 @@ public class Graph {
     }
 
     /**
+     * Gets the right operand of a short-circuit branch which discards the left
+     * operand and leaves a replacement value on the stack.
+     *
+     * @param commands Branch commands
+     * @return Right operand, or null when the branch cannot be an expression
+     */
+    protected GraphTargetItem getShortCircuitRightSide(List<GraphTargetItem> commands) {
+        int last = commands.size() - 1;
+        if (last < 1 || !(commands.get(0) instanceof PopItem)
+                || !(commands.get(last) instanceof PushItem)
+                || !commands.subList(1, last).stream().allMatch(GraphTargetItem::hasReturnValue)) {
+            return null;
+        }
+        GraphTargetItem rightSide = commands.get(last).value;
+        if (last > 1) {
+            // Evaluate these expressions only when the right operand is reached.
+            List<GraphTargetItem> rightCommands = new ArrayList<>(commands.subList(1, last));
+            rightCommands.add(rightSide);
+            rightSide = new CommaExpressionItem(dialect, null, rightSide.getLineStartItem(), rightCommands);
+        }
+        return rightSide;
+    }
+
+    /**
      * Walks graph parts and converts them to target items.
      *
      * @param hasEmptyStackPops Has empty stack pops
@@ -5014,17 +5038,11 @@ public class Graph {
                                 //filteredOnFalse = tmp;
                             }
                             int last = filteredOnTrue.size() - 1;
+                            GraphTargetItem shortCircuitRightSide = getShortCircuitRightSide(filteredOnTrue);
                             if (!stack.isEmpty() && last >= 0 && filteredOnTrue.get(0) instanceof PopItem
-                                    && (last == 0 || (filteredOnTrue.get(last) instanceof PushItem
-                                    && filteredOnTrue.subList(1, last).stream().allMatch(GraphTargetItem::hasReturnValue)))) {
+                                    && (last == 0 || shortCircuitRightSide != null)) {
                                 if (last > 0) {
-                                    GraphTargetItem rightSide = filteredOnTrue.get(last).value;
-                                    if (last > 1) {
-                                        // Evaluate these expressions only when the right operand is reached.
-                                        List<GraphTargetItem> rightCommands = new ArrayList<>(filteredOnTrue.subList(1, last));
-                                        rightCommands.add(rightSide);
-                                        rightSide = new CommaExpressionItem(dialect, null, localData.lineStartInstruction, rightCommands);
-                                    }
+                                    GraphTargetItem rightSide = shortCircuitRightSide;
                                     GraphTargetItem prevExpr = stack.pop();
                                     GraphTargetItem leftSide = expr.getNotCoercedNoDup();
                                     GraphTargetItem invertedLeftSide = leftSide;
