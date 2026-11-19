@@ -65,6 +65,50 @@ public class ActionScript2GraphTest {
         return writer.toString().trim().replace("\r\n", "\n");
     }
 
+    @DataProvider(name = "repeatedShortCircuitConditions")
+    public Object[][] repeatedShortCircuitConditions() {
+        return new Object[][]{{"", "||"}, {"Not\n", "&&"}};
+    }
+
+    @Test(dataProvider = "repeatedShortCircuitConditions")
+    public void testRepeatedShortCircuitCondition(String invert, String operator) throws Exception {
+        String condition = "Push \"key\"\nGetVariable\nPush \"success\"\nStringEquals\nNot\n";
+        String pcode = "Push \"before\"\nTrace\n" + condition + condition + invert
+                + "If join\nPop\nPush \"EOF\"\nGetVariable\nPush \"true\"\nStringEquals\nNot\n"
+                + "join: Not\nIf otherwise\nPush \"yes\"\nTrace\nJump done\n"
+                + "otherwise: Push \"no\"\nTrace\ndone:\n";
+        SWF swf = new SWF();
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        String expected = "trace(\"before\");\nif(key ne \"success\" " + operator + " EOF ne \"true\")\n"
+                + "{\n   trace(\"yes\");\n}\nelse\n{\n   trace(\"no\");\n}";
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
+    @Test
+    public void testRepeatedCallsKeepBothEvaluations() throws Exception {
+        String call = "Push 0, \"check\"\nCallFunction\n";
+        String pcode = call + call + "If join\nPop\nPush false\n"
+                + "join: Not\nIf done\nPush \"yes\"\nTrace\ndone:\n";
+        SWF swf = new SWF();
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        Assert.assertEquals(result.split("check\\(\\)", -1).length - 1, 2, result);
+    }
+
+    @Test
+    public void testRepeatedConditionAfterVariableChange() throws Exception {
+        String condition = "Push \"key\"\nGetVariable\nPush \"success\"\nStringEquals\nNot\n";
+        String pcode = condition + "Push \"key\", \"replacement\"\nGetVariable\nSetVariable\n" + condition
+                + "If join\nPop\nPush false\njoin: Not\nIf done\nPush \"yes\"\nTrace\ndone:\n";
+        SWF swf = new SWF();
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions);
+        Assert.assertEquals(result.split("key (?:eq|ne) \"success\"", -1).length - 1, 2, result);
+        Assert.assertTrue(result.contains("key = replacement;"), result);
+    }
+
     @DataProvider(name = "duplicatedConditionalPolarity")
     public Object[][] duplicatedConditionalPolarity() {
         return new Object[][]{{"", "Not\n", "!"}, {"Not\n", "", ""}};

@@ -5034,12 +5034,20 @@ public class Graph {
                                         invertedLeftSide = invertedLeftSide.invert(null);
                                     }
 
+                                    // Some AVM1 compilers evaluate the same condition twice
+                                    // instead of duplicating its value. No intervening output
+                                    // or side effects may change the second evaluation.
+                                    boolean canMatchRepeatedCondition = !(prevExpr instanceof HasTempIndex)
+                                            && !(leftSide instanceof HasTempIndex)
+                                            && prevExpr.outputPos >= 0 && prevExpr.outputPos == leftSide.outputPos
+                                            && !prevExpr.hasSideEffect() && !leftSide.hasSideEffect();
                                     prevExpr = prevExpr.getThroughDuplicate();
 
                                     boolean hideEmptyTrueFalse = true;
 
                                     if (leftSide instanceof DuplicateItem
-                                            || leftSide.getNotCoerced() == prevExpr) {
+                                            || leftSide.getNotCoerced() == prevExpr
+                                            || (canMatchRepeatedCondition && leftSide.getNotCoerced().valueEquals(prevExpr))) {
                                         if (leftSide instanceof DuplicateItem && !currentRet.isEmpty() && currentRet.get(currentRet.size() - 1) instanceof SetTemporaryItem) {
                                             DuplicateItem d = (DuplicateItem) leftSide;
                                             SetTemporaryItem st = (SetTemporaryItem) currentRet.get(currentRet.size() - 1);
@@ -5057,7 +5065,8 @@ public class Graph {
                                             stack.push(new OrItem(dialect, null, localData.lineStartInstruction, prevExpr, rightSide));
                                         }
                                     } else if (invertedLeftSide.getNotCoercedNoDup() instanceof DuplicateItem
-                                            || invertedLeftSide.getNotCoerced() == prevExpr) { //.getNotCoercedNoDup() instanceof DuplicateItem) {
+                                            || invertedLeftSide.getNotCoerced() == prevExpr
+                                            || (canMatchRepeatedCondition && invertedLeftSide.getNotCoerced().valueEquals(prevExpr))) {
                                         if (leftSide.invert(null).getNotCoercedNoDup() instanceof DuplicateItem && !currentRet.isEmpty() && currentRet.get(currentRet.size() - 1) instanceof SetTemporaryItem) {
                                             DuplicateItem d = (DuplicateItem) leftSide.invert(null).getNotCoercedNoDup();
                                             SetTemporaryItem st = (SetTemporaryItem) currentRet.get(currentRet.size() - 1);
