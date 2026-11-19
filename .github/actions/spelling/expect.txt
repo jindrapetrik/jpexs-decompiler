@@ -3560,6 +3560,7 @@ storepass
 storeregister
 storetype
 strd
+streamingmedia
 streamreader
 Strein
 strf
