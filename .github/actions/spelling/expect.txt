@@ -2789,6 +2789,7 @@ outputstream
 outrect
 outsidepart
 ovalue
+overapproximate
 PACKAGEINTERNALNS
 packagemapper
 PACKAGENAMESPACE
