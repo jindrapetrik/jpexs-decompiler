@@ -16,6 +16,11 @@
  */
 package com.jpexs.decompiler.flash;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
@@ -30,10 +35,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -108,6 +111,68 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         }
 
         return null;
+    }
+
+    private String interfacePackageSetup(String interfaceName) {
+        String[] path = interfaceName.split("\\.");
+        String prefix = "Push \"_global\"\nGetVariable\n";
+        StringBuilder pcode = new StringBuilder();
+        for (int i = 0; i < path.length; i++) {
+            String member = "Push \"" + path[i] + "\"\nGetMember\n";
+            pcode.append(prefix).append(member).append("Not\nNot\nIf next").append(i).append('\n');
+            if (i < path.length - 1) {
+                pcode.append(prefix).append("Push \"").append(path[i])
+                        .append("\", 0.0, \"Object\"\nNewObject\nSetMember\n");
+            }
+            pcode.append("next").append(i).append(":Pop\n");
+            prefix += member;
+        }
+        return pcode.toString();
+    }
+
+    @DataProvider(name = "erasedInterfaces")
+    public Object[][] erasedInterfaces() {
+        return new Object[][]{
+            {"mx.controls.streamingmedia.ICuePointHolder", false},
+            {"mx.controls.streamingmedia.IPlayer", false},
+            {"mx.utils.Collection", false},
+            {"mx.utils.Iterator", false},
+            {"mx.controls.streamingmedia.ICuePointHolder", true},
+            {"mx.controls.streamingmedia.IPlayer", true},
+            {"mx.utils.Collection", true},
+            {"mx.utils.Iterator", true}
+        };
+    }
+
+    @Test(dataProvider = "erasedInterfaces")
+    public void testErasedInterface(String interfaceName, boolean deobfuscate) {
+        boolean originalDeobfuscate = Configuration.autoDeobfuscate.get();
+        try {
+            Configuration.autoDeobfuscate.set(deobfuscate);
+            assertEquals(cleanPCode(decompileClassPcode(interfacePackageSetup(interfaceName))),
+                    cleanPCode("interface " + interfaceName + "\n{\n}"));
+        } finally {
+            Configuration.autoDeobfuscate.set(originalDeobfuscate);
+        }
+    }
+
+    @Test
+    public void testEmptyGuardWithFollowingCodeIsNotInterface() {
+        String result = decompileClassPcode(interfacePackageSetup("mx.utils.Iterator")
+                + "Push \"after guard\"\nTrace\n");
+        assertFalse(result.contains("interface mx.utils.Iterator"), result);
+        assertTrue(result.contains("trace(\"after guard\")"), result);
+    }
+
+    @Test
+    public void testUnrelatedEmptyGuardIsNotInterface() {
+        String pcode = interfacePackageSetup("mx.utils.Iterator");
+        int finalGuard = pcode.lastIndexOf("Push \"_global\"");
+        pcode = pcode.substring(0, finalGuard)
+                + pcode.substring(finalGuard).replace("Push \"utils\"", "Push \"other\"");
+        String result = decompileClassPcode(pcode);
+        assertFalse(result.contains("interface "), result);
+        assertTrue(result.contains("_global.mx.other.Iterator"), result);
     }
 
     @Test

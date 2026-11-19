@@ -944,6 +944,17 @@ public class ActionScript2ClassDetector {
                         List<String> classPath = pathToSearchVariant1;
                         classPath.remove(0); //remove _global
                         if (ifItem.onTrue.isEmpty()) { //if can have zero offset as the code is larger than bytes limit. TODO: make this check also for variant 2 (?)
+                            // Some compilers erase the runtime definition of an interface,
+                            // leaving only the package setup and its empty existence guard.
+                            if (ifItem.onFalse.isEmpty() && checkPos + 2 == commands.size()
+                                    && commands.get(checkPos + 1) instanceof PopItem) {
+                                GraphTargetItem interfaceName = getWithoutGlobal(condType);
+                                for (int k = checkPos + 1; k >= pos; k--) {
+                                    commands.remove(k);
+                                }
+                                commands.add(pos, new InterfaceActionItem(interfaceName, new ArrayList<>()));
+                                return true;
+                            }
                             if (this.checkClassContent(uninitializedClassTraits, commands, variables, checkPos + 1, pos, commands.size() - 1, commands, classPath, scriptPath)) {
                                 return true;
                             } else {
