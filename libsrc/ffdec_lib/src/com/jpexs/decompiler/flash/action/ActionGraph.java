@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTarget2ActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTargetActionItem;
@@ -48,6 +49,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionEnumerate;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
@@ -639,6 +641,10 @@ public class ActionGraph extends Graph {
 
     private void structureForInLoops(List<GraphTargetItem> list, FinalProcessLocalData localData) {
         for (int t = 1/*not first*/; t < list.size(); t++) {
+            if (structureCopiedEnumerationKey(list, t)) {
+                t--;
+                continue;
+            }
             GraphTargetItem it = list.get(t);
             List<GraphTargetItem> checkedBody = null;
             GraphTargetItem checkedCondition = null;
@@ -765,6 +771,82 @@ public class ActionGraph extends Graph {
                 }
             }
         }
+    }
+
+    private boolean isNullValue(GraphTargetItem item) {
+        return item instanceof DirectValueActionItem && ((DirectValueActionItem) item).value == Null.INSTANCE;
+    }
+
+    private boolean isRegisterValue(GraphTargetItem item, int register) {
+        return item instanceof DirectValueActionItem && ((DirectValueActionItem) item).value instanceof RegisterNumber
+                && ((RegisterNumber) ((DirectValueActionItem) item).value).number == register;
+    }
+
+    private boolean structureCopiedEnumerationKey(List<GraphTargetItem> list, int index) {
+        if (!(list.get(index - 1) instanceof EnumerateActionItem) || !(list.get(index) instanceof WhileItem)
+                || index + 1 >= list.size() || !(list.get(index + 1) instanceof WhileItem)) {
+            return false;
+        }
+        WhileItem loop = (WhileItem) list.get(index);
+        WhileItem drain = (WhileItem) list.get(index + 1);
+        List<GraphTargetItem> body = loop.commands;
+        if (loop.expression.size() != 1 || !(loop.expression.get(0) instanceof TrueItem) || body.size() < 4
+                || !(body.get(0) instanceof PushItem) || !(body.get(0).value instanceof StoreRegisterActionItem)
+                || !(body.get(1) instanceof IfItem) || !(body.get(2) instanceof PopItem)
+                || ((PopItem) body.get(2)).resolvedValue != null
+                || !(body.get(3) instanceof SetVariableActionItem || body.get(3) instanceof SetMemberActionItem)
+                || drain.expression.size() != 1 || !drain.commands.isEmpty()
+                || !(drain.expression.get(0) instanceof NeqActionItem)) {
+            return false;
+        }
+        StoreRegisterActionItem store = (StoreRegisterActionItem) body.get(0).value;
+        IfItem endCheck = (IfItem) body.get(1);
+        if (!(store.value.getThroughDuplicate() instanceof EnumeratedValueActionItem)
+                || !(endCheck.expression instanceof EqActionItem) || !endCheck.onFalse.isEmpty()
+                || endCheck.onTrue.size() != 1 || !(endCheck.onTrue.get(0) instanceof BreakItem)
+                || ((BreakItem) endCheck.onTrue.get(0)).loopId != loop.loop.id) {
+            return false;
+        }
+        EqActionItem comparison = (EqActionItem) endCheck.expression;
+        GraphTargetItem key = comparison.leftSide;
+        if (isNullValue(key)) {
+            key = comparison.rightSide;
+        } else if (!isNullValue(comparison.rightSide)) {
+            return false;
+        }
+        SetTypeActionItem assignment = (SetTypeActionItem) body.get(3);
+        NeqActionItem drainCheck = (NeqActionItem) drain.expression.get(0);
+        boolean drainsEnumeration = (drainCheck.leftSide instanceof EnumeratedValueActionItem && isNullValue(drainCheck.rightSide))
+                || (drainCheck.rightSide instanceof EnumeratedValueActionItem && isNullValue(drainCheck.leftSide));
+        if (store.register.name != null || assignment.getCompoundOperator() != null
+                || !isRegisterValue(key, store.register.number) || !isRegisterValue(assignment.getValue(), store.register.number)
+                || !drainsEnumeration || registerUsage == null) {
+            return false;
+        }
+        List<GraphSourceItemPos> reads = registerUsage.getReads(store.getSrc());
+        if (reads == null || reads.size() != 2) {
+            return false;
+        }
+        for (GraphSourceItemPos read : reads) {
+            if (!(read.item == key.getSrc() && read.pos == key.getPos())
+                    && !(read.item == assignment.getValue().getSrc() && read.pos == assignment.getValue().getPos())) {
+                return false;
+            }
+        }
+        EnumerateActionItem enumerate = (EnumerateActionItem) list.get(index - 1);
+        GraphTargetItem object = enumerate.object;
+        if (enumerate.getSrc() instanceof ActionEnumerate) {
+            object = new GetVariableActionItem(enumerate.getSrc(), enumerate.getLineStartItem(), object);
+        }
+        List<GraphTargetItem> commands = new ArrayList<>(body.subList(4, body.size()));
+        assignment.setValue(new DirectValueActionItem(Null.INSTANCE));
+        // The extra stack copy and the empty drain belong to the enumeration
+        // protocol. The source-level for-in also handles cleanup on break.
+        for (int i = index + 1; i >= index - 1; i--) {
+            list.remove(i);
+        }
+        list.add(index - 1, new ForInActionItem(null, null, loop.loop, (GraphTargetItem) assignment, object, commands));
+        return true;
     }
 
     private void removeUnreachableGotosAfterTerminalControl(List<GraphTargetItem> list) {

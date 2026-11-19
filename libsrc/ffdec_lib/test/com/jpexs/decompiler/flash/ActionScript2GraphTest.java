@@ -65,6 +65,100 @@ public class ActionScript2GraphTest {
         return writer.toString().trim().replace("\r\n", "\n");
     }
 
+    private String copiedEnumerationLoop(String enumerate, boolean nullFirst, String body, String label) {
+        return enumerate + label + "Loop: StoreRegister 0\n"
+                + (nullFirst ? "Push null, register0\n" : "Push register0, null\n")
+                + "Equals2\nIf " + label + "Drain\nPop\nPush \"key\", register0\nSetVariable\n"
+                + body + "Jump " + label + "Loop\n"
+                + label + "Drain: Push null\n" + (nullFirst ? "StackSwap\n" : "")
+                + "Equals2\nIf " + label + "Done\nJump " + label + "Drain\n" + label + "Done:\n";
+    }
+
+    @DataProvider(name = "copiedEnumerationKeys")
+    public Object[][] copiedEnumerationKeys() {
+        return new Object[][]{
+            {"Push \"obj\"\nGetVariable\nEnumerate2\n", false},
+            {"Push \"obj\"\nGetVariable\nEnumerate2\n", true},
+            {"Push \"obj\"\nEnumerate\n", false},
+            {"Push \"obj\"\nEnumerate\n", true}
+        };
+    }
+
+    private String decompilePcode(String pcode) throws Exception {
+        SWF swf = new SWF();
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        return decompile(swf, new DoActionTag(swf), actions);
+    }
+
+    @Test(dataProvider = "copiedEnumerationKeys")
+    public void testForInWithCopiedKeyAndDrain(String enumerate, boolean nullFirst) throws Exception {
+        String pcode = copiedEnumerationLoop(enumerate, nullFirst, "Push \"key\"\nGetVariable\nTrace\n", "enum")
+                + "Push \"after\"\nTrace\n";
+        String expected = "for(key in obj)\n{\n   trace(key);\n}\ntrace(\"after\");";
+        String result = decompilePcode(pcode);
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
+    @Test
+    public void testCopiedEnumerationInsideConditionalWith() throws Exception {
+        String pcode = "Push \"scope\"\nGetVariable\nWith {\nPush \"enabled\"\nGetVariable\nNot\nIf outside\n"
+                + copiedEnumerationLoop("Push \"obj\"\nGetVariable\nEnumerate2\n", false, "Push \"key\"\nGetVariable\nTrace\n", "enum")
+                + "outside:\n}\n";
+        String expected = "with(scope)\n{\n   if(enabled)\n   {\n      for(key in obj)\n      {\n         trace(key);\n      }\n   }\n}";
+        String result = decompilePcode(pcode);
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
+    @DataProvider(name = "copiedEnumerationControl")
+    public Object[][] copiedEnumerationControl() {
+        return new Object[][]{{"Drain", "break;"}, {"Loop", "continue;"}};
+    }
+
+    @Test
+    public void testNestedCopiedEnumerationsReuseRegister() throws Exception {
+        String inner = copiedEnumerationLoop("Push \"children\"\nGetVariable\nEnumerate2\n", false,
+                "Push \"key\"\nGetVariable\nTrace\n", "inner").replace("\"key\"", "\"child\"");
+        String pcode = copiedEnumerationLoop("Push \"obj\"\nGetVariable\nEnumerate2\n", false, inner, "outer");
+        String expected = "for(key in obj)\n{\n   for(child in children)\n   {\n      trace(child);\n   }\n}";
+        String result = decompilePcode(pcode);
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
+    @Test(dataProvider = "copiedEnumerationControl")
+    public void testCopiedEnumerationBreakAndContinue(String target, String control) throws Exception {
+        String body = "Push \"key\"\nGetVariable\nPush \"skip\"\nEquals2\nIf enum" + target
+                + "\nPush \"key\"\nGetVariable\nTrace\n";
+        String result = decompilePcode(copiedEnumerationLoop("Push \"obj\"\nGetVariable\nEnumerate2\n", false, body, "enum"));
+        Assert.assertTrue(result.contains("for(key in obj)"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertEquals(result.split("trace\\(key\\)", -1).length - 1, 1, result);
+        if (target.equals("Drain")) {
+            Assert.assertTrue(result.contains(control), result);
+        }
+        Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
+    @Test
+    public void testCopiedEnumerationRegisterReadAfterLoopPreventsElision() throws Exception {
+        String result = decompilePcode(copiedEnumerationLoop("Push \"obj\"\nGetVariable\nEnumerate2\n", false,
+                "Push \"key\"\nGetVariable\nTrace\n", "enum") + "Push register0\nTrace\n");
+        Assert.assertFalse(result.contains("for(key in obj)"), result);
+        Assert.assertTrue(result.contains("trace(_loc0_);"), result);
+    }
+
+    @Test
+    public void testCopiedEnumerationDrainWithSideEffectsIsPreserved() throws Exception {
+        String pcode = copiedEnumerationLoop("Push \"obj\"\nGetVariable\nEnumerate2\n", false,
+                "Push \"key\"\nGetVariable\nTrace\n", "enum")
+                .replace("Jump enumDrain", "Push \"cleanup\"\nTrace\nJump enumDrain");
+        String result = decompilePcode(pcode);
+        Assert.assertFalse(result.contains("for(key in obj)"), result);
+        Assert.assertTrue(result.contains("trace(\"cleanup\");"), result);
+    }
+
     @DataProvider(name = "shortCircuitRegisterAssignments")
     public Object[][] shortCircuitRegisterAssignments() {
         return new Object[][]{
