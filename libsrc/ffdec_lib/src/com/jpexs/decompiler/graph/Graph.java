@@ -1461,6 +1461,25 @@ public class Graph {
         return false;
     }
 
+    private boolean containsStackOperations(GraphTargetItem expression) {
+        Reference<Boolean> found = new Reference<>(false);
+        GraphTargetVisitorInterface visitor = new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem item) {
+                if (item instanceof PushItem || item instanceof BranchStackResistant
+                        || (item instanceof PopItem && ((PopItem) item).resolvedValue == null)) {
+                    found.setVal(true);
+                    return false;
+                }
+                return true;
+            }
+        };
+        if (visitor.visit(expression)) {
+            expression.visitRecursively(visitor);
+        }
+        return found.getVal();
+    }
+
     private void promotePushItemsToCommands(List<GraphTargetItem> list) {
         GraphTargetVisitorInterface visitor = new AbstractGraphTargetVisitor() {
             @Override
@@ -4230,6 +4249,7 @@ public class Graph {
         Stack<LoopLocalData> loopStack = new Stack<>();
         GraphPart nextOnePart = null;
         GraphPart lastTranslatedPart = null;
+        GraphPart expressionStackJoin = null;
         int linearOutputStart = 0;
 
         boolean isLoop = false;
@@ -4540,13 +4560,15 @@ public class Graph {
             boolean parseNext = true;
 
             //****************************DECOMPILING PART*************
-            // Only recover saved stack values along an unbranched path in this output list.
-            if (isLoop || parent == null || parent != lastTranslatedPart
+            // Recover saved stack values along unbranched paths or through complete folded expressions.
+            boolean continuesExpression = !isLoop && part == expressionStackJoin;
+            if (!continuesExpression && (isLoop || parent == null || parent != lastTranslatedPart
                     || parent.nextParts.size() != 1 || parent.nextParts.get(0) != part
-                    || part.refs.size() != 1 || part.refs.get(0) != parent) {
+                    || part.refs.size() != 1 || part.refs.get(0) != parent)) {
                 linearOutputStart = currentRet.size();
             }
             lastTranslatedPart = null;
+            expressionStackJoin = null;
             if (stack.isEmpty() && (currentRet instanceof GraphPartMarkedArrayList)) {
                 ((GraphPartMarkedArrayList) currentRet).clearCurrentParts();
             }
@@ -5025,6 +5047,13 @@ public class Graph {
                             }
                             TernarOpItem top = new TernarOpItem(dialect, null, localData.lineStartInstruction, expr.invert(null), ternarOnTrue, ternarOnFalse);
                             stack.push(handleTernar(top, localData));
+                            // Both branches produce their own value without consuming earlier stack values.
+                            // Keep those values reachable at this join, before any intervening assignments.
+                            if (next != null && next.refs.size() == 2 && topBsr == null
+                                    && filteredOnTrue.size() == 1 && filteredOnFalse.size() == 1
+                                    && !containsStackOperations(top)) {
+                                expressionStackJoin = next;
+                            }
                         } else {
                             boolean isIf = true;
                             //If the ontrue is empty, switch ontrue and onfalse

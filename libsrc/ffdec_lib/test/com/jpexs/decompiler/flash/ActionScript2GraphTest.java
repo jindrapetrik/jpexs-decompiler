@@ -57,9 +57,13 @@ public class ActionScript2GraphTest {
     }
 
     private String decompile(SWF swf, DoActionTag tag, List<Action> compiledActions) throws Exception {
+        return decompile(swf, tag, compiledActions, 1);
+    }
+
+    private String decompile(SWF swf, DoActionTag tag, List<Action> compiledActions, int deobfuscationMode) throws Exception {
         byte[] actionBytes = Action.actionsToBytes(compiledActions, true, swf.version);
         ActionList actions = ActionListReader.readActionListTimeout(tag, new ArrayList<>(),
-                new SWFInputStream(swf, actionBytes), swf.version, 0, actionBytes.length, "", 1);
+                new SWFInputStream(swf, actionBytes), swf.version, 0, actionBytes.length, "", deobfuscationMode);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         Action.actionsToSource(new HashMap<>(), tag, actions, "", writer, swf.getCharset());
         writer.finishHilights();
@@ -115,9 +119,14 @@ public class ActionScript2GraphTest {
     }
 
     private Object runComparisonAssignments(List<Action> actions, Object value) {
+        return runComparisonAssignments(actions, value, null);
+    }
+
+    private Object runComparisonAssignments(List<Action> actions, Object value, Object y) {
         Action.setActionsAddresses(actions, 0);
         LocalDataArea local = new LocalDataArea(null);
         local.localVariables.put("value", value);
+        local.localVariables.put("y", y);
         int steps = 0;
         for (int ip = 0; ip < actions.size();) {
             Assert.assertTrue(++steps < 1000, "Comparison chain did not terminate");
@@ -190,6 +199,66 @@ public class ActionScript2GraphTest {
         SWF swf = new SWF();
         List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
         return decompile(swf, new DoActionTag(swf), actions);
+    }
+
+    private String absoluteValuePcode(String label) {
+        return "Push \"x\"\nGetVariable\nPush \"0\"\nLess\nIf " + label + "Negative\n"
+                + "Push \"x\"\nGetVariable\nJump " + label + "Done\n"
+                + label + "Negative: Push \"0\", \"x\"\nGetVariable\nSubtract\n" + label + "Done:\n";
+    }
+
+    @DataProvider(name = "savedComparisonValues")
+    public Object[][] savedComparisonValues() {
+        List<Object[]> values = new ArrayList<>();
+        for (long x : new long[]{-3, -1, 1, 3}) {
+            for (long y : new long[]{-3, -1, 1, 3}) {
+                values.add(new Object[]{x, y});
+            }
+        }
+        return values.toArray(new Object[values.size()][]);
+    }
+
+    @Test(dataProvider = "savedComparisonValues")
+    public void testSavedComparisonAcrossTernaryPreservesEvaluationOrder(long x, long y) throws Exception {
+        String pcode = "Push \"result\", 0\nSetVariable\nPush \"x\", \"value\"\nGetVariable\nSetVariable\n"
+                + absoluteValuePcode("first") + "Push \"2\"\nLess\n"
+                + "Push \"x\", \"y\"\nGetVariable\nSetVariable\n"
+                + absoluteValuePcode("second") + "Push \"2\"\nLess\nAnd\nNot\nIf done\n"
+                + "Push \"result\", 1\nSetVariable\ndone:\n";
+        SWF swf = new SWF();
+        List<Action> original = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), original, 0);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertTrue(result.contains("var _temp_1 = (x >= \"0\" ? x : - x) < \"2\";"), result);
+        Assert.assertTrue(result.indexOf("var _temp_1") < result.indexOf("x = y;"), result);
+        List<Action> compiled = new ActionScript2Parser(swf, new DoActionTag(swf)).actionsFromString(result, Utf8Helper.charsetName);
+        long expected = Math.abs(x) < 2 && Math.abs(y) < 2 ? 1 : 0;
+        Assert.assertEquals(runComparisonAssignments(original, x, y), expected);
+        Assert.assertEquals(runComparisonAssignments(compiled, x, y), expected);
+    }
+
+    @Test
+    public void testMultipleSavedValuesAcrossTernary() throws Exception {
+        String pcode = "Push \"value\"\nGetVariable\nPush \"value\"\nGetVariable\nPush 10\nAdd2\n"
+                + "Push \"x\", \"y\"\nGetVariable\nSetVariable\n" + absoluteValuePcode("abs")
+                + "Add2\nAdd2\nPush \"result\"\nStackSwap\nSetVariable\n";
+        SWF swf = new SWF();
+        List<Action> original = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), original, 0);
+        Assert.assertFalse(result.contains("§§"), result);
+        List<Action> compiled = new ActionScript2Parser(swf, new DoActionTag(swf)).actionsFromString(result, Utf8Helper.charsetName);
+        Assert.assertEquals(runComparisonAssignments(original, 7L, -3L), 27.0);
+        Assert.assertEquals(runComparisonAssignments(compiled, 7L, -3L), 27.0);
+    }
+
+    @Test
+    public void testTernaryConsumingSavedValueDoesNotRecoverItAgain() throws Exception {
+        String pcode = "Push \"a\"\nGetVariable\nPush \"b\"\nGetVariable\nPush \"x\", 0\nSetVariable\n"
+                + "Push \"enabled\"\nGetVariable\nIf yes\nPush 1\nAdd2\nJump done\n"
+                + "yes: Push 2\nAdd2\ndone: Add2\nTrace\n";
+        String result = decompilePcode(pcode);
+        Assert.assertTrue(result.contains("§§pop()"), result);
+        Assert.assertFalse(result.contains("var _temp_"), result);
     }
 
     @Test(dataProvider = "copiedEnumerationKeys")
