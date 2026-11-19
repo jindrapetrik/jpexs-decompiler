@@ -81,6 +81,7 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LabelItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -621,6 +622,7 @@ public class ActionGraph extends Graph {
                 t = -1;
             }
         }
+        resolveDuplicatedComparisonChains(list);
         structureForInLoops(list, localData);
 
         for (int t = 0; t < list.size(); t++) {
@@ -637,6 +639,135 @@ public class ActionGraph extends Graph {
         //Handle for loops at the end:
         super.finalProcess(parent, list, level, localData, path);
         removeUnreachableGotosAfterTerminalControl(list);
+    }
+
+    private boolean isCachedTemporary(GraphTargetItem item, int index) {
+        return item instanceof HasTempIndex && !(item instanceof SetTemporaryItem)
+                && ((HasTempIndex) item).getTempIndex() == index;
+    }
+
+    private boolean leavesPreservedStackAlone(List<GraphTargetItem> commands, int preservedTemp) {
+        Reference<Boolean> valid = new Reference<>(true);
+        Set<GraphTargetItem> seen = new LinkedIdentityHashSet<>();
+        GraphTargetVisitorInterface visitor = new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem item) {
+                if (item == null || !valid.getVal() || !seen.add(item) || item instanceof FunctionActionItem) {
+                    return false;
+                }
+                if (item instanceof PushItem || (item instanceof PopItem && ((PopItem) item).resolvedValue == null)
+                        || item instanceof EnumerateActionItem || item instanceof EnumeratedValueActionItem
+                        || item instanceof GotoItem || item instanceof LabelItem || item instanceof BreakItem || item instanceof ContinueItem
+                        || (item instanceof SetTemporaryItem && ((SetTemporaryItem) item).tempIndex == preservedTemp)) {
+                    valid.setVal(false);
+                    return false;
+                }
+                // Temporary references print the cached value, not their backing expression.
+                if (!(item instanceof HasTempIndex) || item instanceof SetTemporaryItem) {
+                    item.visit(this);
+                }
+                return true;
+            }
+        };
+        for (GraphTargetItem command : commands) {
+            visitor.visit(command);
+        }
+        return valid.getVal();
+    }
+
+    private boolean isCachedComparison(IfItem item, int temp, int preservedTemp) {
+        if (!(item.expression instanceof EqActionItem || item.expression instanceof NeqActionItem)) {
+            return false;
+        }
+        BinaryOpItem comparison = (BinaryOpItem) item.expression;
+        GraphTargetItem other;
+        if (isCachedTemporary(comparison.leftSide, temp)) {
+            other = comparison.rightSide;
+        } else if (isCachedTemporary(comparison.rightSide, temp)) {
+            other = comparison.leftSide;
+        } else {
+            return false;
+        }
+        List<GraphTargetItem> expression = new ArrayList<>();
+        expression.add(other);
+        return leavesPreservedStackAlone(expression, preservedTemp);
+    }
+
+    private boolean isRestoredComparison(List<GraphTargetItem> commands) {
+        return commands.size() == 3 && commands.get(0) instanceof SetTemporaryItem
+                && commands.get(1) instanceof PushItem && commands.get(2) instanceof IfItem;
+    }
+
+    private void resolveDuplicatedComparisonChains(List<GraphTargetItem> list) {
+        for (int i = 1; i + 2 < list.size(); i++) {
+            if (!(list.get(i - 1) instanceof SetTemporaryItem) || !(list.get(i) instanceof PushItem)
+                    || !(list.get(i + 1) instanceof IfItem) || !(list.get(i + 2) instanceof PopItem)
+                    || ((PopItem) list.get(i + 2)).resolvedValue != null) {
+                continue;
+            }
+            SetTemporaryItem snapshot = (SetTemporaryItem) list.get(i - 1);
+            if (snapshot.tempIndex <= 0 || !isCachedTemporary(list.get(i).value, snapshot.tempIndex)) {
+                continue;
+            }
+            IfItem current = (IfItem) list.get(i + 1);
+            int currentTemp = snapshot.tempIndex;
+            Set<Integer> aliases = new HashSet<>();
+            aliases.add(currentTemp);
+            List<List<GraphTargetItem>> restores = new ArrayList<>();
+            List<PopItem> pops = new ArrayList<>();
+            boolean valid = true;
+            while (true) {
+                if (!isCachedComparison(current, currentTemp, snapshot.tempIndex)) {
+                    valid = false;
+                    break;
+                }
+                boolean restoreTrue = isRestoredComparison(current.onTrue);
+                boolean restoreFalse = isRestoredComparison(current.onFalse);
+                if (restoreTrue == restoreFalse) {
+                    valid = !restoreTrue && leavesPreservedStackAlone(current.onTrue, snapshot.tempIndex)
+                            && leavesPreservedStackAlone(current.onFalse, snapshot.tempIndex);
+                    break;
+                }
+                List<GraphTargetItem> unmatched = restoreTrue ? current.onTrue : current.onFalse;
+                List<GraphTargetItem> matched = restoreTrue ? current.onFalse : current.onTrue;
+                if (!leavesPreservedStackAlone(matched, snapshot.tempIndex)) {
+                    valid = false;
+                    break;
+                }
+                SetTemporaryItem restore = (SetTemporaryItem) unmatched.get(0);
+                if (!(restore.value instanceof PopItem) || ((PopItem) restore.value).resolvedValue != null
+                        || restore.tempIndex <= 0 || !aliases.add(restore.tempIndex)
+                        || !isCachedTemporary(unmatched.get(1).value, restore.tempIndex)) {
+                    valid = false;
+                    break;
+                }
+                restores.add(unmatched);
+                pops.add((PopItem) restore.value);
+                currentTemp = restore.tempIndex;
+                current = (IfItem) unmatched.get(2);
+            }
+            if (!valid || restores.isEmpty()) {
+                continue;
+            }
+            // Every branch preserves this one stack slot. The duplicates in
+            // subsequent comparisons therefore read the original cached value.
+            for (int r = 0; r < restores.size(); r++) {
+                List<GraphTargetItem> restored = restores.get(r);
+                SetTemporaryItem alias = (SetTemporaryItem) restored.get(0);
+                IfItem next = (IfItem) restored.get(2);
+                BinaryOpItem comparison = (BinaryOpItem) next.expression;
+                GraphTargetItem cached = new TemporaryItem(dialect, snapshot.getSrc(), snapshot.getLineStartItem(), snapshot.value, snapshot.tempIndex);
+                pops.get(r).resolvedValue = cached;
+                if (isCachedTemporary(comparison.leftSide, alias.tempIndex)) {
+                    comparison.leftSide = cached;
+                } else {
+                    comparison.rightSide = cached;
+                }
+                restored.remove(1);
+            }
+            list.remove(i + 2);
+            list.remove(i);
+        }
     }
 
     private void structureForInLoops(List<GraphTargetItem> list, FinalProcessLocalData localData) {

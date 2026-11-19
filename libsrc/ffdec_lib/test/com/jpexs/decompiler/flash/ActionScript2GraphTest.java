@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -63,6 +64,107 @@ public class ActionScript2GraphTest {
         Action.actionsToSource(new HashMap<>(), tag, actions, "", writer, swf.getCharset());
         writer.finishHilights();
         return writer.toString().trim().replace("\r\n", "\n");
+    }
+
+    private String duplicatedComparisonChain(String value, boolean reverse, boolean equal, boolean fallback, boolean assignments) {
+        StringBuilder pcode = new StringBuilder(value);
+        for (int i = 1; i <= 3; i++) {
+            pcode.append("PushDuplicate\nPush ").append(i).append('\n');
+            if (reverse) {
+                pcode.append("StackSwap\n");
+            }
+            pcode.append("Equals2\n");
+            if (equal) {
+                pcode.append("Not\n");
+            }
+            pcode.append("If next").append(i).append('\n');
+            if (assignments) {
+                pcode.append("Push \"result\", ").append(i).append("\nSetVariable\n");
+            } else {
+                pcode.append("Push 0, \"handle").append(i).append("\"\nCallFunction\nPop\n");
+            }
+            pcode.append("Jump done\nnext").append(i).append(":\n");
+        }
+        if (fallback) {
+            pcode.append(assignments ? "Push \"result\", 0\nSetVariable\n" : "Push 0, \"fallback\"\nCallFunction\nPop\n");
+        }
+        return pcode.append("done: Pop\n").toString();
+    }
+
+    @DataProvider(name = "duplicatedComparisonChains")
+    public Object[][] duplicatedComparisonChains() {
+        return new Object[][]{{false, true, false}, {false, true, true}, {true, true, true}, {false, false, true}, {true, false, false}};
+    }
+
+    @Test(dataProvider = "duplicatedComparisonChains")
+    public void testDuplicatedLooseComparisonChain(boolean reverse, boolean equal, boolean fallback) throws Exception {
+        String result = decompilePcode(duplicatedComparisonChain("Push \"value\"\nGetVariable\n", reverse, equal, fallback, false));
+        StringBuilder expected = new StringBuilder("var _temp_1 = value;\n");
+        for (int i = 1; i <= 3; i++) {
+            if (i > 1) {
+                expected.append("else ");
+            }
+            expected.append("if(").append(reverse ? i : "_temp_1").append(equal ? " == " : " != ")
+                    .append(reverse ? "_temp_1" : i).append(")\n{\n   handle").append(i).append("();\n}\n");
+        }
+        if (fallback) {
+            expected.append("else\n{\n   fallback();\n}\n");
+        }
+        Assert.assertEquals(result, expected.toString().trim());
+        Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
+    private Object runComparisonAssignments(List<Action> actions, Object value) {
+        Action.setActionsAddresses(actions, 0);
+        LocalDataArea local = new LocalDataArea(null);
+        local.localVariables.put("value", value);
+        int steps = 0;
+        for (int ip = 0; ip < actions.size();) {
+            Assert.assertTrue(++steps < 1000, "Comparison chain did not terminate");
+            Action action = actions.get(ip);
+            if (action.isExit()) {
+                break;
+            }
+            local.jump = null;
+            Assert.assertTrue(action.execute(local), action.toString());
+            ip = local.jump == null ? ip + 1 : Action.adr2ip(actions, local.jump);
+        }
+        Assert.assertTrue(local.stack.isEmpty(), "Comparison chain did not discard its saved value");
+        return local.localVariables.get("result");
+    }
+
+    @Test
+    public void testDuplicatedComparisonEvaluatesInputOnce() throws Exception {
+        String result = decompilePcode(duplicatedComparisonChain("Push 0, \"read\"\nCallFunction\n", false, true, true, false));
+        Assert.assertFalse(result.contains("§§") || result.contains("switch("), result);
+        Assert.assertEquals(result.split("read\\(\\)", -1).length - 1, 1, result);
+        Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
+    @DataProvider(name = "looseComparisonValues")
+    public Object[][] looseComparisonValues() {
+        return new Object[][]{{"1", 1L}, {1L, 1L}, {true, 1L}, {"2", 2L}, {2.0, 2L}, {"3", 3L}, {false, 0L}, {"other", 0L}};
+    }
+
+    @Test(dataProvider = "looseComparisonValues")
+    public void testDuplicatedComparisonPreservesLooseEquality(Object value, Object expected) throws Exception {
+        SWF swf = new SWF();
+        String pcode = duplicatedComparisonChain("Push \"value\"\nGetVariable\n", false, true, true, true);
+        List<Action> original = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), original);
+        Assert.assertFalse(result.contains("§§") || result.contains("switch("), result);
+        List<Action> compiled = new ActionScript2Parser(swf, new DoActionTag(swf)).actionsFromString(result, Utf8Helper.charsetName);
+        Assert.assertEquals(runComparisonAssignments(original, value), expected);
+        Assert.assertEquals(runComparisonAssignments(compiled, value), expected);
+    }
+
+    @Test
+    public void testComparisonCaseConsumingSavedValueIsPreserved() throws Exception {
+        String pcode = duplicatedComparisonChain("Push 0, \"read\"\nCallFunction\n", false, true, false, false)
+                .replace("Push 0, \"handle1\"", "Push 1, \"consume\"\nCallFunction\nPop\nPush 0, \"handle1\"");
+        String result = decompilePcode(pcode);
+        Assert.assertTrue(result.contains("consume(§§pop())"), result);
+        Assert.assertTrue(result.contains("handle1();"), result);
     }
 
     private String copiedEnumerationLoop(String enumerate, boolean nullFirst, String body, String label) {
