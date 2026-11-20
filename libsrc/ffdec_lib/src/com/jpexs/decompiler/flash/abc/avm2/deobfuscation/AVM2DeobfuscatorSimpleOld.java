@@ -64,6 +64,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
@@ -426,6 +427,8 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
         int instructionsProcessed = 0;
+        int executionStart = idx;
+        boolean linearExecution = true;
 
         int minChangedIp = Integer.MAX_VALUE;
 
@@ -441,7 +444,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
             AVM2Instruction ins = replacements.get(idx);
             InstructionDefinition def = ins.definition;
-            if (def instanceof IfTypeIns) {
+            if (def instanceof IfTypeIns || def instanceof LookupSwitchIns) {
                 replacements.flush();
             }
             //System.err.println("" + ins + " stack size:" + stack.size());
@@ -576,6 +579,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     || def instanceof DecrementIns//
                     || def instanceof DecrementIIns //
                     || def instanceof IfTypeIns
+                    || def instanceof LookupSwitchIns
                     || def instanceof JumpIns
                     || def instanceof EqualsIns
                     || def instanceof LessEqualsIns
@@ -638,21 +642,22 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 }
                 idx++;
             } else if (def instanceof JumpIns) {
+                linearExecution = false;
                 long address = ins.getTargetAddress();
                 idx = code.adr2pos(address);
                 if (idx == -1) {
                     throw new TranslateException("Jump target not found: " + address);
                 }
-            } else if (def instanceof IfTypeIns) {
+            } else if (def instanceof IfTypeIns || def instanceof LookupSwitchIns) {
 
-                long ifAddress = code.pos2adr(idx);
-                // Rebuild jump targets only when a conditional actually needs them.
+                long branchAddress = code.pos2adr(idx);
+                // Rebuild jump targets only when a branch actually needs them.
                 // Register substitutions can invalidate offsets thousands of times.
                 if (importantOffsets.getVal() == null) {
                     importantOffsets.setVal(code.getImportantOffsets(body, false));
                 }
-                if (importantOffsets.getVal().contains(ifAddress)) {
-                    //There is jump directly to ifTypeIns like in &&, || operator
+                if (importantOffsets.getVal().contains(branchAddress)) {
+                    // Another path may supply different operands directly to this branch.
                     return false;
                 }
                 if (stack.isEmpty()) {
@@ -660,8 +665,38 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 }
 
                 GraphTargetItem top = stack.pop();
-                Boolean res = top.getResultAsBoolean();
-                long address = ins.getTargetAddress();
+                boolean res;
+                long address;
+                if (def instanceof LookupSwitchIns) {
+                    // Other entries into this path may supply a different index.
+                    if (!linearExecution) {
+                        return false;
+                    }
+                    for (int ip = executionStart + 1; ip < idx; ip++) {
+                        if (importantOffsets.getVal().contains(code.code.get(ip).getAddress())) {
+                            return false;
+                        }
+                    }
+                    if (!top.isCompileTime() || top.hasSideEffect()) {
+                        return false;
+                    }
+                    Object value = top.getResult();
+                    if (!(value instanceof Number)) {
+                        return false;
+                    }
+                    double number = ((Number) value).doubleValue();
+                    int index = ((Number) value).intValue();
+                    // lookupswitch expects an int, without coercing arbitrary values.
+                    if (number != index) {
+                        return false;
+                    }
+                    int offset = index >= 0 && index <= ins.operands[1] ? ins.operands[index + 2] : ins.operands[0];
+                    address = ins.getAddress() + offset;
+                    res = true;
+                } else {
+                    res = top.getResultAsBoolean();
+                    address = ins.getTargetAddress();
+                }
                 int nidx = code.adr2pos(address);
                 AVM2Instruction tarIns = code.code.get(nidx);
 

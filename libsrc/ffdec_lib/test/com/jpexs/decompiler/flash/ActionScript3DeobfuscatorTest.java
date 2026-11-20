@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGroupParts;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimpleOld;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
@@ -219,6 +220,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         MethodBody b = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
         AVM2Code code = ASM3Parser.parse(abc, new StringReader(str), null, b, new MethodInfo());
         b.setCode(code);
+        abc.addMethodInfo(new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]));
         deobfuscator.avm2CodeRemoveTraps("test", 0, true, 0, abc, null, 0, b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         code.toASMSource(abc, abc.constants, new MethodInfo(), new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]), ScriptExportMode.PCODE, writer);
@@ -285,6 +287,77 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         return new Object[][]{
             {"1!=5"}, {"5==5"}, {"1<4"}, {"5>4"}, {"5*6==30"}
         };
+    }
+
+    @DataProvider(name = "constantSwitchIndices")
+    public Object[][] constantSwitchIndices() {
+        return new Object[][]{
+            {"pushbyte 0", "zero"}, {"pushbyte 1", "one"}, {"pushbyte 2", "two"},
+            {"pushbyte -1", "default"}, {"pushbyte 107", "default"},
+            {"pushint 2147483647", "default"}, {"pushint -2147483648", "default"},
+            {"pushbyte 5\npushbyte 3\nsubtract_i", "two"},
+            {"pushdouble 1.8\nconvert_i", "one"},
+            {"pushdouble 4294967297\nconvert_i", "one"}
+        };
+    }
+
+    private String switchTrace(String value) {
+        return "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"" + value + "\"\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n";
+    }
+
+    @Test(dataProvider = "constantSwitchIndices")
+    public void testConstantLookupSwitch(String index, String selected) throws Exception {
+        decompilePCode(index + "\nlookupswitch other, [zero, one, two]\n"
+                + "zero: " + switchTrace("zero") + "jump done\n"
+                + "one: " + switchTrace("one") + "jump done\n"
+                + "two: " + switchTrace("two") + "jump done\n"
+                + "other: " + switchTrace("default") + "done:\n",
+                "         trace(\"" + selected + "\");\n");
+    }
+
+    @Test
+    public void testConstantLookupSwitchRemovesObfuscationLoop() throws Exception {
+        decompilePCode("jump dispatch\n"
+                + "zero: jump dispatch\none: jump dispatch\n"
+                + "other: " + switchTrace("selected") + "jump done\n"
+                + "dispatch: pushbyte 107\nlookupswitch other, [zero, one]\ndone:\n",
+                "         trace(\"selected\");\n");
+    }
+
+    @Test
+    public void testConstantLookupSwitchPreservesLowerStackAndFallthrough() throws Exception {
+        decompilePCode(switchTrace("before")
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"saved\"\n"
+                + "pushbyte 0\nlookupswitch other, [zero, one]\n"
+                + "zero: callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "one: " + switchTrace("fallthrough") + "jump done\n"
+                + "other: pop\npop\n" + switchTrace("unreachable") + "done:\n",
+                "         trace(\"before\");\n         trace(\"saved\");\n         trace(\"fallthrough\");\n");
+    }
+
+    @DataProvider(name = "switchMergePoints")
+    public Object[][] switchMergePoints() {
+        return new Object[][]{{""}, {"nop\n"}};
+    }
+
+    @Test(dataProvider = "switchMergePoints")
+    public void testLookupSwitchWithMergedIndicesIsPreserved(String afterMerge) throws Exception {
+        String result = recompilePCode("getlocal0\ngetproperty QName(PackageNamespace(\"\"),\"enabled\")\n"
+                + "iftrue alternate\npushbyte 0\njump dispatch\n"
+                + "alternate: pushbyte 1\ndispatch: " + afterMerge + "lookupswitch other, [zero, one]\n"
+                + "zero: returnvoid\none: returnvoid\nother: returnvoid\n",
+                new AVM2DeobfuscatorSimpleOld());
+        Assert.assertTrue(result.contains("lookupswitch"), result);
+        Assert.assertTrue(result.contains("pushbyte 0") && result.contains("pushbyte 1"), result);
+    }
+
+    @Test
+    public void testNonIntegerLookupSwitchIndexIsNotCoerced() throws Exception {
+        String result = recompilePCode("pushbyte 3\npushbyte 2\ndivide\n"
+                + "lookupswitch other, [zero, one]\nzero: returnvoid\none: returnvoid\nother: returnvoid\n",
+                new AVM2DeobfuscatorSimpleOld());
+        Assert.assertTrue(result.contains("lookupswitch"), result);
     }
 
     @DataProvider(name = "provideBasicFalseExpressions")
