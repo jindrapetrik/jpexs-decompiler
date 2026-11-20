@@ -833,7 +833,7 @@ public abstract class Action implements GraphSourceItem {
                 for (String c : cPool.constantPool) {
                     writer.appendNoHilight(constIdx);
                     writer.appendNoHilight("|");
-                    writer.appendNoHilight(Helper.escapeString(c));
+                    writer.appendNoHilight(Helper.escapeStringNoQuotes(c));
                     writer.newLine();
                     constIdx++;
                 }
