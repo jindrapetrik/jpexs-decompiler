@@ -163,7 +163,7 @@ public class Helper {
 
     /**
      * Escapes string by adding backslashes.
-     * Thie one does not escape ' and ".
+     * This one does not escape ' and ".
      *
      * @param s String to escape
      * @return Escaped string
