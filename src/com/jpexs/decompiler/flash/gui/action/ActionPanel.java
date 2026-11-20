@@ -1028,6 +1028,9 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 JCheckBox removeObfuscatedDeclarationsMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.remove_obfuscated_declarations"));
                 removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
                 removeObfuscatedDeclarationsMenuItem.addActionListener(ActionPanel.this::removeObfuscatedDeclarationsMenuItemActionPerformed);
+                JCheckBox removeDebugResolveMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.remove_debug_resolve"));
+                removeDebugResolveMenuItem.setSelected(Configuration.deobfuscateAs12RemoveGlobalDebugResolve.get());
+                removeDebugResolveMenuItem.addActionListener(ActionPanel.this::removeDebugResolveMenuItemActionPerformed);
                 JCheckBox skipUninitializedClassFieldsDetectionMenuItem = new JCheckBox(AppStrings.translate("deobfuscate_options.skip_uninitialized_class_fields_detection"));
                 skipUninitializedClassFieldsDetectionMenuItem.setSelected(Configuration.skipDetectionOfUninitializedClassFields.get());
                 skipUninitializedClassFieldsDetectionMenuItem.addActionListener(ActionPanel.this::skipUninitializedClassFieldsDetectionMenuItemActionPerformed);
@@ -1036,6 +1039,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 popupMenu.add(simplifyExpressionsMenuItem);
                 popupMenu.add(disableDecompilationMenuItem);
                 popupMenu.add(removeObfuscatedDeclarationsMenuItem);
+                popupMenu.add(removeDebugResolveMenuItem);
                 popupMenu.add(skipUninitializedClassFieldsDetectionMenuItem);
                 
                 return popupMenu;
@@ -1184,6 +1188,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     private void removeObfuscatedDeclarationsMenuItemActionPerformed(ActionEvent evt) {
         JCheckBox checkBox = (JCheckBox) evt.getSource();
         Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.set(checkBox.isSelected());
+        mainPanel.autoDeobfuscateChanged();
+    }
+
+    private void removeDebugResolveMenuItemActionPerformed(ActionEvent evt) {
+        JCheckBox checkBox = (JCheckBox) evt.getSource();
+        Configuration.deobfuscateAs12RemoveGlobalDebugResolve.set(checkBox.isSelected());
         mainPanel.autoDeobfuscateChanged();
     }
     

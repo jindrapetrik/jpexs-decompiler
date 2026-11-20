@@ -394,7 +394,14 @@ public class ActionScript2GraphTest {
                 + "Push \"p\"\nGetVariable\nPush \"lockedIndex\"\nGetMember\n"
                 + "Push \"pn\"\nGetVariable\nPush \"lockedIndex\"\nGetMember\nEquals2\nNot\n"
                 + "join: If done\nPush -1\nReturn\ndone: Push undefined\nReturn\n}\n";
-        String result = decompilePcode(pcode);
+        boolean removeDebugResolve = Configuration.deobfuscateAs12RemoveGlobalDebugResolve.get();
+        String result;
+        Configuration.deobfuscateAs12RemoveGlobalDebugResolve.set(false);
+        try {
+            result = decompilePcode(pcode);
+        } finally {
+            Configuration.deobfuscateAs12RemoveGlobalDebugResolve.set(removeDebugResolve);
+        }
         Assert.assertTrue(result.contains("delete _global.__resolve;\n      var _temp_2 = undefined == pn.lockedIndex;\n"
                 + "      _global.__resolve = _global.__debugResolve;\n"
                 + "      §§push(_temp_2 || p.lockedIndex != pn.lockedIndex);"), result);

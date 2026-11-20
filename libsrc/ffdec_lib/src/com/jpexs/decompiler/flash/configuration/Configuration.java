@@ -1331,6 +1331,10 @@ public final class Configuration {
     @ConfigurationCategory("ai")
     public static ConfigurationItem<String> aiOpenCodePlan = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("deobfuscation")
+    public static ConfigurationItem<Boolean> deobfuscateAs12RemoveGlobalDebugResolve = null;
+
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();
 
