@@ -348,6 +348,59 @@ public class ActionScript2GraphTest {
                 + "Not\nIf done\nPush register0\nTrace\ndone: Push register0\nTrace\n";
     }
 
+    @DataProvider(name = "savedShortCircuitOperands")
+    public Object[][] savedShortCircuitOperands() {
+        List<Object[]> values = new ArrayList<>();
+        for (boolean and : new boolean[]{false, true}) {
+            for (boolean left : new boolean[]{false, true}) {
+                for (boolean changed : new boolean[]{false, true}) {
+                    for (boolean right : new boolean[]{false, true}) {
+                        values.add(new Object[]{and, left, changed, right});
+                    }
+                }
+            }
+        }
+        return values.toArray(new Object[values.size()][]);
+    }
+
+    @Test(dataProvider = "savedShortCircuitOperands")
+    public void testShortCircuitKeepsOperandSavedBeforeAssignment(boolean and, boolean left, boolean changed, boolean right) throws Exception {
+        String pcode = "Push \"result\", 0\nSetVariable\nPush \"value\"\nGetVariable\n"
+                + "Push \"value\", " + changed + "\nSetVariable\nPushDuplicate\n" + (and ? "Not\n" : "")
+                + "If join\nPop\nPush \"y\"\nGetVariable\njoin: Not\nIf done\n"
+                + "Push \"result\", 1\nSetVariable\ndone:\n";
+        SWF swf = new SWF();
+        List<Action> original = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), original, 0);
+        Assert.assertTrue(result.contains("var _temp_1 = value;"), result);
+        Assert.assertTrue(result.indexOf("var _temp_1") < result.indexOf("value = " + changed + ";"), result);
+        Assert.assertTrue(result.contains("_temp_1 " + (and ? "&&" : "||") + " y"), result);
+        List<Action> compiled = new ActionScript2Parser(swf, new DoActionTag(swf)).actionsFromString(result, Utf8Helper.charsetName);
+        long expected = (and ? left && right : left || right) ? 1 : 0;
+        Assert.assertEquals(runComparisonAssignments(original, left, right), expected);
+        Assert.assertEquals(runComparisonAssignments(compiled, left, right), expected);
+    }
+
+    @Test
+    public void testNestedShortCircuitReadsPropertyBeforeRestoringResolver() throws Exception {
+        String disable = "Push \"_global\"\nGetVariable\nPush \"__resolve\"\nDelete\nPop\n";
+        String restore = "Push \"_global\"\nGetVariable\nPush \"__resolve\", \"_global\"\nGetVariable\n"
+                + "Push \"__debugResolve\"\nGetMember\nSetMember\n";
+        String pcode = "DefineFunction \"check\", 2, \"p\", \"pn\" {\n"
+                + disable + "Push undefined, \"p\"\nGetVariable\nPush \"lockedIndex\"\nGetMember\nEquals2\n"
+                + restore + "PushDuplicate\nIf join\nPop\n"
+                + disable + "Push undefined, \"pn\"\nGetVariable\nPush \"lockedIndex\"\nGetMember\nEquals2\n"
+                + restore + "PushDuplicate\nIf join\nPop\n"
+                + "Push \"p\"\nGetVariable\nPush \"lockedIndex\"\nGetMember\n"
+                + "Push \"pn\"\nGetVariable\nPush \"lockedIndex\"\nGetMember\nEquals2\nNot\n"
+                + "join: If done\nPush -1\nReturn\ndone: Push undefined\nReturn\n}\n";
+        String result = decompilePcode(pcode);
+        Assert.assertTrue(result.contains("delete _global.__resolve;\n      var _temp_2 = undefined == pn.lockedIndex;\n"
+                + "      _global.__resolve = _global.__debugResolve;\n"
+                + "      §§push(_temp_2 || p.lockedIndex != pn.lockedIndex);"), result);
+        Assert.assertFalse(result.contains("§§push(undefined == pn.lockedIndex ||"), result);
+    }
+
     @Test(dataProvider = "shortCircuitRegisterAssignments")
     public void testShortCircuitRegisterAssignment(String invert, String operator, String target, String assignment, String name) throws Exception {
         SWF swf = new SWF();

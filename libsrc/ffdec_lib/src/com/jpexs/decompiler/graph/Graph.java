@@ -4165,6 +4165,21 @@ public class Graph {
         return stack.pop();
     }
 
+    private GraphTargetItem getShortCircuitLeftSide(GraphTargetItem previous, GraphTargetItem condition, List<GraphTargetItem> output, TranslateStack stack) {
+        if (condition instanceof DuplicateItem && !output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
+            DuplicateItem duplicate = (DuplicateItem) condition;
+            SetTemporaryItem assignment = (SetTemporaryItem) output.get(output.size() - 1);
+            if (assignment.tempIndex == duplicate.tempIndex) {
+                output.remove(output.size() - 1);
+                stack.moveToStack(output);
+                return previous.getThroughDuplicate();
+            }
+        }
+        // A saved value can have statements between its evaluation and this use.
+        // Keep the read when its assignment cannot be inlined at this position.
+        return previous instanceof HasTempIndex ? previous : previous.getThroughDuplicate();
+    }
+
     /**
      * Gets the right operand of a short-circuit branch which discards the left
      * operand and leaves a replacement value on the stack.
@@ -5072,7 +5087,8 @@ public class Graph {
                                     && (last == 0 || shortCircuitRightSide != null)) {
                                 if (last > 0) {
                                     GraphTargetItem rightSide = shortCircuitRightSide;
-                                    GraphTargetItem prevExpr = stack.pop();
+                                    GraphTargetItem originalPrevExpr = stack.pop();
+                                    GraphTargetItem prevExpr = originalPrevExpr;
                                     GraphTargetItem leftSide = expr.getNotCoercedNoDup();
                                     GraphTargetItem invertedLeftSide = leftSide;
                                     if (invertedLeftSide instanceof NotItem) {
@@ -5095,14 +5111,7 @@ public class Graph {
                                     if (leftSide instanceof DuplicateItem
                                             || leftSide.getNotCoerced() == prevExpr
                                             || (canMatchRepeatedCondition && leftSide.getNotCoerced().valueEquals(prevExpr))) {
-                                        if (leftSide instanceof DuplicateItem && !currentRet.isEmpty() && currentRet.get(currentRet.size() - 1) instanceof SetTemporaryItem) {
-                                            DuplicateItem d = (DuplicateItem) leftSide;
-                                            SetTemporaryItem st = (SetTemporaryItem) currentRet.get(currentRet.size() - 1);
-                                            if (st.tempIndex == d.tempIndex) {
-                                                currentRet.remove(currentRet.size() - 1);
-                                                stack.moveToStack(currentRet);
-                                            }
-                                        }
+                                        prevExpr = getShortCircuitLeftSide(originalPrevExpr, leftSide, currentRet, stack);
                                         isIf = false;
                                         if (hideEmptyTrueFalse && prevExpr.getNotCoercedNoDup() instanceof FalseItem) {
                                             stack.push(rightSide);
@@ -5114,14 +5123,7 @@ public class Graph {
                                     } else if (invertedLeftSide.getNotCoercedNoDup() instanceof DuplicateItem
                                             || invertedLeftSide.getNotCoerced() == prevExpr
                                             || (canMatchRepeatedCondition && invertedLeftSide.getNotCoerced().valueEquals(prevExpr))) {
-                                        if (leftSide.invert(null).getNotCoercedNoDup() instanceof DuplicateItem && !currentRet.isEmpty() && currentRet.get(currentRet.size() - 1) instanceof SetTemporaryItem) {
-                                            DuplicateItem d = (DuplicateItem) leftSide.invert(null).getNotCoercedNoDup();
-                                            SetTemporaryItem st = (SetTemporaryItem) currentRet.get(currentRet.size() - 1);
-                                            if (st.tempIndex == d.tempIndex) {
-                                                currentRet.remove(currentRet.size() - 1);
-                                                stack.moveToStack(currentRet);
-                                            }
-                                        }
+                                        prevExpr = getShortCircuitLeftSide(originalPrevExpr, invertedLeftSide.getNotCoercedNoDup(), currentRet, stack);
                                         isIf = false;
                                         if (hideEmptyTrueFalse && prevExpr.getNotCoercedNoDup() instanceof TrueItem) {
                                             stack.push(rightSide);
@@ -5151,7 +5153,7 @@ public class Graph {
                                             stack.push(new OrItem(dialect, null, localData.lineStartInstruction, leftSide, rightSide));
                                         }
                                     } else {
-                                        stack.push(prevExpr); //push it back
+                                        stack.push(originalPrevExpr); //push it back
                                         //Still unstructured
                                     }
                                 } else {
