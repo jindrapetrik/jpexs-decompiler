@@ -133,6 +133,8 @@ public class Graph {
 
     private int reachabilityCacheRows;
 
+    private final Set<Integer> gotoTargetIps = new HashSet<>();
+
     /**
      * Debug flag to print all parts
      */
@@ -1116,6 +1118,7 @@ public class Graph {
      * @throws InterruptedException On interrupt
      */
     public List<GraphTargetItem> translate(BaseLocalData localData, int staticOperation, String path) throws InterruptedException {
+        gotoTargetIps.clear();
 
         Set<GraphPart> allParts = new HashSet<>();
         for (GraphPart head : heads) {
@@ -1195,6 +1198,7 @@ public class Graph {
         if (localData.secondPassData == null) {
             SecondPassData secondPassData = prepareSecondPass(localData, loops, throwStates, ret);
             if (secondPassData != null) {
+                secondPassData.gotoTargetIps.addAll(gotoTargetIps);
                 throw new SecondPassException(secondPassData, ret);
             }
         }
@@ -4165,6 +4169,18 @@ public class Graph {
         return stack.pop();
     }
 
+    private boolean isTerminalExitPart(BaseLocalData localData, GraphPart part, List<ThrowState> throwStates) {
+        if (part.end < 0 || part.end >= code.size() || !getNextParts(localData, part).isEmpty() || !code.get(part.end).isExit()) {
+            return false;
+        }
+        for (ThrowState state : throwStates) {
+            if (state.state != 1 && state.throwingParts.contains(part)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private GraphTargetItem getShortCircuitLeftSide(GraphTargetItem previous, GraphTargetItem condition, List<GraphTargetItem> output, TranslateStack stack) {
         if (condition instanceof DuplicateItem && !output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
             DuplicateItem duplicate = (DuplicateItem) condition;
@@ -4476,6 +4492,7 @@ public class Graph {
                         firstCode.add(firstCodePos, new LabelItem(dialect, null, localData.lineStartInstruction, labelName));
                     }
                     ret.add(new GotoItem(dialect, null, localData.lineStartInstruction, labelName));
+                    gotoTargetIps.add(part.start);
                     localData.gotosUsed.setVal(true);
                     break loopPrintGraph;
                 } else {
@@ -4928,6 +4945,13 @@ public class Graph {
                                             }
                                             if (!n.leadsTo(localData, this, code, next, loops, throwStates, true /*IMPORTANT*/)) {
                                                 GraphPart n2 = getCommonPart(localData, r, Arrays.asList(next, n), loops, throwStates);
+                                                if (n2 == null && !ig.contains(next) && !ig.contains(n)
+                                                        && localData.secondPassData.gotoTargetIps.contains(next.start)
+                                                        && isTerminalExitPart(localData, n, throwStates)) {
+                                                    // A return/uncaught throw has no common continuation.
+                                                    // Keep that exit inside the block and break to the shared tail.
+                                                    n2 = next;
+                                                }
                                                 if (n2 != null && n2.start < code.size()) {
                                                     //System.err.println("Found block: start = " + part + ", break = " + n2 + ", exit = " + r);
                                                     //System.err.println("next = " + next);

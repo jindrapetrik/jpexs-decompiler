@@ -201,6 +201,84 @@ public class ActionScript2GraphTest {
         return decompile(swf, new DoActionTag(swf), actions);
     }
 
+    private String countAlwaysBreakPath(String counter, String marker) {
+        return "Push \"" + counter + "\", \"" + counter + "\"\nGetVariable\nPush 1\nAdd2\nSetVariable\n"
+                + "Push \"marker\", \"" + marker + "\"\nSetVariable\n";
+    }
+
+    private String alwaysBreakWithExitPcode(String exit) {
+        return "Push \"entry\"\nGetVariable\nNot\nIf shared\n"
+                + "Push \"first\"\nGetVariable\nNot\nIf early\n"
+                + "Push \"second\"\nGetVariable\nNot\nIf early\n"
+                + countAlwaysBreakPath("selectedCounter", "SELECTED")
+                + "Push \"call\"\nGetVariable\nNot\nIf leave\n"
+                + countAlwaysBreakPath("calledCounter", "CALLED")
+                + "leave: Jump shared\nearly: " + countAlwaysBreakPath("earlyCounter", "EARLY")
+                + "Push 0\n" + exit + "\nshared: " + countAlwaysBreakPath("sharedCounter", "SHARED")
+                + "Push 0\nReturn\n";
+    }
+
+    @DataProvider(name = "alwaysBreakExitPaths")
+    public Object[][] alwaysBreakExitPaths() {
+        List<Object[]> paths = new ArrayList<>();
+        for (int bits = 0; bits < 16; bits++) {
+            paths.add(new Object[]{(bits & 1) != 0, (bits & 2) != 0, (bits & 4) != 0, (bits & 8) != 0});
+        }
+        return paths.toArray(new Object[paths.size()][]);
+    }
+
+    private LocalDataArea runAlwaysBreakPath(List<Action> actions, boolean entry, boolean first, boolean second, boolean call) {
+        Action.setActionsAddresses(actions, 0);
+        LocalDataArea local = new LocalDataArea(null);
+        local.localVariables.put("entry", entry);
+        local.localVariables.put("first", first);
+        local.localVariables.put("second", second);
+        local.localVariables.put("call", call);
+        for (String name : new String[]{"selectedCounter", "calledCounter", "earlyCounter", "sharedCounter"}) {
+            local.localVariables.put(name, 0L);
+        }
+        int steps = 0;
+        for (int ip = 0; ip < actions.size();) {
+            Assert.assertTrue(++steps < 1000, "Always-break block did not terminate");
+            Action action = actions.get(ip);
+            local.jump = null;
+            Assert.assertTrue(action.execute(local), action.toString());
+            if (action.isExit()) {
+                break;
+            }
+            ip = local.jump == null ? ip + 1 : Action.adr2ip(actions, local.jump);
+        }
+        Assert.assertTrue(local.stack.isEmpty(), "Always-break block left values on the stack");
+        return local;
+    }
+
+    @Test(dataProvider = "alwaysBreakExitPaths")
+    public void testAlwaysBreakWithSeparateReturnDoesNotDuplicateCode(boolean entry, boolean first, boolean second, boolean call) throws Exception {
+        SWF swf = new SWF();
+        List<Action> original = ASMParser.parse(0, true, alwaysBreakWithExitPcode("Return"), swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), original, 0);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertTrue(result.contains("while(true)") && result.contains("break;"), result);
+        for (String marker : new String[]{"SELECTED", "CALLED", "EARLY", "SHARED"}) {
+            Assert.assertEquals(result.split("\"" + marker + "\"", -1).length - 1, 1, result);
+        }
+        Assert.assertEquals(result.split("return 0;", -1).length - 1, 2, result);
+        List<Action> compiled = new ActionScript2Parser(swf, new DoActionTag(swf)).actionsFromString(result, Utf8Helper.charsetName);
+        LocalDataArea before = runAlwaysBreakPath(original, entry, first, second, call);
+        LocalDataArea after = runAlwaysBreakPath(compiled, entry, first, second, call);
+        Assert.assertEquals(after.returnValue, before.returnValue);
+        Assert.assertEquals(after.localVariables, before.localVariables);
+    }
+
+    @Test
+    public void testAlwaysBreakWithSeparateThrowDoesNotDuplicateCode() throws Exception {
+        String result = decompilePcode(alwaysBreakWithExitPcode("Throw"));
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertTrue(result.contains("while(true)") && result.contains("break;"), result);
+        Assert.assertEquals(result.split("\"SHARED\"", -1).length - 1, 1, result);
+        Assert.assertEquals(result.split("throw 0;", -1).length - 1, 1, result);
+    }
+
     private String absoluteValuePcode(String label) {
         return "Push \"x\"\nGetVariable\nPush \"0\"\nLess\nIf " + label + "Negative\n"
                 + "Push \"x\"\nGetVariable\nJump " + label + "Done\n"
