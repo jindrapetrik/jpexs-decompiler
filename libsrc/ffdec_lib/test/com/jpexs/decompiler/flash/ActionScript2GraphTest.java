@@ -201,6 +201,26 @@ public class ActionScript2GraphTest {
         return decompile(swf, new DoActionTag(swf), actions);
     }
 
+    @DataProvider(name = "shortCircuitLoopConditions")
+    public Object[][] shortCircuitLoopConditions() {
+        return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
+    }
+
+    @Test(dataProvider = "shortCircuitLoopConditions")
+    public void testDoWhileKeepsConditionEvaluatedBeforePrecontinue(boolean and, boolean nested) throws Exception {
+        String branch = "PushDuplicate\n" + (and ? "Not\n" : "") + "If join\nPop\n";
+        String pcode = "start: Push \"value\", 0, \"next\"\nCallFunction\nSetVariable\n"
+                + "Push 0, \"left\"\nCallFunction\n" + branch
+                + (nested ? "Push 0, \"middle\"\nCallFunction\n" + branch : "")
+                + "Push 0, \"right\"\nCallFunction\njoin: If start\nPush \"after\"\nTrace\n";
+        String operator = and ? " && " : " || ";
+        String condition = "left()" + operator + (nested ? "(middle()" + operator + "right())" : "right()");
+        String expected = "do\n{\n   value = next();\n}\nwhile(" + condition + ");\ntrace(\"after\");";
+        String result = decompilePcode(pcode);
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
     private String countAlwaysBreakPath(String counter, String marker) {
         return "Push \"" + counter + "\", \"" + counter + "\"\nGetVariable\nPush 1\nAdd2\nSetVariable\n"
                 + "Push \"marker\", \"" + marker + "\"\nSetVariable\n";

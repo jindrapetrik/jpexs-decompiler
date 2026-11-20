@@ -4557,7 +4557,9 @@ public class Graph {
                                 && ((ifi.onFalse.size() == 1) && (ifi.onFalse.get(0) instanceof BreakItem) && (((BreakItem) ifi.onFalse.get(0)).loopId == currentLoop.id))) {
                             ok = true;
                         }
-                        if (ok) {
+                        // A condition which consumes a value from the loop body
+                        // cannot be translated separately with an empty stack.
+                        if (ok && !containsPopItems(precontinueCommands)) {
                             doWhileCandidate = true;
                         }
                     }
