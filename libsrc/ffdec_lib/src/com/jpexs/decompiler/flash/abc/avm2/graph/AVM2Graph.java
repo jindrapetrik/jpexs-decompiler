@@ -91,6 +91,7 @@ import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.AbstractGraphTargetRecursiveVisitor;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
+import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphException;
@@ -1458,6 +1459,9 @@ public class AVM2Graph extends Graph {
                     finallyCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, finallyPart, finallyStopPart, finallyStopPartKind, loops, throwStates, staticOperation, path);
                 }
                 if (switchPart != null) {
+                    if (localData.finallyKinds.get(finallyIndex) == FINALLY_KIND_STACK_BASED) {
+                        removeFinallySelectorSaves(finallyCommands, localData, switchPart, allParts);
+                    }
                     try {
                         translatePart(finallyCommands, localData, switchPart, stack, staticOperation, path);
                     } catch (GraphPartChangeException ex) {
@@ -1694,6 +1698,73 @@ public class AVM2Graph extends Graph {
                 printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, afterPart, stopPart, stopPartKind, loops, throwStates, currentRet, staticOperation, path, recursionLevel);
             }
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Removes saves of the hidden finally selector around nested try blocks.
+     * AVM2 clears the operand stack on entry to a catch, so the compiler keeps
+     * the selector in a local until the nested try/catch has finished.
+     */
+    private void removeFinallySelectorSaves(List<GraphTargetItem> commands, AVM2LocalData localData,
+            GraphPart switchPart, Set<GraphPart> allParts) {
+        for (int i = 0; i < commands.size(); i++) {
+            GraphTargetItem item = commands.get(i);
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    removeFinallySelectorSaves(sub, localData, switchPart, allParts);
+                }
+            } else if (item instanceof SetLocalAVM2Item && item.getSrc() != null
+                    && item.value.getNotCoerced() instanceof PopItem
+                    && ((PopItem) item.value.getNotCoerced()).resolvedValue == null) {
+                SetLocalAVM2Item save = (SetLocalAVM2Item) item;
+                int saveIp = avm2code.adr2pos(item.getSrc().getAddress());
+                Set<Integer> usages = localData.getSetLocalUsages(saveIp);
+                if (usages.size() == 1
+                        && localData.codeStats.instructionStats[saveIp].stackpos
+                        == localData.codeStats.instructionStats[switchPart.end].stackpos
+                        && isFinallySelectorRestore(usages.iterator().next(), save.regIndex, switchPart, allParts)) {
+                    commands.remove(i--);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks that the saved local is read only to feed the known finally
+     * dispatch, allowing the compiler's conversion and register cleanup.
+     */
+    private boolean isFinallySelectorRestore(int readIp, int register, GraphPart switchPart, Set<GraphPart> allParts) {
+        AVM2Instruction read = avm2code.code.get(readIp);
+        if (!(read.definition instanceof GetLocalTypeIns)
+                || ((GetLocalTypeIns) read.definition).getRegisterId(read) != register) {
+            return false;
+        }
+        GraphPart part = searchPart(readIp, allParts);
+        Set<GraphPart> visited = new HashSet<>();
+        int ip = readIp + 1;
+        while (part != null && visited.add(part)) {
+            for (; ip <= part.end; ip++) {
+                if (part == switchPart && ip == switchPart.end) {
+                    return true;
+                }
+                AVM2Instruction ins = avm2code.code.get(ip);
+                if (!(ins.definition instanceof CoerceAIns)
+                        && !(ins.definition instanceof ConvertIIns)
+                        && !(ins.definition instanceof KillIns && ins.operands[0] == register)
+                        && !(ins.definition instanceof DebugLineIns)
+                        && !(ins.definition instanceof LabelIns)
+                        && !(ins.definition instanceof NopIns)
+                        && !(ins.definition instanceof JumpIns)) {
+                    return false;
+                }
+            }
+            if (part.nextParts.size() != 1) {
+                return false;
+            }
+            part = part.nextParts.get(0);
+            ip = part.start;
         }
         return false;
     }

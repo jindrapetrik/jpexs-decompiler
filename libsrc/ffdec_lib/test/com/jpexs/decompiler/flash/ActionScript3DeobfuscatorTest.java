@@ -1043,6 +1043,54 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "         trace(\"after\");\n");
     }
 
+    @DataProvider(name = "savedFinallySelectors")
+    public Object[][] savedFinallySelectors() {
+        return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
+    }
+
+    @Test(dataProvider = "savedFinallySelectors")
+    public void testNestedTryPreservesOuterFinallySelector(boolean coerce, boolean reuseRegister) throws Exception {
+        String inner = "try\n"
+                + "{\n"
+                + "   trace(\"inner\");\n"
+                + "}\n"
+                + "catch(e:Error)\n"
+                + "{\n"
+                + "}";
+        inner = "if(param1)\n{\n" + inner.replaceAll("(?m)^", "   ") + "\n}";
+        StringBuilder expected = new StringBuilder("         try\n         {\n            trace(\"work\");\n"
+                + "         }\n         catch(e:Error)\n         {\n         }\n         finally\n         {\n");
+        expected.append(inner.replaceAll("(?m)^", "            ")).append("\n         }\n         trace(\"after\");\n");
+        if (reuseRegister) {
+            expected.append("         var _loc3_:int = 42;\n         trace(_loc3_);\n");
+        }
+        decompilePCodeWithLines(
+                "protected_start:\nfindpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"work\"\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "caught_end: jump normal\n"
+                + "outer_catch: getlocal0\npushscope\nnewcatch 0\ndup\nsetlocal 4\ndup\npushscope\nswap\n"
+                + "setslot 1\npopscope\nkill 4\n"
+                + "normal: pushbyte -1\nprotected_end: jump cleanup\n"
+                + "handler: getlocal0\npushscope\ncoerce_a\nsetlocal2\npushbyte 0\njump cleanup\n"
+                + "rethrow: getlocal2\nkill 2\nthrow\n"
+                + "cleanup: getlocal1\niffalse dispatch\n"
+                + "inner_start:\n" + (coerce ? "coerce_a\n" : "") + "setlocal3\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"inner\"\n"
+                + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\ninner_end: jump restore\n"
+                + "inner_handler: getlocal0\npushscope\nnewcatch 2\ndup\nsetlocal 4\ndup\npushscope\nswap\n"
+                + "setslot 1\npopscope\nkill 4\n"
+                + "restore: getlocal3\n" + (coerce ? "convert_i\n" : "") + "kill 3\n"
+                + "dispatch: lookupswitch done, [rethrow]\n"
+                + "done: findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"after\"\n"
+                + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + (reuseRegister ? "pushbyte 42\nsetlocal3\nfindpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                        + "getlocal3\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n" : "")
+                + "try from protected_start to caught_end target outer_catch type QName(PackageNamespace(\"\"),\"Error\") name QName(PackageNamespace(\"\"),\"e\") end\n"
+                + "try from protected_start to protected_end target handler type null name null end\n"
+                + "try from inner_start to inner_end target inner_handler type QName(PackageNamespace(\"\"),\"Error\") name QName(PackageNamespace(\"\"),\"e\") end\n",
+                expected.toString());
+    }
+
     @Test
     public void testWhileTrue() throws Exception {
         decompilePCode(
