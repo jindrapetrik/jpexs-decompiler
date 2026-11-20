@@ -201,6 +201,36 @@ public class ActionScript2GraphTest {
         return decompile(swf, new DoActionTag(swf), actions);
     }
 
+    @DataProvider(name = "functionsInLoops")
+    public Object[][] functionsInLoops() {
+        return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
+    }
+
+    @Test(dataProvider = "functionsInLoops")
+    public void testFunctionAssignmentsStayInsideLoop(boolean function2, boolean pretest) throws Exception {
+        String function = function2
+                ? "DefineFunction2 \"\", 0, 1, false, false, false, false, false, false, false, false, false {\n"
+                : "DefineFunction \"\", 0 {\n";
+        String condition = "Push \"i\"\nGetVariable\nPush \"count\"\nGetVariable\nLess2\n";
+        String pcode = "Push \"i\", 0\nDefineLocal\nloop:\n"
+                + (pretest ? condition + "Not\nIf done\n" : "")
+                + "Push \"first\"\nGetVariable\nPush \"onRelease\"\n" + function
+                + "Push \"first callback\"\nTrace\n}\nSetMember\n"
+                + "Push \"between\"\nTrace\nPush \"second\"\nGetVariable\nPush \"onRelease\"\n" + function
+                + "Push \"second callback\"\nTrace\n}\nSetMember\n"
+                + "Push \"i\", \"i\"\nGetVariable\nIncrement\nSetVariable\n"
+                + (pretest ? "Jump loop\n" : condition + "If loop\n")
+                + "done: Push \"after\"\nTrace\n";
+        String expected = "var i = 0;\n" + (pretest ? "while(i < count)" : "do") + "\n{\n"
+                + "   first.onRelease = function()\n   {\n      trace(\"first callback\");\n   };\n"
+                + "   trace(\"between\");\n"
+                + "   second.onRelease = function()\n   {\n      trace(\"second callback\");\n   };\n"
+                + "   i++;\n}\n" + (pretest ? "" : "while(i < count);\n") + "trace(\"after\");";
+        String result = decompilePcode(pcode);
+        Assert.assertEquals(result, expected);
+        Assert.assertEquals(compileAndDecompile(result), expected);
+    }
+
     @DataProvider(name = "shortCircuitLoopConditions")
     public Object[][] shortCircuitLoopConditions() {
         return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};

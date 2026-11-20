@@ -1431,6 +1431,12 @@ public abstract class Action implements GraphSourceItem {
                 }
 
                 ((GraphSourceItemContainer) action).translateContainer(outs, action, stack, output, registerNames, variables, functions);
+                // Function bodies are skipped by the graph's successor edge.
+                // Ending at their header is a normal part boundary, not a jump
+                // which should restart translation of the current loop.
+                if (ip == end && (action instanceof ActionDefineFunction || action instanceof ActionDefineFunction2)) {
+                    return;
+                }
                 ip = adr2ip(actions, endAddr);
                 continue;
             }
