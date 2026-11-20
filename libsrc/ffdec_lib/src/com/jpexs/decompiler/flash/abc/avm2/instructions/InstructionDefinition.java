@@ -1424,13 +1424,18 @@ public abstract class InstructionDefinition implements Serializable {
         if (!saved.directlyCausedByDup || saved.regIndex != loaded.regIndex || saved.getSrc() == null || loaded.getSrc() == null
                 || loaded.computedValue == null || loaded.computedValue.getThroughDuplicate() != update
                 || !(update instanceof IncrementAVM2Item || update instanceof DecrementAVM2Item)
-                || !TypeItem.INT.equals(update.returnType()) || !(update.value instanceof GetPropertyAVM2Item)) {
+                || !(update.value instanceof GetPropertyAVM2Item)) {
             return false;
         }
+        // uint prefix updates keep a Number result on the stack and coerce
+        // only the value stored back to the property. int updates use int arithmetic.
+        GraphTargetItem numberType = update.returnType();
         GetPropertyAVM2Item property = (GetPropertyAVM2Item) update.value;
         if (!(property.object instanceof FindPropertyAVM2Item)
                 || property.object != ((LocalRegAVM2Item) obj).computedValue
-                || !name.equals(property.propertyName) || !TypeItem.INT.equals(property.returnType())) {
+                || !name.equals(property.propertyName)
+                || !(numberType.equals(property.returnType())
+                    || (TypeItem.NUMBER.equals(numberType) && TypeItem.UINT.equals(property.returnType())))) {
             return false;
         }
         Set<Integer> usages = localData.getSetLocalUsages(localData.code.adr2pos(saved.getSrc().getAddress()));
@@ -1440,8 +1445,8 @@ public abstract class InstructionDefinition implements Serializable {
 
         stack.pop();
         stack.push(update instanceof IncrementAVM2Item
-                ? new PreIncrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, TypeItem.INT)
-                : new PreDecrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, TypeItem.INT));
+                ? new PreIncrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, numberType)
+                : new PreDecrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, numberType));
         return true;
     }
 

@@ -1874,6 +1874,49 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         return new Object[][]{{"increment", "++"}, {"decrement", "--"}};
     }
 
+    @DataProvider(name = "numberPrefixConditions")
+    public Object[][] numberPrefixConditions() {
+        return new Object[][]{
+            {"++", "||", "Number"}, {"--", "||", "Number"}, {"++", "&&", "Number"}, {"--", "&&", "Number"},
+            {"++", "||", "uint"}, {"--", "||", "uint"}, {"++", "&&", "uint"}, {"--", "&&", "uint"}
+        };
+    }
+
+    @Test(dataProvider = "numberPrefixConditions")
+    public void testNumberPropertyPrefixUpdateInShortCircuit(String update, String logical, String type) throws Exception {
+        String condition = "ready() " + logical + " " + update + "deadCount == liveTime";
+        String result = recompileSource("package { public class Test {"
+                + "private var deadCount:" + type + "; private var liveTime:Number;"
+                + "private function ready():Boolean { return false; }"
+                + "private function removeMe():void { }"
+                + "public function test():void { if(" + condition + ") { removeMe(); } }"
+                + "} }");
+        assertTrue(result.contains("if(" + condition + ")"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+    }
+
+    @Test(dataProvider = "updateOperators")
+    public void testChainedIndexedAssignmentWithNumberPrefixUpdate(String operator) throws Exception {
+        String update = "id = table[key] = " + operator + "uid;";
+        String source = recompileSource("package { import flash.utils.Dictionary; public class Test {"
+                + "private static var uid:Number; private static var table:Dictionary = new Dictionary();"
+                + "public static function test(key:Object):Number { var id:Number = Number(table[key]);"
+                + "if(id == 0) { " + update + " } return id; } } }");
+        assertTrue(source.contains(update), source);
+        Assert.assertFalse(source.contains("§§"), source);
+    }
+
+    @Test(dataProvider = "updateOperators")
+    public void testUnsignedPrefixUpdateReturnsNumberAtOverflow(String operator) throws Exception {
+        String initial = "++".equals(operator) ? "4294967295" : "0";
+        String result = recompileSource("package { public class Test {"
+                + "private var counter:uint = " + initial + ";"
+                + "public function test():Number { return " + operator + "counter; }"
+                + "} }");
+        assertTrue(result.contains("return " + operator + "counter;"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+    }
+
     @Test(dataProvider = "updateOperators")
     public void testIntegerPropertyPostUpdateInShortCircuit(String operator) throws Exception {
         String condition = "counter < 2147483647 && counter" + operator + " == 0";
