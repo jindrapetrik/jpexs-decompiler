@@ -3575,6 +3575,28 @@ public class AVM2Graph extends Graph {
     }
 
     /**
+     * Gets the end of a handler's scope restoration and newcatch prefix.
+     * Returns the target itself when the prefix is not recognized.
+     */
+    private int getCatchScopeSetupEnd(int exceptionIndex) {
+        int targetIp = code.adr2pos(body.exceptions[exceptionIndex].target);
+        for (int ip = targetIp; ip < avm2code.code.size(); ip++) {
+            AVM2Instruction ins = avm2code.code.get(ip);
+            if (ins.definition instanceof NewCatchIns) {
+                return ins.operands[0] == exceptionIndex ? ip + 1 : targetIp;
+            }
+            if (!(ins.definition instanceof GetLocalTypeIns)
+                    && !(ins.definition instanceof PushScopeIns)
+                    && !(ins.definition instanceof DebugLineIns)
+                    && !(ins.definition instanceof NopIns)
+                    && !(ins.definition instanceof LabelIns)) {
+                return targetIp;
+            }
+        }
+        return targetIp;
+    }
+
+    /**
      * Gets throw states.
      *
      * @param localData Local data
@@ -3596,8 +3618,16 @@ public class AVM2Graph extends Graph {
             int startIp = code.adr2pos(body.exceptions[e].start, true);
             int endIp = code.adr2pos(body.exceptions[e].end, true);
             ts.startPart = searchPart(startIp, allParts);
+            int targetIp = code.adr2pos(body.exceptions[e].target);
+            int catchSetupEnd = getCatchScopeSetupEnd(e);
             for (GraphPart p : allParts) {
                 if (p.start >= startIp && p.start < endIp) {
+                    // Some protected ranges extend into their own handler's
+                    // scope setup. This compiler prefix is not a re-entry into
+                    // the catch body and must not create an exception loop.
+                    if (p.start >= targetIp && Math.min(p.end + 1, endIp) <= catchSetupEnd) {
+                        continue;
+                    }
                     ts.throwingParts.add(p);
                 }
             }

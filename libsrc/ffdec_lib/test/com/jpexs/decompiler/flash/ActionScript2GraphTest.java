@@ -208,6 +208,18 @@ public class ActionScript2GraphTest {
         return decompile(swf, new DoActionTag(swf), actions);
     }
 
+    @Test
+    public void testTellTargetWithRuntimeRegisterValue() throws Exception {
+        String result = decompilePcode("Push \"_root\"\nGetVariable\nStoreRegister 1\nPop\n"
+                + "Push register1\nSetTarget2\nGotoFrame 1\nSetTarget \"\"\nPush \"after\"\nTrace\n");
+        Assert.assertTrue(result.contains("tellTarget(_loc1_)"), result);
+        Assert.assertTrue(result.contains("_root"), result);
+        Assert.assertTrue(result.contains("gotoAndStop(2)"), result);
+        Assert.assertTrue(result.contains("trace(\"after\")"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
     @DataProvider(name = "overlappingFunctionTails")
     public Object[][] overlappingFunctionTails() {
         return new Object[][]{{false}, {true}};

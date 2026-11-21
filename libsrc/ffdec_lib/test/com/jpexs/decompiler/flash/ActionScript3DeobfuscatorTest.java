@@ -1092,6 +1092,50 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         assertTrue(result.indexOf("trace(\"after inner\");") > result.indexOf("trace(\"inner catch\");"), result);
     }
 
+    @DataProvider(name = "catchScopeSetups")
+    public Object[][] catchScopeSetups() {
+        return new Object[][]{{false, false}, {true, false}, {true, true}};
+    }
+
+    @Test(dataProvider = "catchScopeSetups")
+    public void testTryRangeOverlapsCatchScopeSetup(boolean coversNewCatch, boolean loopInCatch) throws Exception {
+        decompilePCodeWithLines("newactivation\ndup\nsetlocal2\npushscope\n"
+                + "protected_start: findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"work\"\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "pushnull\nreturnvalue\n"
+                + "security_handler: getlocal0\npushscope\ngetlocal2\npushscope\n"
+                + (coversNewCatch ? "" : "protected_end:\n") + "newcatch 0\n"
+                + (coversNewCatch ? "protected_end:\n" : "")
+                + "dup\nsetlocal3\ndup\npushscope\nswap\nsetslot 1\n"
+                + (loopInCatch ? "repeat_security: label\n" : "")
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"security\"\n"
+                + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + (loopInCatch ? "getlocal1\niftrue repeat_security\n" : "")
+                + "popscope\nkill 3\njump done\n"
+                + "error_handler: getlocal0\npushscope\ngetlocal2\npushscope\nnewcatch 1\n"
+                + "dup\nsetlocal3\ndup\npushscope\nswap\nsetslot 1\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"error\"\n"
+                + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\npopscope\nkill 3\n"
+                + "done: pushnull\nreturnvalue\n"
+                + "try from protected_start to protected_end target security_handler type QName(PackageNamespace(\"\"),\"SecurityError\") name QName(PackageNamespace(\"\"),\"e\") end\n"
+                + "try from protected_start to protected_end target error_handler type QName(PackageNamespace(\"\"),\"Error\") name QName(PackageNamespace(\"\"),\"e\") end\n",
+                "         try\n"
+                + "         {\n"
+                + "            trace(\"work\");\n"
+                + "            return null;\n"
+                + "         }\n"
+                + "         catch(e:SecurityError)\n"
+                + "         {\n"
+                + (loopInCatch ? "            do\n            {\n               trace(\"security\");\n            }\n            while(param1);\n"
+                        : "            trace(\"security\");\n")
+                + "         }\n"
+                + "         catch(e:Error)\n"
+                + "         {\n"
+                + "            trace(\"error\");\n"
+                + "         }\n"
+                + "         return null;\n");
+    }
+
     @DataProvider(name = "enumerationSharedTails")
     public Object[][] enumerationSharedTails() {
         return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
