@@ -524,7 +524,7 @@ public class ActionGraph extends Graph {
                         t--;
                         continue;
                     }
-                    if ((st.target instanceof DirectValueActionItem) && st.target.getResult().equals("")) {
+                    if ((st.target instanceof DirectValueActionItem) && "".equals(st.target.getResult())) {
                         if (targetStart > -1) {
                             targetEnd = t;
                             break;
@@ -587,7 +587,7 @@ public class ActionGraph extends Graph {
             }
             if (it instanceof SetTarget2ActionItem) {
                 SetTarget2ActionItem st = (SetTarget2ActionItem) it;
-                if ((st.target instanceof DirectValueActionItem) && st.target.getResult().equals("")) {
+                if ((st.target instanceof DirectValueActionItem) && "".equals(st.target.getResult())) {
                     if (targetStart > -1) {
                         targetEnd = t;
                     } else {
