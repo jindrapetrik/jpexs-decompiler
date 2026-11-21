@@ -16,7 +16,9 @@ import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -129,5 +131,95 @@ public class DebugLoaderEventBridgeTest {
         helper.name_index = abc.constants.getPublicQnameId("bridgeEventListener", true);
         clazz.static_traits.traits.add(helper);
         assertTrue(DebugLoaderEventBridge.isAvailable(abc, PACKAGE));
+    }
+
+    @DataProvider(name = "missingListenerNames")
+    public Object[][] missingListenerNames() {
+        Object[][] cases = new Object[24][2];
+        int index = 0;
+        for (int kind = 0; kind < 8; kind++) {
+            for (int opcode : new int[]{AVM2Instructions.GetProperty,
+                AVM2Instructions.CallProperty, AVM2Instructions.CallPropVoid}) {
+                cases[index++] = new Object[]{kind, opcode};
+            }
+        }
+        return cases;
+    }
+
+    @Test(dataProvider = "missingListenerNames")
+    public void skipsMissingNamesAndStillInstrumentsReachableListeners(int kind, int opcode) {
+        ABC abc = new ABC(null);
+        int listener = abc.constants.getPublicQnameId("addEventListener", true);
+        int string = abc.constants.getStringId("addEventListener", true);
+        int publicNamespace = abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true);
+        int invalid;
+        switch (kind) {
+            case 0:
+                invalid = 0; // The implicit wildcard entry is null.
+                break;
+            case 1:
+                invalid = abc.constants.addMultiname(null);
+                break;
+            case 2:
+                invalid = 0x100000;
+                break;
+            case 3:
+                invalid = abc.constants.addMultiname(Multiname.createQName(false, string, 0));
+                break;
+            case 4:
+                invalid = abc.constants.addMultiname(Multiname.createMultiname(false, string, 0));
+                break;
+            case 5:
+                invalid = abc.constants.addMultiname(Multiname.createQName(false, 0x100000, publicNamespace));
+                break;
+            case 6:
+                invalid = abc.constants.addMultiname(Multiname.createQName(false, string, 0x100000));
+                break;
+            default:
+                invalid = abc.constants.addMultiname(Multiname.createMultiname(false, string, 0x100000));
+                break;
+        }
+        MethodBody body = new MethodBody();
+        AVM2Code code = body.getCode();
+        AVM2Instruction bad = new AVM2Instruction(0, opcode,
+                opcode == AVM2Instructions.GetProperty ? new int[]{invalid} : new int[]{invalid, 2});
+        code.code.add(new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{0}));
+        code.code.add(bad); // Obfuscators can put invalid references in dead code.
+        code.code.add(new AVM2Instruction(0, AVM2Instructions.CallPropVoid, new int[]{listener, 2}));
+        code.code.add(new AVM2Instruction(0, AVM2Instructions.ReturnVoid, null));
+        code.markOffsets();
+        code.code.get(0).operands[0] = bad.getBytesLength();
+        body.max_stack = 8;
+        body.setModified();
+        abc.bodies.add(body);
+        byte[] original = body.getCodeBytes().clone();
+
+        assertTrue(DebugLoaderEventBridge.inject(abc, PACKAGE));
+        assertSame(code.code.get(1), bad);
+        assertEquals(code.code.size(), 14);
+        assertEquals(code.code.get(0).getTargetAddress(), code.code.get(2).getAddress());
+        assertTrue(DebugLoaderEventBridge.remove(abc, PACKAGE));
+        assertEquals(body.getCodeBytes(), original);
+        assertEquals(body.max_stack, 8);
+    }
+
+    @Test
+    public void skipsMissingNamespaceWhenAnotherNamespaceIsPublic() {
+        ABC abc = new ABC(null);
+        int publicNamespace = abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, "", 0, true);
+        int set = abc.constants.addNamespaceSet(new NamespaceSet(new int[]{0, publicNamespace}));
+        int listener = abc.constants.addMultiname(Multiname.createMultiname(false,
+                abc.constants.getStringId("removeEventListener", true), set));
+        MethodBody body = new MethodBody();
+        body.getCode().code.add(new AVM2Instruction(0, AVM2Instructions.CallPropVoid, new int[]{listener, 2}));
+        body.getCode().markOffsets();
+        body.max_stack = 3;
+        body.setModified();
+        abc.bodies.add(body);
+        byte[] original = body.getCodeBytes().clone();
+
+        assertTrue(DebugLoaderEventBridge.inject(abc, PACKAGE));
+        assertTrue(DebugLoaderEventBridge.remove(abc, PACKAGE));
+        assertEquals(body.getCodeBytes(), original);
     }
 }

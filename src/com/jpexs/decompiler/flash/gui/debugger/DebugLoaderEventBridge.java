@@ -15,6 +15,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,8 @@ final class DebugLoaderEventBridge {
             }
             for (Trait trait : abc.class_info.get(i).static_traits.traits) {
                 Multiname name = abc.constants.getMultiname(trait.name_index);
-                if (METHOD.equals(abc.constants.getString(name.name_index))) {
+                if (name != null && name.name_index > 0 && name.name_index < abc.constants.getStringCount()
+                        && METHOD.equals(abc.constants.getString(name.name_index))) {
                     return true;
                 }
             }
@@ -146,19 +148,41 @@ final class DebugLoaderEventBridge {
     }
 
     private static boolean isListenerName(ABC abc, int index) {
+        // Index zero is the implicit wildcard entry, not a Multiname object.
+        // Dead obfuscation code can also reference missing pool entries.
+        if (index <= 0 || index >= abc.constants.getMultinameCount()) {
+            return false;
+        }
         Multiname name = abc.constants.getMultiname(index);
-        if (name.kind != Multiname.QNAME && name.kind != Multiname.MULTINAME) {
+        if (name == null || (name.kind != Multiname.QNAME && name.kind != Multiname.MULTINAME)
+                || name.name_index <= 0 || name.name_index >= abc.constants.getStringCount()) {
             return false;
         }
         String value = abc.constants.getString(name.name_index);
         if (!"addEventListener".equals(value) && !"removeEventListener".equals(value)) {
             return false;
         }
-        int[] namespaces = name.kind == Multiname.QNAME ? new int[]{name.namespace_index}
-                : abc.constants.getNamespaceSet(name.namespace_set_index).namespaces;
+        int[] namespaces;
+        if (name.kind == Multiname.QNAME) {
+            namespaces = new int[]{name.namespace_index};
+        } else {
+            if (name.namespace_set_index <= 0 || name.namespace_set_index >= abc.constants.getNamespaceSetCount()) {
+                return false;
+            }
+            NamespaceSet set = abc.constants.getNamespaceSet(name.namespace_set_index);
+            if (set == null || set.namespaces == null) {
+                return false;
+            }
+            namespaces = set.namespaces;
+        }
         for (int indexNs : namespaces) {
+            if (indexNs <= 0 || indexNs >= abc.constants.getNamespaceCount()) {
+                continue;
+            }
             Namespace ns = abc.constants.getNamespace(indexNs);
-            if (ns.kind == Namespace.KIND_PACKAGE && "".equals(abc.constants.getString(ns.name_index))) {
+            if (ns != null && ns.kind == Namespace.KIND_PACKAGE
+                    && ns.name_index >= 0 && ns.name_index < abc.constants.getStringCount()
+                    && "".equals(abc.constants.getString(ns.name_index))) {
                 return true;
             }
         }
