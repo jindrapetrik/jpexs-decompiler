@@ -1723,12 +1723,14 @@ importtext
 importxml
 imt
 IMXML
+inbuf
 incatch
 inclocal
 inclocalp
 includeantruntime
 includeemptydirs
 includesfile
+incnt
 Indexnumber
 ine
 inexpr
