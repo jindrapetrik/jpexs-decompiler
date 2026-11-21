@@ -4733,6 +4733,7 @@ public class Graph {
 
                     GraphTargetItem it = switchedItem;
                     int defaultBranch = 0;
+                    boolean hasDefaultBranch = false;
                     boolean hasExpr = false;
                     List<GraphTargetItem> commaCommands = new ArrayList<>();
                     Map<Integer, List<GraphTargetItem>> caseCommaCommands = new HashMap<>();
@@ -4822,6 +4823,7 @@ public class Graph {
                     //int ignoredBranch = -1;
                     if ((it instanceof IntegerValueTypeItem) && !(switchedItem instanceof IntegerValueTypeItem)) {
                         defaultBranch = ((IntegerValueTypeItem) it).intValue();
+                        hasDefaultBranch = true;
                     }
 
                     Map<Integer, GraphTargetItem> caseExpressionOtherSides = caseExpressions;
@@ -4885,6 +4887,10 @@ public class Graph {
                                 expr = new CommaExpressionItem(dialect, null, expr.lineStartItem, exprCommaCommands);
                             }
                             caseValues.add(expr);
+                        } else if (hasDefaultBranch && pos == defaultBranch) {
+                            // The index selector retains the original default
+                            // position even when it shares a body with cases.
+                            caseValues.add(new DefaultItem(dialect));
                         } else {
                             pos++;
                             continue;
@@ -6036,7 +6042,7 @@ public class Graph {
             GraphSourceItem switchStartItem, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, Set<GraphPart> allParts, TranslateStack stack, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, BaseLocalData localData, int staticOperation, String path,
             List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef, Reference<Boolean> hasEmptyStackPops) throws InterruptedException {
 
-        boolean hasDefault = false;
+        boolean hasDefault = caseValuesMap.stream().anyMatch(value -> value instanceof DefaultItem);
         /*
                 case 4:
                 case 5:
@@ -6047,7 +6053,7 @@ public class Graph {
                 
          */
         //must go backwards to hit case 5, not case 4
-        for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
+        for (int i = caseBodyParts.size() - 1; !hasDefault && i >= 0; i--) {
             if (caseBodyParts.get(i) == defaultPart) {
                 DefaultItem di = new DefaultItem(dialect);
                 caseValuesMap.add(i + 1, di);
