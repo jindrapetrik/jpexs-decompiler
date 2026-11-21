@@ -836,4 +836,31 @@ public class ActionScript2GraphTest {
         Assert.assertTrue(compileAndDecompile(result).contains("for(var _loc3_ in stacks[_loc4_].items)"), result);
     }
 
+    @DataProvider(name = "guardedVoidExitLoops")
+    public Object[][] guardedVoidExitLoops() {
+        return new Object[][]{{true}, {false}};
+    }
+
+    @Test(dataProvider = "guardedVoidExitLoops")
+    public void testForInWithSharedVoidExitAndFallthrough(boolean guarded) throws Exception {
+        String pcode = "DefineFunction \"check\", 0 {\n"
+                + (guarded ? "Push \"enabled\"\nGetVariable\nNot\nIf afterLoop\n" : "")
+                + "Push \"obj\"\nGetVariable\nEnumerate2\n"
+                + "loop: StoreRegister 0\nPush null\nEquals2\nIf afterLoop\n"
+                + "Push \"key\", register0\nSetVariable\n"
+                + "Push \"hit\"\nGetVariable\nNot\nIf next\n"
+                + "Push \"side\"\nGetVariable\nNot\nIf second\n"
+                + "Push \"first\"\nTrace\nJump drain\n"
+                + "second: Push \"second\"\nTrace\n"
+                + "drain: Push null\nEquals2\nNot\nIf drain\nJump done\n"
+                + "next: Push \"border\", null\nSetVariable\nJump loop\n"
+                + "afterLoop: Push \"after\"\nTrace\ndone:\n}\n";
+        String result = decompilePcode(pcode);
+        Assert.assertTrue(result.contains("for(key in obj)"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertEquals(result.split("trace\\(\"after\"\\)", -1).length - 1, 1, result);
+        Assert.assertTrue(result.contains("border = null;"), result);
+        Assert.assertEquals(compileAndDecompile(result).replace("return undefined;", "return;"), result);
+    }
+
 }

@@ -1168,7 +1168,7 @@ public class Graph {
             //TODO: Make getPrecontinues faster
             getBackEdges(localData, loops, throwStates);
         }
-        LoopDetector detector = new LoopDetector();
+        LoopDetector detector = new LoopDetector(code.size());
 
         if (debugPrintLoopList) {
             detector.calculateClosedTime(heads, loops);

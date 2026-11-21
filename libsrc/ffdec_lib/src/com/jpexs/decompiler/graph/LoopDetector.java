@@ -27,6 +27,26 @@ import java.util.logging.Logger;
 public class LoopDetector {
 
     /**
+     * First instruction position outside the source, when known.
+     */
+    private final int codeSize;
+
+    /**
+     * Creates a detector for a graph without a known instruction limit.
+     */
+    public LoopDetector() {
+        this(Integer.MAX_VALUE);
+    }
+
+    /**
+     * @param codeSize First position after the real instructions; parts at this
+     * position represent implicit method completion rather than shared code.
+     */
+    public LoopDetector(int codeSize) {
+        this.codeSize = codeSize;
+    }
+
+    /**
      * Detects loops.
      *
      * @param heads
@@ -627,6 +647,11 @@ public class LoopDetector {
                     deadEndOutParts.add(outPart);
                 }
             }
+            if (deadEndOutParts.size() == localOutParts.size()) {
+                // Keep the condition's normal continuation when every exit
+                // eventually finishes the method. Other exits can return inline.
+                deadEndOutParts.removeAll(naturalOutParts);
+            }
             if (!deadEndOutParts.isEmpty() && deadEndOutParts.size() < localOutParts.size()) {
                 localOutParts.removeAll(deadEndOutParts);
                 excludedTargets.addAll(deadEndOutParts);
@@ -767,6 +792,10 @@ public class LoopDetector {
     private boolean isDeadEnd(Loop loop, GraphPart outPart, Set<GraphPartEdge> backEdges, PrevNextWalker walker, Set<GraphPartEdge> ignoredEdges) {
         Set<GraphPart> reachable = getReachable(outPart, backEdges, new HashSet<>(), walker, ignoredEdges);
         for (GraphPart part : reachable) {
+            if (part.start >= codeSize) {
+                // Sharing the empty end-of-code node does not share statements.
+                continue;
+            }
             for (GraphPart prev : walker.getPrev(part)) {
                 if (prev.start < 0) {
                     continue;
