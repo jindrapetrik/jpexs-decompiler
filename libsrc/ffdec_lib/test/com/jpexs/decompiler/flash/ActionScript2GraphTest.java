@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionTrace;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
@@ -205,6 +206,41 @@ public class ActionScript2GraphTest {
         SWF swf = new SWF();
         List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
         return decompile(swf, new DoActionTag(swf), actions);
+    }
+
+    @DataProvider(name = "overlappingFunctionTails")
+    public Object[][] overlappingFunctionTails() {
+        return new Object[][]{{false}, {true}};
+    }
+
+    @Test(dataProvider = "overlappingFunctionTails")
+    public void testOverlappingDeadActionKeepsFunctionAssignment(boolean function2) throws Exception {
+        SWF swf = new SWF();
+        String definition = function2
+                ? "DefineFunction2 \"\", 0, 1, false, false, false, false, false, false, false, false, false {\n"
+                : "DefineFunction \"\", 0 {\n";
+        List<Action> compiled = ASMParser.parse(0, true,
+                "Push \"obj\"\nGetVariable\nPush \"method\"\n" + definition
+                + "Push false\nIf garbage\nPush undefined\nReturn\ngarbage: Unknown_c0\n}\n"
+                + "SetMember\nPush \"after\"\nTrace\n", swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        byte[] bytes = Action.actionsToBytes(compiled, true, swf.version);
+        int scriptLength = bytes.length;
+        // The unreachable action claims data extending across the function's
+        // declared end and the SetMember that assigns the function.
+        int unknownOffset = (int) compiled.stream().filter(action -> action instanceof ActionUnknown)
+                .findFirst().get().getAddress();
+        bytes = java.util.Arrays.copyOf(bytes, bytes.length + 64);
+        bytes[unknownOffset + 1] = 64;
+        DoActionTag tag = new DoActionTag(swf);
+        ActionList actions = ActionListReader.readActionListTimeout(tag, new ArrayList<>(),
+                new SWFInputStream(swf, bytes), swf.version, 0, scriptLength, "", 1);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        Action.actionsToSource(new HashMap<>(), tag, actions, "", writer, swf.getCharset());
+        writer.finishHilights();
+        String result = writer.toString();
+        Assert.assertTrue(result.contains("obj.method = function()"), result);
+        Assert.assertTrue(result.contains("trace(\"after\")"), result);
+        Assert.assertFalse(result.contains("§§"), result);
     }
 
     @DataProvider(name = "waitForFrameNumbers")
