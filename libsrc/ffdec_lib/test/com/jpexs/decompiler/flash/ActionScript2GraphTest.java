@@ -316,6 +316,52 @@ public class ActionScript2GraphTest {
         return decompile(swf, tag, actions);
     }
 
+    @DataProvider(name = "classInitializerScopes")
+    public Object[][] classInitializerScopes() {
+        return new Object[][]{{"", "cleanup"}, {"", "_temp_1"}, {"this", "cleanup"}, {"arguments", "cleanup"}};
+    }
+
+    @Test(dataProvider = "classInitializerScopes")
+    public void testClassFieldInitializerWithSetupAndCleanup(String setupArgument, String cleanup) throws Exception {
+        SWF swf = new SWF();
+        DefineSpriteTag sprite = new DefineSpriteTag(swf);
+        swf.addTag(sprite);
+        ExportAssetsTag exports = new ExportAssetsTag(swf);
+        exports.tags.add(sprite.spriteId);
+        exports.names.add(SWF.AS2_PKG_PREFIX + "Test");
+        swf.addTag(exports);
+        DoInitActionTag tag = new DoInitActionTag(swf);
+        tag.spriteId = sprite.spriteId;
+        swf.addTag(tag);
+        List<Action> actions = ASMParser.parse(0, true,
+                "Push \"_global\"\nGetVariable\nPush \"Test\"\nGetMember\nNot\nNot\nIf done\n"
+                + "Push \"_global\"\nGetVariable\nPush \"Test\"\nDefineFunction \"\", 0 {\n}\n"
+                + "StoreRegister 1\nSetMember\nPush register1, \"prototype\"\nGetMember\nStoreRegister 2\nPop\n"
+                + "Push register1, \"value\"\n"
+                + (setupArgument.isEmpty() ? "Push 0\n" : "Push \"" + setupArgument + "\"\nGetVariable\nPush 1\n")
+                + "Push \"prepare\"\nCallFunction\nPop\n"
+                + "Push 0, \"read\"\nCallFunction\nPush 0, \"" + cleanup + "\"\nCallFunction\nPop\nSetMember\n"
+                + "Push 1, null, register2, 3, \"ASSetPropFlags\"\nCallFunction\nPop\ndone:\n",
+                swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, tag, actions);
+        if (setupArgument.equals("arguments")) {
+            Assert.assertFalse(result.contains("class Test"), result);
+            Assert.assertTrue(result.contains("prepare(arguments)"), result);
+            return;
+        }
+        Assert.assertTrue(result.contains("class Test"), result);
+        Assert.assertTrue(result.contains("static var value"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+        for (String name : new String[]{"prepare", "read", cleanup}) {
+            Assert.assertEquals(result.split(name + "\\(" + (name.equals("prepare") ? setupArgument : "") + "\\)", -1).length - 1, 1, result);
+        }
+        Assert.assertTrue(result.indexOf("prepare(") < result.indexOf("read()"), result);
+        Assert.assertTrue(result.indexOf("read()") < result.indexOf(cleanup + "()"), result);
+        Assert.assertTrue(result.matches("(?s).*var (_temp_[0-9]+_*) = read\\(\\);.*" + cleanup + "\\(\\);.*return \\1;.*"), result);
+        Assert.assertTrue(result.contains(".call(this)"), result);
+        new ActionScript2Parser(swf, tag).actionsFromString(result, Utf8Helper.charsetName);
+    }
+
     @Test
     public void testUnpoppedValueAfterClassDetection() throws Exception {
         String result = decompileClassWithSavedStackValue(false);
