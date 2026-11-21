@@ -136,6 +136,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -2038,7 +2039,7 @@ public class AVM2Graph extends Graph {
             // to select an index and then dispatch through a shared lookupswitch.
             // Leave that pattern for the real switch handler below instead of
             // mistaking the index-selection comparisons for the source switch.
-            GraphPart lookupSwitchPart = getLinearLookupSwitchTarget(part.nextParts.get(branchNum));
+            GraphPart lookupSwitchPart = getLinearLookupSwitchTarget(caseBodyParts.get(0));
             if (lookupSwitchPart != null) {
                 for (GraphPart caseBodyPart : caseBodyParts) {
                     if (getLinearLookupSwitchTarget(caseBodyPart) != lookupSwitchPart) {
@@ -2046,18 +2047,9 @@ public class AVM2Graph extends Graph {
                         break;
                     }
                 }
-                if (lookupSwitchPart != null) {
-                    boolean lookupSwitchIsInLoop = false;
-                    for (Loop loop : loops) {
-                        if (loop.loopBody.contains(lookupSwitchPart)) {
-                            lookupSwitchIsInLoop = true;
-                            break;
-                        }
-                    }
-                    if (lookupSwitchIsInLoop) {
-                        stack.push(firstSet);
-                        return ret;
-                    }
+                if (lookupSwitchPart != null && allPathsReachLookupSwitch(part.nextParts.get(branchNum), lookupSwitchPart)) {
+                    stack.push(firstSet);
+                    return ret;
                 }
             }
             List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;
@@ -3572,6 +3564,45 @@ public class AVM2Graph extends Graph {
             part = part.nextParts.get(0);
         }
         return null;
+    }
+
+    /**
+     * Checks a remaining index-selection expression, including short-circuit
+     * branches, without following the actual switch bodies or accepting cycles.
+     */
+    private boolean allPathsReachLookupSwitch(GraphPart start, GraphPart target) {
+        Map<GraphPart, Integer> states = new HashMap<>();
+        states.put(target, 2);
+        Deque<GraphPart> pending = new ArrayDeque<>();
+        pending.push(start);
+        while (!pending.isEmpty()) {
+            GraphPart part = pending.peek();
+            if (states.getOrDefault(part, 0) == 2) {
+                pending.pop();
+                continue;
+            }
+            if (part.nextParts.isEmpty() || partIsSwitch(part)) {
+                return false;
+            }
+            states.put(part, 1);
+            boolean visitNext = false;
+            for (GraphPart next : part.nextParts) {
+                int state = states.getOrDefault(next, 0);
+                if (state == 1) {
+                    return false;
+                }
+                if (state == 0) {
+                    pending.push(next);
+                    visitNext = true;
+                    break;
+                }
+            }
+            if (!visitNext) {
+                states.put(part, 2);
+                pending.pop();
+            }
+        }
+        return true;
     }
 
     /**

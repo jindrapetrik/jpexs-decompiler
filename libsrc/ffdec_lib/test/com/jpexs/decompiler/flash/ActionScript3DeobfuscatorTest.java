@@ -803,6 +803,29 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
     }
 
+    @DataProvider(name = "logicalSwitchCases")
+    public Object[][] logicalSwitchCases() {
+        return new Object[][]{{"&&", true}, {"||", true}, {"&&", false}, {"||", false}};
+    }
+
+    @Test(dataProvider = "logicalSwitchCases")
+    public void testBooleanSwitchWithLogicalCaseExpressions(String operator, boolean switchedValue) throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test(a:int, b:int):String { var result:String; switch(" + switchedValue + ") {"
+                + "case a < 0 " + operator + " b < 0: result = \"negative\"; break;"
+                + "case a + 1 == b: result = \"next\"; break;"
+                + "case a > 0 " + operator + " b == a: result = \"same\"; break;"
+                + "case a > 0 " + operator + " b > a: result = \"larger\"; break;"
+                + "default: result = \"other\"; } return result; } } }");
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertEquals(result.split("switch\\(", -1).length - 1, 1, result);
+        String compact = result.replaceAll("\\s+", "");
+        assertTrue(compact.contains("switch(" + switchedValue + ")"), result);
+        assertTrue(compact.contains("casea<0" + operator + "b<0:"), result);
+        assertTrue(compact.contains("casea>0" + operator + "b==a:"), result);
+        assertTrue(compact.contains("casea>0" + operator + "b>a:"), result);
+    }
+
     @Test(dataProvider = "switchSharedExits")
     public void testSwitchSharedTailBeforeConditionalExit(boolean booleanSwitch, boolean throwExit) throws Exception {
         String result = recompileSource("package { public class Test {"
