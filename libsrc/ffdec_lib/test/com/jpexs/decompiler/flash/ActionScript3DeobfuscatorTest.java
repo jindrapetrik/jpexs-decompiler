@@ -720,6 +720,43 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "         }\n");
     }
 
+    @DataProvider(name = "switchSharedExits")
+    public Object[][] switchSharedExits() {
+        return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
+    }
+
+    @Test(dataProvider = "switchSharedExits")
+    public void testSwitchSharedTailBeforeConditionalExit(boolean booleanSwitch, boolean throwExit) throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test(which:int, exit:Boolean):void {"
+                + "switch(" + (booleanSwitch ? "true" : "which") + ") {"
+                + "case " + (booleanSwitch ? "which == 0" : "0") + ": trace(\"zero\"); break;"
+                + "case " + (booleanSwitch ? "which == 1" : "1") + ": trace(\"one\"); break;"
+                + "default: return; }"
+                + "if (exit) { trace(\"exit\"); " + (throwExit ? "throw new Error();" : "return;") + " }"
+                + "trace(\"after\"); } } }");
+        Assert.assertFalse(result.contains("§§"), result);
+        assertTrue(result.replaceAll("\\s+", "").contains("default:return;}if(exit){trace(\"exit\");"), result);
+        assertEquals(result.split("trace\\(\"exit\"\\);", -1).length - 1, 1, result);
+        assertEquals(result.split("trace\\(\"after\"\\);", -1).length - 1, 1, result);
+    }
+
+    @Test
+    public void testLookupSwitchSharedTailWithEarlyReturn() throws Exception {
+        decompilePCodeWithLines("getlocal1\nlookupswitch invalid, [zero, one]\n"
+                + "zero: " + switchTrace("zero") + "jump shared\n"
+                + "one: " + switchTrace("one") + "jump shared\n"
+                + "invalid: returnvoid\n"
+                + "shared: getlocal1\niffalse after\n" + switchTrace("exit") + "returnvoid\n"
+                + "after: " + switchTrace("after"),
+                "         switch(param1)\n         {\n"
+                + "            case 0:\n               trace(\"zero\");\n               break;\n"
+                + "            case 1:\n               trace(\"one\");\n               break;\n"
+                + "            default:\n               return;\n         }\n"
+                + "         if(param1)\n         {\n            trace(\"exit\");\n            return;\n         }\n"
+                + "         trace(\"after\");\n");
+    }
+
     @Test
     public void testSwitchFollowedByStrictComparison() throws Exception {
         decompilePCode("getlocal1\n"

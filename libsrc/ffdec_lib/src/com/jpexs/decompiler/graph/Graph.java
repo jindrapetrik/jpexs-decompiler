@@ -968,7 +968,7 @@ public class Graph {
                 System.err.println("- " + p);
             }           
         }*/
-        loopc:
+        PartCommon firstCommon = null;
         for (PartCommon pc : commonSet) {
             /*for (GraphPart p : partsLeadingToStopPart) {
                 if (p != pc.part && !p.leadsTo(localData, this, code, pc.part, loops, throwStates, false)) {
@@ -979,17 +979,30 @@ public class Graph {
                 }
             }*/
             if (pc.level <= 1) {
-                return null;
+                break;
             }
+            if (firstCommon == null) {
+                firstCommon = pc;
+            } else if (pc.level < firstCommon.level) {
+                break;
+            } else if (pc.part.leadsTo(localData, this, code, firstCommon.part, loops, throwStates, false)
+                    && !firstCommon.part.leadsTo(localData, this, code, pc.part, loops, throwStates, false)) {
+                // Prefer the start of a shared tail over its later blocks.
+                // A conditional return/throw can prevent a common postdominator,
+                // even though several cases all enter this same tail.
+                firstCommon = pc;
+            }
+        }
+        if (firstCommon != null) {
             if (debugPrintLoopList) {
                 StringBuilder sb = new StringBuilder();
                 for (GraphPart p : parts) {
                     sb.append(" ");
                     sb.append(p.toString());
                 }
-                System.err.println("most common part of" + sb.toString() + " is " + pc.part);
+                System.err.println("most common part of" + sb.toString() + " is " + firstCommon.part);
             }
-            return pc.part;
+            return firstCommon.part;
         }
 
         return null;
