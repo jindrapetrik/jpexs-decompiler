@@ -1468,18 +1468,28 @@ public abstract class InstructionDefinition implements Serializable {
         GraphTargetItem update = saved.value;
         if (saved.regIndex != loaded.regIndex || saved.getSrc() == null || loaded.getSrc() == null
                 || loaded.computedValue != update || !(update instanceof IncrementAVM2Item || update instanceof DecrementAVM2Item)
-                || !TypeItem.INT.equals(update.returnType()) || !(update.value instanceof DuplicateItem)
-                || !(original.value instanceof GetPropertyAVM2Item)) {
+                || !(update.value instanceof DuplicateItem)) {
             return false;
         }
 
         DuplicateItem duplicate = (DuplicateItem) update.value;
-        GetPropertyAVM2Item property = (GetPropertyAVM2Item) original.value;
+        GraphTargetItem oldValueExpression = original.value;
+        GraphTargetItem propertyExpression = oldValueExpression;
+        if (propertyExpression instanceof ConvertAVM2Item && TypeItem.NUMBER.equals(propertyExpression.returnType())) {
+            propertyExpression = propertyExpression.value;
+        }
+        if (!(propertyExpression instanceof GetPropertyAVM2Item)) {
+            return false;
+        }
+        GetPropertyAVM2Item property = (GetPropertyAVM2Item) propertyExpression;
+        GraphTargetItem numberType = update.returnType();
+        boolean integerUpdate = TypeItem.INT.equals(numberType) && TypeItem.INT.equals(property.returnType());
+        boolean numberUpdate = TypeItem.NUMBER.equals(numberType) && TypeItem.NUMBER.equals(oldValueExpression.returnType());
         if (duplicate.tempIndex != original.tempIndex || oldValue.tempIndex != original.tempIndex
-                || duplicate.getThroughDuplicate() != property || oldValue.getThroughDuplicate() != property
+                || duplicate.getThroughDuplicate() != oldValueExpression || oldValue.getThroughDuplicate() != oldValueExpression
                 || !(property.object instanceof FindPropertyAVM2Item)
                 || property.object != ((LocalRegAVM2Item) obj).computedValue
-                || !name.equals(property.propertyName) || !TypeItem.INT.equals(property.returnType())) {
+                || !name.equals(property.propertyName) || !(integerUpdate || numberUpdate)) {
             return false;
         }
 
@@ -1493,8 +1503,8 @@ public abstract class InstructionDefinition implements Serializable {
         }
         stack.moveToStack(output);
         stack.push(update instanceof IncrementAVM2Item
-                ? new PostIncrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, TypeItem.INT)
-                : new PostDecrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, TypeItem.INT));
+                ? new PostIncrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, numberType)
+                : new PostDecrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, numberType));
         return true;
     }
 

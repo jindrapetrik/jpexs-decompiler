@@ -2182,6 +2182,29 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         return new Object[][]{{"increment", "++"}, {"decrement", "--"}};
     }
 
+    @Test(dataProvider = "postUpdates")
+    public void testIndexedReadWithNumberPropertyPostUpdate(String instruction, String operator) throws Exception {
+        decompilePCodeWithLines("getlex QName(PackageNamespace(\"\"),\"inbuf\")\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"incnt\")\ndup\nsetlocal2\n"
+                + "getproperty QName(PackageNamespace(\"\"),\"incnt\")\nconvert_d\ndup\n"
+                + instruction + "\nsetlocal3\ngetlocal2\ngetlocal3\n"
+                + "setproperty QName(PackageNamespace(\"\"),\"incnt\")\nkill 3\nkill 2\n"
+                + "getproperty MultinameL([PackageNamespace(\"\")])\nreturnvalue\n",
+                "         return inbuf[incnt" + operator + "];\n");
+    }
+
+    @Test(dataProvider = "updateOperators")
+    public void testIndexedPropertyPostUpdateInShortCircuit(String operator) throws Exception {
+        String result = recompileSource("package { import flash.utils.ByteArray; public class Test {"
+                + "private var inbuf:ByteArray; private var incnt:uint;"
+                + "public function test():void { var len:uint = inbuf[incnt" + operator + "];"
+                + "len |= inbuf[incnt" + operator + "] << 8;"
+                + "if(inbuf[incnt" + operator + "] != (~len & 255) || inbuf[incnt" + operator + "] != (~len >> 8 & 255)) {"
+                + "throw new Error(\"mismatch\"); } } } }");
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertEquals(result.split("inbuf\\[incnt" + (operator.equals("++") ? "\\+\\+" : "--") + "\\]", -1).length - 1, 4, result);
+    }
+
     @DataProvider(name = "numberPrefixConditions")
     public Object[][] numberPrefixConditions() {
         return new Object[][]{
