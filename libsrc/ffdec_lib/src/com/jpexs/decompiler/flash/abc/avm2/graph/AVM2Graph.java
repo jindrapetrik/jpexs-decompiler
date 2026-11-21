@@ -255,6 +255,36 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
+    protected GraphTargetItem getShortCircuitRightSide(List<GraphTargetItem> commands) {
+        if (commands.size() == 3 && commands.get(0) instanceof PopItem
+                && commands.get(1) instanceof SetLocalAVM2Item && commands.get(2) instanceof PushItem) {
+            SetLocalAVM2Item assignment = (SetLocalAVM2Item) commands.get(1);
+            GraphTargetItem assigned = assignment.value;
+            GraphTargetItem result = commands.get(2).value;
+            while (result instanceof CoerceAVM2Item && result.returnType().equals(TypeItem.UNBOUNDED)) {
+                result = result.value;
+            }
+            if (assignment.getCompoundOperator() == null && assigned.isCompileTime() && result.isCompileTime()
+                    && !assigned.hasSideEffect() && !result.hasSideEffect()) {
+                Object assignedValue = assigned.getResult();
+                Object resultValue = result.getResult();
+                // Numeric constants may have different Java wrapper types.
+                // Preserve the distinction between positive and negative zero.
+                boolean sameValue = assignedValue instanceof Number && resultValue instanceof Number
+                        ? Double.doubleToLongBits(((Number) assignedValue).doubleValue())
+                                == Double.doubleToLongBits(((Number) resultValue).doubleValue())
+                        : Objects.equals(assignedValue, resultValue);
+                if (sameValue) {
+                    // A compiler temporary can leave the assigned constant on
+                    // the stack instead of duplicating the assignment itself.
+                    return assignment;
+                }
+            }
+        }
+        return super.getShortCircuitRightSide(commands);
+    }
+
+    @Override
     protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part, List<ThrowState> throwStates) {
         for (ThrowState ts : throwStates) {
             if (ts.targetPart == part) {

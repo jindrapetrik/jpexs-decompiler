@@ -74,6 +74,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     public void init() throws IOException, InterruptedException {
         //Main.initLogging(false);
         Configuration.autoDeobfuscate.set(true);
+        Configuration.simplifyExpressions.set(false);
         Configuration.decimalAddress.set(false);
         Configuration.decompilationTimeoutSingleMethod.set(Integer.MAX_VALUE);
         Configuration.padAs3PCodeInstructionName.set(false);
@@ -309,6 +310,28 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "invalidReturn: pushfalse\nnot\nreturnvalue\n"
                 + "registerFrames: callpropvoid QName(PackageNamespace(\"\"),\"addFrameScript\"), 4\n",
                 "         addFrameScript(2,frame3,3,frame4);\n");
+    }
+
+    @DataProvider(name = "shortCircuitConstantAssignments")
+    public Object[][] shortCircuitConstantAssignments() {
+        return new Object[][]{
+            {"iffalse", "&&", false}, {"iftrue", "||", false},
+            {"iffalse", "&&", true}, {"iftrue", "||", true}
+        };
+    }
+
+    @Test(dataProvider = "shortCircuitConstantAssignments")
+    public void testShortCircuitConstantAssignmentWithTemporary(String branch, String operator, boolean simplify) throws Exception {
+        boolean originalSimplify = Configuration.simplifyExpressions.get();
+        Configuration.simplifyExpressions.set(simplify);
+        try {
+            decompilePCode("getlocal1\npushbyte 0\nlessthan\ncoerce_a\ndup\n" + branch + " done\n"
+                    + "pop\npushbyte 0\ndup\nsetlocal2\nconvert_i\nsetlocal1\n"
+                    + "getlocal2\nkill 2\ncoerce_a\ndone: pop\n",
+                    "         param1 < 0 " + operator + " (param1 = 0);\n");
+        } finally {
+            Configuration.simplifyExpressions.set(originalSimplify);
+        }
     }
 
     @DataProvider(name = "constantSwitchIndices")
