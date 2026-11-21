@@ -68,6 +68,9 @@ public class NextNameAVM2Item extends AVM2Item {
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visit(index);
         visitor.visit(obj);
+        if (localReg != null && localReg != index) {
+            visitor.visit(localReg);
+        }
     }
 
     @Override

@@ -97,6 +97,7 @@ public class TryActionItem extends ActionItem implements Block {
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
+        visitNoBlock(visitor);
         if (tryCommands != null) {
             visitor.visitAll(tryCommands);
         }
@@ -110,7 +111,12 @@ public class TryActionItem extends ActionItem implements Block {
 
     @Override
     public void visitNoBlock(GraphTargetVisitorInterface visitor) {
-
+        visitor.visitAll(catchExceptionNames);
+        for (GraphTargetItem type : catchExceptionTypes) {
+            if (type != null) {
+                visitor.visit(type);
+            }
+        }
     }
 
     /**

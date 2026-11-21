@@ -214,6 +214,10 @@ public class ActionListReader {
                             int size = jump.getTotalActionLength();
                             jump.setJumpOffset((int) (nextAddress - action.getAddress() - size));
                             ret.add(jump);
+                            // This jump represents the original action's
+                            // continuation. Keep it in the same container,
+                            // including when that action overlaps its end.
+                            replaceContainerLastActions(containerLastActions, action, jump);
                         }
                     }
                 }

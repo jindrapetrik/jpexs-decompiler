@@ -1,0 +1,378 @@
+pushfalse
+   pushtrue
+   jump block1
+   call 9
+   throw
+   newclass 120
+block1:
+   setlocal 4
+   jump block2
+   throw
+   setlocal2
+   istypelate
+   lessequals
+   setlocal2
+   jump block3
+block3:
+   ifgt block4
+block4:
+   pushscope
+   lshift
+   setlocal3
+   convert_b
+   inclocal 3
+   declocal_i 4
+block2:
+   setlocal 5
+   debugfile "Test.as"
+   getlocal 4
+   iffalse block5
+   debugline 1
+   pushtrue
+   iftrue block5
+   returnvoid
+   popscope
+   newfunction 110
+   throw
+   pushnull
+   setlocal2
+block5:
+   getlocal0
+   pushscope
+   getlocal 4
+   iffalse block6
+   jump block7
+block8:
+   label
+   getlocal0
+   getproperty QName(PackageNamespace(""),"state")
+   getproperty QName(PackageNamespace(""),"count")
+   pushbyte 1
+   ifnge block9
+   getlocal 5
+   dup
+   iffalse block10
+   pop
+   getlocal2
+   convert_b
+   jump block10
+   returnvoid
+   constructprop QName(PackageNamespace("example"),"Item"), 21
+   throw
+block10:
+   iftrue block11
+   debugline 3
+   getlocal 4
+   dup
+   iftrue block12
+   pop
+   getlocal1
+   convert_b
+block12:
+   iffalse block13
+   pushtrue
+   iftrue block14
+block15:
+   label
+   debugline 2
+   getlocal 5
+   dup
+   iffalse block16
+   pop
+   getlocal3
+   pushfalse
+   iffalse block17
+   pushfalse
+   returnvalue
+   setlocal1
+   pushwith
+   newfunction 12
+   throw
+   pushwith
+block17:
+   convert_b
+block16:
+   iffalse block18
+   jump block6
+block18:
+   jump block8
+block7:
+   debug 1, "arg", 0, 1
+   getlocal 4
+   dup
+   iftrue block19
+   pop
+   getlocal2
+   convert_b
+block19:
+   iffalse block6
+   jump block15
+block14:
+   getlocal0
+   getproperty QName(PackageNamespace(""),"state")
+   jump block20
+   popscope
+   newfunction 3
+   throw
+   setlocal2
+   coerce_s
+block20:
+   dup
+   setlocal2
+   getproperty QName(PackageNamespace(""),"count")
+   increment
+   setlocal3
+   getlocal 5
+   iftrue block21
+   getlocal2
+   getlocal3
+   setproperty QName(PackageNamespace(""),"count")
+block21:
+   kill 3
+   kill 2
+   getlocal 4
+   iffalse block22
+   jump block23
+   convert_s
+   setlocal2
+   setlocal3
+   convert_s
+   nextvalue
+   instanceof
+block23:
+   jump block24
+block25:
+   label
+block9:
+   returnvoid
+   pushtrue
+   iftrue block26
+block26:
+   label
+   debugline 12
+   getlocal 5
+   dup
+   jump block27
+   declocal_i 2
+   inclocal_i 4
+   inclocal_i 3
+   declocal_i 4
+   convert_b
+   declocal 4
+   bitxor
+   setlocal2
+   jump block28
+block28:
+   pushfalse
+   lessequals
+   lshift
+   setlocal0
+   setlocal0
+   typeof
+   inclocal_i 3
+block27:
+   iffalse block29
+   pop
+   getlocal0
+   convert_b
+   jump block29
+   ifgt block29
+block29:
+   iftrue block30
+   getlocal 5
+   dup
+   iffalse block31
+   pop
+   getlocal2
+   convert_b
+block31:
+   iftrue block32
+   getlocal 4
+   jump block33
+   checkfilter
+   newfunction 61
+   throw
+   setlocal0
+   decrement
+block33:
+   iftrue block34
+   jump block35
+block34:
+   jump block25
+block36:
+   label
+   getlex QName(PackageNamespace(""),"Observer")
+   callpropvoid QName(PackageNamespace(""),"notify"), 0
+block30:
+   getlocal 5
+   dup
+   iffalse block37
+   pop
+   getlocal0
+   convert_b
+block37:
+   iftrue block38
+   getlocal 4
+   iffalse block39
+block6:
+   jump block26
+   jump block40
+block40:
+   divide
+   callpropvoid QName(PrivateNamespace("example:Helper"),"calculate"), 5
+   pushwith
+block41:
+   label
+   debugline 10
+block38:
+   getlocal 4
+   dup
+   iftrue block42
+   pop
+   getlocal1
+   convert_b
+block42:
+   iffalse block43
+block22:
+   jump block36
+   pushwith
+   setlocal0
+block44:
+   label
+   getlocal0
+   getproperty QName(PackageNamespace(""),"state")
+   getproperty QName(PackageNamespace(""),"phase")
+   pushbyte 5
+   ifne block36
+block43:
+   getlocal 5
+   dup
+   pushfalse
+   iffalse block45
+   returnvoid
+   popscope
+   newfunction 100
+   throw
+   coerce_s
+   equals
+block45:
+   iffalse block46
+   pop
+   getlocal3
+   convert_b
+block46:
+   iftrue block47
+block13:
+   getlocal0
+   getproperty QName(PackageNamespace(""),"state")
+   pushbyte 6
+   setproperty QName(PackageNamespace(""),"phase")
+block39:
+   getlocal 4
+   dup
+   iftrue block48
+   pop
+   getlocal0
+   convert_b
+   jump block48
+   bitxor
+   constructprop QName(PackageNamespace(""),"factory"), 5
+   pushwith
+block48:
+   iffalse block49
+   getlocal 5
+   iftrue block50
+block11:
+   jump block41
+block51:
+   label
+   debugline 8
+block47:
+   jump block44
+block52:
+   label
+   getlocal0
+   pushtrue
+   jump block53
+   inclocal 3
+   kill 2
+   kill 2
+   setlocal3
+   getlocal 4
+   kill 4
+   pushtrue
+   iftrue block54
+block54:
+   returnvoid
+   popscope
+   bitor
+   instanceof
+   pushscope
+   increment
+   negate
+   getlocal 4
+   hasnext
+   inclocal_i 4
+block53:
+   initproperty QName(PackageNamespace(""),"enabled")
+block49:
+   jump block51
+block55:
+   label
+   debugline 6
+block50:
+   getlocal 4
+   dup
+   iffalse block56
+   jump block57
+block56:
+   pop
+   getlocal1
+   convert_b
+block57:
+   iffalse block58
+   jump block52
+block59:
+   label
+   getlocal0
+   jump block60
+   decrement
+   callsupervoid QName(PackageNamespace(""),"trace"), 5
+   pushwith
+block60:
+   getlocal0
+   getproperty QName(PackageNamespace(""),"value")
+   pushbyte 3
+   multiply
+   setproperty QName(PackageNamespace(""),"value")
+   jump block32
+   ifle block32
+block32:
+   jump block55
+   ifne block61
+block61:
+   label
+   debugline 5
+block58:
+   getlocal 5
+   iftrue block62
+   jump block59
+block63:
+   label
+   getlex QName(PackageNamespace(""),"Service")
+   callproperty QName(PackageNamespace(""),"instance"), 0
+   pushstring "event"
+   callpropvoid QName(PackageNamespace(""),"invoke"), 1
+block35:
+   jump block61
+block24:
+   debugline 4
+   jump block62
+   popscope
+   pushwith
+   newfunction 13
+   throw
+   increment
+block62:
+   jump block63
+   returnvoid

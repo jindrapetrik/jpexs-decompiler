@@ -31,6 +31,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
@@ -72,6 +73,19 @@ public class TellTargetActionItem extends ActionItem implements Block {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;
         this.commands = commands;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitNoBlock(visitor);
+        if (commands != null) {
+            visitor.visitAll(commands);
+        }
+    }
+
+    @Override
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+        visitor.visit(target);
     }
 
     @Override

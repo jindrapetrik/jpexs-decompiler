@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
@@ -83,6 +84,13 @@ public class IndexAVM2Item extends AssignableAVM2Item {
             nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc);
         }
         return abc.getSelectedAbc().constants.getNamespaceSetId(nssa, true);
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(object);
+        visitor.visit(index);
+        super.visit(visitor);
     }
 
     @Override

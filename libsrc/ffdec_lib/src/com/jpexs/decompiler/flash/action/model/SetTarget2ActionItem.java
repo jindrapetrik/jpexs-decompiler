@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -49,6 +50,11 @@ public class SetTarget2ActionItem extends ActionItem {
     public SetTarget2ActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.target = target;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(target);
     }
 
     @Override

@@ -62,6 +62,7 @@ public class CallFunctionActionItem extends ActionItem {
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visitAll(arguments);
+        visitor.visit(functionName);
     }
 
     /**

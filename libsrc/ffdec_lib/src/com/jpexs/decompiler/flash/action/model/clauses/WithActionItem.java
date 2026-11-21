@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -72,6 +73,19 @@ public class WithActionItem extends ActionItem {
         super(instruction, lineStartIns, NOPRECEDENCE);
         this.scope = scope;
         this.items = new ArrayList<>();
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitNoBlock(visitor);
+        if (items != null) {
+            visitor.visitAll(items);
+        }
+    }
+
+    @Override
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+        visitor.visit(scope);
     }
 
     @Override

@@ -449,7 +449,11 @@ public class DebugPanel extends JPanel {
             @Override
             public void errorException(DebuggerSession session, String message, Variable thrownVar) {
                 logAdd(session, "unhandled exception: " + message);
-                selectedTab = tabTypes.get(tabTypes.size() - 1);
+                if (tabTypes.size() > 0) {
+                    selectedTab = tabTypes.get(tabTypes.size() - 1);
+                } else {
+                    selectedTab = null;
+                }
                 refresh();
             }
         });

@@ -31,6 +31,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -106,6 +107,17 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     public SetVariableActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem name, GraphTargetItem value) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.name = name;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(name);
+        if (value != null) {
+            visitor.visit(value);
+        }
+        if (compoundValue != null) {
+            visitor.visit(compoundValue);
+        }
     }
 
     private boolean resultNeeded() {

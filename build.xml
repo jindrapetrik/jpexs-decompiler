@@ -90,6 +90,7 @@
             <fileset dir="libsrc/ffdec_lib/src/com/jpexs" includes="**/*.java">
                 <exclude name="**/*Lexer.java" />
                 <exclude name="**/jna/" />
+                <exclude name="**/flash/math/area/*.java" />
             </fileset>
         </checkstyle>
     </target>

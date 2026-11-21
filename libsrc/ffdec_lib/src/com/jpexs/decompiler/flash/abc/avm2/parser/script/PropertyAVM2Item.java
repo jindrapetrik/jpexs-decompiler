@@ -37,6 +37,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -137,6 +138,14 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         this.nsKeyword = nsKeyword;
         this.line = line;
         this.thisType = thisType;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        if (object != null) {
+            visitor.visit(object);
+        }
+        super.visit(visitor);
     }
 
     @Override

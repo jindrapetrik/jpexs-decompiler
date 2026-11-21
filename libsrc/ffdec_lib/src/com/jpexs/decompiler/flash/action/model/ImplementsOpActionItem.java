@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 import java.util.Objects;
@@ -53,6 +54,12 @@ public class ImplementsOpActionItem extends ActionItem {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.subclass = subclass;
         this.superclasses = superclasses;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(subclass);
+        visitor.visitAll(superclasses);
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.*;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.flash.fla.reader.*;
@@ -32,9 +33,15 @@ import java.util.zip.ZipFile;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
+import org.testng.annotations.BeforeClass;
 
 public class GeneratorTemplateExportTest {
 
+    @BeforeClass
+    public void init() {
+        Configuration.useFoldersInFlaExport.set(false);
+    }
+    
     private SWF movie() throws Exception {
         return movie("f4-generator");
     }
@@ -304,7 +311,7 @@ public class GeneratorTemplateExportTest {
         shapeName.characterId = 2;
         shapeName.name = "Assets/Red shape";
         swf.addTag(shapeName);
-        Path directory = Files.createTempDirectory("ffdec-generator-names-");
+        Path directory = Files.createTempDirectory("ffdec-generator-names-");        
         try (ZipFile zip = new ZipFile(export(swf, directory, FLAVersion.CS6).toFile())) {
             assertNotNull(zip.getEntry("LIBRARY/MyRect.xml"));
             assertNotNull(zip.getEntry("LIBRARY/Assets/Red shape.xml"));
@@ -319,7 +326,7 @@ public class GeneratorTemplateExportTest {
                 document = new String(out.toByteArray(), StandardCharsets.UTF_8);
             }
             assertTrue(document.contains("name=\"Assets\""), document);
-            assertFalse(document.contains("__ffdec_generator_"));
+            assertFalse(document.contains("__ffdec_generator_"));            
         } finally {
             cleanup(directory);
         }

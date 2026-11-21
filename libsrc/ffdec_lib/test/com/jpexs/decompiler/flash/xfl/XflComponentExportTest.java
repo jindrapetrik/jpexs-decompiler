@@ -66,11 +66,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class XflComponentExportTest {
 
+    @BeforeClass
+    public void init() {
+        Configuration.useFoldersInFlaExport.set(false);
+    }
+    
     private SWF movie() throws Exception {
         return movie("button");
     }

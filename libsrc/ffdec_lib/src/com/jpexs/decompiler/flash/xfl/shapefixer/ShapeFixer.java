@@ -141,6 +141,11 @@ public class ShapeFixer {
         Rectangle2D bbox() {
             return be.bbox();
         }
+
+        static int compareSourceOrder(BezierEdgeWrapper first, BezierEdgeWrapper second) {
+            int shapeOrder = Integer.compare(first.shapeIndex, second.shapeIndex);
+            return shapeOrder != 0 ? shapeOrder : Integer.compare(first.edgeIndex, second.edgeIndex);
+        }
     }
 
     static final class Event implements Comparable<Event> {
@@ -169,8 +174,7 @@ public class ShapeFixer {
             if (ct != 0) {
                 return ct;
             }
-            int ce = System.identityHashCode(this.e) - System.identityHashCode(o.e);
-            return ce;
+            return BezierEdgeWrapper.compareSourceOrder(e, o.e);
         }
     }
 
@@ -182,7 +186,7 @@ public class ShapeFixer {
             if (cMinY != 0) {
                 return cMinY;
             }
-            return Integer.compare(System.identityHashCode(e1), System.identityHashCode(e2));
+            return BezierEdgeWrapper.compareSourceOrder(e1, e2);
         };
         final java.util.TreeSet<BezierEdgeWrapper> status = new TreeSet<>(statusCmp);
         //final java.util.Set<BezierEdgeWrapper> status = new HashSet<>();
@@ -208,7 +212,8 @@ public class ShapeFixer {
 
                 switch (ev.type) {
                     case START:
-                        BezierEdgeWrapper beMaxY = new BezierEdgeWrapper(null, 0, 0, 0) {
+                        // Include every edge whose minimum Y is exactly the upper bound.
+                        BezierEdgeWrapper beMaxY = new BezierEdgeWrapper(null, 0, Integer.MAX_VALUE, Integer.MAX_VALUE) {
                             @Override
                             double minY() {
                                 return ev.e.maxY();
@@ -332,17 +337,7 @@ public class ShapeFixer {
 
             List<BezierEdgeWrapper> splittedBewList = new ArrayList<>(splitPointsMap.keySet());
 
-            splittedBewList.sort((BezierEdgeWrapper o1, BezierEdgeWrapper o2) -> {
-                int dShapeIndex = o1.shapeIndex - o2.shapeIndex;
-                if (dShapeIndex != 0) {
-                    return dShapeIndex;
-                }
-                int dEIndex = o1.edgeIndex - o2.edgeIndex;
-                if (dEIndex != 0) {
-                    return dEIndex;
-                }
-                return System.identityHashCode(o1) - System.identityHashCode(o2);
-            });
+            splittedBewList.sort(BezierEdgeWrapper::compareSourceOrder);
 
             double roundingDivisor = wasSmall ? 2 : 100;
             Map<BezierEdgeWrapper, List<BezierEdge>> splitEdges = new LinkedHashMap<>();
@@ -910,6 +905,12 @@ public class ShapeFixer {
             LINESTYLEARRAY baseLineStyles,
             boolean wasSmall
     ) {
+        return fix(records, shapeNum, baseFillStyles, baseLineStyles, wasSmall, 0);
+    }
+
+    public List<ShapeRecordAdvanced> fix(List<SHAPERECORD> records, int shapeNum,
+            FILLSTYLEARRAY baseFillStyles, LINESTYLEARRAY baseLineStyles, boolean wasSmall,
+            double tinyFillLoopSpan) {
         List<List<BezierEdge>> shapes = new ArrayList<>();
         List<Integer> fillStyles0 = new ArrayList<>();
         List<Integer> fillStyles1 = new ArrayList<>();
@@ -928,7 +929,68 @@ public class ShapeFixer {
             detectOverlappingEdges(shapes, fillStyles0, fillStyles1, lineStyles, layers, wasSmall);
         }
 
+        if (tinyFillLoopSpan > 0) {
+            removeTinyFillLoops(shapes, tinyFillLoopSpan);
+        }
         return combineLayers(shapes, fillStyles0, fillStyles1, lineStyles, layers, fillStyleLayers, lineStyleLayers);
+    }
+
+    private static void removeTinyFillLoops(List<List<BezierEdge>> contours, double maximumSpan) {
+        Map<Point2D, Integer> visits = new HashMap<>();
+        for (List<BezierEdge> contour : contours) {
+            for (BezierEdge edge : contour) {
+                visits.merge(edge.getBeginPoint(), 1, Integer::sum);
+            }
+        }
+        for (int i = 0; i < contours.size(); i++) {
+            List<BezierEdge> contour = contours.get(i);
+            if (contour.size() == 2 && contour.stream().noneMatch(edge -> visits.get(edge.getBeginPoint()) > 1)) {
+                continue; // A detached small fill is a legitimate detail.
+            }
+            List<BezierEdge> cleaned = new ArrayList<>(contour.size());
+            for (BezierEdge edge : contour) {
+                int last = cleaned.size() - 1;
+                if (last >= 0 && isTinyFillLoop(cleaned.get(last), edge, maximumSpan)) {
+                    cleaned.remove(last);
+                } else {
+                    cleaned.add(edge);
+                }
+            }
+            while (cleaned.size() > 2 && isTinyFillLoop(cleaned.get(cleaned.size() - 1), cleaned.get(0), maximumSpan)) {
+                cleaned.remove(cleaned.size() - 1);
+                cleaned.remove(0);
+            }
+            contours.set(i, cleaned);
+        }
+    }
+
+    private static boolean isTinyFillLoop(BezierEdge first, BezierEdge second, double maximumSpan) {
+        Point2D start = first.getBeginPoint();
+        Point2D end = first.getEndPoint();
+        if (!start.equals(second.getEndPoint()) || !end.equals(second.getBeginPoint())) {
+            return false;
+        }
+        double spanSquared = maximumSpan * maximumSpan;
+        double chordSquared = start.distanceSq(end);
+        if (chordSquared == 0 || chordSquared > spanSquared) {
+            return false;
+        }
+        double dx = end.getX() - start.getX();
+        double dy = end.getY() - start.getY();
+        double controlOffset = 0;
+        for (BezierEdge edge : Arrays.asList(first, second)) {
+            if (edge.points.size() == 3) {
+                Point2D control = edge.points.get(1);
+                if (control.distanceSq(start) > spanSquared || control.distanceSq(end) > spanSquared) {
+                    return false;
+                }
+                double offset = dx * (control.getY() - start.getY()) - dy * (control.getX() - start.getX());
+                controlOffset += edge == first ? offset : -offset;
+            }
+        }
+        // The gap between paired quadratics peaks at their midpoints. Treat
+        // a return along the same chord as a rounding artifact below one XFL twip.
+        return controlOffset * controlOffset < 4 * chordSquared;
     }
 
     private ShapeRecordAdvanced bezierToAdvancedRecord(BezierEdge be) {

@@ -948,7 +948,7 @@ public class CommandLineArgumentParser {
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
 
             if (type == String.class) {
-                System.out.println("Config " + item.getName() + " set to \"" + Helper.escapeString(stringValue) + "\"");
+                System.out.println("Config " + item.getName() + " set to \"" + Helper.escapeActionScriptString(stringValue) + "\"");
                 ((ConfigurationItem<String>) item).set(stringValue);
             } else if (type == Calendar.class) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

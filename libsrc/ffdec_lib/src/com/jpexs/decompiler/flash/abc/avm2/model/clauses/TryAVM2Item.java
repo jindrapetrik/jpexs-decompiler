@@ -96,6 +96,7 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
+        visitNoBlock(visitor);
         if (tryCommands != null) {
             visitor.visitAll(tryCommands);
         }
@@ -114,7 +115,11 @@ public class TryAVM2Item extends AVM2Item implements Block {
 
     @Override
     public void visitNoBlock(GraphTargetVisitorInterface visitor) {
-
+        if (catchExceptions2 != null) {
+            for (NameAVM2Item declaration : catchExceptions2) {
+                visitor.visit(declaration);
+            }
+        }
     }
 
     /**

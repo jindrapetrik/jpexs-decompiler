@@ -478,6 +478,7 @@ CARDHEADER
 CARDPREVIEWPANEL
 CARDTEXTPANEL
 CARETCOLOR
+casea
 casecount
 CASEINSENSITIVE
 caseoffsets
@@ -813,6 +814,7 @@ defaultstate
 defaultsyntaxkit
 defaultvalue
 deff
+definebuttons
 definefunc
 definefunction
 definelocal
@@ -943,7 +945,6 @@ dotsq
 dotssprite
 dottedchain
 doubletoatom
-doubletype
 Doubrovkine
 dowhile
 downloadnow
@@ -1042,6 +1043,7 @@ ecff
 ECHOSC
 ECIMAL
 ecj
+eclipsesource
 Ecriture
 edff
 editation
@@ -1090,6 +1092,7 @@ enlog
 enm
 ent
 enternew
+enumerat
 eofclose
 eofval
 eoi
@@ -1156,6 +1159,7 @@ EXSTYLE
 extaction
 extags
 EXTENDEDKEY
+externalimage
 extitle
 Extrahandling
 EXTRALIGHT
@@ -1719,12 +1723,14 @@ importtext
 importxml
 imt
 IMXML
+inbuf
 incatch
 inclocal
 inclocalp
 includeantruntime
 includeemptydirs
 includesfile
+incnt
 Indexnumber
 ine
 inexpr
@@ -2294,7 +2300,6 @@ mgardi
 MGTPE
 mhreljac
 mhs
-Microsystem's
 mindex
 minfo
 mingc
@@ -2787,6 +2792,7 @@ outputstream
 outrect
 outsidepart
 ovalue
+overapproximate
 PACKAGEINTERNALNS
 packagemapper
 PACKAGENAMESPACE
@@ -2814,6 +2820,7 @@ pathpart
 pathsource
 pathvar
 Pawel
+payg
 pbit
 pblend
 pbmi
@@ -3207,6 +3214,7 @@ Sameline
 samepackage
 samepkg
 samplecode
+samplecount
 sampledata
 samplefac
 samplelength
@@ -3326,7 +3334,6 @@ SETHOTKEY
 setinstancemetadata
 setlanguage
 setloc
-setlocals
 setlocalx
 setmember
 setprop
@@ -3388,6 +3395,7 @@ SHOWWINDOW
 shx
 sidata
 sideeffect
+sidespeed
 sidex
 sids
 SIF
@@ -3556,6 +3564,7 @@ storepass
 storeregister
 storetype
 strd
+streamingmedia
 streamreader
 Strein
 strf
@@ -4006,6 +4015,7 @@ validitems
 valueclass
 VALUENAME
 VARCHARACTER
+varentryinitems
 variablename
 varincdec
 VARPROPSETTER

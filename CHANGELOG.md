@@ -102,13 +102,13 @@ All notable changes to this project will be documented in this file.
 - swc: store the SWC library.swf uncompressed ([PR312])
 - shape bitmap exporter: differentiate start and end cap style
 - simple editor: fix timeline frames border, empty frames drawing
-- fix nullpointer in CalcellableWorker
+- fix nullpointer in CancellableWorker
 - fix pixel hinting
 - simple editor: select newly created swf tab
 - fix nullpointer on timeline
 - fix add/remove character on non-unicode fonts
 - as3: compile super.method() as callsuper ([#2784], [PR315])
-- fix nullpointer on nonswf item
+- fix nullpointer on non-swf item
 
 ### Performance Improvements
 - fla export: add tween detection quality setting

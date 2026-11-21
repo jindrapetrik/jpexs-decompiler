@@ -109,7 +109,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (localData.seenMethods.contains(methodIndex)) {
-            return writer.append("§§method(").append(methodIndex).append(")");
+            return writer.append("undefined /* recursive function reference (id=").append(methodIndex).append(") */");
         }
         MethodBody body = abc.findBody(methodIndex);
         writer.append("function");

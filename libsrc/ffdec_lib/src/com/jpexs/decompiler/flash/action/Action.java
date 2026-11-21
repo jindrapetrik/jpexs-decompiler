@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionSetTarget2;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionDelete;
 import com.jpexs.decompiler.flash.action.swf5.ActionWith;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.action.swf7.ActionTry;
@@ -833,7 +834,7 @@ public abstract class Action implements GraphSourceItem {
                 for (String c : cPool.constantPool) {
                     writer.appendNoHilight(constIdx);
                     writer.appendNoHilight("|");
-                    writer.appendNoHilight(Helper.escapeString(c));
+                    writer.appendNoHilight(Helper.escapeStringNoQuotes(c));
                     writer.newLine();
                     constIdx++;
                 }
@@ -896,7 +897,7 @@ public abstract class Action implements GraphSourceItem {
      * @return long value
      */
     protected long popLong(TranslateStack stack) {
-        GraphTargetItem item = stack.pop();
+        GraphTargetItem item = stack.pop().getThroughDuplicate();
         if (item instanceof DirectValueActionItem) {
             return (long) (double) EcmaScript.toNumberAs2(((DirectValueActionItem) item).value);
         }
@@ -1082,7 +1083,7 @@ public abstract class Action implements GraphSourceItem {
      * @throws InterruptedException On interrupt
      */
     public static List<GraphTargetItem> actionsToTree(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
-        actions = cleanDefineFunctionRegistersForDecompilation(actions, version, path, charset);
+        actions = cleanActionsForDecompilation(actions, version, path, charset);
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
         ActionSecondPassContext currentContext = ActionSecondPassContext.current();
@@ -1100,15 +1101,18 @@ public abstract class Action implements GraphSourceItem {
         }
     }
 
-    private static List<Action> cleanDefineFunctionRegistersForDecompilation(List<Action> actions, int version, String path, String charset) throws InterruptedException {
+    private static List<Action> cleanActionsForDecompilation(List<Action> actions, int version, String path, String charset) throws InterruptedException {
         boolean hasDefineFunction = false;
+        boolean hasDebugResolve = false;
         for (Action action : actions) {
             if (action instanceof ActionDefineFunction) {
                 hasDefineFunction = true;
-                break;
+            }
+            if (Configuration.deobfuscateAs12RemoveGlobalDebugResolve.get() && action instanceof ActionDelete) {
+                hasDebugResolve = true;
             }
         }
-        if (!hasDefineFunction) {
+        if (!hasDefineFunction && !hasDebugResolve) {
             return actions;
         }
         // The cleaner changes instruction fields as well as the list. Keep the
@@ -1132,12 +1136,17 @@ public abstract class Action implements GraphSourceItem {
             }
         }
         try {
-            new ActionDefineFunctionPushRegistersCleaner().actionListParsed(copy, null);
+            if (hasDefineFunction) {
+                new ActionDefineFunctionPushRegistersCleaner().actionListParsed(copy, null);
+            }
+            if (hasDebugResolve) {
+                new ActionDebugResolveCleaner().clean(copy);
+            }
             return copy;
         } catch (ThreadDeath | InterruptedException ex) {
             throw ex;
         } catch (Throwable ex) {
-            logger.log(Level.SEVERE, "Cleaning push registers in ActionDefineFunction failed: " + path, ex);
+            logger.log(Level.SEVERE, "Cleaning actions for decompilation failed: " + path, ex);
             return actions;
         }
     }
@@ -1318,6 +1327,10 @@ public abstract class Action implements GraphSourceItem {
             logger.log(Level.FINE, "Entering {0}-{1}{2}", new Object[]{start, end, actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""});
         }
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, variables, functions, graph.getUninitializedClassTraits(), usedDeobfuscations, new ArrayList<>(), new ArrayList<>());
+        if (stack.localData != null) {
+            // Both the actions and stack pops can allocate temporaries in this graph.
+            localData.maxTempIndex = stack.localData.maxTempIndex;
+        }
         localData.lineStartAction = lineStartActionRef.getVal();
         int ip = start;
         boolean isWhile = false;
@@ -1373,6 +1386,7 @@ public abstract class Action implements GraphSourceItem {
                 String cntName = cnt.getName();
                 List<List<GraphTargetItem>> outs = new ArrayList<>();
                 HashMap<String, GraphTargetItem> variables2 = prepareVariables(cnt, variables);
+                ActionRegisterUsage registerUsage = action instanceof ActionWith || action instanceof ActionTry ? graph.getRegisterUsage() : null;
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
                         outs.add(new ArrayList<>());
@@ -1390,10 +1404,10 @@ public abstract class Action implements GraphSourceItem {
                         }
                         int startIp = adr2ip(actions, endAddr);
                         try {                            
-                            out = ActionGraph.translateViaGraph(usedDeobfuscations, graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
+                            out = ActionGraph.translateViaGraph(usedDeobfuscations, graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp, registerUsage);
                         } catch (SecondPassException spe) {
                             variables2 = prepareVariables(cnt, variables);
-                            out = ActionGraph.translateViaGraph(usedDeobfuscations, graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp);
+                            out = ActionGraph.translateViaGraph(usedDeobfuscations, graph.doesNeedUninitializedClassFieldsDetection(), graph.getUninitializedClassTraits(), spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(0, adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset, startIp, registerUsage);
                         }
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex) {
                         logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
@@ -1417,6 +1431,12 @@ public abstract class Action implements GraphSourceItem {
                 }
 
                 ((GraphSourceItemContainer) action).translateContainer(outs, action, stack, output, registerNames, variables, functions);
+                // Function bodies are skipped by the graph's successor edge.
+                // Ending at their header is a normal part boundary, not a jump
+                // which should restart translation of the current loop.
+                if (ip == end && (action instanceof ActionDefineFunction || action instanceof ActionDefineFunction2)) {
+                    return;
+                }
                 ip = adr2ip(actions, endAddr);
                 continue;
             }

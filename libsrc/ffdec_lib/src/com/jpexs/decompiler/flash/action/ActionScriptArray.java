@@ -106,6 +106,24 @@ public class ActionScriptArray extends ActionScriptObject {
     }
 
     /**
+     * Appends an element, including an explicit undefined value.
+     *
+     * @param value Element value
+     */
+    public void appendValue(Object value) {
+        values.add(value);
+    }
+
+    /**
+     * Gets the array length, including trailing undefined elements.
+     *
+     * @return Array length
+     */
+    public int getLength() {
+        return values.size();
+    }
+
+    /**
      * Trims array by removing trailing undefined values
      */
     public void trim() {

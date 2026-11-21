@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeFunctionItem;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -89,6 +90,12 @@ public class CallAVM2Item extends AVM2Item {
         this.line = line;
         this.abcIndex = abcIndex;
         this.thisType = thisType;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(name);
+        visitor.visitAll(arguments);
     }
 
     @Override

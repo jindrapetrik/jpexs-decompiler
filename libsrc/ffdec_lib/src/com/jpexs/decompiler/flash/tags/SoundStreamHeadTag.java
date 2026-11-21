@@ -88,7 +88,7 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
 
     @Internal
     private int virtualCharacterId = -1;
-
+    
     /**
      * Constructor
      *
@@ -121,8 +121,12 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
         streamSoundSize = sis.readUB(1, "streamSoundSize") == 1;
         streamSoundType = sis.readUB(1, "streamSoundType") == 1;
         streamSoundSampleCount = sis.readUI16("streamSoundSampleCount");
-        if (streamSoundCompression == 2) {
-            latencySeek = sis.readSI16("latencySeek");
+        if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
+            if (sis.available() >= 2) { //some SWFs found in the wild that have no latencySeek
+                latencySeek = sis.readSI16("latencySeek");
+            } else {
+                latencySeek = 0;
+            }
         }
     }
 
@@ -143,7 +147,7 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
         sos.writeUB(1, streamSoundSize ? 1 : 0);
         sos.writeUB(1, streamSoundType ? 1 : 0);
         sos.writeUI16(streamSoundSampleCount);
-        if (streamSoundCompression == 2) {
+        if (streamSoundCompression == SoundFormat.FORMAT_MP3) {
             sos.writeSI16(latencySeek);
         }
     }

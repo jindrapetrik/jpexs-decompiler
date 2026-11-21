@@ -72,7 +72,7 @@ public final class Configuration {
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
-    public static ConfigurationItem<Boolean> openMultipleFiles = null;
+    public static ConfigurationItem<Boolean> openMultipleFiles = null;   
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
@@ -1309,6 +1309,31 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> useFoldersInFlaExport = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> ai = null;
+
+    
+    @ConfigurationDefaultString("openrouter")
+    @ConfigurationCategory("ai")
+    public static ConfigurationItem<String> aiProvider = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("ai")
+    public static ConfigurationItem<String> aiOpenRouterModel = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("ai")
+    public static ConfigurationItem<String> aiOpenCodeModel = null;
+
+    @ConfigurationDefaultString("payg")
+    @ConfigurationCategory("ai")
+    public static ConfigurationItem<String> aiOpenCodePlan = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("deobfuscation")
+    public static ConfigurationItem<Boolean> deobfuscateAs12RemoveGlobalDebugResolve = null;
 
     private static Map<String, String> configurationDescriptions = new LinkedHashMap<>();
     private static Map<String, String> configurationTitles = new LinkedHashMap<>();

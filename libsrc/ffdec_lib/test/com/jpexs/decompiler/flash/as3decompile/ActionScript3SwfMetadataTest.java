@@ -78,7 +78,7 @@ public class ActionScript3SwfMetadataTest extends ActionScript3DecompileTestBase
         writer.finishHilights();
         String actual = writer.toString();
 
-        assertTrue(actual.contains("[SWF(width=\"1280\", height=\"720\", backgroundColor=\"#112233\", frameRate=\"48\")]"),
+        assertTrue(actual.contains("[SWF(width=\"1280\",height=\"720\",backgroundColor=\"#112233\",frameRate=\"48\")]"),
                 actual);
         // Only the document class should get header metadata
         assertFalse(actual.indexOf("[SWF(") != actual.lastIndexOf("[SWF("), actual);

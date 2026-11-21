@@ -10,6 +10,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionDefineFunctionPushRegistersCleaner;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf4.ActionWaitForFrame2;
@@ -260,6 +261,63 @@ public class ActionDefineFunctionRegistersTest {
             Assert.assertSame(result, expected);
         }
         Assert.assertTrue(lda.stack.empty());
+    }
+
+    @DataProvider(name = "shortCircuitRegisterReturns")
+    public Object[][] shortCircuitRegisterReturns() {
+        return new Object[][]{
+            {1, "&&", "Not\n", false},
+            {2, "&&", "Not\n", false},
+            {1, "||", "", false},
+            {2, "||", "", false},
+            {1, "&&", "Not\n", true},
+            {2, "&&", "Not\n", true},
+            {1, "||", "", true},
+            {2, "||", "", true}
+        };
+    }
+
+    @Test(dataProvider = "shortCircuitRegisterReturns")
+    public void cleanerPreservesBranchesToReturnJump(int registerCount, String operator, String invert, boolean deobfuscate) throws Exception {
+        SWF swf = newSwf(6);
+        String pcode = "DefineFunction \"test\", 2, \"first\", \"second\" {\n"
+                + "Push register1, " + (registerCount == 2 ? "register2, " : "") + "\"first\"\n"
+                + "GetVariable\nStoreRegister 1\nPop\n"
+                + (registerCount == 2 ? "Push \"second\"\nGetVariable\nStoreRegister 2\nPop\n" : "")
+                + "Push register1\nPushDuplicate\n" + invert + "If join\nPop\n"
+                + (registerCount == 2 ? "Push register2\n" : "Push \"second\"\nGetVariable\n")
+                + "join: Jump cleanup\n"
+                + "cleanup: StoreRegister 0\nPop\n"
+                + (registerCount == 2 ? "StoreRegister 2\nPop\n" : "")
+                + "StoreRegister 1\nPop\nPush register0\nReturn\n}\n";
+        List<Action> assembled = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        DoActionTag tag = new DoActionTag(swf);
+        Configuration.autoDeobfuscate.set(deobfuscate);
+        tag.setActions(assembled);
+        ActionList original = tag.getActions();
+        byte[] originalBytes = Action.actionsToBytes(original, true, swf.version);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        tag.getActionScriptSource(writer, original);
+        writer.finishHilights();
+        String source = writer.toString();
+        Assert.assertFalse(source.contains("§§"), source);
+        Assert.assertTrue(source.contains(" " + operator + " "), source);
+        Assert.assertEquals(Action.actionsToBytes(original, true, swf.version), originalBytes);
+
+        ActionList cleaned = Helper.deepCopy(original);
+        new ActionDefineFunctionPushRegistersCleaner().actionListParsed(cleaned, swf);
+        List<Action> recompiled = readRaw(compile(source, swf), swf);
+        for (List<Action> actions : Arrays.asList(cleaned, recompiled)) {
+            for (boolean first : new boolean[]{false, true}) {
+                for (boolean second : new boolean[]{false, true}) {
+                    LocalDataArea lda = new LocalDataArea(null);
+                    lda.stack.push("caller stack");
+                    Object result = invoke(actions, "test", Arrays.<Object>asList(first, second), lda);
+                    Assert.assertEquals(result, "&&".equals(operator) ? first && second : first || second);
+                    Assert.assertEquals(lda.stack, Arrays.asList("caller stack"));
+                }
+            }
+        }
     }
 
     @Test

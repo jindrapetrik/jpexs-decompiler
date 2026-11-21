@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
@@ -219,6 +220,7 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
 
         int posBeforeFinishPart;
         Action actionBeforeFinishPart = null;
+        Action sharedReturnTarget = null;
         if (returnReg > -1) {
             if (!(code.get(pos) instanceof ActionPop)) {
                 return false;
@@ -237,26 +239,34 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
             }
 
             Action actionWithRefs = asr;
-
-            //Special: ignore zero jump when pushundefined is stripped as unreachable            
-            if (code.get(pos - 1) instanceof ActionJump) {
-                if (((ActionJump) code.get(pos - 1)).getJumpOffset() == 0) {
-                    Iterator<Action> zit = code.getReferencesFor(code.get(pos));
-                    int refCnt = 0;
-                    while (zit.hasNext()) {
-                        zit.next();
-                        refCnt++;
-                    }
-                    if (refCnt == 1) {
-                        actionWithRefs = code.get(pos - 1);
-                        pos--;
-                    }
+            // A zero jump may replace an unreachable push of undefined.
+            // Keep it as a shared return when a conditional expression targets it.
+            if (code.get(pos - 1) instanceof ActionJump
+                    && ((ActionJump) code.get(pos - 1)).getJumpOffset() == 0) {
+                int refCount = 0;
+                Iterator<Action> refs = code.getReferencesFor(asr);
+                while (refs.hasNext()) {
+                    refs.next();
+                    refCount++;
+                }
+                boolean conditionalJoin = false;
+                refs = code.getReferencesFor(code.get(pos - 1));
+                while (refs.hasNext()) {
+                    conditionalJoin |= refs.next() instanceof ActionIf;
+                }
+                if (refCount == 1 && !conditionalJoin) {
+                    actionWithRefs = code.get(pos - 1);
+                    pos--;
                 }
             }
 
             Iterator<Action> ait = code.getReferencesFor(actionWithRefs);
             while (ait.hasNext()) {
                 Action a = ait.next();
+                if (a instanceof ActionIf) {
+                    sharedReturnTarget = asr;
+                    continue;
+                }
                 if (!(a instanceof ActionJump)) {
                     return false;
                 }
@@ -280,8 +290,21 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
             ActionReturn ret = new ActionReturn();
             ret.setVirtualAddress(jump.getVirtualAddress());
             ret.fileOffset = jump.fileOffset;
-            code.removeAction(index);
-            code.addAction(index, ret);
+            // A zero-offset jump can also be the join of a short-circuit expression.
+            // Keep incoming branches aimed at its replacement return.
+            ActionListReader.addAction(code, index, ret, false, true);
+            code.removeAction(index + 1);
+        }
+
+        if (sharedReturnTarget != null) {
+            int index = code.indexOf(sharedReturnTarget);
+            ActionReturn ret = new ActionReturn();
+            ret.setVirtualAddress(sharedReturnTarget.getVirtualAddress());
+            ret.fileOffset = sharedReturnTarget.fileOffset;
+            ActionListReader.addAction(code, index, ret, false, true);
+            posBeforeFinishPart = index;
+            actionBeforeFinishPart = null;
+            count++;
         }
 
         //previous action (not jump) also leads to finishpart, we might add return there aswell

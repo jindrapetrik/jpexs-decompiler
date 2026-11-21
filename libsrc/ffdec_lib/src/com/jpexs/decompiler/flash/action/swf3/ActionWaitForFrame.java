@@ -138,7 +138,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
 
     @Override
     public void translate(Set<String> usedDeobfuscations, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
-        GraphTargetItem frameTi = new DirectValueActionItem(null, null, 0, (Long) ((long) frame), new ArrayList<>());
+        GraphTargetItem frameTi = new DirectValueActionItem(null, null, 0, (long) frame + 1, new ArrayList<>());
         List<GraphTargetItem> body;
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);

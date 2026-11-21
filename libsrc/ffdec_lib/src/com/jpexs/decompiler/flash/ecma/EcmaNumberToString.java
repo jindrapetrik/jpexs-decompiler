@@ -606,7 +606,7 @@ public final class EcmaNumberToString {
      * @param power Power of 5.
      * @return BigInteger of power of 5.
      */
-    private static BigInteger bigPowerOf5(final int power) {
+    private static synchronized BigInteger bigPowerOf5(final int power) {
         if (powerOf5Cache == null) {
             powerOf5Cache = new BigInteger[power + 1];
         } else if (powerOf5Cache.length <= power) {

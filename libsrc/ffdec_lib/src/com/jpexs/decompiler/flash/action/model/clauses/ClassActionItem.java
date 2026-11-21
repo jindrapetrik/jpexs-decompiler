@@ -92,7 +92,11 @@ public class ClassActionItem extends ActionItem implements Block {
 
     @Override
     public void visitNoBlock(GraphTargetVisitorInterface visitor) {
-
+        visitor.visit(className);
+        if (extendsOp != null) {
+            visitor.visit(extendsOp);
+        }
+        visitor.visitAll(implementsOp);
     }
 
     /**
@@ -328,7 +332,9 @@ public class ClassActionItem extends ActionItem implements Block {
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
+        visitNoBlock(visitor);
         for (MyEntry<GraphTargetItem, GraphTargetItem> en : traits) {
+            visitor.visit(en.getKey());
             GraphTargetItem value = en.getValue();
             if (value != null) {
                 visitor.visit(value);

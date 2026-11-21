@@ -65,6 +65,22 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
         this.frame = frame;
     }
 
+    /**
+     * Gets the one-based frame expression.
+     * @return Frame expression
+     */
+    public GraphTargetItem getFrame() {
+        return frame;
+    }
+
+    /**
+     * Gets the commands executed when the frame is loaded.
+     * @return Commands
+     */
+    public List<GraphTargetItem> getActions() {
+        return actions;
+    }
+
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visit(frame);

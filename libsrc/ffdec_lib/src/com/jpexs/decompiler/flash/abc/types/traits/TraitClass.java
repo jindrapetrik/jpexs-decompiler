@@ -725,11 +725,11 @@ public class TraitClass extends Trait implements TraitWithSlot {
         int height = (int) Math.round(swf.displayRect.getHeight() / SWF.unitDivisor);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("[SWF(width=\"").append(width).append("\", height=\"").append(height).append("\"");
+        sb.append("[SWF(width=\"").append(width).append("\",height=\"").append(height).append("\"");
 
         SetBackgroundColorTag bgTag = swf.getBackgroundColor();
         if (bgTag != null && bgTag.backgroundColor != null) {
-            sb.append(", backgroundColor=\"").append(bgTag.backgroundColor.toHexRGB()).append("\"");
+            sb.append(",backgroundColor=\"").append(bgTag.backgroundColor.toHexRGB()).append("\"");
         }
 
         float frameRate = swf.frameRate;
@@ -739,7 +739,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         } else {
             frameRateStr = Float.toString(frameRate);
         }
-        sb.append(", frameRate=\"").append(frameRateStr).append("\")]");
+        sb.append(",frameRate=\"").append(frameRateStr).append("\")]");
         writer.appendNoHilight(sb.toString()).newLine();
     }
 

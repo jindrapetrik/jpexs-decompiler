@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
@@ -69,10 +70,14 @@ public class DependencyParser {
      * @param uses Uses
      */
     public static void parseDependenciesFromNS(AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, int namespace_index, DottedChain ignorePackage, String name, DependencyType dependencyType, List<String> uses) {
+        DottedChain identifier = DottedChain.TOPLEVEL.addWithSuffix(name.isEmpty() ? "*" : name);
+        parseDependenciesFromNS(abcIndex, ignoredCustom, abc, dependencies, namespace_index, ignorePackage,
+                identifier.getLast(), identifier.getLastNamespaceSuffix(), dependencyType, uses);
+    }
+
+    private static void parseDependenciesFromNS(AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies,
+            int namespace_index, DottedChain ignorePackage, String name, String namespaceSuffix, DependencyType dependencyType, List<String> uses) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
-        if (name.isEmpty()) {
-            name = "*";
-        }
         DottedChain newimport = ns.getName(abc.constants);
 
         if (ns.kind == Namespace.KIND_NAMESPACE || ns.kind == Namespace.KIND_PACKAGE_INTERNAL) {
@@ -104,7 +109,7 @@ public class DependencyParser {
         if (ns.kind != Namespace.KIND_PACKAGE) { // && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
             return;
         }
-        newimport = newimport.addWithSuffix(name);
+        newimport = newimport.add(name, namespaceSuffix);
         Dependency dep = new Dependency(newimport, dependencyType);
 
         if (!dependencies.contains(dep)) {
@@ -144,14 +149,22 @@ public class DependencyParser {
                 return;
             }
             Namespace ns = m.getNamespace(abc.constants);
-            String name = m.getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, true, true);
+            // A raw ABC name such as #3 can look like a namespace suffix.
+            String name = m.getName(usedDeobfuscations, abc, abc.constants, null, true, false);
+            String namespaceSuffix = m.getNamespaceSuffix();
+            if (name.isEmpty()) {
+                name = "*";
+                namespaceSuffix = "";
+            }
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
             if (ns != null && !m.doesDisplayNamespace()) {
-                parseDependenciesFromNS(abcIndex, ignoredCustom, abc, dependencies, m.namespace_index, ignorePackage, name, dependencyType, uses);
+                parseDependenciesFromNS(abcIndex, ignoredCustom, abc, dependencies, m.namespace_index, ignorePackage, name, namespaceSuffix, dependencyType, uses);
             }
             if (nss != null) {
+                boolean wildcard = nss.namespaces.length > 1;
                 for (int n : nss.namespaces) {
-                    parseDependenciesFromNS(abcIndex, ignoredCustom, abc, dependencies, n, ignorePackage, nss.namespaces.length > 1 ? "" : name, dependencyType, uses);
+                    parseDependenciesFromNS(abcIndex, ignoredCustom, abc, dependencies, n, ignorePackage,
+                            wildcard ? "*" : name, wildcard ? "" : namespaceSuffix, dependencyType, uses);
                 }
             }
         }
@@ -254,6 +267,7 @@ public class DependencyParser {
             AVM2Instruction prevIns = null;
             for (int i = 0; i < instructions.size(); i++) {
                 AVM2Instruction ins = instructions.get(i);
+                AVM2Instruction nextIns = i + 1 < instructions.size() ? instructions.get(i + 1) : null;
                 
                 
                 //Do not parse dependencies from class parent chain
@@ -279,11 +293,13 @@ public class DependencyParser {
                     }
                 }
                 if (ins.definition instanceof NewFunctionIns) {
-                    if (ins.operands[0] != method_index) {
-                        if (!visitedMethods.contains(ins.operands[0])) {
-                            parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, ins.operands[0], dependencies, ignorePackage, fullyQualifiedNames, visitedMethods, uses, numberContextRef);
+                    if (nextIns == null || !(nextIns.definition instanceof PopIns)) { //in obfuscated code the newfunction is immediately popped, do not process such functions
+                        if (ins.operands[0] != method_index) {
+                            if (!visitedMethods.contains(ins.operands[0])) {
+                                parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, ins.operands[0], dependencies, ignorePackage, fullyQualifiedNames, visitedMethods, uses, numberContextRef);
+                            }
                         }
-                    }
+                    }                    
                 }
                 if (ins.definition instanceof ConstructPropIns) {
                     Multiname m = abc.constants.getMultiname(ins.operands[0]);

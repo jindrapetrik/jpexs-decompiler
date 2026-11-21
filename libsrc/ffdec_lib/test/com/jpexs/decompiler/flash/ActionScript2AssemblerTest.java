@@ -16,6 +16,11 @@
  */
 package com.jpexs.decompiler.flash;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
@@ -30,10 +35,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -108,6 +111,68 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         }
 
         return null;
+    }
+
+    private String interfacePackageSetup(String interfaceName) {
+        String[] path = interfaceName.split("\\.");
+        String prefix = "Push \"_global\"\nGetVariable\n";
+        StringBuilder pcode = new StringBuilder();
+        for (int i = 0; i < path.length; i++) {
+            String member = "Push \"" + path[i] + "\"\nGetMember\n";
+            pcode.append(prefix).append(member).append("Not\nNot\nIf next").append(i).append('\n');
+            if (i < path.length - 1) {
+                pcode.append(prefix).append("Push \"").append(path[i])
+                        .append("\", 0.0, \"Object\"\nNewObject\nSetMember\n");
+            }
+            pcode.append("next").append(i).append(":Pop\n");
+            prefix += member;
+        }
+        return pcode.toString();
+    }
+
+    @DataProvider(name = "erasedInterfaces")
+    public Object[][] erasedInterfaces() {
+        return new Object[][]{
+            {"mx.controls.streamingmedia.ICuePointHolder", false},
+            {"mx.controls.streamingmedia.IPlayer", false},
+            {"mx.utils.Collection", false},
+            {"mx.utils.Iterator", false},
+            {"mx.controls.streamingmedia.ICuePointHolder", true},
+            {"mx.controls.streamingmedia.IPlayer", true},
+            {"mx.utils.Collection", true},
+            {"mx.utils.Iterator", true}
+        };
+    }
+
+    @Test(dataProvider = "erasedInterfaces")
+    public void testErasedInterface(String interfaceName, boolean deobfuscate) {
+        boolean originalDeobfuscate = Configuration.autoDeobfuscate.get();
+        try {
+            Configuration.autoDeobfuscate.set(deobfuscate);
+            assertEquals(cleanPCode(decompileClassPcode(interfacePackageSetup(interfaceName))),
+                    cleanPCode("interface " + interfaceName + "\n{\n}"));
+        } finally {
+            Configuration.autoDeobfuscate.set(originalDeobfuscate);
+        }
+    }
+
+    @Test
+    public void testEmptyGuardWithFollowingCodeIsNotInterface() {
+        String result = decompileClassPcode(interfacePackageSetup("mx.utils.Iterator")
+                + "Push \"after guard\"\nTrace\n");
+        assertFalse(result.contains("interface mx.utils.Iterator"), result);
+        assertTrue(result.contains("trace(\"after guard\")"), result);
+    }
+
+    @Test
+    public void testUnrelatedEmptyGuardIsNotInterface() {
+        String pcode = interfacePackageSetup("mx.utils.Iterator");
+        int finalGuard = pcode.lastIndexOf("Push \"_global\"");
+        pcode = pcode.substring(0, finalGuard)
+                + pcode.substring(finalGuard).replace("Push \"utils\"", "Push \"other\"");
+        String result = decompileClassPcode(pcode);
+        assertFalse(result.contains("interface "), result);
+        assertTrue(result.contains("_global.mx.other.Iterator"), result);
     }
 
     @Test
@@ -642,6 +707,165 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "tellTarget(\"../test\")\n"
                 + "{\n"
                 + "gotoAndStop(\"MyLabel\");\n"
+                + "play();\n"
+                + "}");
+    }
+
+    @Test
+    public void testStackSwapVariable() {
+        String res = decompilePcode("Push \"\"\n"
+                + "Push 7\n"
+                + "Push \"_root\"\n"
+                + "Push \"_parent\"\n"
+                + "GetVariable\n"
+                + "StackSwap\n"
+                + "GetVariable\n"
+                + "Push \"hasBall\"\n"
+                + "GetMember\n"
+                + "Equals2\n"
+                + "PushDuplicate\n"
+                + "If loc007a\n"
+                + "Pop\n"
+                + "Push \"_parent\"\n"
+                + "GetVariable\n"
+                + "Push \"_parent\"\n"
+                + "GetMember\n"
+                + "Push \"_parent\"\n"
+                + "GetMember\n"
+                + "Push \"_root\"\n"
+                + "GetVariable\n"
+                + "Push \"hasBall\"\n"
+                + "GetMember\n"
+                + "Equals2\n"
+                + "loc007a:SetProperty");
+        res = cleanPCode(res);
+        assertEquals(res, "_visible = _parent == _root.hasBall || _parent._parent._parent == _root.hasBall;");
+    }
+
+    @Test
+    public void testStackSwapSetVariableTemporaries() {
+        String res = decompilePcode("Push \"upspeed\"\n"
+                + "Push 1.1\n"
+                + "Push \"upspeed\"\n"
+                + "GetVariable\n"
+                + "StackSwap\n"
+                + "Multiply\n"
+                + "SetVariable\n"
+                + "Push \"sidespeed\"\n"
+                + "Push \"sidespeed\"\n"
+                + "GetVariable\n"
+                + "Push 1.1\n"
+                + "Multiply\n"
+                + "SetVariable");
+        assertEquals(cleanPCode(res), "upspeed *= 1.1;\n"
+                + "sidespeed *= 1.1;");
+    }
+
+    @Test
+    public void testStackSwapCallMethodTemporaries() {
+        String res = decompilePcode("Push 6\n"
+                + "Push 1\n"
+                + "Push \"gotoAndStop\"\n"
+                + "Push \"clip\"\n"
+                + "GetVariable\n"
+                + "StackSwap\n"
+                + "CallMethod\n"
+                + "Pop");
+        assertEquals(cleanPCode(res), "clip.gotoAndStop(6);");
+    }
+
+    @Test
+    public void testStackSwapShortCircuitTemporaries() {
+        String left = "Push \"ready\"\n"
+                + "GetVariable\n"
+                + "PushDuplicate\n";
+        String right = "If locEnd\n"
+                + "Pop\n"
+                + "Push \"key\"\n"
+                + "GetVariable\n"
+                + "Push \"target\"\n"
+                + "GetVariable\n"
+                + "StackSwap\n"
+                + "GetMember\n"
+                + "locEnd:Trace";
+        assertEquals(cleanPCode(decompilePcode(left + "Not\n" + right)),
+                "var _temp_2;\ntrace(ready && ((_temp_2 = key,target[_temp_2])));");
+        assertEquals(cleanPCode(decompilePcode(left + right)),
+                "var _temp_2;\ntrace(ready || ((_temp_2 = key,target[_temp_2])));");
+    }
+
+    @Test
+    public void testStackValueAcrossJump() {
+        String res = decompilePcode("Push \"keyFormation\"\n"
+                + "Push \"_root\"\n"
+                + "GetVariable\n"
+                + "Push \"P1keyFormation\"\n"
+                + "Push \"keyPASS\"\n"
+                + "Push \"_root\"\n"
+                + "GetVariable\n"
+                + "Push \"P1keyPASS\"\n"
+                + "GetMember\n"
+                + "SetVariable\n"
+                + "GetMember\n"
+                + "Jump locAssign\n"
+                + "Push \"unreachable\"\n"
+                + "locAssign:SetVariable");
+        assertEquals(cleanPCode(res), "keyPASS = _root.P1keyPASS;\n"
+                + "keyFormation = _root.P1keyFormation;");
+    }
+
+    @Test
+    public void testStackValueAcrossJumpKeepsEvaluationOrder() {
+        String res = decompilePcode("Push \"targetName\"\n"
+                + "GetVariable\n"
+                + "Push \"_root\"\n"
+                + "GetVariable\n"
+                + "Push \"formation\"\n"
+                + "Push \"targetName\"\n"
+                + "Push \"after\"\n"
+                + "SetVariable\n"
+                + "GetMember\n"
+                + "Jump locAssign\n"
+                + "Push \"unreachable\"\n"
+                + "locAssign:SetVariable");
+        assertEquals(cleanPCode(res), "var _temp_1 = targetName;\n"
+                + "targetName = \"after\";\n"
+                + "set(_temp_1,_root.formation);");
+    }
+
+    @Test
+    public void testCallFunctionPreservesNameTemporary() {
+        String res = decompilePcode("Push 0\n"
+                + "Push \"functionName\"\n"
+                + "GetVariable\n"
+                + "Push \"flag\"\n"
+                + "Push 1\n"
+                + "SetVariable\n"
+                + "CallFunction\n"
+                + "Pop");
+        assertEquals(cleanPCode(res), "var _temp_1 = functionName;\n"
+                + "flag = 1;\n"
+                + "_temp_1();");
+    }
+
+    @Test
+    public void testTellTargetPreservesTargetTemporary() {
+        String res = decompilePcode("Push \"memberName\"\n"
+                + "GetVariable\n"
+                + "Push \"flag\"\n"
+                + "Push 1\n"
+                + "SetVariable\n"
+                + "Push \"obj\"\n"
+                + "GetVariable\n"
+                + "StackSwap\n"
+                + "GetMember\n"
+                + "SetTarget2\n"
+                + "Play\n"
+                + "SetTarget \"\"");
+        assertEquals(cleanPCode(res), "var _temp_1 = memberName;\n"
+                + "flag = 1;\n"
+                + "tellTarget(obj[_temp_1])\n"
+                + "{\n"
                 + "play();\n"
                 + "}");
     }

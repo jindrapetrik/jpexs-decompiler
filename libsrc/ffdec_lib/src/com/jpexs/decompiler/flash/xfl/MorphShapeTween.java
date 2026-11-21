@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
+import com.jpexs.decompiler.flash.math.area.BezierArea;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.timeline.TweenRange;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -24,7 +25,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
-import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
@@ -305,7 +305,7 @@ final class MorphShapeTween {
         path.closePath();
         int contours = 0;
         double[] p = new double[6];
-        for (PathIterator it = new Area(path).getPathIterator(null); !it.isDone(); it.next()) {
+        for (PathIterator it = new BezierArea(path).getPathIterator(null); !it.isDone(); it.next()) {
             if (it.currentSegment(p) == PathIterator.SEG_MOVETO) {
                 contours++;
             }

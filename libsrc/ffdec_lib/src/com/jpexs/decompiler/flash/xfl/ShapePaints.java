@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.xfl;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
 import com.jpexs.decompiler.flash.math.BezierEdge;
+import com.jpexs.decompiler.flash.math.area.BezierArea;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
@@ -34,7 +35,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import java.awt.Shape;
-import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -115,17 +115,17 @@ final class ShapePaints {
         if (shape.fillStyles.fillStyles.length < 2) {
             return false;
         }
-        List<Area> areas = new ArrayList<>();
+        List<BezierArea> areas = new ArrayList<>();
         for (int i = 0; i < shape.fillStyles.fillStyles.length; i++) {
-            Area area = new Area(PathExporter.exportFillStyle(windingRule, shapeNum, swf, shape, i + 1));
+            BezierArea area = new BezierArea(PathExporter.exportFillStyle(windingRule, shapeNum, swf, shape, i + 1));
             if (area.isEmpty()) {
                 continue;
             }
-            for (Area previous : areas) {
+            for (BezierArea previous : areas) {
                 if (!previous.getBounds2D().intersects(area.getBounds2D())) {
                     continue;
                 }
-                Area intersection = new Area(previous);
+                BezierArea intersection = new BezierArea(previous);
                 intersection.intersect(area);
                 if (!intersection.isEmpty()) {
                     return true;
@@ -147,9 +147,9 @@ final class ShapePaints {
         for (int i = 0; i < shape.fillStyles.fillStyles.length; i++) {
             SHAPEWITHSTYLE paint = empty();
             paint.fillStyles.fillStyles = new FILLSTYLE[]{shape.fillStyles.fillStyles[i]};
-            // Area resolves SWF's fill rule into closed contours, including holes.
+            // BezierArea resolves SWF's fill rule into closed contours, including holes.
             // Its outer contours are counterclockwise, so XFL fillStyle0 is the inside.
-            paint.shapeRecords = records(new Area(PathExporter.exportFillStyle(windingRule, shapeNum, swf, shape, i + 1)), true);
+            paint.shapeRecords = records(new BezierArea(PathExporter.exportFillStyle(windingRule, shapeNum, swf, shape, i + 1)), true);
             result.add(paint);
         }
         int lineCount = shapeNum <= 3 ? shape.lineStyles.lineStyles.length : shape.lineStyles.lineStyles2.length;

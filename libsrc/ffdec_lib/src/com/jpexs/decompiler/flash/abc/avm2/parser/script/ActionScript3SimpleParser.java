@@ -1312,14 +1312,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
     private boolean xml(List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
         List<String> openedTags = new ArrayList<>();
         xmltag(errors, thisType, new Reference<>(false), openedTags, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
-        lexer.setEnableWhiteSpace(true);
         lexer.begin(ActionScriptLexer.YYINITIAL);
-        ParsedSymbol s = lexer.lex();
-        while (s.isType(SymbolType.XML_WHITESPACE)) {
-            s = lexer.lex();
-        }
-        lexer.setEnableWhiteSpace(false);
-        lexer.pushback(s);
         //TODO: Order of additions as in official compiler
         return true;
     }

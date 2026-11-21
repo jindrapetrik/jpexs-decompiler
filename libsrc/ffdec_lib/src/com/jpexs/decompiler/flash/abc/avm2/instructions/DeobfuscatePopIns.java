@@ -76,33 +76,40 @@ public class DeobfuscatePopIns extends PopIns {
         AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
             @Override
             public boolean visit(GraphTargetItem subItem) {
-                if ((subItem instanceof DuplicateSourceItem) || (subItem instanceof DuplicateItem)) {
-                    int tempIndex = ((HasTempIndex) subItem).getTempIndex();
-                    if (!output.isEmpty() && output.get(output.size() - 1) instanceof SetTemporaryItem) {
-                        SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
-                        if (st.tempIndex == tempIndex) {                                                        
-                            st.refCount--;
-                            if (st.refCount <= 0) {
-                                output.remove(output.size() - 1);
-                                stack.moveToStack(output);
-                            } else if (st.refCount == 1) {
-                                for (int i = 0; i < stack.size(); i++) {
-                                    if (stack.get(i) instanceof HasTempIndex) {
-                                        HasTempIndex ht = (HasTempIndex) stack.get(i);
-                                        if (ht.getTempIndex() == tempIndex) {
-                                            stack.set(i, st.value);
-                                            st.refCount--;
-                                            output.remove(output.size() - 1);
-                                            stack.moveToStack(output);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if (!(subItem instanceof DuplicateSourceItem) && !(subItem instanceof DuplicateItem)) {
+                    return true;
+                }
+                if (output.isEmpty() || !(output.get(output.size() - 1) instanceof SetTemporaryItem)) {
                     return false;
                 }
-                return true;
+                int tempIndex = ((HasTempIndex) subItem).getTempIndex();
+                SetTemporaryItem st = (SetTemporaryItem) output.get(output.size() - 1);
+                if (st.tempIndex != tempIndex) {
+                    return false;
+                }
+                st.refCount--;
+                if (st.refCount > 1) {
+                    return false;
+                }
+                int remainingIndex = -1;
+                int remainingOnStack = 0;
+                for (int i = 0; i < stack.size(); i++) {
+                    GraphTargetItem stackItem = stack.get(i);
+                    if (stackItem instanceof HasTempIndex && ((HasTempIndex) stackItem).getTempIndex() == tempIndex) {
+                        remainingIndex = i;
+                        remainingOnStack++;
+                    }
+                }
+                st.refCount = Math.max(st.refCount, remainingOnStack);
+                if (st.refCount == 1 && remainingIndex != -1) {
+                    stack.set(remainingIndex, st.value);
+                    st.refCount--;
+                }
+                if (st.refCount == 0) {
+                    output.remove(output.size() - 1);
+                    stack.moveToStack(output);
+                }
+                return false;
             }            
         };
         visitor.visit(item);

@@ -35,6 +35,7 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -123,7 +124,14 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
 
     @Override
     public boolean isSimpleValue() {
-        return !(value instanceof RegisterNumber);
+        if (!(value instanceof RegisterNumber)) {
+            return true;
+        }
+        String regName = ((RegisterNumber) value).translate();
+        if (Arrays.asList("_root", "_parent", "_global", "this", "super", "arguments").contains(regName) || (regName != null && regName.matches("^level_[0-9]+$"))) {
+            return true;
+        }
+        return false;
     }
 
     @Override
