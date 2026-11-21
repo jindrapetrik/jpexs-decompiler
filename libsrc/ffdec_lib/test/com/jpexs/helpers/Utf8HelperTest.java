@@ -43,4 +43,38 @@ public class Utf8HelperTest {
     public void testInvalidBytes(byte[] data, String expected) {
         Assert.assertEquals(Utf8Helper.decode(data), expected);        
     }
+
+    @Test(dataProvider = "samples")
+    public void testEncodeInvalidBytes(byte[] data, String escaped) {
+        Assert.assertEquals(Utf8Helper.getBytes(escaped), data);
+        Assert.assertEquals(Utf8Helper.getBytesLength(escaped), data.length);
+    }
+
+    @Test
+    public void testEscapesAmongUnicodeText() {
+        String text = "ř𝓬{invalid_utf8=255}𝓬ž{invalid_utf8:128}";
+        byte[] prefix = "ř𝓬".getBytes(Utf8Helper.charset);
+        byte[] middle = "𝓬ž".getBytes(Utf8Helper.charset);
+        byte[] expected = new byte[prefix.length + middle.length + 2];
+        System.arraycopy(prefix, 0, expected, 0, prefix.length);
+        expected[prefix.length] = (byte) 255;
+        System.arraycopy(middle, 0, expected, prefix.length + 1, middle.length);
+        expected[expected.length - 1] = (byte) 128;
+        Assert.assertEquals(Utf8Helper.getBytes(text), expected);
+    }
+
+    @Test
+    public void testLiteralAndIncompleteEscapes() {
+        String text = "{+invalid_utf8=128}{invalid_utf8=x}{invalid_utf8=12";
+        Assert.assertEquals(Utf8Helper.getBytes(text), text.getBytes(Utf8Helper.charset));
+    }
+
+    @Test(timeOut = 5000)
+    public void testManyInvalidBytes() {
+        byte[] bytes = new byte[100000];
+        java.util.Arrays.fill(bytes, (byte) 255);
+        String escaped = Utf8Helper.decode(bytes);
+        Assert.assertEquals(Utf8Helper.getBytes(escaped), bytes);
+        Assert.assertEquals(Utf8Helper.getBytesLength(escaped), bytes.length);
+    }
 }
