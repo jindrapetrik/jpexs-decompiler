@@ -1791,6 +1791,18 @@ public class AVM2Graph extends Graph {
         return true;
     }
 
+    @Override
+    protected boolean canUsePrecontinue(BaseLocalData localData, Loop loop) {
+        for (int ip = loop.loopContinue.start; ip <= loop.loopContinue.end && ip < avm2code.code.size(); ip++) {
+            if (avm2code.code.get(ip).definition instanceof HasNext2Ins) {
+                // for-in/for-each have no increment clause. Keep a shared tail
+                // inside the body, so it also follows the switch's branches.
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Checks whether the part can handle loop.
      *

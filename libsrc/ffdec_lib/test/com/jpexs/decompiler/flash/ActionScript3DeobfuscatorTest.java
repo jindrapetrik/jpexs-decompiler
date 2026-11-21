@@ -977,6 +977,29 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         assertTrue(result.indexOf("trace(\"after inner\");") > result.indexOf("trace(\"inner catch\");"), result);
     }
 
+    @DataProvider(name = "enumerationSharedTails")
+    public Object[][] enumerationSharedTails() {
+        return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
+    }
+
+    @Test(dataProvider = "enumerationSharedTails")
+    public void testEnumerationKeepsSharedTailInsideBody(boolean each, boolean skipTail) throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test(items:Array):void {"
+                + "for " + (each ? "each " : "") + "(var entry:* in items) {"
+                + (skipTail ? "if (entry.skip) { continue; }" : "")
+                + "if (entry.active) { switch(entry.kind) {"
+                + "case 1: trace(\"one\"); break;"
+                + "case 2: trace(\"two\"); break; } }"
+                + "trace(\"tail\"); } trace(\"after\"); } } }").replace("\r\n", "\n");
+        Assert.assertFalse(result.contains("§§"), result);
+        String expected = (each ? "foreach" : "for") + "(varentryinitems){"
+                + (skipTail ? "if(!entry.skip){" : "")
+                + "if(entry.active){switch(entry.kind){case1:trace(\"one\");break;case2:trace(\"two\");}}"
+                + "trace(\"tail\");" + (skipTail ? "}" : "") + "}trace(\"after\");";
+        assertTrue(result.replaceAll("\\s+", "").contains(expected), result);
+    }
+
     @Test
     public void testCatchReturningThroughUnconditionalFinallyReturn() throws Exception {
         String result = recompileSource("package { public class Test {"

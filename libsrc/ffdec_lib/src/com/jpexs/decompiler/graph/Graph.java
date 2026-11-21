@@ -4129,6 +4129,17 @@ public class Graph {
     }
 
     /**
+     * Whether the loop's shared tail can be moved into a for increment clause.
+     *
+     * @param localData Local data
+     * @param loop Loop
+     * @return True to use the detected precontinue
+     */
+    protected boolean canUsePrecontinue(BaseLocalData localData, Loop loop) {
+        return true;
+    }
+
+    /**
      * Checks whether part can be checked over visited parts list. Defaults to
      * true. Can be overridden to provide custom behavior.
      *
@@ -4519,6 +4530,9 @@ public class Graph {
                 currentRet = loopItem.commands;
                 li = loopItem;
 
+                if (currentLoop.loopPreContinue != null && !canUsePrecontinue(localData, currentLoop)) {
+                    currentLoop.loopPreContinue = null;
+                }
                 if (currentLoop.loopPreContinue != null) {
                     GraphPart backup = currentLoop.loopPreContinue;
                     currentLoop.loopPreContinue = null;
