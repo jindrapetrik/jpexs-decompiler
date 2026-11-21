@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
 import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.TellTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.EqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
@@ -47,6 +48,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionEnumerate;
@@ -80,11 +82,13 @@ import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
+import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LabelItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
@@ -622,6 +626,7 @@ public class ActionGraph extends Graph {
                 t = -1;
             }
         }
+        resolveFrameLoadedBooleanBranches(list);
         resolveDuplicatedComparisonChains(list);
         structureForInLoops(list, localData);
 
@@ -639,6 +644,43 @@ public class ActionGraph extends Graph {
         //Handle for loops at the end:
         super.finalProcess(parent, list, level, localData, path);
         removeUnreachableGotosAfterTerminalControl(list);
+    }
+
+    private boolean isBooleanLiteral(GraphTargetItem item, boolean value) {
+        return (value ? item instanceof TrueItem : item instanceof FalseItem)
+                || (item instanceof DirectValueActionItem
+                && Boolean.valueOf(value).equals(((DirectValueActionItem) item).value));
+    }
+
+    private void resolveFrameLoadedBooleanBranches(List<GraphTargetItem> list) {
+        for (int i = 0; i + 2 < list.size(); i++) {
+            if (!(list.get(i) instanceof PushItem) || !isBooleanLiteral(list.get(i).value, false)
+                    || !(list.get(i + 1) instanceof IfFrameLoadedActionItem)
+                    || !(list.get(i + 2) instanceof IfItem)) {
+                continue;
+            }
+            IfFrameLoadedActionItem loaded = (IfFrameLoadedActionItem) list.get(i + 1);
+            IfItem branch = (IfItem) list.get(i + 2);
+            GraphTargetItem condition = branch.expression;
+            while (condition instanceof NotItem && condition.value instanceof NotItem) {
+                condition = condition.value.value;
+            }
+            List<GraphTargetItem> body = loaded.getActions();
+            // The skipped pair must replace the saved false with true. A graph
+            // translated separately for this pair can print its final push as
+            // a bare value, even though the surrounding graph consumes it.
+            if (!(loaded.getSrc() instanceof ActionStore) || ((ActionStore) loaded.getSrc()).getStoreSize() != 2
+                    || body.size() != 2 || !(body.get(0) instanceof PopItem)
+                    || ((PopItem) body.get(0)).resolvedValue != null
+                    || !isBooleanLiteral(body.get(1) instanceof PushItem ? body.get(1).value : body.get(1), true)
+                    || !(condition instanceof PopItem) || ((PopItem) condition).resolvedValue != null
+                    || (branch.onFalse != null && !branch.onFalse.isEmpty())) {
+                continue;
+            }
+            list.set(i, new IfFrameLoadedActionItem(loaded.getFrame(), branch.onTrue, loaded.getSrc(), loaded.getLineStartItem()));
+            list.remove(i + 1);
+            list.remove(i + 1);
+        }
     }
 
     private boolean isCachedTemporary(GraphTargetItem item, int index) {

@@ -207,6 +207,47 @@ public class ActionScript2GraphTest {
         return decompile(swf, new DoActionTag(swf), actions);
     }
 
+    @DataProvider(name = "waitForFrameNumbers")
+    public Object[][] waitForFrameNumbers() {
+        return new Object[][]{{0}, {22}, {65535}};
+    }
+
+    @Test(dataProvider = "waitForFrameNumbers")
+    public void testWaitForFrameUsesOneBasedNumber(int frame) throws Exception {
+        String result = decompilePcode("WaitForFrame " + frame + ", 2\nGotoFrame 22\nPlay\n");
+        Assert.assertEquals(result, "ifFrameLoaded(" + (frame + 1) + ")\n{\n   gotoAndPlay(23);\n}");
+        Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
+    @DataProvider(name = "frameLoadedChecks")
+    public Object[][] frameLoadedChecks() {
+        return new Object[][]{{"WaitForFrame 22, 2\n"}, {"Push 23\nWaitForFrame2 2\n"}};
+    }
+
+    @Test(dataProvider = "frameLoadedChecks")
+    public void testFrameLoadedBooleanBranch(String wait) throws Exception {
+        String result = decompilePcode("Push false\n" + wait
+                + "Pop\nPush true\nNot\nIf done\nGotoFrame 22\nPlay\ndone:\n");
+        Assert.assertEquals(result, "ifFrameLoaded(23)\n{\n   gotoAndPlay(23);\n}");
+        Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
+    @Test
+    public void testFrameLoadedBooleanBranchKeepsFollowingCommands() throws Exception {
+        String result = decompilePcode("Push false\nWaitForFrame 22, 2\nPop\nPush true\n"
+                + "Not\nIf done\nGotoFrame 22\nPlay\ndone:\nPush \"after\"\nTrace\n");
+        Assert.assertEquals(result, "ifFrameLoaded(23)\n{\n   gotoAndPlay(23);\n}\ntrace(\"after\");");
+        Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
+    @Test
+    public void testOtherFrameLoadedStackValuesAreNotFolded() throws Exception {
+        String result = decompilePcode("Push false\nWaitForFrame 22, 2\nPop\nPush false\n"
+                + "Not\nIf done\nGotoFrame 22\nPlay\ndone:\n");
+        Assert.assertTrue(result.contains("§§"), result);
+        Assert.assertTrue(result.contains("gotoAndPlay(23)"), result);
+    }
+
     private String decompileClassWithSavedStackValue(boolean consumeValue) throws Exception {
         SWF swf = new SWF();
         DoInitActionTag tag = new DoInitActionTag(swf);
