@@ -49,6 +49,9 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -436,6 +439,31 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "done: pop\npushbyte 99\nreturnvalue\n", new AVM2DeobfuscatorSimpleOld());
         assertTrue(result.contains("iffalse") && result.contains("pushbyte 99"), result);
         Assert.assertFalse(result.contains("iftrue") || result.contains("pushbyte -99"), result);
+    }
+
+    @Test
+    public void testConstantBranchesAfterRegisterInlining() throws Exception {
+        boolean autoDeobfuscate = Configuration.autoDeobfuscate.get();
+        // The helper runs removeTraps explicitly; do not repeat it in toSource.
+        Configuration.autoDeobfuscate.set(false);
+        try {
+            decompilePCode(new String(Files.readAllBytes(Paths.get(
+                    "testdata/as3_deobfuscation/constantBranchesAfterRegisterInlining.pcode")), StandardCharsets.UTF_8),
+                    "         if(this.state.count >= 1)\n"
+                    + "         {\n"
+                    + "            ++this.state.count;\n"
+                    + "            Service.instance().invoke(\"event\");\n"
+                    + "            this.value *= 3;\n"
+                    + "            this.enabled = true;\n"
+                    + "            if(this.state.phase == 5)\n"
+                    + "            {\n"
+                    + "               this.state.phase = 6;\n"
+                    + "            }\n"
+                    + "            Observer.notify();\n"
+                    + "         }\n");
+        } finally {
+            Configuration.autoDeobfuscate.set(autoDeobfuscate);
+        }
     }
 
     @DataProvider(name = "provideBasicFalseExpressions")
