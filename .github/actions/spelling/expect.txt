@@ -4012,6 +4012,7 @@ validitems
 valueclass
 VALUENAME
 VARCHARACTER
+varentryinitems
 variablename
 varincdec
 VARPROPSETTER
