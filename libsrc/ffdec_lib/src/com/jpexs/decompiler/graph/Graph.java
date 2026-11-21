@@ -1249,9 +1249,7 @@ public class Graph {
         //if (!hasEmptyStackPops.getVal() && 
         
         
-        if (!containsPopItems(ret)) {
-            promotePushItemsToCommands(ret);
-        }
+        promoteUnpoppedPushItemsToCommands(ret);
 
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
         //fixSwitchEnds(ret);
@@ -1497,7 +1495,17 @@ public class Graph {
         return found.getVal();
     }
 
-    private void promotePushItemsToCommands(List<GraphTargetItem> list) {
+    /**
+     * Displays unused stack values as expressions after stack-consuming
+     * structures have been resolved. May be repeated after dialect-specific
+     * processing removes additional pops.
+     *
+     * @param list Commands to process
+     */
+    protected final void promoteUnpoppedPushItemsToCommands(List<GraphTargetItem> list) {
+        if (containsPopItems(list)) {
+            return;
+        }
         GraphTargetVisitorInterface visitor = new AbstractGraphTargetVisitor() {
             @Override
             public boolean visit(GraphTargetItem item) {

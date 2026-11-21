@@ -20,12 +20,18 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf4.ActionTrace;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,11 +62,11 @@ public class ActionScript2GraphTest {
         return decompile(swf, tag, compiledActions);
     }
 
-    private String decompile(SWF swf, DoActionTag tag, List<Action> compiledActions) throws Exception {
+    private String decompile(SWF swf, ASMSource tag, List<Action> compiledActions) throws Exception {
         return decompile(swf, tag, compiledActions, 1);
     }
 
-    private String decompile(SWF swf, DoActionTag tag, List<Action> compiledActions, int deobfuscationMode) throws Exception {
+    private String decompile(SWF swf, ASMSource tag, List<Action> compiledActions, int deobfuscationMode) throws Exception {
         byte[] actionBytes = Action.actionsToBytes(compiledActions, true, swf.version);
         ActionList actions = ActionListReader.readActionListTimeout(tag, new ArrayList<>(),
                 new SWFInputStream(swf, actionBytes), swf.version, 0, actionBytes.length, "", deobfuscationMode);
@@ -199,6 +205,43 @@ public class ActionScript2GraphTest {
         SWF swf = new SWF();
         List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
         return decompile(swf, new DoActionTag(swf), actions);
+    }
+
+    private String decompileClassWithSavedStackValue(boolean consumeValue) throws Exception {
+        SWF swf = new SWF();
+        DoInitActionTag tag = new DoInitActionTag(swf);
+        DefineSpriteTag sprite = new DefineSpriteTag(swf);
+        swf.addTag(sprite);
+        tag.spriteId = sprite.spriteId;
+        ExportAssetsTag exports = new ExportAssetsTag(swf);
+        exports.tags.add(sprite.spriteId);
+        exports.names.add(SWF.AS2_PKG_PREFIX + "Test");
+        swf.addTag(exports);
+        swf.addTag(tag);
+        List<Action> actions = new ActionScript2Parser(swf, tag).actionsFromString(
+                "class Test { function Test() {} static function run() { trace(\"method\"); } }", Utf8Helper.charsetName);
+        actions.add(0, new ActionPush(new Object[]{false}, swf.getCharset()));
+        if (consumeValue) {
+            actions.add(new ActionTrace());
+        }
+        return decompile(swf, tag, actions);
+    }
+
+    @Test
+    public void testUnpoppedValueAfterClassDetection() throws Exception {
+        String result = decompileClassWithSavedStackValue(false);
+        Assert.assertTrue(result.contains("class Test"), result);
+        Assert.assertTrue(result.contains("false; //unpopped"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+    }
+
+    @Test
+    public void testConsumedValueAfterClassDetectionStaysOnStack() throws Exception {
+        String result = decompileClassWithSavedStackValue(true);
+        Assert.assertTrue(result.contains("class Test"), result);
+        Assert.assertTrue(result.contains("§§push(false)"), result);
+        Assert.assertTrue(result.contains("trace(§§pop())"), result);
+        Assert.assertFalse(result.contains("unpopped"), result);
     }
 
     @DataProvider(name = "functionsInLoops")

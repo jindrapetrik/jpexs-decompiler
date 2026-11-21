@@ -1098,6 +1098,9 @@ public class ActionGraph extends Graph {
         if (insideDoInitAction && !insideFunction) {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
             detector.checkClass(uninitializedClassTraits, ret, ((ActionGraphSource) code).getVariables(), path);
+            // Class construction can contain pops that disappear only during
+            // detection, after the common graph pass checked unused pushes.
+            promoteUnpoppedPushItemsToCommands(ret);
             if (needsUninitializedClassFieldsDetection && Configuration.skipDetectionOfUninitializedClassFields.get()) {
                 ret.add(0, new CommentItem(AppResources.translate("decompilationWarning.as2.noUninitializedClassFieldsDetection")));
             }
