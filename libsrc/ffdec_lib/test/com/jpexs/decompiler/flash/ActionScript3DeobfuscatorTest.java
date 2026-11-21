@@ -289,6 +289,28 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         };
     }
 
+    @DataProvider(name = "thisBooleanConversions")
+    public Object[][] thisBooleanConversions() {
+        return new Object[][]{
+            {"convert_b\n"}, {"coerce_b\n"},
+            {"convert_b\nconvert_b\n"}, {"convert_b\nnot\nnot\n"}
+        };
+    }
+
+    @Test(dataProvider = "thisBooleanConversions")
+    public void testThisBooleanConversionPreservesFrameScriptCall(String conversion) throws Exception {
+        // ghost3_die: the call's receiver and arguments remain on the stack
+        // while an always-false !Boolean(this) guards an unreachable return.
+        decompilePCode("findpropstrict QName(PackageNamespace(\"\"),\"addFrameScript\")\n"
+                + "pushbyte 2\ngetlex QName(PackageInternalNs(\"\"),\"frame3\")\n"
+                + "pushbyte 3\ngetlex QName(PackageInternalNs(\"\"),\"frame4\")\n"
+                + "getlocal0\n" + conversion + "not\niffalse registerFrames\n"
+                + "pushbyte 100\nlookupswitch invalidReturn, [invalidReturn, invalidReturn]\n"
+                + "invalidReturn: pushfalse\nnot\nreturnvalue\n"
+                + "registerFrames: callpropvoid QName(PackageNamespace(\"\"),\"addFrameScript\"), 4\n",
+                "         addFrameScript(2,frame3,3,frame4);\n");
+    }
+
     @DataProvider(name = "constantSwitchIndices")
     public Object[][] constantSwitchIndices() {
         return new Object[][]{

@@ -81,5 +81,9 @@ public class ClassAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return false;
     }
-
+    
+    @Override
+    public Boolean getResultAsBoolean() {
+        return true;
+    }
 }
