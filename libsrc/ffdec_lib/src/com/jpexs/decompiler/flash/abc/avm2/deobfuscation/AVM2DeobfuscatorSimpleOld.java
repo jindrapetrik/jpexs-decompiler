@@ -660,6 +660,16 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     // Another path may supply different operands directly to this branch.
                     return false;
                 }
+                // A jump or another entry along this path can supply different
+                // operands, including a changed stack counter on a loop backedge.
+                if (!linearExecution) {
+                    return false;
+                }
+                for (int ip = executionStart + 1; ip < idx; ip++) {
+                    if (importantOffsets.getVal().contains(code.code.get(ip).getAddress())) {
+                        return false;
+                    }
+                }
                 if (stack.isEmpty()) {
                     return false;
                 }
@@ -668,15 +678,6 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 boolean res;
                 long address;
                 if (def instanceof LookupSwitchIns) {
-                    // Other entries into this path may supply a different index.
-                    if (!linearExecution) {
-                        return false;
-                    }
-                    for (int ip = executionStart + 1; ip < idx; ip++) {
-                        if (importantOffsets.getVal().contains(code.code.get(ip).getAddress())) {
-                            return false;
-                        }
-                    }
                     if (!top.isCompileTime() || top.hasSideEffect()) {
                         return false;
                     }

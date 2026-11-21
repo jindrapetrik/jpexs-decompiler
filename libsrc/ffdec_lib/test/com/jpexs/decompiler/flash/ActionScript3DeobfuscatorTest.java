@@ -360,6 +360,39 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         Assert.assertTrue(result.contains("lookupswitch"), result);
     }
 
+    @DataProvider(name = "stackCounterBranches")
+    public Object[][] stackCounterBranches() {
+        return new Object[][]{{"iffalse", ""}, {"iftrue", "not\n"}};
+    }
+
+    @Test(dataProvider = "stackCounterBranches")
+    public void testStackCountdownKeepsLoopExit(String branch, String negate) throws Exception {
+        String result = recompilePCode("pushshort 664\n"
+                + "loop: dup\n" + negate + branch + " done\ndecrement_i\njump loop\n"
+                + "done: pop\npushbyte 99\nreturnvalue\n", new AVM2DeobfuscatorSimpleOld());
+        assertTrue(result.contains(branch), result);
+        assertTrue(result.contains("pushbyte 99"), result);
+    }
+
+    @Test(dataProvider = "stackCounterBranches")
+    public void testConditionalBranchWithMergedStackOperandsIsPreserved(String branch, String negate) throws Exception {
+        String result = recompilePCode("getlocal0\ngetproperty QName(PackageNamespace(\"\"),\"enabled\")\n"
+                + "iftrue alternate\npushbyte 0\njump join\nalternate: pushbyte 1\n"
+                + "join: nop\n" + negate + branch + " selected\npushbyte -99\nreturnvalue\n"
+                + "selected: pushbyte 99\nreturnvalue\n", new AVM2DeobfuscatorSimpleOld());
+        assertTrue(result.contains("pushbyte -99") && result.contains("pushbyte 99"), result);
+    }
+
+    @Test
+    public void testConstantConditionInsideStackCountdownStillFolds() throws Exception {
+        String result = recompilePCode("pushbyte 3\nloop: dup\niffalse done\ndecrement_i\n"
+                + "pushfalse\niftrue unreachable\njump loop\n"
+                + "unreachable: pop\npushbyte -99\nreturnvalue\n"
+                + "done: pop\npushbyte 99\nreturnvalue\n", new AVM2DeobfuscatorSimpleOld());
+        assertTrue(result.contains("iffalse") && result.contains("pushbyte 99"), result);
+        Assert.assertFalse(result.contains("iftrue") || result.contains("pushbyte -99"), result);
+    }
+
     @DataProvider(name = "provideBasicFalseExpressions")
     public Object[][] provideBasicFalseExpressions() {
         return new Object[][]{
