@@ -314,7 +314,7 @@ public class AVM2Graph extends Graph {
             }
         }
 
-        getIgnoredSwitches((AVM2LocalData) localData, allParts);
+        getIgnoredSwitches((AVM2LocalData) localData, allParts, throwStates);
         Set<Integer> integerSwitchesIps = new HashSet<>();
         for (GraphPart p : avm2LocalData.ignoredSwitches.values()) {
             integerSwitchesIps.add(p.end);
@@ -351,9 +351,10 @@ public class AVM2Graph extends Graph {
      *
      * @param localData Local data
      * @param allParts All parts
+     * @param throwStates Throw states
      * @throws InterruptedException On interrupt
      */
-    private void getIgnoredSwitches(AVM2LocalData localData, Set<GraphPart> allParts) throws InterruptedException {
+    private void getIgnoredSwitches(AVM2LocalData localData, Set<GraphPart> allParts, List<ThrowState> throwStates) throws InterruptedException {
 
         for (int e = 0; e < body.exceptions.length; e++) {
             ABCException ex = body.exceptions[e];
@@ -431,6 +432,22 @@ public class AVM2Graph extends Graph {
                     int ip = foundIps.get(i);
                     if (avm2code.code.get(ip).definition instanceof LookupSwitchIns) {
                         switchPart = foundParts.get(i);
+                    } else if (avm2code.code.get(ip).definition instanceof SetLocalTypeIns) {
+                        // A nested try at the start of finally saves the selector
+                        // before any other instruction consumes it from the stack.
+                        AVM2Instruction save = avm2code.code.get(ip);
+                        int register = ((SetLocalTypeIns) save.definition).getRegisterId(save);
+                        GraphPart savePart = foundParts.get(i);
+                        Set<Integer> usages = new HashSet<>();
+                        walkLocalRegsUsage(throwStates, localData, usages, savePart, savePart,
+                                new HashSet<>(), ip + 1, register);
+                        if (usages.size() == 1) {
+                            GraphPart candidate = findFinallySelectorSwitch(usages.iterator().next(), register, allParts);
+                            if (candidate != null && localData.codeStats.instructionStats[ip].stackpos
+                                    == localData.codeStats.instructionStats[candidate.end].stackpos) {
+                                switchPart = candidate;
+                            }
+                        }
                     } else if (avm2code.code.get(ip).definition instanceof PopIns) {
                         //In swftools try..finally, there is dup before lookupswitch and pop in its branches
                         GraphPart popPart = searchPart(ip, allParts);
@@ -1767,20 +1784,28 @@ public class AVM2Graph extends Graph {
      * dispatch, allowing the compiler's conversion and register cleanup.
      */
     private boolean isFinallySelectorRestore(int readIp, int register, GraphPart switchPart, Set<GraphPart> allParts) {
+        return findFinallySelectorSwitch(readIp, register, allParts) == switchPart;
+    }
+
+    /**
+     * Follows a saved selector read to its dispatch, allowing only conversion
+     * and register cleanup between the read and the switch.
+     */
+    private GraphPart findFinallySelectorSwitch(int readIp, int register, Set<GraphPart> allParts) {
         AVM2Instruction read = avm2code.code.get(readIp);
         if (!(read.definition instanceof GetLocalTypeIns)
                 || ((GetLocalTypeIns) read.definition).getRegisterId(read) != register) {
-            return false;
+            return null;
         }
         GraphPart part = searchPart(readIp, allParts);
         Set<GraphPart> visited = new HashSet<>();
         int ip = readIp + 1;
         while (part != null && visited.add(part)) {
             for (; ip <= part.end; ip++) {
-                if (part == switchPart && ip == switchPart.end) {
-                    return true;
-                }
                 AVM2Instruction ins = avm2code.code.get(ip);
+                if (ins.definition instanceof LookupSwitchIns && ip == part.end) {
+                    return part;
+                }
                 if (!(ins.definition instanceof CoerceAIns)
                         && !(ins.definition instanceof ConvertIIns)
                         && !(ins.definition instanceof KillIns && ins.operands[0] == register)
@@ -1788,16 +1813,16 @@ public class AVM2Graph extends Graph {
                         && !(ins.definition instanceof LabelIns)
                         && !(ins.definition instanceof NopIns)
                         && !(ins.definition instanceof JumpIns)) {
-                    return false;
+                    return null;
                 }
             }
             if (part.nextParts.size() != 1) {
-                return false;
+                return null;
             }
             part = part.nextParts.get(0);
             ip = part.start;
         }
-        return false;
+        return null;
     }
 
     /**

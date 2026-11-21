@@ -1333,11 +1333,14 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
 
     @DataProvider(name = "savedFinallySelectors")
     public Object[][] savedFinallySelectors() {
-        return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
+        return new Object[][]{
+            {false, false, true}, {true, false, true}, {false, true, true}, {true, true, true},
+            {false, false, false}, {true, false, false}, {false, true, false}, {true, true, false}
+        };
     }
 
     @Test(dataProvider = "savedFinallySelectors")
-    public void testNestedTryPreservesOuterFinallySelector(boolean coerce, boolean reuseRegister) throws Exception {
+    public void testNestedTryPreservesOuterFinallySelector(boolean coerce, boolean reuseRegister, boolean conditional) throws Exception {
         String inner = "try\n"
                 + "{\n"
                 + "   trace(\"inner\");\n"
@@ -1345,7 +1348,9 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "catch(e:Error)\n"
                 + "{\n"
                 + "}";
-        inner = "if(param1)\n{\n" + inner.replaceAll("(?m)^", "   ") + "\n}";
+        if (conditional) {
+            inner = "if(param1)\n{\n" + inner.replaceAll("(?m)^", "   ") + "\n}";
+        }
         StringBuilder expected = new StringBuilder("         try\n         {\n            trace(\"work\");\n"
                 + "         }\n         catch(e:Error)\n         {\n         }\n         finally\n         {\n");
         expected.append(inner.replaceAll("(?m)^", "            ")).append("\n         }\n         trace(\"after\");\n");
@@ -1361,7 +1366,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "normal: pushbyte -1\nprotected_end: jump cleanup\n"
                 + "handler: getlocal0\npushscope\ncoerce_a\nsetlocal2\npushbyte 0\njump cleanup\n"
                 + "rethrow: getlocal2\nkill 2\nthrow\n"
-                + "cleanup: getlocal1\niffalse dispatch\n"
+                + "cleanup: " + (conditional ? "getlocal1\niffalse dispatch\n" : "")
                 + "inner_start:\n" + (coerce ? "coerce_a\n" : "") + "setlocal3\n"
                 + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"inner\"\n"
                 + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\ninner_end: jump restore\n"
