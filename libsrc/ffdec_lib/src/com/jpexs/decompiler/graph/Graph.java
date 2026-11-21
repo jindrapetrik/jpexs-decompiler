@@ -991,6 +991,12 @@ public class Graph {
                 // A conditional return/throw can prevent a common postdominator,
                 // even though several cases all enter this same tail.
                 firstCommon = pc;
+            } else if (parts.contains(firstCommon.part) && !parts.contains(pc.part)
+                    && !firstCommon.part.leadsTo(localData, this, code, pc.part, loops, throwStates, false)) {
+                // Several falling-through cases can make one of their own
+                // entries tie with an independent shared tail of other cases.
+                // Keep that case body in the switch and prefer the shared tail.
+                firstCommon = pc;
             }
         }
         if (firstCommon != null) {

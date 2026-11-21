@@ -835,6 +835,61 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "         trace(\"after\");\n");
     }
 
+    @DataProvider(name = "switchFallthroughReturns")
+    public Object[][] switchFallthroughReturns() {
+        return new Object[][]{{false}, {true}};
+    }
+
+    @Test(dataProvider = "switchFallthroughReturns")
+    public void testSwitchSharedTailTiedWithFallthroughReturn(boolean inTry) throws Exception {
+        String pcode = "pushbyte 0\nsetlocal2\nprotected_start: jump dispatch\n"
+                + "zero: label\n" + switchTrace("zero") + "jump shared\n"
+                + "one: label\n" + switchTrace("one") + "jump shared\n"
+                + "two: label\n" + switchTrace("two") + "jump shared\n"
+                + "three: label\n" + switchTrace("three")
+                + "four: label\n" + switchTrace("four")
+                + "other: label\npushbyte 0\nreturnvalue\n"
+                + "dispatch: getlocal1\nlookupswitch other, [zero, one, two, three, four]\n"
+                + "shared: getlocal2\npushbyte 0\nifnlt done\npushbyte -1\nreturnvalue\n"
+                + "done: getlocal2\nreturnvalue\n";
+        String expected = "         var _loc2_:int = 0;\n"
+                + "         switch(param1)\n         {\n"
+                + "            case 0:\n               trace(\"zero\");\n               break;\n"
+                + "            case 1:\n               trace(\"one\");\n               break;\n"
+                + "            case 2:\n               trace(\"two\");\n               break;\n"
+                + "            case 3:\n               trace(\"three\");\n"
+                + "            case 4:\n               trace(\"four\");\n"
+                + "            default:\n               return 0;\n         }\n"
+                + "         if(_loc2_ < 0)\n         {\n            return -1;\n         }\n"
+                + "         return _loc2_;\n";
+        if (inTry) {
+            pcode += "protected_end: getlocal0\npushscope\nnewcatch 0\ndup\nsetlocal3\ndup\npushscope\nswap\nsetslot 1\n"
+                    + "pushbyte -2\nreturnvalue\n"
+                    + "try from protected_start to protected_end target protected_end type QName(PackageNamespace(\"\"),\"Error\") name QName(PackageNamespace(\"\"),\"e\") end\n";
+            expected = "         var _loc2_:int = 0;\n         try\n         {\n"
+                    + expected.substring(expected.indexOf('\n') + 1).replaceAll("(?m)^", "   ")
+                    + "         }\n         catch(e:Error)\n         {\n            return -2;\n         }\n";
+        }
+        decompilePCodeWithLines(pcode, expected);
+    }
+
+    @Test
+    public void testSwitchFallthroughReturnInsideConditionalTry() throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test(which:int, split:Boolean):int { var ret:int = 0; try {"
+                + "if (split) { trace(\"split\"); } else { switch(which) {"
+                + "case 0: trace(\"zero\"); ret = first(); break;"
+                + "case 1: trace(\"one\"); ret = second(); break;"
+                + "case 2: trace(\"two\"); ret = third(); break;"
+                + "case 3: trace(\"three\");"
+                + "case 4: trace(\"four\"); default: return 0; }"
+                + "if (ret < 0) { return -1; } } return ret;"
+                + "} catch(e:Error) { return -2; } } } }");
+        Assert.assertFalse(result.contains("§§"), result);
+        assertEquals(result.split("ret < 0", -1).length - 1, 1, result);
+        assertTrue(result.replaceAll("\\s+", "").contains("case3:trace(\"three\");case4:trace(\"four\");default:return0;"), result);
+    }
+
     @Test
     public void testSwitchFollowedByStrictComparison() throws Exception {
         decompilePCode("getlocal1\n"

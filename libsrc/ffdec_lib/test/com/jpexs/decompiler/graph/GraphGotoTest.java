@@ -38,6 +38,33 @@ import org.testng.annotations.Test;
 public class GraphGotoTest {
 
     @Test
+    public void testSharedSwitchTailPreferredOverTiedFallthroughCase() throws InterruptedException {
+        GraphPart firstCase = new GraphPart(0, 0);
+        GraphPart secondCase = new GraphPart(1, 1);
+        GraphPart thirdCase = new GraphPart(2, 2);
+        GraphPart fallthroughCase = new GraphPart(3, 3);
+        GraphPart nextFallthroughCase = new GraphPart(4, 4);
+        GraphPart defaultReturn = new GraphPart(5, 5);
+        GraphPart shared = new GraphPart(6, 6);
+        GraphPart earlyReturn = new GraphPart(7, 7);
+        GraphPart continuation = new GraphPart(8, 8);
+        firstCase.nextParts.add(shared);
+        secondCase.nextParts.add(shared);
+        thirdCase.nextParts.add(shared);
+        fallthroughCase.nextParts.add(nextFallthroughCase);
+        nextFallthroughCase.nextParts.add(defaultReturn);
+        shared.nextParts.addAll(Arrays.asList(earlyReturn, continuation));
+        // Both defaultReturn and shared are reachable from three case entries.
+        // With equal closing times, the earlier default used to win the tie.
+        GraphSource source = new ActionGraphSource("", false, Collections.<Action>nCopies(9, new ActionEnd()),
+                10, new HashMap<>(), new HashMap<>(), new HashMap<>(), Utf8Helper.charsetName, 0);
+        Graph graph = new Graph(null, source, Collections.emptyList(), 0);
+        Assert.assertSame(graph.getMostCommonPart(new BaseLocalData() { },
+                Arrays.asList(firstCase, secondCase, thirdCase, fallthroughCase, nextFallthroughCase, defaultReturn),
+                new ArrayList<>(), new ArrayList<>(), new ArrayList<>()), shared);
+    }
+
+    @Test
     public void testSharedSwitchTailStartsBeforeItsConditionalExit() throws InterruptedException {
         GraphPart firstCase = new GraphPart(0, 0);
         GraphPart secondCase = new GraphPart(1, 1);
