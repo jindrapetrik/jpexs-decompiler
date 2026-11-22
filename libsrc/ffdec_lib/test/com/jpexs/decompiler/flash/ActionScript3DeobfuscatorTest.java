@@ -406,6 +406,23 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         }
     }
 
+    @Test
+    public void testManyConstantRegisterBranches() throws Exception {
+        StringBuilder pcode = new StringBuilder("pushfalse\npushtrue\nsetlocal 128\nsetlocal 129\n");
+        StringBuilder expected = new StringBuilder();
+        for (int i = 0; i < 128; i++) {
+            pcode.append("getlocal 128\niftrue check").append(i).append('\n')
+                    .append(switchTrace("unreachable"))
+                    .append("check").append(i).append(": getlocal 129\niftrue dead").append(i).append('\n')
+                    .append(switchTrace("kept" + i))
+                    .append("jump next").append(i).append('\n')
+                    .append("dead").append(i).append(": ").append(switchTrace("unreachable"))
+                    .append("next").append(i).append(": nop\n");
+            expected.append("         trace(\"kept").append(i).append("\");\n");
+        }
+        decompilePCode(pcode.toString(), expected.toString());
+    }
+
     @DataProvider(name = "constantSwitchIndices")
     public Object[][] constantSwitchIndices() {
         return new Object[][]{
