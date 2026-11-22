@@ -225,6 +225,39 @@ public class ActionScript2GraphTest {
         return new Object[][]{{false}, {true}};
     }
 
+    @Test(dataProvider = "overlappingFunctionTails", timeOut = 10000)
+    public void testBackwardJumpRedeclaringFunctionRemainsExternal(boolean function2) throws Exception {
+        int timeout = Configuration.decompilationTimeoutSingleMethod.get();
+        Configuration.decompilationTimeoutSingleMethod.set(2);
+        try {
+            String definition = function2
+                    ? "DefineFunction2 \"sample\", 0, 1, false, false, false, false, false, false, false, false, false {\n"
+                    : "DefineFunction \"sample\", 0 {\n";
+            String result = decompilePcode("header: " + definition
+                    + "Push \"condition\"\nGetVariable\nIf header\n"
+                    + "Push \"body\"\nTrace\n}\nPush \"after\"\nTrace\nEnd\n");
+            Assert.assertEquals(result.split("function sample\\(", -1).length - 1, 1, result);
+            Assert.assertTrue(result.contains("§§goto(addr0000);"), result);
+            Assert.assertTrue(result.contains("addr0000:"), result);
+            Assert.assertTrue(result.contains("trace(\"body\");") && result.contains("trace(\"after\");"), result);
+            Assert.assertFalse(result.contains("Decompilation error"), result);
+        } finally {
+            Configuration.decompilationTimeoutSingleMethod.set(timeout);
+        }
+    }
+
+    @Test(dataProvider = "overlappingFunctionTails")
+    public void testBackwardJumpBeforeFunctionWithoutRedeclaration(boolean function2) throws Exception {
+        String definition = function2
+                ? "DefineFunction2 \"sample\", 0, 1, false, false, false, false, false, false, false, false, false {\n"
+                : "DefineFunction \"sample\", 0 {\n";
+        String result = decompilePcode("Jump header\nshared: Push \"prefix\"\nTrace\nPush undefined\nReturn\n"
+                + "header: " + definition + "Jump shared\n}\nPush \"after\"\nTrace\nEnd\n");
+        Assert.assertTrue(result.contains("function sample()"), result);
+        Assert.assertTrue(result.contains("trace(\"prefix\");") && result.contains("trace(\"after\");"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+    }
+
     @Test(dataProvider = "overlappingFunctionTails")
     public void testOverlappingDeadActionKeepsFunctionAssignment(boolean function2) throws Exception {
         SWF swf = new SWF();

@@ -133,6 +133,9 @@ public class ActionGraph extends Graph {
      */
     private boolean insideFunction;
 
+    /** Parts whose execution from before the function would redeclare it. */
+    private final Set<GraphPart> recursiveFunctionEntries = new HashSet<>();
+
     /**
      * Needs uninitialized class fields detection
      */
@@ -251,6 +254,34 @@ public class ActionGraph extends Graph {
 
     @Override
     protected void beforeGetLoops(BaseLocalData localData, String path, Set<GraphPart> allParts, List<ThrowState> throwStates) throws InterruptedException {
+        if (insideFunction && startIp > 0 && startIp < code.size()) {
+            long startAddress = code.pos2adr(startIp);
+            Action lastAction = (Action) code.get(code.size() - 1);
+            long endAddress = lastAction.getAddress() + lastAction.getTotalActionLength();
+            for (int ip = startIp - 1; ip >= 0; ip--) {
+                GraphSourceItem item = code.get(ip);
+                if (!(item instanceof ActionDefineFunction) && !(item instanceof ActionDefineFunction2)) {
+                    continue;
+                }
+                GraphSourceItemContainer container = (GraphSourceItemContainer) item;
+                long bodyStart = ((Action) item).getAddress() + container.getHeaderSize();
+                if (bodyStart > startAddress || bodyStart + container.getContainerSizes().get(0) < endAddress) {
+                    continue;
+                }
+                GraphPart headerPart = searchPart(ip, allParts);
+                if (headerPart != null) {
+                    List<GraphPart> pending = new ArrayList<>();
+                    pending.add(headerPart);
+                    while (!pending.isEmpty()) {
+                        GraphPart part = pending.remove(pending.size() - 1);
+                        if (recursiveFunctionEntries.add(part)) {
+                            pending.addAll(part.refs);
+                        }
+                    }
+                }
+                break;
+            }
+        }
         if (registerUsage == null) {
             registerUsage = new ActionRegisterUsage(getGraphCode(), startIp);
         }
@@ -263,6 +294,23 @@ public class ActionGraph extends Graph {
      */
     public ActionRegisterUsage getRegisterUsage() {
         return registerUsage;
+    }
+
+    @Override
+    protected GraphPart checkPartWithOutput(List<GraphTargetItem> output, TranslateStack stack,
+            BaseLocalData localData, GraphPart prev, GraphPart part, Set<GraphPart> allParts) {
+        if (part.start < startIp && recursiveFunctionEntries.contains(part)) {
+            // A backward transfer which redeclares this function cannot be
+            // expanded into a finite tree of nested function declarations.
+            Action target = (Action) code.get(part.start);
+            ActionSecondPassContext context = ActionSecondPassContext.current();
+            String label = context == null ? "addr" + Helper.formatAddress(target.getAddress())
+                    : context.registerExternalLabel(target);
+            makeAllCommands(output, stack);
+            output.add(new GotoItem(ActionGraphTargetDialect.INSTANCE, target, localData.lineStartInstruction, label));
+            return null;
+        }
+        return super.checkPartWithOutput(output, stack, localData, prev, part, allParts);
     }
 
     /**

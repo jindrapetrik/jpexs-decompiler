@@ -74,6 +74,7 @@ import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CommentItem;
+import com.jpexs.decompiler.graph.model.LabelItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.ByteArrayRange;
@@ -1358,6 +1359,12 @@ public abstract class Action implements GraphSourceItem {
                 stack.simplify();
             }
             Action action = actions.get(ip);            
+            ActionSecondPassContext context = ActionSecondPassContext.current();
+            if (context != null && context.getExternalLabel(action) != null) {
+                graph.makeAllCommands(output, stack);
+                output.add(new LabelItem(ActionGraphTargetDialect.INSTANCE,
+                        action, localData.lineStartAction, context.getExternalLabel(action)));
+            }
             if (action.isIgnored()) {
                 ip++;
                 continue;
