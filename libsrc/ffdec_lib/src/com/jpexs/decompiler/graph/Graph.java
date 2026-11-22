@@ -4179,6 +4179,19 @@ public class Graph {
     }
 
     /**
+     * Whether a part leads through only metadata and jumps to a return
+     * without a value.
+     * Such an exit can be emitted on each incoming path without duplicating
+     * any expression or side effect.
+     *
+     * @param part Graph part
+     * @return True for a plain return
+     */
+    protected boolean isPartReturnOnly(GraphPart part) {
+        return false;
+    }
+
+    /**
      * Checks whether the list of items can be converted to comma separated
      * list.
      *
@@ -6122,6 +6135,19 @@ public class Graph {
 
         //gotoTargets
         GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops, throwStates, stopPart);
+        if (breakPart != null && isPartReturnOnly(breakPart)) {
+            // A case which returns directly must not pull the shared tail of
+            // the other cases into the first case body.
+            List<GraphPart> continuingCases = new ArrayList<>(new LinkedHashSet<>(caseBodyParts));
+            int caseCount = continuingCases.size();
+            continuingCases.removeIf(this::isPartReturnOnly);
+            if (continuingCases.size() > 1 && continuingCases.size() < caseCount) {
+                GraphPart sharedTail = getMostCommonPart(localData, continuingCases, loops, throwStates, stopPart);
+                if (sharedTail != null) {
+                    breakPart = sharedTail;
+                }
+            }
+        }
         //removeEdgeToFromList(gotoTargets, breakPart);
 
         List<List<GraphTargetItem>> caseCommands = new ArrayList<>();

@@ -892,6 +892,22 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test(dataProvider = "switchFallthroughReturns")
+    public void testSwitchSharedTailEndingAtEarlyReturnCase(boolean debugLine) throws Exception {
+        decompilePCodeWithLines("getlocal1\nlookupswitch other, [zero, one, done]\n"
+                + "zero: " + switchTrace("zero") + "jump shared\n"
+                + "one: " + switchTrace("one") + "jump shared\n"
+                + "other: " + switchTrace("other") + "jump shared\n"
+                + "shared: " + switchTrace("shared")
+                + "done: label\n" + (debugLine ? "jump exit\nexit: label\ndebugline 42\nnop\n" : "") + "returnvoid\n",
+                "         switch(param1)\n         {\n"
+                + "            case 0:\n               trace(\"zero\");\n               break;\n"
+                + "            case 1:\n               trace(\"one\");\n               break;\n"
+                + "            default:\n               trace(\"other\");\n               break;\n"
+                + "            case 2:\n               return;\n         }\n"
+                + "         trace(\"shared\");\n");
+    }
+
+    @Test(dataProvider = "switchFallthroughReturns")
     public void testSwitchSharedTailTiedWithFallthroughReturn(boolean inTry) throws Exception {
         String pcode = "pushbyte 0\nsetlocal2\nprotected_start: jump dispatch\n"
                 + "zero: label\n" + switchTrace("zero") + "jump shared\n"

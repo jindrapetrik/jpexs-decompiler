@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.HasNext2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.LabelIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.NopIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.DecLocalPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.IncLocalPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
@@ -1834,6 +1835,11 @@ public class AVM2Graph extends Graph {
      */
     @Override
     protected boolean canHandleVisited(BaseLocalData localData, GraphPart part) {
+        if (isPartReturnOnly(part)) {
+            // Several switch cases may return at the same instruction.
+            // Emit return in each path instead of a goto to that return.
+            return false;
+        }
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         for (ABCException ex : body.exceptions) {
             if (aLocalData.parsedExceptions.contains(ex)) {
@@ -1845,6 +1851,33 @@ public class AVM2Graph extends Graph {
             }
         }
         return true;
+    }
+
+    @Override
+    protected boolean isPartReturnOnly(GraphPart part) {
+        Set<GraphPart> visited = new HashSet<>();
+        while (visited.add(part)) {
+            if (part.start < 0 || part.end < part.start || part.end >= avm2code.code.size()) {
+                return false;
+            }
+            for (int ip = part.start; ip <= part.end; ip++) {
+                AVM2Instruction ins = avm2code.code.get(ip);
+                if (ins.definition instanceof ReturnVoidIns) {
+                    return ip == part.end;
+                }
+                if (!(ins.definition instanceof LabelIns)
+                        && !(ins.definition instanceof DebugLineIns)
+                        && !(ins.definition instanceof NopIns)
+                        && !(ins.definition instanceof JumpIns && ip == part.end)) {
+                    return false;
+                }
+            }
+            if (part.nextParts.size() != 1) {
+                return false;
+            }
+            part = part.nextParts.get(0);
+        }
+        return false;
     }
 
     @Override
