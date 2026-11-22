@@ -1959,6 +1959,24 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testForInWithSwitchesBeforeBreak() throws Exception {
+        String result = recompileSource("package { public class Test { public function test(items:Object):void {"
+                + "for (var key:String in items) {"
+                + "if (items[key].first) {"
+                + "switch (items[key].kind) { case 'a': trace('firstCase'); break; default: trace('firstDefault'); }"
+                + "trace('firstEnd'); break; }"
+                + "if (items[key].second) {"
+                + "switch (items[key].kind) { case 'b': trace('secondCase'); break; default: trace('secondDefault'); }"
+                + "trace('secondEnd'); break; }"
+                + "} trace('after'); } } }");
+        Assert.assertFalse(result.contains("§§") || result.contains("while(true)"), result);
+        assertTrue(result.contains(" in items)"), result);
+        for (String message : new String[]{"firstCase", "firstDefault", "firstEnd", "secondCase", "secondDefault", "secondEnd", "after"}) {
+            assertEquals(result.split("trace\\(\"" + message + "\"\\);", -1).length - 1, 1, result);
+        }
+    }
+
+    @Test
     public void testStringSwitchCasesContinuingOuterLoop() throws Exception {
         String res = recompileSource("package { public class Test { public function testLoop() {"
                 + "var result = 0;"

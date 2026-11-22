@@ -534,9 +534,16 @@ public class LoopDetector {
                 for (GraphPart casePart : switchParts.get(i)) {
                     dispatchParts.retainAll(casePart.refs);
                 }
-                // A switch dispatched inside this loop can share the loop's exit.
+                // A switch in a branch which exits the loop is outside its
+                // natural cycle too. Only an enclosing switch has a case which
+                // reaches the loop header without traversing a back edge.
                 if (dispatchParts.isEmpty()) {
-                    parentBreaks.add(switchBreak);
+                    for (GraphPart casePart : switchParts.get(i)) {
+                        if (getReachable(casePart, backEdges, Collections.emptySet(), pnw, ignoredEdges).contains(loop.loopContinue)) {
+                            parentBreaks.add(switchBreak);
+                            break;
+                        }
+                    }
                 }
             }
 

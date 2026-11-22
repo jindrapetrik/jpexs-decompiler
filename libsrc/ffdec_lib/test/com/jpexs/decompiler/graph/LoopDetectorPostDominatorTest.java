@@ -98,6 +98,72 @@ public class LoopDetectorPostDominatorTest {
     }
 
     @Test
+    public void testSwitchesInExitingBranchesDoNotEncloseLoop() throws InterruptedException {
+        GraphPart entry = new GraphPart(0, 0);
+        GraphPart condition = new GraphPart(1, 1);
+        GraphPart firstCheck = new GraphPart(2, 2);
+        GraphPart firstSwitch = new GraphPart(3, 3);
+        GraphPart secondCheck = new GraphPart(4, 4);
+        GraphPart firstCase = new GraphPart(5, 5);
+        GraphPart secondSwitch = new GraphPart(6, 6);
+        GraphPart firstDefault = new GraphPart(7, 7);
+        GraphPart firstJoin = new GraphPart(8, 8);
+        GraphPart secondCase = new GraphPart(9, 9);
+        GraphPart done = new GraphPart(10, 10);
+        GraphPart secondDefault = new GraphPart(11, 11);
+        connect(entry, condition);
+        connect(condition, firstCheck, done);
+        connect(firstCheck, firstSwitch, secondCheck);
+        connect(secondCheck, secondSwitch, condition);
+        connect(firstSwitch, firstCase, firstDefault);
+        connect(firstCase, firstJoin);
+        connect(firstDefault, firstJoin);
+        connect(firstJoin, done);
+        connect(secondSwitch, secondCase, secondDefault);
+        connect(secondCase, done);
+        connect(secondDefault, done);
+        Set<GraphPart> parts = new LinkedHashSet<>(Arrays.asList(entry, condition, firstCheck,
+                firstSwitch, secondCheck, firstCase, secondSwitch, firstDefault, firstJoin,
+                secondCase, done, secondDefault));
+        List<Loop> loops = new ArrayList<>();
+        new LoopDetector().detectLoops(Collections.singletonList(entry), loops, Collections.emptyList(),
+                parts, Arrays.asList(Arrays.asList(firstCase, firstDefault), Arrays.asList(secondCase, secondDefault)),
+                Arrays.asList(firstJoin, done), true);
+        Assert.assertEquals(loops.size(), 1);
+        Assert.assertSame(loops.get(0).loopContinue, condition);
+        Assert.assertSame(loops.get(0).loopBreak, done);
+    }
+
+    @Test
+    public void testEnclosingSwitchKeepsEarlyExitSeparate() throws InterruptedException {
+        GraphPart dispatch = new GraphPart(0, 0);
+        GraphPart firstCase = new GraphPart(1, 1);
+        GraphPart secondCase = new GraphPart(2, 2);
+        GraphPart condition = new GraphPart(3, 3);
+        GraphPart body = new GraphPart(4, 4);
+        GraphPart afterLoop = new GraphPart(5, 5);
+        GraphPart earlyExit = new GraphPart(6, 6);
+        GraphPart following = new GraphPart(7, 7);
+        GraphPart done = new GraphPart(8, 8);
+        connect(dispatch, firstCase, secondCase);
+        connect(firstCase, condition);
+        connect(condition, body, afterLoop);
+        connect(body, condition, earlyExit);
+        connect(afterLoop, following);
+        connect(following, done);
+        connect(earlyExit, done);
+        connect(secondCase, done);
+        Set<GraphPart> parts = new LinkedHashSet<>(Arrays.asList(dispatch, firstCase, secondCase,
+                condition, body, afterLoop, earlyExit, following, done));
+        List<Loop> loops = new ArrayList<>();
+        new LoopDetector().detectLoops(Collections.singletonList(dispatch), loops, Collections.emptyList(),
+                parts, Collections.singletonList(Arrays.asList(firstCase, secondCase)),
+                Collections.singletonList(done), true);
+        Assert.assertEquals(loops.size(), 1);
+        Assert.assertSame(loops.get(0).loopBreak, afterLoop);
+    }
+
+    @Test
     public void testAgainstOrderedSetAlgorithm() throws Exception {
         Method method = LoopDetector.class.getDeclaredMethod("findNearestCommonPostDominator",
                 Set.class, Set.class, Set.class, PrevNextWalker.class, Set.class, Set.class, Set.class);
