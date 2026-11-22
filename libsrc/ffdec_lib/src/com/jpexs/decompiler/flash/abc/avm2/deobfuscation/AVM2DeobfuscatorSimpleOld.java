@@ -294,6 +294,8 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         private final MethodBody body;
         private final SortedMap<Integer, AVM2Instruction> pending = new TreeMap<>();
 
+        private Map<Integer, List<Integer>> predecessors;
+
         InstructionReplacements(AVM2Code code, MethodBody body) {
             this.code = code;
             this.body = body;
@@ -307,6 +309,17 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         void put(int index, AVM2Instruction instruction) {
             instruction.setAddress(code.code.get(index).getAddress());
             pending.put(index, instruction);
+        }
+
+        Map<Integer, List<Integer>> getPredecessors() throws InterruptedException {
+            if (predecessors == null) {
+                predecessors = code.visitCode(body);
+            }
+            return predecessors;
+        }
+
+        void invalidateControlFlow() {
+            predecessors = null;
         }
 
         void flush() {
@@ -429,6 +442,8 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         int instructionsProcessed = 0;
         int executionStart = idx;
         boolean linearExecution = true;
+        List<Integer> executionPath = new ArrayList<>();
+        boolean pathInvalidated = false;
 
         int minChangedIp = Integer.MAX_VALUE;
 
@@ -441,6 +456,8 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
             if (instructionsProcessed > executionLimit) {
                 break;
             }
+
+            executionPath.add(idx);
 
             AVM2Instruction ins = replacements.get(idx);
             InstructionDefinition def = ins.definition;
@@ -494,6 +511,8 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                                 idx = code.code.indexOf(nins);
                             }
                             importantOffsets.setVal(null);
+                            replacements.invalidateControlFlow();
+                            pathInvalidated = true;
                             continue;
                         }
                     }
@@ -656,18 +675,31 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 if (importantOffsets.getVal() == null) {
                     importantOffsets.setVal(code.getImportantOffsets(body, false));
                 }
-                if (importantOffsets.getVal().contains(branchAddress)) {
-                    // Another path may supply different operands directly to this branch.
+                if (pathInvalidated) {
                     return false;
                 }
-                // A jump or another entry along this path can supply different
-                // operands, including a changed stack counter on a loop backedge.
-                if (!linearExecution) {
-                    return false;
-                }
-                for (int ip = executionStart + 1; ip < idx; ip++) {
-                    if (importantOffsets.getVal().contains(code.code.get(ip).getAddress())) {
+                if (linearExecution) {
+                    if (importantOffsets.getVal().contains(branchAddress)) {
+                        // Another path may supply different operands directly to this branch.
                         return false;
+                    }
+                    for (int ip = executionStart + 1; ip < idx; ip++) {
+                        if (importantOffsets.getVal().contains(code.code.get(ip).getAddress())) {
+                            return false;
+                        }
+                    }
+                } else {
+                    // An unconditional jump may split a constant expression
+                    // across blocks. Fold only if every instruction after the
+                    // starting point has this path as its sole incoming edge.
+                    // Merges and loop backedges may carry different operands.
+                    Map<Integer, List<Integer>> predecessors = replacements.getPredecessors();
+                    for (int ip = 1; ip < executionPath.size(); ip++) {
+                        List<Integer> incoming = predecessors.get(executionPath.get(ip));
+                        if (incoming == null || incoming.size() != 1
+                                || !incoming.get(0).equals(executionPath.get(ip - 1))) {
+                            return false;
+                        }
                     }
                 }
                 if (stack.isEmpty()) {
@@ -745,6 +777,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 }
 
                 importantOffsets.setVal(null);
+                replacements.invalidateControlFlow();
 
                 minChangedIpRef.setVal(minChangedIp);
                 return true;

@@ -431,6 +431,42 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         assertTrue(result.contains("pushbyte -99") && result.contains("pushbyte 99"), result);
     }
 
+    @Test(dataProvider = "stackCounterBranches")
+    public void testConstantBranchAcrossUniqueJumpTargets(String branch, String negate) throws Exception {
+        String result = recompilePCode("jump setup\n"
+                + "decision: " + negate + branch + " rejected\n"
+                + "pushbyte 99\nreturnvalue\n"
+                + "setup: pushtrue\ndup\npop\njump relay\n"
+                + "rejected: pushbyte -99\nreturnvalue\n"
+                + "relay: nop\njump decision\n", new AVM2DeobfuscatorSimpleOld());
+        Assert.assertFalse(result.contains(branch) || result.contains("pushbyte -99"), result);
+        assertTrue(result.contains("pushbyte 99"), result);
+    }
+
+    @Test
+    public void testConstantLookupSwitchAcrossUniqueJumpTargets() throws Exception {
+        String result = recompilePCode("jump setup\n"
+                + "decision: lookupswitch other, [zero, one]\n"
+                + "zero: pushbyte -98\nreturnvalue\n"
+                + "one: pushbyte 99\nreturnvalue\n"
+                + "setup: pushbyte 1\njump relay\n"
+                + "other: pushbyte -99\nreturnvalue\n"
+                + "relay: nop\njump decision\n", new AVM2DeobfuscatorSimpleOld());
+        Assert.assertFalse(result.contains("lookupswitch") || result.contains("pushbyte -98") || result.contains("pushbyte -99"), result);
+        assertTrue(result.contains("pushbyte 99"), result);
+    }
+
+    @Test
+    public void testBranchAcrossJumpsWithMergedStackOperandsIsPreserved() throws Exception {
+        String result = recompilePCode("getlocal0\ngetproperty QName(PackageNamespace(\"\"),\"enabled\")\n"
+                + "iftrue alternate\npushfalse\njump decision\n"
+                + "alternate: pushtrue\njump relay\n"
+                + "decision: iftrue selected\npushbyte -99\nreturnvalue\n"
+                + "selected: pushbyte 99\nreturnvalue\n"
+                + "relay: nop\njump decision\n", new AVM2DeobfuscatorSimpleOld());
+        assertTrue(result.contains("iftrue") && result.contains("pushbyte -99") && result.contains("pushbyte 99"), result);
+    }
+
     @Test
     public void testConstantConditionInsideStackCountdownStillFolds() throws Exception {
         String result = recompilePCode("pushbyte 3\nloop: dup\niffalse done\ndecrement_i\n"
