@@ -1282,6 +1282,36 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testSwitchCasesPreserveCatchScope() throws Exception {
+        decompilePCodeWithLines(
+                "protected_start:\n" + switchTrace("work")
+                + "protected_end: jump done\n"
+                + "handler: getlocal0\npushscope\nnewcatch 0\ndup\nsetlocal2\ndup\npushscope\nswap\nsetslot 1\n"
+                + "jump selector\n"
+                + "handled: " + switchTrace("handled") + "popscope\nkill 2\njump done\n"
+                + "rethrow: getscopeobject 1\ngetslot 1\nthrow\n"
+                + "selector: pushtrue\nsetlocal3\n"
+                + "getscopeobject 1\ngetslot 1\ngetlex QName(PackageNamespace(\"\"),\"ArgumentError\")\n"
+                + "istypelate\ngetlocal3\nifstrictne next\npushbyte 0\njump dispatch\n"
+                + "next: getscopeobject 1\ngetslot 1\ngetlex QName(PackageNamespace(\"\"),\"TypeError\")\n"
+                + "istypelate\ngetlocal3\nifstrictne otherwise\npushbyte 1\njump dispatch\n"
+                + "otherwise: pushbyte 2\n"
+                + "dispatch: kill 3\nlookupswitch rethrow, [handled, handled, rethrow]\n"
+                + "done: " + switchTrace("after")
+                + "try from protected_start to protected_end target handler type QName(PackageNamespace(\"\"),\"Error\") name QName(PackageNamespace(\"\"),\"e\") end\n",
+                "         try\n"
+                + "         {\n            trace(\"work\");\n         }\n"
+                + "         catch(e:Error)\n"
+                + "         {\n            switch(true)\n            {\n"
+                + "               case e is ArgumentError:\n"
+                + "               case e is TypeError:\n"
+                + "                  trace(\"handled\");\n                  break;\n"
+                + "               default:\n                  throw e;\n"
+                + "            }\n         }\n"
+                + "         trace(\"after\");\n");
+    }
+
+    @Test
     public void testFinallyWithSplitExceptionHandler() throws Exception {
         decompilePCodeWithLines(
                 "   protected_start:\n"

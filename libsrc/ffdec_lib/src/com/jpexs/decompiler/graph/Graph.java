@@ -6192,7 +6192,7 @@ public class Graph {
                 stopPartKind2x.add(StopPartKind.OTHER);
             }
             TranslateStack subStack = (TranslateStack) stack.clone();
-            currentCaseCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, localData, subStack, allParts, null, caseBodies.get(i), stopPart2x, stopPartKind2x, loops, throwStates, staticOperation, path);
+            currentCaseCommands = printGraph(hasEmptyStackPops, foundGotos, partCodes, partCodePos, visited, prepareBranchLocalData(localData), subStack, allParts, null, caseBodies.get(i), stopPart2x, stopPartKind2x, loops, throwStates, staticOperation, path);
             if (willHaveBreak) {
                 if (!currentCaseCommands.isEmpty()) {
                     GraphTargetItem last = currentCaseCommands.get(currentCaseCommands.size() - 1);
