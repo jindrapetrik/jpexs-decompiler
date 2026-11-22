@@ -103,6 +103,18 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
     }
 
     @Test
+    public void testEntryDispatcherKeepsExternalVariableRead() throws Exception {
+        StringBuilder pcode = new StringBuilder("Push \"state\", 7\nDefineLocal\nJump dispatch\n");
+        for (int i = 0; i < 100; i++) {
+            pcode.append("decoy").append(i).append(": Push \"external\"\nGetVariable\nIf decoy")
+                    .append((i + 1) % 100).append("\nJump dispatch\n");
+        }
+        pcode.append("dispatch: Push \"state\"\nGetVariable\nPush 7\nEquals2\nIf selected\n")
+                .append("Jump decoy0\nselected: Push \"external\"\nGetVariable\nTrace\nEnd\n");
+        Assert.assertEquals(decompilePCode(pcode.toString()), "var state = 7;\ntrace(external);");
+    }
+
+    @Test
     public void testFoldObjectWithNestedArray() throws Exception {
         String res = decompilePCode("Push \"sample\"\n"
                 + "Push \"second\"\n"

@@ -124,6 +124,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         fastActions.removeUnknownActions();
         fastActions.expandPushes();
         Map<String, Object> fakeFunctions = getFakeFunctionResults(fastActions);
+        removeObfuscationAtEntry(fastActions, fakeFunctions);
         boolean changed = true;
         boolean useVariables = false;
         while (changed) {
@@ -309,6 +310,27 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         }
 
         return ret;
+    }
+
+    /**
+     * Follow the script entry with known variable assignments before examining
+     * every block. A constant dispatcher can otherwise keep thousands of dead
+     * branches alive until the later variable-aware passes.
+     */
+    private void removeObfuscationAtEntry(FastActionList actions, Map<String, Object> fakeFunctions) throws InterruptedException {
+        if (actions.isEmpty()) {
+            return;
+        }
+        LocalDataArea localData = new LocalDataArea(new Stage(null), true);
+        localData.stack = new FixItemCounterStack();
+        localData.checkStackSize = false;
+        ExecutionResult result = new ExecutionResult();
+        FastActionListIterator iterator = actions.iterator();
+        ActionItem entry = iterator.next();
+        executeActions(entry, localData, getConstantPool(actions), result, fakeFunctions, true, true);
+        if (result.item != null && result.resultValue == null) {
+            replaceExecutionResult(actions, iterator, entry, result);
+        }
     }
 
     private boolean removeObfuscationIfs(FastActionList actions, Map<String, Object> fakeFunctions, boolean useVariables) throws InterruptedException {
