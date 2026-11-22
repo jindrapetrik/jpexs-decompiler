@@ -18,18 +18,25 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3SimpleParser;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
 import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
+import com.jpexs.decompiler.flash.simpleparser.SimpleParseException;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.helpers.Reference;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
@@ -37,6 +44,16 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class ActionScript3ParserTest {
+
+    private static final String COMPUTED_ATTRIBUTES_SOURCE = "package { public class Test {\n"
+            + "private function parseAttributeAsString(param1:XML, param2:String):String {\n"
+            + "if (param1.@[param2].length() > 0) { return param1.@[param2]; }\n"
+            + "return null;\n"
+            + "}\n"
+            + "private function readOther(xml:XML, name:String):Array {\n"
+            + "return [(xml).@ [name], xml[name]];\n"
+            + "}\n"
+            + "} }";
 
     private void parse(String source) throws Exception {
         ABC abc = new DoABC2Tag(new SWF()).getABC();
@@ -99,6 +116,42 @@ public class ActionScript3ParserTest {
     public void testFieldsInDifferentClasses() throws Exception {
         parse("package { public class Test { public var value:int; } }"
                 + "class Other { public var value:int; }");
+    }
+
+    @Test
+    public void testComputedXmlAttributeBytecode() throws Exception {
+        SWF swf = new SWF();
+        ABC abc = new DoABC2Tag(swf).getABC();
+        AbcIndexing index = swf.getAbcIndex();
+        index.selectAbc(abc);
+        new ActionScript3Parser(index).addScript(COMPUTED_ATTRIBUTES_SOURCE, "Test.as", 0, 0, null, abc);
+
+        List<Integer> propertyKinds = new ArrayList<>();
+        abc.bodies.forEach(body -> body.getCode().code.forEach(instruction -> {
+            if (instruction.definition.instructionCode == AVM2Instructions.GetProperty) {
+                propertyKinds.add(abc.constants.getMultiname(instruction.operands[0]).kind);
+            }
+        }));
+        assertEquals(Collections.frequency(propertyKinds, Multiname.MULTINAMELA), 3);
+        assertEquals(Collections.frequency(propertyKinds, Multiname.MULTINAMEL), 1);
+    }
+
+    @Test
+    public void testComputedXmlAttributeReferences() throws Exception {
+        ABC abc = new DoABC2Tag(new SWF()).getABC();
+        List<SimpleParseException> errors = new ArrayList<>();
+        Map<Integer, Integer> references = new HashMap<>();
+        String source = COMPUTED_ATTRIBUTES_SOURCE;
+        new ActionScript3SimpleParser(abc).parse(source, new HashMap<>(), references, errors,
+                new ArrayList<>(), new HashMap<>(), new HashMap<>(), null, new HashMap<>(),
+                new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(),
+                new HashMap<>(), null, new ArrayList<>());
+
+        assertEquals(errors.size(), 0, errors.toString());
+        Integer param2Definition = source.indexOf("param2:String");
+        assertEquals(references.get(source.indexOf("param2]")), param2Definition);
+        assertEquals(references.get(source.lastIndexOf("param2]")), param2Definition);
+        assertEquals(references.get(source.indexOf("name]")), Integer.valueOf(source.indexOf("name:String")));
     }
 
     @Test

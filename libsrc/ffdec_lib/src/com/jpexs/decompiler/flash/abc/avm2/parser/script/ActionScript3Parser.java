@@ -292,20 +292,19 @@ public class ActionScript3Parser {
         GraphTargetItem ret = obj;
         ParsedSymbol s = lex();
         while (s.isType(SymbolType.DOT, SymbolType.NULL_DOT, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME)) {
-            ParsedSymbol s2 = lex();
             boolean attr = false;
-            boolean nullDot = false;
-            if (s.type == SymbolType.NULL_DOT) {
-                nullDot = true;
-                lexer.pushback(s2);
-            } else if (s.type == SymbolType.DOT) {
-                if (s2.type == SymbolType.ATTRIBUTE) {
-                    attr = true;
-                } else {
-                    lexer.pushback(s2);
+            boolean nullDot = s.type == SymbolType.NULL_DOT;
+            if (s.type == SymbolType.DOT) {
+                ParsedSymbol next = lex();
+                attr = next.type == SymbolType.ATTRIBUTE;
+                if (attr) {
+                    next = lex();
                 }
-            } else {
-                lexer.pushback(s2);
+                if (attr && next.type == SymbolType.BRACKET_OPEN) {
+                    s = next;
+                } else {
+                    lexer.pushback(next);
+                }
             }
             if (s.type == SymbolType.TYPENAME) {
                 lexer.pushback(s);
@@ -389,7 +388,6 @@ public class ActionScript3Parser {
         }
         name2 += s.value.toString();
         s = lex();
-        boolean attrBracket = false;
         String nsSuffix = "";
         if (s.type == SymbolType.NAMESPACESUFFIX) {
             if (nsKeyword != null) {
@@ -404,34 +402,31 @@ public class ActionScript3Parser {
             if (nsKeyword != null) {
                 throw new AVM2ParseException(nsKeyword + " not expected in this situation", lexer.yyline());
             }
-            //name += s.value.toString(); //. or ::
+            ParsedSymbol dot = s;
             s = lex();
-            name2 = "";
-            attribute = false;
-            if (s.type == SymbolType.ATTRIBUTE) {
-                attribute = true;
+            attribute = s.type == SymbolType.ATTRIBUTE;
+            if (attribute) {
+                ParsedSymbol attributeSign = s;
                 s = lex();
-                if (s.type == SymbolType.MULTIPLY) {
-                    name2 += s.value.toString();
-                } else if (s.group == SymbolGroup.IDENTIFIER) {
-                    name2 += s.value.toString();
-                } else {
-                    if (s.type != SymbolType.BRACKET_OPEN) {
-                        throw new AVM2ParseException("Attribute identifier or bracket expected", lexer.yyline());
-                    }
-                    attrBracket = true;
-                    continue;
+                if (s.type == SymbolType.BRACKET_OPEN) {
+                    lexer.pushback(s);
+                    lexer.pushback(attributeSign);
+                    s = dot;
+                    break;
+                }
+                if (!s.isType(SymbolType.MULTIPLY, SymbolGroup.IDENTIFIER)) {
+                    throw new AVM2ParseException("Attribute identifier or bracket expected", lexer.yyline());
                 }
             } else {
                 expected(
                         s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE, SymbolType.MULTIPLY,
                         SymbolType.PUBLIC, SymbolType.PROTECTED, SymbolType.PRIVATE, SymbolType.INTERNAL
                 );
-                name2 += s.value.toString();
                 if (s.isType(SymbolType.PUBLIC, SymbolType.PROTECTED, SymbolType.PRIVATE, SymbolType.INTERNAL)) {
                     nsKeyword = s.value.toString();
                 }
             }
+            name2 = s.value.toString();
             s = lex();
             nsSuffix = "";
             if (s.type == SymbolType.NAMESPACESUFFIX) {
@@ -481,10 +476,6 @@ public class ActionScript3Parser {
         }
         if (s.isType(SymbolType.BRACKET_OPEN, SymbolType.DOT, SymbolType.NULL_DOT, SymbolType.TYPENAME)) {
             lexer.pushback(s);
-            /*if (attrBracket) {
-                lexer.pushback(new ParsedSymbol(-1, SymbolGroup.OPERATOR, SymbolType.ATTRIBUTE, "@"));
-                lexer.pushback(new ParsedSymbol(-1, SymbolGroup.OPERATOR, SymbolType.DOT, "."));
-            }*/
             ret = member(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, ret, registerVars, inFunction, inMethod, variables, abc);
         } else {
             lexer.pushback(s);
