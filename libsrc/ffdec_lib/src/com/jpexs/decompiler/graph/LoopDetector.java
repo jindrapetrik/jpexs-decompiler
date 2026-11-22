@@ -599,6 +599,28 @@ public class LoopDetector {
                 }
             }
 
+            if (naturalOutParts.isEmpty()) {
+                // A short-circuit condition can leave from a later part, not
+                // the loop header itself. Its join may also be the parent's
+                // branching precontinue. Retain that join when all local exits
+                // must reach it before any enclosing loop boundary.
+                for (GraphPart target : parentContinues) {
+                    if (!outParts.contains(target) || parentBreaks.contains(target)
+                            || target.nextParts.size() <= 1 || !isParentPreContinueOnly(loop, target)) {
+                        continue;
+                    }
+                    Set<GraphPart> boundaries = new LinkedHashSet<>(abruptTargets);
+                    boundaries.addAll(exceptionTargets);
+                    boundaries.remove(target);
+                    Set<GraphPart> localExits = new LinkedHashSet<>(outParts);
+                    localExits.removeAll(boundaries);
+                    if (localExits.size() > 1 && findNearestCommonPostDominator(localExits, backEdges,
+                            boundaries, walker, ignoredEdges, boundaries, outParts) == target) {
+                        abruptTargets.remove(target);
+                    }
+                }
+            }
+
             Set<GraphPart> classifiedAbruptTargets = new LinkedHashSet<>(abruptTargets);
             if (!naturalOutParts.isEmpty() && !abruptTargets.isEmpty()) {
                 Set<GraphPart> stopTargets = new LinkedHashSet<>(abruptTargets);

@@ -37,6 +37,44 @@ import org.testng.annotations.Test;
 public class LoopDetectorPostDominatorTest {
 
     @Test
+    public void testShortCircuitInnerConditionJoinsAtOuterPrecontinue() throws InterruptedException {
+        GraphPart entry = new GraphPart(0, 0);
+        GraphPart outerCondition = new GraphPart(1, 1);
+        GraphPart innerInit = new GraphPart(2, 2);
+        GraphPart innerCondition = new GraphPart(3, 3);
+        GraphPart secondCondition = new GraphPart(4, 4);
+        GraphPart conditionResult = new GraphPart(5, 5);
+        GraphPart innerBody = new GraphPart(6, 6);
+        GraphPart earlyExit = new GraphPart(7, 7);
+        GraphPart commonExit = new GraphPart(8, 8);
+        GraphPart firstTail = new GraphPart(9, 9);
+        GraphPart secondTail = new GraphPart(10, 10);
+        GraphPart outerIncrement = new GraphPart(11, 11);
+        GraphPart done = new GraphPart(12, 12);
+        connect(entry, outerCondition);
+        connect(outerCondition, innerInit, done);
+        connect(innerInit, innerCondition);
+        connect(innerCondition, secondCondition, conditionResult);
+        connect(secondCondition, conditionResult);
+        connect(conditionResult, innerBody, commonExit);
+        connect(innerBody, innerCondition, earlyExit);
+        connect(earlyExit, commonExit);
+        connect(commonExit, firstTail, secondTail);
+        connect(firstTail, outerIncrement);
+        connect(secondTail, outerIncrement);
+        connect(outerIncrement, outerCondition);
+        Set<GraphPart> parts = new LinkedHashSet<>(Arrays.asList(entry, outerCondition, innerInit, innerCondition,
+                secondCondition, conditionResult, innerBody, earlyExit, commonExit, firstTail, secondTail, outerIncrement, done));
+        List<Loop> loops = new ArrayList<>();
+        new LoopDetector().detectLoops(Collections.singletonList(entry), loops, Collections.emptyList(),
+                parts, Collections.emptyList(), Collections.emptyList(), true);
+        Assert.assertEquals(loops.size(), 2);
+        Assert.assertSame(loops.get(0).loopPreContinue, commonExit);
+        Assert.assertSame(loops.get(1).loopContinue, innerCondition);
+        Assert.assertSame(loops.get(1).loopBreak, commonExit);
+    }
+
+    @Test
     public void testInnerLoopExitsJoinBeforeOuterContinue() throws InterruptedException {
         assertInnerLoopExit(true);
     }
