@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.UnknownInstructionCodeException;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorPushFalseIfFalse;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewCatchIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
@@ -41,6 +42,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -158,6 +160,10 @@ public final class MethodBody implements Cloneable {
      */
     @Internal
     private transient MethodBody lastConvertedBody = null;
+
+    /** Warnings about malformed exception entries omitted from a conversion. */
+    @Internal
+    private transient List<String> conversionWarnings = new ArrayList<>();
 
     /**
      * Constructs a new MethodBody with empty traits, code bytes and exceptions.
@@ -481,6 +487,9 @@ public final class MethodBody implements Cloneable {
                             if (convertData.restoredStatementFilter != null) {
                                 convertData.restoredStatementFilter.accept(MethodBody.this, convertedItems1);
                             }
+                            for (int i = converted.conversionWarnings.size() - 1; i >= 0; i--) {
+                                convertedItems1.add(0, new CommentItem(converted.conversionWarnings.get(i)));
+                            }
                             try (Statistics s = new Statistics("Graph.graphToString")) {
                                 Graph.graphToString(convertedItems1, writer, LocalData.create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames, seenMethods, exportMode, swfVersion, usedDeobfuscations, classIndex));
                             }
@@ -634,6 +643,7 @@ public final class MethodBody implements Cloneable {
         MethodBody body = clone();
         AVM2Code code = body.getCode();
         code.markVirtualAddresses();
+        body.removeInvalidExceptionHandlers(path);
         code.fixJumps(path, body);
 
         if (deobfuscate) {
@@ -647,6 +657,8 @@ public final class MethodBody implements Cloneable {
                 logger.log(Level.SEVERE, "Deobfuscation failed in: " + path, ex);
                 body = clone();
                 code = body.getCode();
+                code.markVirtualAddresses();
+                body.removeInvalidExceptionHandlers(path);
                 code.fixJumps(path, body);
                 return body;
             }
@@ -659,6 +671,57 @@ public final class MethodBody implements Cloneable {
 
         lastConvertedBody = body;
         return body;
+    }
+
+    /**
+     * Keeps malformed exception entries from hiding the entire method. This is
+     * called only on the conversion copy; the original bytecode and exception
+     * table remain available in p-code and in the saved SWF.
+     */
+    private void removeInvalidExceptionHandlers(String path) {
+        if (exceptions.length == 0) {
+            return;
+        }
+        AVM2Code instructions = getCode();
+        long end = instructions.getEndOffset();
+        List<ABCException> valid = new ArrayList<>();
+        int[] indices = new int[exceptions.length];
+        for (int i = 0; i < exceptions.length; i++) {
+            ABCException entry = exceptions[i];
+            indices[i] = -1;
+            int target = entry.target >= 0 && entry.target < end
+                    ? instructions.adr2pos(entry.target, true) : instructions.code.size();
+            // Empty protected ranges and bounds between instructions are used
+            // by existing SWFs. Only the handler target must be an instruction.
+            if (entry.start >= 0 && entry.start <= entry.end && entry.end <= end
+                    && target < instructions.code.size()
+                    && instructions.code.get(target).getAddress() == entry.target) {
+                indices[i] = valid.size();
+                valid.add(entry);
+            } else {
+                String warning = "Ignored invalid exception handler #" + i
+                        + " (from ofs" + Helper.formatAddress(entry.start)
+                        + " to ofs" + Helper.formatAddress(entry.end)
+                        + ", target ofs" + Helper.formatAddress(entry.target)
+                        + "). Exception handling may be incomplete.";
+                conversionWarnings.add(warning);
+                logger.log(Level.WARNING, "{0}: {1}", new Object[]{path, warning});
+            }
+        }
+        if (valid.size() == exceptions.length) {
+            return;
+        }
+        exceptions = valid.toArray(new ABCException[valid.size()]);
+        for (AVM2Instruction ins : instructions.code) {
+            if (ins.definition instanceof NewCatchIns) {
+                int index = ins.operands[0];
+                if (index >= 0 && index < indices.length) {
+                    // Leave references to omitted handlers out of range rather
+                    // than accidentally referring to a different valid catch.
+                    ins.setOperand(0, indices[index] < 0 ? exceptions.length : indices[index], instructions, this);
+                }
+            }
+        }
     }
 
     /**
@@ -726,6 +789,7 @@ public final class MethodBody implements Cloneable {
             }
             ret.convertedItems = null;
             ret.convertException = null;
+            ret.conversionWarnings = new ArrayList<>(conversionWarnings);
 
             return ret;
         } catch (CloneNotSupportedException ex) {

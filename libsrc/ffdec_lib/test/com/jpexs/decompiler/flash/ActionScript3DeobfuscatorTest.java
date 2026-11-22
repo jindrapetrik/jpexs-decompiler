@@ -38,6 +38,11 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewCatchIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIns;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
@@ -56,6 +61,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import macromedia.asc.util.Decimal128;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
@@ -246,6 +252,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     private String recompileSource(String str, String scriptInitializer) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+        return recompileSource(str, scriptInitializer, null);
+    }
+
+    private String recompileSource(String str, String scriptInitializer, Consumer<ABC> edit) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         final ABC abc = new ABC(new ABCContainerTag() {
             @Override
             public ABC getABC() {
@@ -272,6 +282,9 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         ActionScript3Parser par = new ActionScript3Parser(index);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         par.addScript(str, "Test.as", 0, 0, swf.getDocumentClass(), abc);
+        if (edit != null) {
+            edit.accept(abc);
+        }
 
         ConvertData conversion = new ConvertData();
         ScriptInfo script = abc.script_info.get(0);
@@ -284,6 +297,62 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         script.getPacks(abc, 0, "", new ArrayList<>()).get(0).toSource(swf.getAbcIndex(), writer, script.traits.traits, conversion, ScriptExportMode.AS, false, false, false);
         writer.finishHilights();
         return writer.toString();
+    }
+
+    @DataProvider(name = "invalidExceptionHandlers")
+    public Object[][] invalidExceptionHandlers() {
+        return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
+    }
+
+    @Test(dataProvider = "invalidExceptionHandlers")
+    public void testInvalidExceptionTargetDoesNotHideMethod(boolean deobfuscate, boolean keepValidCatch) throws Exception {
+        boolean oldDeobfuscate = Configuration.autoDeobfuscate.get();
+        Configuration.autoDeobfuscate.set(deobfuscate);
+        MethodBody[] original = new MethodBody[1];
+        byte[][] bytes = new byte[1][];
+        int[] target = new int[1];
+        try {
+            String result = recompileSource("package { public class Test { public static function test():void {"
+                    + "try { trace(\"body\"); } catch(e:Error) { trace(\"caught\"); } } } }", null, abc -> {
+                for (Trait trait : abc.class_info.get(0).static_traits.traits) {
+                    if (!(trait instanceof TraitMethodGetterSetter)) {
+                        continue;
+                    }
+                    MethodBody body = abc.findBody(((TraitMethodGetterSetter) trait).method_info);
+                    ABCException invalid = body.exceptions[0].clone();
+                    for (AVM2Instruction ins : body.getCode().code) {
+                        if (ins.definition instanceof CallPropVoidIns) {
+                            invalid.target = (int) ins.getAddress() + 1;
+                            break;
+                        }
+                    }
+                    if (keepValidCatch) {
+                        body.exceptions = new ABCException[]{invalid, body.exceptions[0]};
+                        for (AVM2Instruction ins : body.getCode().code) {
+                            if (ins.definition instanceof NewCatchIns) {
+                                ins.setOperand(0, 1, body.getCode(), body);
+                            }
+                        }
+                    } else {
+                        body.exceptions = new ABCException[]{invalid};
+                    }
+                    original[0] = body;
+                    bytes[0] = body.getCodeBytes().clone();
+                    target[0] = invalid.target;
+                    break;
+                }
+            });
+            Assert.assertFalse(result.contains("Decompilation error"), result);
+            assertTrue(result.contains("Ignored invalid exception handler #0"), result);
+            assertTrue(result.contains("trace(\"body\");"), result);
+            assertEquals(result.contains("catch(e:Error)"), keepValidCatch, result);
+            assertEquals(result.contains("trace(\"caught\");"), keepValidCatch, result);
+            assertEquals(original[0].exceptions.length, keepValidCatch ? 2 : 1);
+            assertEquals(original[0].exceptions[0].target, target[0]);
+            assertEquals(original[0].getCodeBytes(), bytes[0]);
+        } finally {
+            Configuration.autoDeobfuscate.set(oldDeobfuscate);
+        }
     }
 
     @DataProvider(name = "provideBasicTrueExpressions")
