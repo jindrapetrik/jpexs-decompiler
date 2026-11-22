@@ -661,6 +661,9 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             return;
         }
 
+        // Push metadata may still refer to a discarded obfuscation pool.
+        // Interpret indices using the known pool, then any pool executed below.
+        localData.constantPool = constantPool == null ? null : constantPool.constantPool;
         FixItemCounterStack stack = (FixItemCounterStack) localData.stack;
         int instructionsProcessed = 0;
         int skippedInstructions = 0;
@@ -681,6 +684,17 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             }
 
             Action action = item.action;
+
+            if (action instanceof ActionPush) {
+                for (Object value : ((ActionPush) action).values) {
+                    if (value instanceof RegisterNumber
+                            || (value instanceof ConstantIndex && (localData.constantPool == null
+                            || ((ConstantIndex) value).index >= localData.constantPool.size()))) {
+                        // An unresolved index is not a literal "constantN" string.
+                        return;
+                    }
+                }
+            }
 
             /*System.out.print(action.getASMSource(actions, new ArrayList<Long>(), ScriptExportMode.PCODE));
              for (int j = 0; j < stack.size(); j++) {
@@ -793,17 +807,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
             if (action instanceof ActionPush) {
                 ActionPush push = (ActionPush) action;
-                boolean ok = true;
                 instructionsProcessed += push.values.size() - 1;
-                for (Object value : push.values) {
-                    if ((constantPool == null && value instanceof ConstantIndex) || value instanceof RegisterNumber) {
-                        ok = false;
-                        break;
-                    }
-                }
-                if (!ok) {
-                    break;
-                }
             }
             
             if (action instanceof ActionPushDuplicate) {

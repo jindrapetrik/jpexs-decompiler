@@ -19,9 +19,11 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionWith;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
@@ -36,6 +38,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -100,6 +103,40 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "GetVariable\n"
                 + "Trace");
         Assert.assertEquals(res, "sample = [42,undefined];\ntrace(sample);");
+    }
+
+    @DataProvider(name = "discardedConstantPools")
+    public Object[][] discardedConstantPools() {
+        return new Object[][]{{Arrays.asList("wrongName")}, {Arrays.asList("wrongName", "wrongValue")}};
+    }
+
+    @Test(dataProvider = "discardedConstantPools")
+    public void testDiscardedPoolDoesNotBecomeLiteralString(List<String> discardedPool) throws Exception {
+        ActionList actions = ASMParser.parse(0, true, "ConstantPool \"value\", \"resolved\"\n"
+                + "Push \"external\"\nGetVariable\nTrace\n"
+                + "Push constant0, constant1\nPushDuplicate\nPop\nSetVariable\n"
+                + "Push constant0\nGetVariable\nTrace\nEnd\n",
+                swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        // This is the intermediate state after an obfuscation pool is removed:
+        // the surviving pool is correct, but Push metadata still names the old one.
+        for (Action action : actions) {
+            if (action instanceof ActionPush) {
+                ((ActionPush) action).constantPool = discardedPool;
+            }
+        }
+        new ActionDeobfuscator().actionListParsed(actions, swf);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        Action.actionsToSource(new HashMap<>(), null, actions, "", writer, swf.getCharset());
+        writer.finishHilights();
+        Assert.assertEquals(writer.toString().trim().replace("\r\n", "\n"),
+                "trace(external);\nvalue = \"resolved\";\ntrace(value);");
+    }
+
+    @Test
+    public void testInvalidPoolIndexIsNotReplacedWithString() throws Exception {
+        String result = decompilePCode("ConstantPool \"value\"\n"
+                + "Push constant0, constant7\nSetVariable\nEnd\n");
+        Assert.assertEquals(result, "value = §§constant(7);");
     }
 
     @Test
