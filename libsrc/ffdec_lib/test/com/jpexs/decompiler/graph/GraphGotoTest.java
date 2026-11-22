@@ -18,12 +18,18 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ThrowAVM2Item;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraphSource;
 import com.jpexs.decompiler.flash.action.special.ActionEnd;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LabelItem;
+import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.CommentItem;
+import com.jpexs.decompiler.graph.model.ScriptEndItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -33,9 +39,82 @@ import java.util.HashMap;
 import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.annotations.DataProvider;
 
 /** Regression tests for goto processing. */
 public class GraphGotoTest {
+
+    private List<GraphTargetItem> commands(GraphTargetItem... items) {
+        return new GraphPartMarkedArrayList<>(Arrays.asList(items));
+    }
+
+    private void removeUnreachable(List<GraphTargetItem> commands) {
+        new Graph(null, null, Collections.emptyList(), 0).removeUnreachableCommands(commands);
+    }
+
+    @DataProvider(name = "unconditionalTransfers")
+    public Object[][] unconditionalTransfers() {
+        return new Object[][]{{new BreakItem(null, null, null, 14)}, {new ContinueItem(null, null, null, 0)},
+            {new ReturnVoidAVM2Item(null, null)}, {new ThrowAVM2Item(null, null, new TrueItem(null, null, null))},
+            {new GotoItem(null, null, null, "target")}, {new ScriptEndItem(null)}};
+    }
+
+    @Test(dataProvider = "unconditionalTransfers")
+    public void testTransferRemovesDeadTailButKeepsLabelEntry(GraphTargetItem exit) {
+        LabelItem label = new LabelItem(null, null, null, "target");
+        CommentItem live = new CommentItem("reachable");
+        List<GraphTargetItem> root = commands(exit, new BreakItem(null, null, null, 1),
+                new GotoItem(null, null, null, "wrong"), new CommentItem("dead"), label, live);
+        removeUnreachable(root);
+        Assert.assertEquals(root, Arrays.asList(exit, label, live));
+    }
+
+    @Test
+    public void testExpandedGotoExitAlsoTerminatesItsParentList() {
+        GotoItem expanded = new GotoItem(null, null, null, null);
+        ReturnVoidAVM2Item exit = new ReturnVoidAVM2Item(null, null);
+        expanded.targetCommands = commands(exit, new CommentItem("dead in target"));
+        List<GraphTargetItem> root = commands(expanded, new BreakItem(null, null, null, 0));
+        removeUnreachable(root);
+        Assert.assertEquals(root, Collections.singletonList(expanded));
+        Assert.assertEquals(expanded.targetCommands, Collections.singletonList(exit));
+    }
+
+    @Test
+    public void testUnreachableTailKeepsNestedIncomingLabel() {
+        IfItem incoming = new IfItem(null, null, null, new TrueItem(null, null, null),
+                commands(new LabelItem(null, null, null, "entry"), new CommentItem("live")), commands());
+        CommentItem after = new CommentItem("after entry");
+        List<GraphTargetItem> root = commands(new ReturnVoidAVM2Item(null, null), new CommentItem("dead"), incoming, after);
+        removeUnreachable(root);
+        Assert.assertEquals(root, Arrays.asList(root.get(0), incoming, after));
+    }
+
+    @Test
+    public void testExpandedGotoLabelKeepsItsIncomingEntry() {
+        GotoItem target = new GotoItem(null, null, null, "entry");
+        CommentItem live = new CommentItem("live");
+        target.targetCommands = commands(live);
+        GotoItem jump = new GotoItem(null, null, null, "entry");
+        CommentItem after = new CommentItem("after entry");
+        List<GraphTargetItem> root = commands(jump, new CommentItem("dead"), target, after);
+        removeUnreachable(root);
+        Assert.assertEquals(root, Arrays.asList(jump, target, after));
+        Assert.assertEquals(target.targetCommands, Collections.singletonList(live));
+    }
+
+    @Test
+    public void testBothExitingBranchesTerminateTheirParentList() {
+        ReturnVoidAVM2Item exit = new ReturnVoidAVM2Item(null, null);
+        BreakItem jump = new BreakItem(null, null, null, 14);
+        IfItem branch = new IfItem(null, null, null, new TrueItem(null, null, null),
+                commands(exit, new CommentItem("dead true")), commands(jump, new BreakItem(null, null, null, 0)));
+        List<GraphTargetItem> root = commands(branch, new CommentItem("dead after if"));
+        removeUnreachable(root);
+        Assert.assertEquals(root, Collections.singletonList(branch));
+        Assert.assertEquals(branch.onTrue, Collections.singletonList(exit));
+        Assert.assertEquals(branch.onFalse, Collections.singletonList(jump));
+    }
 
     @Test
     public void testSharedSwitchTailPreferredOverTiedFallthroughCase() throws InterruptedException {

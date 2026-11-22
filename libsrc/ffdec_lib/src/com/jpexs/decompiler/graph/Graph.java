@@ -1258,10 +1258,63 @@ public class Graph {
         promoteUnpoppedPushItemsToCommands(ret);
 
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
+        removeUnreachableCommands(ret);
         //fixSwitchEnds(ret);
         removeUnreadSetTemporaries(ret);
         handleSetTemporaryDeclarations(ret);
         return ret;
+    }
+
+    private boolean hasLabelEntry(GraphTargetItem item) {
+        if (item instanceof LabelItem || item instanceof GotoItem
+                && ((GotoItem) item).targetCommands != null && ((GotoItem) item).labelName != null) {
+            return true;
+        }
+        if (item instanceof Block) {
+            for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                for (GraphTargetItem child : sub) {
+                    if (hasLabelEntry(child)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isUnconditionalTransfer(GraphTargetItem item) {
+        if (item instanceof BreakItem || item instanceof ContinueItem || item instanceof ExitItem) {
+            return true;
+        }
+        if (item instanceof GotoItem) {
+            List<GraphTargetItem> target = ((GotoItem) item).targetCommands;
+            return target == null || !target.isEmpty() && isUnconditionalTransfer(target.get(target.size() - 1));
+        }
+        if (item instanceof IfItem) {
+            IfItem condition = (IfItem) item;
+            return !condition.onTrue.isEmpty() && !condition.onFalse.isEmpty()
+                    && isUnconditionalTransfer(condition.onTrue.get(condition.onTrue.size() - 1))
+                    && isUnconditionalTransfer(condition.onFalse.get(condition.onFalse.size() - 1));
+        }
+        return false;
+    }
+
+    /** Removes commands after unconditional transfers, retaining label entries. */
+    protected void removeUnreachableCommands(List<GraphTargetItem> commands) {
+        boolean terminated = false;
+        for (int i = 0; i < commands.size(); i++) {
+            GraphTargetItem item = commands.get(i);
+            if (terminated && !hasLabelEntry(item)) {
+                commands.remove(i--);
+                continue;
+            }
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    removeUnreachableCommands(sub);
+                }
+            }
+            terminated = isUnconditionalTransfer(item);
+        }
     }
 
     /**
