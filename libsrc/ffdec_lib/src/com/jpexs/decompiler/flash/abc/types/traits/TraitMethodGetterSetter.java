@@ -104,7 +104,7 @@ public class TraitMethodGetterSetter extends Trait {
         }
         MethodBody body = abc.findBody(method_info);
 
-        getModifiers(usedDeobfuscations, abc, isStatic, insideInterface, writer, classIndex);
+        getModifiers(usedDeobfuscations, abc, isStatic, insideInterface, writer, classIndex, scriptIndex);
 
         if (abc.method_info.get(method_info).flagNative()) {
             writer.appendNoHilight("native ");
@@ -169,7 +169,7 @@ public class TraitMethodGetterSetter extends Trait {
                     //writeUses(scriptIndex, classIndex, isStatic, abc, writer);
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
-                    abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path, exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex);
+                    abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path, exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex, scriptIndex);
                 }
             } else {
                 String retTypeRaw = abc.method_info.get(method_info).getReturnTypeRaw(abc, abc.constants, fullyQualifiedNames);

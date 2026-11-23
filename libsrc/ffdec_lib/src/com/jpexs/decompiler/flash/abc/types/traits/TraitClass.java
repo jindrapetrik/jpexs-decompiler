@@ -121,10 +121,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         //DependencyParser.parseDependenciesFromMultiname(customNs, abc, dependencies, uses, abc.constants.getMultiname(instanceInfo.name_index), packageName, fullyQualifiedNames);
         if (instanceInfo.super_index > 0) {
-            DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, dependencies, abc.constants.getMultiname(instanceInfo.super_index), packageName, fullyQualifiedNames, DependencyType.INHERITANCE, uses);
+            DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, scriptIndex, dependencies, abc.constants.getMultiname(instanceInfo.super_index), packageName, fullyQualifiedNames, DependencyType.INHERITANCE, uses);
         }
         for (int i : instanceInfo.interfaces) {
-            DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, dependencies, abc.constants.getMultiname(i), packageName, fullyQualifiedNames, DependencyType.INHERITANCE, uses);
+            DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, scriptIndex, dependencies, abc.constants.getMultiname(i), packageName, fullyQualifiedNames, DependencyType.INHERITANCE, uses);
         }
 
         //static
@@ -292,7 +292,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                     first.setVal(false);
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(abc.bodies.get(bodyIndex));
-                    abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex);
+                    abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex, scriptIndex);
                     //first.setVal(true);
                     //writer.endBlock();
                 } else {
@@ -349,7 +349,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 if (body != null) {
                     List<MethodBody> callStack = new ArrayList<>();
                     callStack.add(body);
-                    body.toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex);
+                    body.toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex, scriptIndex);
                 }
             }
 

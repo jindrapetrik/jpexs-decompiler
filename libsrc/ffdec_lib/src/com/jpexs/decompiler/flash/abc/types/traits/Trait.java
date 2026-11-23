@@ -291,7 +291,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 customNamespace = m.getSimpleNamespaceName(abc.constants).toRawString();
             }
         }
-        DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE, uses);
+        DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, scriptIndex, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE, uses);
         //DependencyParser.parseUsagesFromMultiname(ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
     }
 
@@ -673,6 +673,22 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return Writer
      */
     public final GraphTextWriter getModifiers(Set<String> usedDeobfuscations, ABC abc, boolean isStatic, boolean insideInterface, GraphTextWriter writer, int classIndex) {
+        return getModifiers(usedDeobfuscations, abc, isStatic, insideInterface, writer, classIndex, -1);
+    }
+
+    /**
+     * Gets modifiers using namespace aliases visible from the given script.
+     *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param insideInterface Inside interface
+     * @param writer Writer
+     * @param classIndex Class index
+     * @param scriptIndex Script index, or -1 if unknown
+     * @return Writer
+     */
+    public final GraphTextWriter getModifiers(Set<String> usedDeobfuscations, ABC abc, boolean isStatic, boolean insideInterface, GraphTextWriter writer, int classIndex, int scriptIndex) {
         if ((kindFlags & ATTR_Final) > 0) {
             if (!isStatic) {
                 writer.appendNoHilight("final ");
@@ -683,7 +699,7 @@ public abstract class Trait implements Cloneable, Serializable {
         }
         Multiname m = getName(abc);
         if (m != null) {
-            DottedChain dc = abc.findCustomNsOfMultiname(m, classIndex);
+            DottedChain dc = abc.findCustomNsOfMultiname(m, classIndex, scriptIndex);
             String nsname = dc != null ? dc.getLast() : null;
 
             int nskind = m.getSimpleNamespaceKind(abc.constants);

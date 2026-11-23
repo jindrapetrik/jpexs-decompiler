@@ -720,6 +720,22 @@ public class Multiname {
      * @return Name with custom namespace
      */
     public String getNameAndCustomNamespace(Set<String> usedDeobfuscations, ABC abc, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix, Reference<DottedChain> customNamespaceRef) {
+        return getNameAndCustomNamespace(usedDeobfuscations, abc, fullyQualifiedNames, dontDeobfuscate, withSuffix, customNamespaceRef, -1);
+    }
+
+    /**
+     * Gets the name and resolves its custom namespace in the given script.
+     *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abc ABC
+     * @param fullyQualifiedNames Fully qualified names
+     * @param dontDeobfuscate Don't deobfuscate flag
+     * @param withSuffix With suffix flag
+     * @param customNamespaceRef Custom namespace
+     * @param scriptIndex Script index, or -1 if unknown
+     * @return Name
+     */
+    public String getNameAndCustomNamespace(Set<String> usedDeobfuscations, ABC abc, List<DottedChain> fullyQualifiedNames, boolean dontDeobfuscate, boolean withSuffix, Reference<DottedChain> customNamespaceRef, int scriptIndex) {
         if (kind == TYPENAME) {
             return typeNameToStr(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, dontDeobfuscate, withSuffix);
         }
@@ -733,7 +749,7 @@ public class Multiname {
 
             int nskind = getSimpleNamespaceKind(abc.constants);
             if (nskind == Namespace.KIND_NAMESPACE || nskind == Namespace.KIND_PACKAGE_INTERNAL) {
-                DottedChain dc = abc.findCustomNsOfMultiname(this);
+                DottedChain dc = abc.findCustomNsOfMultiname(this, -1, scriptIndex);
                 String nsname = dc != null ? dc.getLast() : null;
 
                 if (nsname != null && !"AS3".equals(nsname)) {

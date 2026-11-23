@@ -56,7 +56,7 @@ public class NameSpaceAVM2Item extends AVM2Item {
         }
         AVM2ConstantPool constants = localData.constantsAvm2;
 
-        DottedChain dc = localData.abc.findCustomNsOfNamespace(namespaceIndex);
+        DottedChain dc = localData.abc.findCustomNsOfNamespace(namespaceIndex, localData.scriptIndex);
         String nsname = dc != null ? dc.getLast() : null;
 
         if (nsname != null) {

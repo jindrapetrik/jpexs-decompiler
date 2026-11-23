@@ -95,7 +95,7 @@ public class GetLexAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
         Reference<DottedChain> customNsRef = new Reference<>(null);
-        String localName = propertyName.getNameAndCustomNamespace(localData.usedDeobfuscations, localData.abc, localData.fullyQualifiedNames, false, true, customNsRef);
+        String localName = propertyName.getNameAndCustomNamespace(localData.usedDeobfuscations, localData.abc, localData.fullyQualifiedNames, false, true, customNsRef, localData.scriptIndex);
         DottedChain customNs = customNsRef.getVal();                
         boolean localNamespace = false;
         DottedChain globalNamespace = localData.abc.findCustomNsOfMultiname(propertyName);

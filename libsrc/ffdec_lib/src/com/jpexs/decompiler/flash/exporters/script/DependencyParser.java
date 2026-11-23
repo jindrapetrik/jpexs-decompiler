@@ -71,17 +71,24 @@ public class DependencyParser {
      */
     public static void parseDependenciesFromNS(AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, int namespace_index, DottedChain ignorePackage, String name, DependencyType dependencyType, List<String> uses) {
         DottedChain identifier = DottedChain.TOPLEVEL.addWithSuffix(name.isEmpty() ? "*" : name);
-        parseDependenciesFromNS(abcIndex, ignoredCustom, abc, dependencies, namespace_index, ignorePackage,
+        parseDependenciesFromNS(abcIndex, ignoredCustom, abc, -1, dependencies, namespace_index, ignorePackage,
                 identifier.getLast(), identifier.getLastNamespaceSuffix(), dependencyType, uses);
     }
 
-    private static void parseDependenciesFromNS(AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies,
+    private static void parseDependenciesFromNS(AbcIndexing abcIndex, String ignoredCustom, ABC abc, int scriptIndex, List<Dependency> dependencies,
             int namespace_index, DottedChain ignorePackage, String name, String namespaceSuffix, DependencyType dependencyType, List<String> uses) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
         DottedChain newimport = ns.getName(abc.constants);
 
         if (ns.kind == Namespace.KIND_NAMESPACE || ns.kind == Namespace.KIND_PACKAGE_INTERNAL) {
             String nsVal = ns.getName(abc.constants).toRawString();
+            DottedChain local = abc.findScriptPrivateNamespace(nsVal, scriptIndex);
+            if (local != null) {
+                if (!uses.contains(local.getLast())) {
+                    uses.add(local.getLast());
+                }
+                return;
+            }
             DottedChain nsimport = abcIndex.nsValueToName(nsVal);
             if (nsimport != null) {
                 if (nsimport.equals(AVM2Deobfuscation.BUILTIN)) {
@@ -136,14 +143,33 @@ public class DependencyParser {
      * @param uses Uses
      */
     public static void parseDependenciesFromMultiname(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, DependencyType dependencyType, List<String> uses) {
+        parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, -1, dependencies, m, ignorePackage, fullyQualifiedNames, dependencyType, uses);
+    }
+
+    /**
+     * Parses multiname dependencies in the scope of the given script.
+     *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abcIndex AbcIndexing
+     * @param ignoredCustom Ignored custom
+     * @param abc ABC
+     * @param scriptIndex Script index, or -1 if unknown
+     * @param dependencies Dependencies
+     * @param m Multiname
+     * @param ignorePackage Ignore package
+     * @param fullyQualifiedNames Fully qualified names
+     * @param dependencyType Dependency type
+     * @param uses Uses
+     */
+    public static void parseDependenciesFromMultiname(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, int scriptIndex, List<Dependency> dependencies, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, DependencyType dependencyType, List<String> uses) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
-                    parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames, dependencyType, uses);
+                    parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames, dependencyType, uses);
                 }
                 for (Integer i : m.params) {
                     if (i != 0) {
-                        parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames, dependencyType, uses);
+                        parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames, dependencyType, uses);
                     }
                 }
                 return;
@@ -158,12 +184,12 @@ public class DependencyParser {
             }
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
             if (ns != null && !m.doesDisplayNamespace()) {
-                parseDependenciesFromNS(abcIndex, ignoredCustom, abc, dependencies, m.namespace_index, ignorePackage, name, namespaceSuffix, dependencyType, uses);
+                parseDependenciesFromNS(abcIndex, ignoredCustom, abc, scriptIndex, dependencies, m.namespace_index, ignorePackage, name, namespaceSuffix, dependencyType, uses);
             }
             if (nss != null) {
                 boolean wildcard = nss.namespaces.length > 1;
                 for (int n : nss.namespaces) {
-                    parseDependenciesFromNS(abcIndex, ignoredCustom, abc, dependencies, n, ignorePackage,
+                    parseDependenciesFromNS(abcIndex, ignoredCustom, abc, scriptIndex, dependencies, n, ignorePackage,
                             wildcard ? "*" : name, wildcard ? "" : namespaceSuffix, dependencyType, uses);
                 }
             }
@@ -237,11 +263,11 @@ public class DependencyParser {
         }
         visitedMethods.add(method_index);
         if (abc.method_info.get(method_index).ret_type != 0) {
-            parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(abc.method_info.get(method_index).ret_type), ignorePackage, fullyQualifiedNames, DependencyType.SIGNATURE, uses);
+            parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(abc.method_info.get(method_index).ret_type), ignorePackage, fullyQualifiedNames, DependencyType.SIGNATURE, uses);
         }
         for (int t : abc.method_info.get(method_index).param_types) {
             if (t != 0) {
-                parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(t), ignorePackage, fullyQualifiedNames, DependencyType.SIGNATURE, uses);
+                parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(t), ignorePackage, fullyQualifiedNames, DependencyType.SIGNATURE, uses);
             }
         }
         MethodBody body = abc.findBody(method_index);
@@ -249,7 +275,7 @@ public class DependencyParser {
             body = body.convertMethodBodyCanUseLast(Configuration.autoDeobfuscate.get(), "", isStatic, scriptIndex, classIndex, abc, trait);
             body.traits.getDependencies(usedDeobfuscations, abcIndex, scriptIndex, classIndex, isStatic, ignoredCustom, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
             for (ABCException ex : body.exceptions) {
-                parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION /* or signature?*/, uses);
+                parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION /* or signature?*/, uses);
             }
             
             List<AVM2Instruction> instructions = body.getCode().code;
@@ -359,7 +385,7 @@ public class DependencyParser {
                     if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
                         int m = ins.operands[k];
                         if (m < abc.constants.getMultinameCount()) {
-                            parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, dependencies, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION, uses);
+                            parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION, uses);
                         }
                     }
                     if (ins.definition.operands[k] == AVM2Code.DAT_NUMBER_CONTEXT) {

@@ -314,7 +314,7 @@ public abstract class AVM2Item extends GraphTargetItem {
             if (multinameIndex >= 0  && multinameIndex < localData.constantsAvm2.getMultinameCount()) {
                 Reference<DottedChain> customNsRef = new Reference<>(null);
                 isAttribute = localData.constantsAvm2.getMultiname(multinameIndex).isAttribute();
-                localName = localData.constantsAvm2.getMultiname(multinameIndex).getNameAndCustomNamespace(new HashSet<>(), localData.abc, new ArrayList<>(), true, true, customNsRef);
+                localName = localData.constantsAvm2.getMultiname(multinameIndex).getNameAndCustomNamespace(new HashSet<>(), localData.abc, new ArrayList<>(), true, true, customNsRef, localData.scriptIndex);
                 namespaceSuffix = localData.constantsAvm2.getMultiname(multinameIndex).getNamespaceSuffix();
                 
                 if ("*".equals(localName)) {
