@@ -2609,7 +2609,12 @@ public class AVM2Graph extends Graph {
                             }
                         }
                     } else if (!w.commands.isEmpty()) {
-                        if (w.commands.get(0) instanceof SetTypeAVM2Item) {
+                        GraphTargetItem firstValue = w.commands.get(0) instanceof SetTypeAVM2Item
+                                ? ((SetTypeAVM2Item) w.commands.get(0)).getValue().getNotCoerced() : null;
+                        // Only a direct enumeration assignment can be removed.
+                        // A nested nextvalue/nextname still needs the rest of
+                        // its expression and any assignments around it.
+                        if (firstValue instanceof NextValueAVM2Item || firstValue instanceof NextNameAVM2Item) {
                             SetTypeAVM2Item sti = (SetTypeAVM2Item) w.commands.remove(0);
                             GraphTargetItem gti = sti.getValue().getNotCoerced();
                             GraphTargetItem varName = sti.getObject();
@@ -2715,6 +2720,13 @@ public class AVM2Graph extends Graph {
                                         return false;
                                     }
                                     if ((item instanceof NextNameAVM2Item) || (item instanceof NextValueAVM2Item)) {
+                                        GraphTargetItem obj = item instanceof NextValueAVM2Item
+                                                ? ((NextValueAVM2Item) item).obj : ((NextNameAVM2Item) item).obj;
+                                        GraphTargetItem index = item instanceof NextValueAVM2Item
+                                                ? ((NextValueAVM2Item) item).index : ((NextNameAVM2Item) item).index;
+                                        if (!Objects.equals(obj, hn.obj) || !Objects.equals(index, hn.index)) {
+                                            return false;
+                                        }
                                         handled = true;
                                         if (item instanceof NextValueAVM2Item) {
                                             NextValueAVM2Item nv = (NextValueAVM2Item) item;

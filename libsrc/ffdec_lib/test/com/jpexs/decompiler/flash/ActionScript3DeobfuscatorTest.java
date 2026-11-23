@@ -2665,6 +2665,47 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "         return _temp_3;\n");
     }
 
+    @DataProvider(name = "nestedEnumerationReads")
+    public Object[][] nestedEnumerationReads() {
+        return new Object[][]{{"nextvalue", "for each"}, {"nextname", "for"}};
+    }
+
+    @Test(dataProvider = "nestedEnumerationReads")
+    public void testEnumerationReadInsideChainedAssignment(String instruction, String loop) throws Exception {
+        decompilePCodeWithLines("getlocal1\nsetlocal2\npushbyte 0\nsetlocal3\njump check\n"
+                + "body:\nlabel\ngetlocal2\ngetlocal3\n" + instruction + "\n"
+                + "getproperty QName(PackageNamespace(\"\"),\"value\")\n"
+                + "coerce_s\ndup\nsetlocal 4\ngetproperty QName(PackageNamespace(\"\"),\"length\")\n"
+                + "convert_u\nsetlocal 5\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "getlocal 4\ngetlocal 5\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 2\n"
+                + "check:\nhasnext2 2, 3\niftrue body\n",
+                "         var _loc2_:* = param1;\n"
+                + "         var _loc3_:* = 0;\n"
+                + "         " + loop + "(_loc3_ in _loc2_)\n"
+                + "         {\n"
+                + "            var _loc4_:String = (_loc3_).value;\n"
+                + "            var _loc5_:uint = uint(_loc4_.length);\n"
+                + "            trace(_loc4_,_loc5_);\n"
+                + "         }\n");
+    }
+
+    @Test
+    public void testEnumerationWithoutReadKeepsFirstAssignment() throws Exception {
+        decompilePCodeWithLines("getlocal1\nsetlocal2\npushbyte 0\nsetlocal3\njump check\n"
+                + "body:\nlabel\npushbyte 7\nsetlocal 4\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "getlocal 4\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "check:\nhasnext2 2, 3\niftrue body\n",
+                "         var _loc2_:* = param1;\n"
+                + "         var _loc3_:int = 0;\n"
+                + "         while(§§hasnext(_loc2_,_loc3_))\n"
+                + "         {\n"
+                + "            var _loc4_:int = 7;\n"
+                + "            trace(_loc4_);\n"
+                + "         }\n");
+    }
+
     @Test
     public void testScriptInitializerImports() throws Exception {
         //top-level code after the package block, with no other trait outside
