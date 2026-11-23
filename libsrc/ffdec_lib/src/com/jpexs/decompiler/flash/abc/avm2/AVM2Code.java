@@ -283,6 +283,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForInAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -319,6 +320,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -1958,14 +1960,19 @@ public class AVM2Code implements Cloneable {
                 //i++ of a slot (a script variable) through a temporary register:
                 //getglobalscope, getslot N, increment, setlocal R, getlocal R,
                 //getglobalscope, swap, setslot N, kill R
+                GraphTargetItem saved = output.size() >= 2 ? output.get(output.size() - 2) : null;
+                boolean resultOnStack = saved instanceof PushItem && saved.value instanceof SetLocalAVM2Item;
                 if (output.size() >= 2
                         && (output.get(output.size() - 1) instanceof SetSlotAVM2Item)
-                        && (output.get(output.size() - 2) instanceof SetLocalAVM2Item)) {
+                        && (saved instanceof SetLocalAVM2Item || resultOnStack)) {
                     SetSlotAVM2Item setSlot = (SetSlotAVM2Item) output.get(output.size() - 1);
-                    SetLocalAVM2Item setLoc = (SetLocalAVM2Item) output.get(output.size() - 2);
+                    SetLocalAVM2Item setLoc = (SetLocalAVM2Item) (resultOnStack ? saved.value : saved);
+                    Set<Integer> usages = setLocalPosToGetLocalPos != null && setLoc.getSrc() != null
+                            ? setLocalPosToGetLocalPos.get(adr2pos(setLoc.getSrc().getAddress())) : null;
                     if (setLoc.regIndex == killedReg
                             && (setSlot.value instanceof LocalRegAVM2Item)
-                            && ((LocalRegAVM2Item) setSlot.value).regIndex == killedReg) {
+                            && ((LocalRegAVM2Item) setSlot.value).regIndex == killedReg
+                            && (!resultOnStack || (stack.isEmpty() && usages != null && usages.size() == 1))) {
                         GraphTargetItem value = setLoc.value;
                         GraphTargetItem notCoerced = value.getNotCoerced();
                         boolean increment = notCoerced instanceof IncrementAVM2Item;
@@ -1978,9 +1985,18 @@ public class AVM2Code implements Cloneable {
                             GraphTargetItem type = InstructionDefinition.getNumberType(value);
                             output.remove(output.size() - 1);
                             output.remove(output.size() - 1);
-                            output.add(increment
-                                    ? new PostIncrementAVM2Item(setSlot.getSrc(), setSlot.getLineStartItem(), inside, type)
-                                    : new PostDecrementAVM2Item(setSlot.getSrc(), setSlot.getLineStartItem(), inside, type));
+                            if (resultOnStack) {
+                                // dup before setlocal keeps the updated value for
+                                // the following expression: ++slot or --slot.
+                                stack.moveToStack(output);
+                                stack.push(increment
+                                        ? new PreIncrementAVM2Item(setSlot.getSrc(), setSlot.getLineStartItem(), inside, type)
+                                        : new PreDecrementAVM2Item(setSlot.getSrc(), setSlot.getLineStartItem(), inside, type));
+                            } else {
+                                output.add(increment
+                                        ? new PostIncrementAVM2Item(setSlot.getSrc(), setSlot.getLineStartItem(), inside, type)
+                                        : new PostDecrementAVM2Item(setSlot.getSrc(), setSlot.getLineStartItem(), inside, type));
+                            }
                             ip++;
                             continue;
                         }

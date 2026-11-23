@@ -99,8 +99,9 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             GraphTargetItem inside = ((IncrementAVM2Item) value.getNotCoerced()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetSlotAVM2Item) {
                 GetSlotAVM2Item slotItem = (GetSlotAVM2Item) inside;
-                if ((slotItem.scope.getThroughRegister() == obj.getThroughRegister())
-                        && (slotItem.slotName == slotname)) {
+                if (slotItem.slotIndex == slotIndex && slotItem.slotName == slotname
+                        && (slotItem.scope.getThroughRegister() == obj.getThroughRegister()
+                        || (!obj.hasSideEffect() && Objects.equals(slotItem.scope.getThroughRegister(), obj.getThroughRegister())))) {
                     stack.moveToStack(output);
                     if (!stack.isEmpty()) {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
@@ -130,8 +131,9 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             GraphTargetItem inside = ((DecrementAVM2Item) value.getNotCoerced()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetSlotAVM2Item) {
                 GetSlotAVM2Item slotItem = (GetSlotAVM2Item) inside;
-                if ((slotItem.scope.getThroughRegister() == obj.getThroughRegister())
-                        && (slotItem.slotName == slotname)) {
+                if (slotItem.slotIndex == slotIndex && slotItem.slotName == slotname
+                        && (slotItem.scope.getThroughRegister() == obj.getThroughRegister()
+                        || (!obj.hasSideEffect() && Objects.equals(slotItem.scope.getThroughRegister(), obj.getThroughRegister())))) {
                     stack.moveToStack(output);                    
                     if (!stack.isEmpty()) {
                         GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();

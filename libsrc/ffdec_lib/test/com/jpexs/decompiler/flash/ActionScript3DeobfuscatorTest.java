@@ -2581,6 +2581,91 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testSlotArithmeticResultAcrossAssignment() throws Exception {
+        // The duplicated result survives the write to the slot and is then
+        // recovered from output for the branch condition. Its temporary
+        // assignment must be written to the merged output as well.
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\n"
+                + "pushbyte 2\nadd\ndup\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 1\nkill 2\n"
+                + "iftrue done\ngetlocal1\nreturnvalue\ndone:\n",
+                "         var _loc2_:Number = global.§§slot[1] + 2;\n"
+                + "         var _temp_3:* = _loc2_;\n"
+                + "         global.§§slot[1] = _loc2_;\n"
+                + "         if(!_temp_3)\n"
+                + "         {\n"
+                + "            return param1;\n"
+                + "         }\n");
+    }
+
+    @DataProvider(name = "slotUpdates")
+    public Object[][] slotUpdates() {
+        return new Object[][]{{"increment", "++"}, {"increment_i", "++"},
+            {"decrement", "--"}, {"decrement_i", "--"}};
+    }
+
+    @Test(dataProvider = "slotUpdates")
+    public void testSlotPrefixUpdateWithTempRegisterInCondition(String instruction, String operator) throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\n"
+                + instruction + "\ndup\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 1\nkill 2\n"
+                + "iftrue done\ngetlocal1\nreturnvalue\ndone:\n",
+                "         if(!" + operator + "global.§§slot[1])\n"
+                + "         {\n"
+                + "            return param1;\n"
+                + "         }\n");
+    }
+
+    @Test(dataProvider = "slotUpdates")
+    public void testSlotPrefixUpdateWithTempRegisterReturned(String instruction, String operator) throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\n"
+                + instruction + "\ndup\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 1\nkill 2\nreturnvalue\n",
+                "         return " + operator + "global.§§slot[1];\n");
+    }
+
+    @Test(dataProvider = "slotUpdates")
+    public void testSlotPostfixUpdateWithTempRegisterInCondition(String instruction, String operator) throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\ndup\n"
+                + instruction + "\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 1\nkill 2\n"
+                + "iftrue done\ngetlocal1\nreturnvalue\ndone:\n",
+                "         if(!global.§§slot[1]" + operator + ")\n"
+                + "         {\n"
+                + "            return param1;\n"
+                + "         }\n");
+    }
+
+    @Test(dataProvider = "slotUpdates")
+    public void testSlotPostfixUpdateWithTempRegisterReturned(String instruction, String operator) throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\ndup\n"
+                + instruction + "\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 1\nkill 2\nreturnvalue\n",
+                "         return global.§§slot[1]" + operator + ";\n");
+    }
+
+    @Test
+    public void testSlotPostfixUpdateToDifferentSlotKeepsAssignment() throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\ndup\n"
+                + "increment_i\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 2\nkill 2\nreturnvalue\n",
+                "         var _temp_1:* = global.§§slot[1];\n"
+                + "         global.§§slot[2] = int(int(_temp_1) + 1);\n"
+                + "         return _temp_1;\n");
+    }
+
+    @Test
+    public void testSlotUpdateToDifferentSlotKeepsAssignment() throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\n"
+                + "decrement_i\ndup\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 2\nkill 2\nreturnvalue\n",
+                "         var _loc2_:int = int(int(global.§§slot[1]) - 1);\n"
+                + "         var _temp_3:* = _loc2_;\n"
+                + "         global.§§slot[2] = _loc2_;\n"
+                + "         return _temp_3;\n");
+    }
+
+    @Test
     public void testScriptInitializerImports() throws Exception {
         //top-level code after the package block, with no other trait outside
         //the package, lost the import of a name from another package

@@ -4898,6 +4898,10 @@ public class Graph {
 
             //********************************END PART DECOMPILING
             if (parseNext) {
+                // Recovering a saved stack value can replace a PushItem with
+                // a temporary assignment. Update the merged output, not the
+                // part's output which has already been copied into it.
+                stack.setConnectedOutput(0, currentRet, localData);
 
                 if (getNextParts(localData, part).size() > 2 || partIsSwitch(part)) {
                     GraphTargetItem originalSwitchedItem = stack.pop();
