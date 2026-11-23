@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
+import com.jpexs.decompiler.graph.model.UniversalLoopItem;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -50,6 +51,42 @@ public class GraphGotoTest {
 
     private void removeUnreachable(List<GraphTargetItem> commands) {
         new Graph(null, null, Collections.emptyList(), 0).removeUnreachableCommands(commands);
+    }
+
+    @DataProvider(name = "conditionalTailGuards")
+    public Object[][] conditionalTailGuards() {
+        return new Object[][]{{"external jump"}, {"duplicate label"}, {"break"}, {"other jump"}, {"nested loop"}};
+    }
+
+    @Test(dataProvider = "conditionalTailGuards")
+    public void testConditionalSharedTailKeepsOtherEntriesAndControlScopes(String guard) throws ReflectiveOperationException {
+        GraphTargetItem prefix = new CommentItem("prefix");
+        if (guard.equals("break")) {
+            prefix = new BreakItem(null, null, null, 1);
+        } else if (guard.equals("other jump")) {
+            prefix = new GotoItem(null, null, null, "other");
+        } else if (guard.equals("nested loop")) {
+            prefix = new UniversalLoopItem(null, null, null, new Loop(1, null, null),
+                    commands(new BreakItem(null, null, null, 1)));
+        }
+        LabelItem label = new LabelItem(null, null, null, "shared");
+        GotoItem jump = new GotoItem(null, null, null, "shared");
+        IfItem gate = new IfItem(null, null, null, new TrueItem(null, null, null), commands(jump), commands());
+        List<GraphTargetItem> target = commands(prefix, label, new CommentItem("shared"));
+        List<GraphTargetItem> originalTarget = new ArrayList<>(target);
+        IfItem branch = new IfItem(null, null, null, new TrueItem(null, null, null), target, commands(gate));
+        List<GraphTargetItem> root = commands(branch);
+        if (guard.equals("external jump")) {
+            root.add(new GotoItem(null, null, null, "shared"));
+        } else if (guard.equals("duplicate label")) {
+            root.add(new LabelItem(null, null, null, "shared"));
+        }
+        Method structure = Graph.class.getDeclaredMethod("structureSharedConditionalTails", List.class, List.class, List.class);
+        structure.setAccessible(true);
+        structure.invoke(new Graph(null, null, Collections.emptyList(), 0), root, root, new ArrayList<Loop>());
+        Assert.assertSame(root.get(0), branch);
+        Assert.assertEquals(target, originalTarget);
+        Assert.assertSame(gate.onTrue.get(0), jump);
     }
 
     @DataProvider(name = "unconditionalTransfers")

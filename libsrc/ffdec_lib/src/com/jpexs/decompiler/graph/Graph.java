@@ -1258,11 +1258,129 @@ public class Graph {
         promoteUnpoppedPushItemsToCommands(ret);
 
         finalProcessAll(null, ret, 0, getFinalData(localData, loops, throwStates), path);
+        structureSharedConditionalTails(ret, ret, loops);
         removeUnreachableCommands(ret);
         //fixSwitchEnds(ret);
         removeUnreadSetTemporaries(ret);
         handleSetTemporaryDeclarations(ret);
         return ret;
+    }
+
+    /** Moves a shared if suffix once, with a single-pass block for its skip path. */
+    private void structureSharedConditionalTails(List<GraphTargetItem> commands, List<GraphTargetItem> root, List<Loop> loops) {
+        for (int i = 0; i < commands.size(); i++) {
+            GraphTargetItem item = commands.get(i);
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    structureSharedConditionalTails(sub, root, loops);
+                }
+            }
+            if (!(item instanceof IfItem)) {
+                continue;
+            }
+            IfItem branch = (IfItem) item;
+            for (int side = 0; side < 2; side++) {
+                List<GraphTargetItem> target = side == 0 ? branch.onTrue : branch.onFalse;
+                List<GraphTargetItem> other = side == 0 ? branch.onFalse : branch.onTrue;
+                if (other.size() != 1 || !(other.get(0) instanceof IfItem)) {
+                    continue;
+                }
+                IfItem gate = (IfItem) other.get(0);
+                boolean jumpOnTrue = gate.onFalse.isEmpty() && gate.onTrue.size() == 1;
+                boolean jumpOnFalse = gate.onTrue.isEmpty() && gate.onFalse.size() == 1;
+                if (!jumpOnTrue && !jumpOnFalse) {
+                    continue;
+                }
+                GraphTargetItem last = (jumpOnTrue ? gate.onTrue : gate.onFalse).get(0);
+                if (!(last instanceof GotoItem) || ((GotoItem) last).targetCommands != null) {
+                    continue;
+                }
+                GotoItem jump = (GotoItem) last;
+                for (int j = 0; j + 1 < target.size(); j++) {
+                    if (!(target.get(j) instanceof LabelItem)) {
+                        continue;
+                    }
+                    LabelItem label = (LabelItem) target.get(j);
+                    if (label.labelName == null || !Objects.equals(label.labelName, jump.labelName)
+                            || !canMoveConditionalTail(root, branch, label, jump)) {
+                        continue;
+                    }
+                    Loop loop = new Loop(loops.size(), null, null);
+                    loop.phase = 2;
+                    loops.add(loop);
+                    List<GraphTargetItem> suffix = new ArrayList<>(target.subList(j + 1, target.size()));
+                    // GraphPartMarkedArrayList.subList() is a copy, not a view.
+                    for (int k = target.size() - 1; k >= j; k--) {
+                        target.remove(k);
+                    }
+                    if (jumpOnTrue) {
+                        gate.expression = new NotItem(dialect, null, gate.getLineStartItem(), gate.expression);
+                    }
+                    gate.onTrue = new ArrayList<>();
+                    gate.onFalse = new ArrayList<>();
+                    gate.onTrue.add(new BreakItem(dialect, jump.getSrc(), jump.getLineStartItem(), loop.id));
+                    List<GraphTargetItem> body = new ArrayList<>();
+                    body.add(branch);
+                    body.addAll(suffix);
+                    if (!isUnconditionalTransfer(body.get(body.size() - 1))) {
+                        body.add(new BreakItem(dialect, null, null, loop.id));
+                    }
+                    commands.set(i, new UniversalLoopItem(dialect, item.getSrc(), item.getLineStartItem(), loop, body));
+                    break;
+                }
+            }
+        }
+    }
+
+    private boolean canMoveConditionalTail(List<GraphTargetItem> root, IfItem branch, LabelItem label, GotoItem jump) {
+        int definitions = 0;
+        int references = 0;
+        Deque<GraphTargetItem> pending = new ArrayDeque<>(root);
+        Set<GraphTargetItem> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        while (!pending.isEmpty()) {
+            GraphTargetItem item = pending.removeFirst();
+            if (!visited.add(item)) {
+                if (item instanceof Block || item == label || item == jump) {
+                    return false;
+                }
+                continue;
+            }
+            if (item instanceof LabelItem && Objects.equals(((LabelItem) item).labelName, label.labelName)) {
+                definitions++;
+            }
+            if (item instanceof GotoItem && Objects.equals(((GotoItem) item).labelName, label.labelName)) {
+                if (item != jump || ((GotoItem) item).targetCommands != null) {
+                    return false;
+                }
+                references++;
+            }
+            if (item instanceof Block) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    pending.addAll(sub);
+                }
+            }
+        }
+        if (definitions != 1 || references != 1) {
+            return false;
+        }
+        pending.add(branch);
+        visited.clear();
+        while (!pending.isEmpty()) {
+            GraphTargetItem item = pending.removeFirst();
+            if (!visited.add(item)) {
+                continue;
+            }
+            if (item instanceof BreakItem || item instanceof ContinueItem || item instanceof ExitItem
+                    || item instanceof LabelItem && item != label || item instanceof GotoItem && item != jump
+                    || item instanceof Block && !(item instanceof IfItem) && item != jump) {
+                return false;
+            }
+            if (item instanceof IfItem) {
+                pending.addAll(((IfItem) item).onTrue);
+                pending.addAll(((IfItem) item).onFalse);
+            }
+        }
+        return true;
     }
 
     private boolean hasLabelEntry(GraphTargetItem item) {
@@ -4715,9 +4833,11 @@ public class Graph {
             }
 
             GraphPartMarkedArrayList<GraphTargetItem> output = new GraphPartMarkedArrayList<>();
-            output.startPart(part);
             if (currentRet instanceof GraphPartMarkedArrayList) {
                 ((GraphPartMarkedArrayList) currentRet).startPart(part);
+                output.startParts((GraphPartMarkedArrayList<?>) currentRet);
+            } else {
+                output.startPart(part);
             }
             stack.setConnectedOutput(0, currentRet, localData);
             if (checkPartOutput(hasEmptyStackPops, currentRet, foundGotos, partCodes, partCodePos, visited, code, localData, allParts, stack, parent, part, stopPart, stopPartKind, loops, throwStates, currentLoop, staticOperation, path, recursionLevel)) {

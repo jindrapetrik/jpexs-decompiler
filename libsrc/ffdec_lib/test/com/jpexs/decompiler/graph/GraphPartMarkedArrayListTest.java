@@ -24,6 +24,28 @@ import org.testng.annotations.Test;
 /** Tests for GraphPartMarkedArrayList. */
 public class GraphPartMarkedArrayListTest {
 
+    @Test
+    public void testOutputKeepsPartsWhichOnlyPushedPendingValues() {
+        GraphPart pushes = new GraphPart(0, 1);
+        GraphPart consumes = new GraphPart(2, 3);
+        GraphPart later = new GraphPart(4, 5);
+        GraphPartMarkedArrayList<String> commands = new GraphPartMarkedArrayList<>();
+        commands.startPart(pushes);
+        commands.startPart(consumes);
+        GraphPartMarkedArrayList<String> output = new GraphPartMarkedArrayList<>();
+        output.startParts(commands);
+        commands.startPart(later);
+        output.add("assignment");
+        commands.addAll(output);
+        commands.clearCurrentParts();
+        commands.startPart(later);
+        commands.add("later");
+        Assert.assertEquals(commands.indexOfPart(pushes), 0);
+        Assert.assertEquals(commands.indexOfPart(consumes), 0);
+        Assert.assertEquals(commands.indexOfPart(later), 1);
+        Assert.assertEquals(commands.getPartsAt(0), Arrays.asList(pushes, consumes));
+    }
+
     private static GraphPartMarkedArrayList<String> list(String... items) {
         GraphPartMarkedArrayList<String> ret = new GraphPartMarkedArrayList<>();
         for (String item : items) {

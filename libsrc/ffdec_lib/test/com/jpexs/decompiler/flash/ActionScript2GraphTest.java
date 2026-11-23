@@ -208,6 +208,62 @@ public class ActionScript2GraphTest {
         return decompile(swf, new DoActionTag(swf), actions);
     }
 
+    @DataProvider(name = "conditionalSharedTailPaths")
+    public Object[][] conditionalSharedTailPaths() {
+        Object[][] paths = new Object[][]{{false, -1L}, {false, 0L}, {false, 1L}, {false, 2L},
+            {true, -1L}, {true, 0L}, {true, 1L}, {true, 2L},
+            {true, Double.NaN}, {true, "invalid"}, {false, Double.NaN}};
+        Object[][] result = new Object[paths.length * 2][];
+        for (int i = 0; i < paths.length; i++) {
+            result[2 * i] = new Object[]{paths[i][0], paths[i][1], false};
+            result[2 * i + 1] = new Object[]{paths[i][0], paths[i][1], true};
+        }
+        return result;
+    }
+
+    private LocalDataArea runConditionalSharedTail(List<Action> actions, boolean initialized, Object counter) {
+        Action.setActionsAddresses(actions, 0);
+        LocalDataArea local = new LocalDataArea(null);
+        local.localVariables.put("initialized", initialized);
+        local.localVariables.put("counter", counter);
+        int steps = 0;
+        for (int ip = 0; ip < actions.size();) {
+            Assert.assertTrue(++steps < 1000, "Shared-tail block did not terminate");
+            Action action = actions.get(ip);
+            if (action.isExit()) {
+                break;
+            }
+            local.jump = null;
+            Assert.assertTrue(action.execute(local), action.toString());
+            ip = local.jump == null ? ip + 1 : Action.adr2ip(actions, local.jump);
+        }
+        Assert.assertTrue(local.stack.isEmpty(), "Shared-tail block left values on the stack");
+        return local;
+    }
+
+    @Test(dataProvider = "conditionalSharedTailPaths")
+    public void testConditionalSharedTailPreservesEveryPathWithoutDuplication(boolean initialized, Object counter, boolean splitStack) throws Exception {
+        String sharedTail = (splitStack ? "loadCount: GetVariable\nJump incrementCount\nincrementCount: " : "GetVariable\n")
+                + "Increment\nSetVariable\nPush \"result\", \"SHARED\"\nSetVariable\nJump after\n";
+        String pcode = "Push \"sharedCount\", 0, \"result\", \"SKIPPED\"\nSetVariable\nSetVariable\nJump test\n"
+                + "shared: Push \"sharedCount\", \"sharedCount\"\n" + (splitStack ? "Jump loadCount\n" : sharedTail)
+                + "test: Push \"initialized\"\nGetVariable\nIf already\n"
+                + "Push \"counter\", 0\nSetVariable\nPush \"initialized\", true\nSetVariable\nJump shared\n"
+                + "already: Push \"counter\"\nGetVariable\nPush 1\nGreater\nIf after\nJump shared\n"
+                + (splitStack ? sharedTail : "")
+                + "after: Push \"counter\", \"counter\"\nGetVariable\nIncrement\nSetVariable\n";
+        SWF swf = new SWF();
+        List<Action> original = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), original, 0);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertTrue(result.contains("while(true)") && result.contains("break;"), result);
+        Assert.assertEquals(result.split("\"SHARED\"", -1).length - 1, 1, result);
+        List<Action> compiled = new ActionScript2Parser(swf, new DoActionTag(swf)).actionsFromString(result, Utf8Helper.charsetName);
+        LocalDataArea before = runConditionalSharedTail(original, initialized, counter);
+        LocalDataArea after = runConditionalSharedTail(compiled, initialized, counter);
+        Assert.assertEquals(after.localVariables, before.localVariables);
+    }
+
     @Test
     public void testTellTargetWithRuntimeRegisterValue() throws Exception {
         String result = decompilePcode("Push \"_root\"\nGetVariable\nStoreRegister 1\nPop\n"
