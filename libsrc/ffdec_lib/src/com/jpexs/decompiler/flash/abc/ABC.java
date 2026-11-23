@@ -2957,17 +2957,7 @@ public class ABC implements Openable {
         DottedChain local = findScriptPrivateNamespace(name, scriptIndex);
         return local == null ? getSwf().getAbcIndex().nsValueToName(name) : local;
     }
-
-    /**
-     * Finds custom namespace name of multiname.
-     *
-     * @param m Multiname
-     * @return Custom namespace name
-     */
-    public DottedChain findCustomNsOfMultiname(Multiname m) {
-        return findCustomNsOfMultiname(m, -1, -1);
-    }
-
+        
     private DottedChain findScriptOrGlobalNamespace(Multiname m, int scriptIndex) {
         int nskind = m.getSimpleNamespaceKind(constants);
         if (nskind != Namespace.KIND_NAMESPACE && nskind != Namespace.KIND_PACKAGE_INTERNAL) {
@@ -2983,6 +2973,16 @@ public class ABC implements Openable {
     }
 
     /**
+     * Finds custom namespace name of multiname.
+     *
+     * @param m Multiname
+     * @return Custom namespace name
+     */
+    public DottedChain findCustomNsOfMultiname(Multiname m) {
+        return findCustomNsOfMultiname(m, -1, -1);
+    }
+
+    /**
      * Resolves a namespace declared on the current class as well as package namespaces.
      *
      * @param m Member multiname
@@ -2992,7 +2992,7 @@ public class ABC implements Openable {
     public DottedChain findCustomNsOfMultiname(Multiname m, int classIndex) {
         return findCustomNsOfMultiname(m, classIndex, -1);
     }
-
+    
     /**
      * Resolves custom namespace aliases visible from a class and script.
      *
@@ -3002,12 +3002,26 @@ public class ABC implements Openable {
      * @return Namespace declaration name
      */
     public DottedChain findCustomNsOfMultiname(Multiname m, int classIndex, int scriptIndex) {
-        DottedChain global = findScriptOrGlobalNamespace(m, scriptIndex);
-        if (global != null && !global.isEmpty() || classIndex < 0 || classIndex >= instance_info.size()
+        DottedChain resolved = findScriptOrGlobalNamespace(m, scriptIndex);
+        if ((resolved != null && !resolved.isEmpty())
                 || m.getSimpleNamespaceKind(constants) != Namespace.KIND_NAMESPACE) {
-            return global;
+            return resolved;
         }
-        String uri = m.getSimpleNamespaceName(constants).toRawString();
+        DottedChain local = findClassNamespace(m.getSimpleNamespaceName(constants).toRawString(), classIndex);
+        return local == null ? resolved : local;
+    }
+
+    /**
+     * Finds a namespace declaration on the given class.
+     *
+     * @param uri Namespace URI
+     * @param classIndex Class index, or -1 outside a class
+     * @return Namespace declaration name, or null
+     */
+    public DottedChain findClassNamespace(String uri, int classIndex) {
+        if (classIndex < 0 || classIndex >= instance_info.size()) {
+            return null;
+        }
         List<Trait> traits = new ArrayList<>(class_info.get(classIndex).static_traits.traits);
         traits.addAll(instance_info.get(classIndex).instance_traits.traits);
         for (Trait trait : traits) {
@@ -3016,7 +3030,7 @@ public class ABC implements Openable {
                 return DottedChain.parseWithSuffix(trait.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true));
             }
         }
-        return global;
+        return null;
     }
 
     /**

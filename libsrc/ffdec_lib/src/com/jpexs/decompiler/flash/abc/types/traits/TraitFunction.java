@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.Dependency;
 import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
+import com.jpexs.decompiler.flash.exporters.script.NamespaceUses;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
@@ -177,7 +178,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
     
     @Override
-    public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+    public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, NamespaceUses uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }

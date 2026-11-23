@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.Dependency;
 import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
 import com.jpexs.decompiler.flash.exporters.script.DependencyType;
+import com.jpexs.decompiler.flash.exporters.script.NamespaceUses;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
@@ -329,12 +330,12 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
  
     @Override
-    public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+    public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, NamespaceUses uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
         super.getDependencies(usedDeobfuscations, abcIndex, scriptIndex, classIndex, isStatic, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
-        DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, scriptIndex, dependencies, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames, DependencyType.SIGNATURE, uses);
+        DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, scriptIndex, classIndex, dependencies, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames, DependencyType.SIGNATURE, uses);
     }
 
     /**

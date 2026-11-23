@@ -374,6 +374,19 @@ public abstract class AVM2Item extends GraphTargetItem {
         }
     }
 
+    protected static String getLexicalPackagePropertyName(Multiname name, LocalData localData) {
+        DottedChain packageProperty = localData.abcIndex == null ? null
+                : localData.abcIndex.findLexicalPackageProperty(localData.abc, localData.scriptIndex, name);
+        if (packageProperty == null) {
+            return null;
+        }
+        if (localData.fullyQualifiedNames != null
+                && localData.fullyQualifiedNames.contains(DottedChain.parseWithSuffix(packageProperty.getLast()))) {
+            return packageProperty.toPrintableString(localData.usedDeobfuscations, localData.abc.getSwf(), true);
+        }
+        return name.getName(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, null, false, true);
+    }
+
     /**
      * Gets local register name.
      * @param swf SWF

@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -487,6 +488,15 @@ public class ScriptPack extends AS3ClassTreeItem {
                 }
             }
         }
+        if (!writer.getGeneratedNamespaces().isEmpty()) {
+            if (!first) {
+                writer.newLine();
+            }
+            for (Map.Entry<String, DottedChain> entry : writer.getGeneratedNamespaces().entrySet()) {
+                writer.appendNoHilight("namespace " + entry.getValue().getLast() + " = \""
+                        + Helper.escapeActionScriptString(entry.getKey()) + "\";").newLine();
+            }
+        }
         IdentifiersDeobfuscation.writeCurrentScriptReplacements(writer, usedDeobfuscations, abc.getSwf());
     }
 
@@ -542,7 +552,13 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
         writer.continueMeasure();
 
-        appendTo(usedDeobfuscations, abcIndex, writer, traits, convertData, exportMode, parallel, exportAllClasses);
+        Map<String, DottedChain> previousNamespaces = writer.getGeneratedNamespaces();
+        writer.setGeneratedNamespaces(new LinkedHashMap<>());
+        try {
+            appendTo(usedDeobfuscations, abcIndex, writer, traits, convertData, exportMode, parallel, exportAllClasses);
+        } finally {
+            writer.setGeneratedNamespaces(previousNamespaces);
+        }
     }
 
     /**

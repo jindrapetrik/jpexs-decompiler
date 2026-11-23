@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters.script;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
@@ -28,21 +29,27 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunction
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugFileIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -71,43 +78,38 @@ public class DependencyParser {
      */
     public static void parseDependenciesFromNS(AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, int namespace_index, DottedChain ignorePackage, String name, DependencyType dependencyType, List<String> uses) {
         DottedChain identifier = DottedChain.TOPLEVEL.addWithSuffix(name.isEmpty() ? "*" : name);
-        parseDependenciesFromNS(abcIndex, ignoredCustom, abc, -1, dependencies, namespace_index, ignorePackage,
-                identifier.getLast(), identifier.getLastNamespaceSuffix(), dependencyType, uses);
+        parseDependenciesFromNS(abcIndex, abc, -1, -1, dependencies, namespace_index, ignorePackage,
+                identifier.getLast(), identifier.getLastNamespaceSuffix(), dependencyType, new NamespaceUses(uses, false), false, false);
     }
 
-    private static void parseDependenciesFromNS(AbcIndexing abcIndex, String ignoredCustom, ABC abc, int scriptIndex, List<Dependency> dependencies,
-            int namespace_index, DottedChain ignorePackage, String name, String namespaceSuffix, DependencyType dependencyType, List<String> uses) {
+    private static void parseDependenciesFromNS(AbcIndexing abcIndex, ABC abc, int scriptIndex, int classIndex, List<Dependency> dependencies,
+            int namespace_index, DottedChain ignorePackage, String name, String namespaceSuffix, DependencyType dependencyType, NamespaceUses uses, boolean openNamespace, boolean memberAccess) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
         DottedChain newimport = ns.getName(abc.constants);
 
         if (ns.kind == Namespace.KIND_NAMESPACE || ns.kind == Namespace.KIND_PACKAGE_INTERNAL) {
-            String nsVal = ns.getName(abc.constants).toRawString();
+            String nsVal = ns.getRawName(abc.constants);
             DottedChain local = abc.findScriptPrivateNamespace(nsVal, scriptIndex);
             if (local != null) {
-                if (!uses.contains(local.getLast())) {
-                    uses.add(local.getLast());
-                }
+                uses.add(local.getLast());
                 return;
             }
             DottedChain nsimport = abcIndex.nsValueToName(nsVal);
-            if (nsimport != null) {
+            if (nsimport != null && !nsimport.isEmpty()) {
                 if (nsimport.equals(AVM2Deobfuscation.BUILTIN)) {
                     return; //builtin, no dependency
                 }
-                if (!uses.contains(nsimport.getLast())) {
-                    uses.add(nsimport.getLast());
+                uses.add(nsimport.getLast());
+                Dependency depNs = new Dependency(nsimport, DependencyType.NAMESPACE);
+                if ((ignorePackage == null || !nsimport.getWithoutLast().equals(ignorePackage)) && !dependencies.contains(depNs)) {
+                    dependencies.add(depNs);
                 }
-                if (!nsimport.isEmpty()) {
-                    Dependency depNs = new Dependency(nsimport, DependencyType.NAMESPACE);
-                    if ((ignorePackage == null || !nsimport.getWithoutLast().equals(ignorePackage)) && !dependencies.contains(depNs)) {
-                        dependencies.add(depNs);
-                    }
-                    if (ignoredCustom != null && nsVal.equals(ignoredCustom)) {
-                        return;
-                    }
-                    return;
-                }
+            } else if (uses.collectUndeclared && ns.kind == Namespace.KIND_NAMESPACE
+                    && !nsVal.isEmpty() && abc.findClassNamespace(nsVal, classIndex) == null
+                    && !isInterfaceNamespace(abcIndex, abc, scriptIndex, nsVal, memberAccess)) {
+                uses.undeclared.merge(nsVal, openNamespace, (oldValue, newValue) -> oldValue || newValue);
             }
+            return;
         }
 
         if (dependencyType == DependencyType.NAMESPACE) {
@@ -126,6 +128,58 @@ public class DependencyParser {
             }
             dependencies.add(dep);
         }
+    }
+
+    private static boolean isInterfaceNamespace(AbcIndexing abcIndex, ABC abc, int scriptIndex, String uri, boolean memberAccess) {
+        // AVM2 names interface members with an implicit package:Interface namespace.
+        DottedChain name = DottedChain.parseNoSuffix(uri.replace(':', '.'));
+        String interfaceUri = name.size() > 1 ? name.getWithoutLast().toRawString() + ":" + name.getLast() : name.getLast();
+        if (!uri.equals(interfaceUri)) {
+            return false;
+        }
+        AbcIndexing.ClassIndex type = abcIndex.findClass(new TypeItem(name), abc, scriptIndex < 0 ? null : scriptIndex);
+        if (type != null) {
+            return type.abc.instance_info.get(type.index).isInterface();
+        }
+        if (hasScriptInterfaceNamespace(abc, scriptIndex, uri)) {
+            return true;
+        }
+        if (!memberAccess || name.size() < 2) {
+            return false;
+        }
+        String pkg = name.getWithoutLast().toRawString();
+        String typeName = name.getLast();
+        if (abc.constants.getQnameId(typeName, Namespace.KIND_PACKAGE, pkg, false) > 0) {
+            return true;
+        }
+        // A base interface from a linked library can survive only as its member
+        // namespace. Recognize the interface naming convention in a known package.
+        return typeName.length() > 1 && typeName.charAt(0) == 'I' && Character.isUpperCase(typeName.charAt(1))
+                && IdentifiersDeobfuscation.isValidNameWithDot(true, name.toRawString())
+                && abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, pkg, 0, false) > 0;
+    }
+
+    private static boolean hasScriptInterfaceNamespace(ABC abc, int scriptIndex, String uri) {
+        if (scriptIndex < 0 || scriptIndex >= abc.script_info.size()) {
+            return false;
+        }
+        for (Trait trait : abc.script_info.get(scriptIndex).traits.traits) {
+            if (!(trait instanceof TraitClass) || trait.deleted) {
+                continue;
+            }
+            InstanceInfo instance = abc.instance_info.get(((TraitClass) trait).class_info);
+            if (!instance.isInterface() || instance.deleted) {
+                continue;
+            }
+            for (Trait member : instance.instance_traits.traits) {
+                Multiname memberName = member.getName(abc);
+                if (!member.deleted && memberName.getSimpleNamespaceKind(abc.constants) == Namespace.KIND_NAMESPACE
+                        && uri.equals(memberName.getSimpleNamespaceName(abc.constants).toRawString())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -162,14 +216,23 @@ public class DependencyParser {
      * @param uses Uses
      */
     public static void parseDependenciesFromMultiname(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, int scriptIndex, List<Dependency> dependencies, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, DependencyType dependencyType, List<String> uses) {
+        parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, -1, dependencies, m, ignorePackage, fullyQualifiedNames, dependencyType, new NamespaceUses(uses, false));
+    }
+
+    public static void parseDependenciesFromMultiname(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, int scriptIndex, int classIndex, List<Dependency> dependencies, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, DependencyType dependencyType, NamespaceUses uses) {
+        parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, classIndex,
+                dependencies, m, ignorePackage, fullyQualifiedNames, dependencyType, uses, false);
+    }
+
+    private static void parseDependenciesFromMultiname(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, int scriptIndex, int classIndex, List<Dependency> dependencies, Multiname m, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, DependencyType dependencyType, NamespaceUses uses, boolean memberAccess) {
         if (m != null) {
             if (m.kind == Multiname.TYPENAME) {
                 if (m.qname_index != 0) {
-                    parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames, dependencyType, uses);
+                    parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, classIndex, dependencies, abc.constants.getMultiname(m.qname_index), ignorePackage, fullyQualifiedNames, dependencyType, uses);
                 }
                 for (Integer i : m.params) {
                     if (i != 0) {
-                        parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames, dependencyType, uses);
+                        parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, classIndex, dependencies, abc.constants.getMultiname(i), ignorePackage, fullyQualifiedNames, dependencyType, uses);
                     }
                 }
                 return;
@@ -183,14 +246,14 @@ public class DependencyParser {
                 namespaceSuffix = "";
             }
             NamespaceSet nss = m.getNamespaceSet(abc.constants);
-            if (ns != null && !m.doesDisplayNamespace()) {
-                parseDependenciesFromNS(abcIndex, ignoredCustom, abc, scriptIndex, dependencies, m.namespace_index, ignorePackage, name, namespaceSuffix, dependencyType, uses);
+            if (ns != null && (!m.doesDisplayNamespace() || (uses.collectUndeclared && ns.kind == Namespace.KIND_NAMESPACE))) {
+                parseDependenciesFromNS(abcIndex, abc, scriptIndex, classIndex, dependencies, m.namespace_index, ignorePackage, name, namespaceSuffix, dependencyType, uses, false, memberAccess);
             }
             if (nss != null) {
                 boolean wildcard = nss.namespaces.length > 1;
                 for (int n : nss.namespaces) {
-                    parseDependenciesFromNS(abcIndex, ignoredCustom, abc, scriptIndex, dependencies, n, ignorePackage,
-                            wildcard ? "*" : name, wildcard ? "" : namespaceSuffix, dependencyType, uses);
+                    parseDependenciesFromNS(abcIndex, abc, scriptIndex, classIndex, dependencies, n, ignorePackage,
+                            wildcard ? "*" : name, wildcard ? "" : namespaceSuffix, dependencyType, uses, wildcard || m.needsName(), false);
                 }
             }
         }
@@ -219,6 +282,10 @@ public class DependencyParser {
      * @throws InterruptedException On interrupt
      */
     public static void parseDependenciesFromNewFunctionsInMethodInfo(Set<String> usedDeobfuscations, AbcIndexing abcIndex, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+        parseDependenciesFromNewFunctionsInMethodInfo(usedDeobfuscations, abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, method_index, dependencies, ignorePackage, fullyQualifiedNames, new NamespaceUses(uses, false), numberContextRef);
+    }
+
+    public static void parseDependenciesFromNewFunctionsInMethodInfo(Set<String> usedDeobfuscations, AbcIndexing abcIndex, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, NamespaceUses uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if ((method_index < 0) || (method_index >= abc.method_info.size())) {
             return;
         }
@@ -258,16 +325,20 @@ public class DependencyParser {
      * @throws InterruptedException On interrupt
      */
     public static void parseDependenciesFromMethodInfo(Set<String> usedDeobfuscations, AbcIndexing abcIndex, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+        parseDependenciesFromMethodInfo(usedDeobfuscations, abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, method_index, dependencies, ignorePackage, fullyQualifiedNames, visitedMethods, new NamespaceUses(uses, false), numberContextRef);
+    }
+
+    public static void parseDependenciesFromMethodInfo(Set<String> usedDeobfuscations, AbcIndexing abcIndex, Trait trait, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods, NamespaceUses uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if ((method_index < 0) || (method_index >= abc.method_info.size())) {
             return;
         }
         visitedMethods.add(method_index);
         if (abc.method_info.get(method_index).ret_type != 0) {
-            parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(abc.method_info.get(method_index).ret_type), ignorePackage, fullyQualifiedNames, DependencyType.SIGNATURE, uses);
+            parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, classIndex, dependencies, abc.constants.getMultiname(abc.method_info.get(method_index).ret_type), ignorePackage, fullyQualifiedNames, DependencyType.SIGNATURE, uses);
         }
         for (int t : abc.method_info.get(method_index).param_types) {
             if (t != 0) {
-                parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(t), ignorePackage, fullyQualifiedNames, DependencyType.SIGNATURE, uses);
+                parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, classIndex, dependencies, abc.constants.getMultiname(t), ignorePackage, fullyQualifiedNames, DependencyType.SIGNATURE, uses);
             }
         }
         MethodBody body = abc.findBody(method_index);
@@ -275,7 +346,7 @@ public class DependencyParser {
             body = body.convertMethodBodyCanUseLast(Configuration.autoDeobfuscate.get(), "", isStatic, scriptIndex, classIndex, abc, trait);
             body.traits.getDependencies(usedDeobfuscations, abcIndex, scriptIndex, classIndex, isStatic, ignoredCustom, abc, dependencies, ignorePackage, fullyQualifiedNames, uses, numberContextRef);
             for (ABCException ex : body.exceptions) {
-                parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION /* or signature?*/, uses);
+                parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, classIndex, dependencies, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION /* or signature?*/, uses);
             }
             
             List<AVM2Instruction> instructions = body.getCode().code;
@@ -383,9 +454,33 @@ public class DependencyParser {
                     //this should probably handle only some subset of multiname instructions,
                     // like findproperty, findpropstrict, constructprop, not simple getproperty
                     if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
-                        int m = ins.operands[k];
-                        if (m < abc.constants.getMultinameCount()) {
-                            parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, dependencies, abc.constants.getMultiname(m), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION, uses);
+                        int multinameIndex = ins.operands[k];
+                        if (multinameIndex < abc.constants.getMultinameCount()) {
+                            Multiname multiname = abc.constants.getMultiname(multinameIndex);
+                            boolean lexicalLookup = ins.definition instanceof GetLexIns
+                                    || ins.definition instanceof FindPropertyIns || ins.definition instanceof FindPropertyStrictIns
+                                    || ins.definition instanceof ConstructPropIns;
+                            DottedChain packageProperty = lexicalLookup
+                                    ? abcIndex.findLexicalPackageProperty(abc, scriptIndex, multiname) : null;
+                            if (packageProperty != null) {
+                                Dependency dependency = new Dependency(packageProperty, DependencyType.EXPRESSION);
+                                if (!dependencies.contains(dependency)) {
+                                    dependencies.add(dependency);
+                                }
+                            } else {
+                                boolean memberAccess = ins.definition instanceof CallPropertyIns || ins.definition instanceof CallPropVoidIns
+                                        || ins.definition instanceof GetPropertyIns || ins.definition instanceof SetPropertyIns
+                                        || ins.definition instanceof ConstructPropIns;
+                                parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, ignoredCustom, abc, scriptIndex, classIndex,
+                                        dependencies, multiname, ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION, uses, memberAccess);
+                            }
+                        }
+                    }
+                    if (uses.collectUndeclared && ins.definition.operands[k] == AVM2Code.DAT_NAMESPACE_INDEX) {
+                        int nsIndex = ins.operands[k];
+                        if (nsIndex > 0 && nsIndex < abc.constants.getNamespaceCount()) {
+                            parseDependenciesFromNS(abcIndex, abc, scriptIndex, classIndex, dependencies, nsIndex, ignorePackage,
+                                    "", "", DependencyType.NAMESPACE, uses, false, false);
                         }
                     }
                     if (ins.definition.operands[k] == AVM2Code.DAT_NUMBER_CONTEXT) {
@@ -402,7 +497,7 @@ public class DependencyParser {
      * the call's return type may appear in decompiled local declarations without
      * a matching {@code coerce} multiname. Resolve that return type and import it.
      */
-    private static void parseDependenciesFromCallPropertyReturnType(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, int scriptIndex, int classIndex, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, AVM2Instruction prevIns, AVM2Instruction callIns) {
+    private static void parseDependenciesFromCallPropertyReturnType(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, int scriptIndex, int classIndex, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, NamespaceUses uses, AVM2Instruction prevIns, AVM2Instruction callIns) {
         GraphTargetItem receiverType = null;
         if (prevIns.definition instanceof GetLexIns || prevIns.definition instanceof GetPropertyIns) {
             Multiname receiverMn = abc.constants.getMultiname(prevIns.operands[0]);
@@ -462,7 +557,7 @@ public class DependencyParser {
         return false;
     }
 
-    private static void parseDependenciesFromTypeItem(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, GraphTargetItem type) {
+    private static void parseDependenciesFromTypeItem(Set<String> usedDeobfuscations, AbcIndexing abcIndex, String ignoredCustom, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, NamespaceUses uses, GraphTargetItem type) {
         if (type == null || type == TypeItem.UNBOUNDED || type == TypeItem.UNKNOWN) {
             return;
         }
