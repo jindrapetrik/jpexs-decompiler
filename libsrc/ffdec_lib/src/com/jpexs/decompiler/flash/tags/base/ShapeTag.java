@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -30,7 +31,12 @@ import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.helpers.LazyObject;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.ILINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE2;
+import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -132,8 +138,14 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
                 sis.seek(shapeData.getPos());
                 shapes = sis.readSHAPEWITHSTYLE(getShapeNum(), false, "shapes");
                 shapeData = null; // not needed anymore, give it to GC
-            } catch (IOException ex) {
-                Logger.getLogger(ShapeTag.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(ShapeTag.class.getName()).log(Level.SEVERE, "Cannot read shape data (shape id = " + shapeId + ")", ex);
+                shapes = new SHAPEWITHSTYLE();
+                shapes.fillStyles = new FILLSTYLEARRAY();
+                shapes.fillStyles.fillStyles = new FILLSTYLE[0];
+                shapes.lineStyles = new LINESTYLEARRAY();
+                shapes.lineStyles.lineStyles = new LINESTYLE[0];
+                shapes.lineStyles.lineStyles2 = new LINESTYLE2[0];
             }
         }
 
