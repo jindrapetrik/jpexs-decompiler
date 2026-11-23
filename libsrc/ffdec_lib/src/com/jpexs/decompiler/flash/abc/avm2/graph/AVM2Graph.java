@@ -26,6 +26,8 @@ import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewCatchIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugFileIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictNeIns;
@@ -46,6 +48,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.Dec
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.IncLocalPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
@@ -2002,6 +2006,8 @@ public class AVM2Graph extends Graph {
             GraphTargetItem top = null;
             int cnt = 1;
             int branchCount = 2;
+            GraphPart indexSwitchPart = getIndexLookupSwitchTarget(caseBodyParts.get(0));
+            boolean indexBodiesLinear = indexSwitchPart != null;
             try {
                 Set<GraphPart> ignoredParts = new LinkedHashSet<>();
                 for (Loop el : loops) {
@@ -2017,11 +2023,19 @@ public class AVM2Graph extends Graph {
                     if (part.nextParts.size() == branchCount) {
                         GraphPart possibleNextDispatchPart = part.nextParts.get(branchNum);
                         boolean reachedFromCaseBody = false;
-                        for (GraphPart caseBodyPart : caseBodyParts) {
-                            if (caseBodyPart == possibleNextDispatchPart
-                                    || caseBodyPart.leadsTo(localData, this, code, possibleNextDispatchPart, loops, throwStates, false)) {
-                                reachedFromCaseBody = true;
-                                break;
+                        if (indexBodiesLinear && possibleNextDispatchPart.nextParts.size() == 2
+                                && (((AVM2Instruction) getLastPartSourceItem(possibleNextDispatchPart)).definition instanceof IfStrictEqIns
+                                || ((AVM2Instruction) getLastPartSourceItem(possibleNextDispatchPart)).definition instanceof IfStrictNeIns)) {
+                            // Each collected body only pushes an index and goes
+                            // to the same lookup. Query their common suffix once.
+                            reachedFromCaseBody = indexSwitchPart.leadsTo(localData, this, code, possibleNextDispatchPart, loops, throwStates, false);
+                        } else {
+                            for (GraphPart caseBodyPart : caseBodyParts) {
+                                if (caseBodyPart == possibleNextDispatchPart
+                                        || caseBodyPart.leadsTo(localData, this, code, possibleNextDispatchPart, loops, throwStates, false)) {
+                                    reachedFromCaseBody = true;
+                                    break;
+                                }
                             }
                         }
                         if (reachedFromCaseBody) {
@@ -2056,6 +2070,7 @@ public class AVM2Graph extends Graph {
                             part = part.nextParts.get(0);
                         }
                         caseBodyParts.add(part.nextParts.get(0));
+                        indexBodiesLinear = indexBodiesLinear && getIndexLookupSwitchTarget(part.nextParts.get(0)) == indexSwitchPart;
                         branchNum = 1;
 
                         outs.add(out);
@@ -2077,6 +2092,7 @@ public class AVM2Graph extends Graph {
                         }
 
                         caseBodyParts.add(part.nextParts.get(1));
+                        indexBodiesLinear = indexBodiesLinear && getIndexLookupSwitchTarget(part.nextParts.get(1)) == indexSwitchPart;
                         branchNum = 0;
 
                         outs.add(out);
@@ -2095,10 +2111,13 @@ public class AVM2Graph extends Graph {
 
             // Non-integer switches first use strict comparisons
             // to select an index and then dispatch through a shared lookupswitch.
-            // Leave that pattern for the real switch handler below instead of
-            // mistaking the index-selection comparisons for the source switch.
+            // Simple index-only bodies can form a flat intermediate switch;
+            // finalProcess merges it with the real switch. Otherwise retain the
+            // expression path, including loop exits and exception scopes.
             GraphPart lookupSwitchPart = getLinearLookupSwitchTarget(caseBodyParts.get(0));
-            if (lookupSwitchPart != null) {
+            boolean simpleIndexSelection = loops.isEmpty() && throwStates.isEmpty() && indexBodiesLinear
+                    && getIndexLookupSwitchTarget(part.nextParts.get(branchNum)) == indexSwitchPart;
+            if (lookupSwitchPart != null && !simpleIndexSelection) {
                 for (GraphPart caseBodyPart : caseBodyParts) {
                     if (getLinearLookupSwitchTarget(caseBodyPart) != lookupSwitchPart) {
                         lookupSwitchPart = null;
@@ -3618,6 +3637,44 @@ public class AVM2Graph extends Graph {
             }
             if (part.nextParts.size() != 1) {
                 return null;
+            }
+            part = part.nextParts.get(0);
+        }
+        return null;
+    }
+
+    /** Finds a lookup reached by pushing just one integer dispatch index. */
+    private GraphPart getIndexLookupSwitchTarget(GraphPart part) {
+        Set<GraphPart> visited = new HashSet<>();
+        boolean pushed = false;
+        while (visited.add(part)) {
+            if (part.start < 0 || part.end >= avm2code.code.size()) {
+                return null;
+            }
+            if (partIsSwitch(part)) {
+                for (int ip = part.start; ip < part.end; ip++) {
+                    InstructionDefinition def = avm2code.code.get(ip).definition;
+                    if (!(def instanceof KillIns) && !(def instanceof NopIns) && !(def instanceof LabelIns) && !(def instanceof DebugIns)
+                            && !(def instanceof DebugLineIns) && !(def instanceof DebugFileIns)) {
+                        return null;
+                    }
+                }
+                return pushed ? part : null;
+            }
+            if (part.nextParts.size() != 1) {
+                return null;
+            }
+            for (int ip = part.start; ip <= part.end; ip++) {
+                InstructionDefinition def = avm2code.code.get(ip).definition;
+                if (def instanceof PushByteIns || def instanceof PushShortIns || def instanceof PushIntIns) {
+                    if (pushed) {
+                        return null;
+                    }
+                    pushed = true;
+                } else if (!(def instanceof JumpIns) && !(def instanceof NopIns) && !(def instanceof LabelIns)
+                        && !(def instanceof DebugIns) && !(def instanceof DebugLineIns) && !(def instanceof DebugFileIns)) {
+                    return null;
+                }
             }
             part = part.nextParts.get(0);
         }

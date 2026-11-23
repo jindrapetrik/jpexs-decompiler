@@ -60,6 +60,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import macromedia.asc.util.Decimal128;
@@ -2141,6 +2142,53 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         assertTrue(result.contains(" in items)"), result);
         for (String message : new String[]{"firstCase", "firstDefault", "firstEnd", "secondCase", "secondDefault", "secondEnd", "after"}) {
             assertEquals(result.split("trace\\(\"" + message + "\"\\);", -1).length - 1, 1, result);
+        }
+    }
+
+    @DataProvider(name = "largeStringSwitchModes")
+    public Object[][] largeStringSwitchModes() {
+        return new Object[][]{{false}, {true}};
+    }
+
+    @Test(dataProvider = "largeStringSwitchModes", timeOut = 30000)
+    public void testLargeStringSwitchKeepsEveryMappingAndDefaultPosition(boolean deobfuscate) throws Exception {
+        List<String> names = new ArrayList<>();
+        StringBuilder pcode = new StringBuilder("getlocal1\nsetlocal2\njump dispatch\n");
+        for (int i = 0; i < 512; i++) {
+            if (i == 17) {
+                names.add("alias");
+            }
+            names.add("asset_" + i);
+            pcode.append("body").append(i).append(": pushshort ").append(i).append("\nreturnvalue\n");
+        }
+        pcode.append("defaultBody: pushbyte -1\nreturnvalue\ndispatch:\n");
+        StringBuilder expected = new StringBuilder("         switch(param1)\n         {\n");
+        List<String> targets = new ArrayList<>();
+        for (int i = 0; i < names.size(); i++) {
+            if (i == 128) {
+                targets.add("defaultBody");
+                expected.append("            default:\n               return -1;\n");
+            }
+            String name = names.get(i);
+            int bodyIndex = name.equals("alias") ? 17 : Integer.parseInt(name.substring(6));
+            pcode.append("check").append(i).append(": pushstring \"").append(name)
+                    .append("\"\ngetlocal2\nifstrictne check").append(i + 1)
+                    .append("\npushshort ").append(i < 128 ? i : i + 1).append("\njump lookup\n");
+            targets.add("body" + bodyIndex);
+            expected.append("            case \"").append(name).append("\":\n");
+            if (!name.equals("alias")) {
+                expected.append("               return ").append(bodyIndex).append(";\n");
+            }
+        }
+        pcode.append("check").append(names.size()).append(": pushshort 128\nlookup: kill 2\nlookupswitch defaultBody, [")
+                .append(String.join(", ", targets)).append("]\n");
+        expected.append("         }\n");
+        boolean oldDeobfuscate = Configuration.autoDeobfuscate.get();
+        Configuration.autoDeobfuscate.set(false);
+        try {
+            decompilePCode(pcode.toString(), expected.toString(), deobfuscate);
+        } finally {
+            Configuration.autoDeobfuscate.set(oldDeobfuscate);
         }
     }
 
