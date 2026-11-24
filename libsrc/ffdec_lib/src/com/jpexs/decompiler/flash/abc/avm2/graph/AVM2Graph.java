@@ -1893,6 +1893,40 @@ public class AVM2Graph extends Graph {
                 return false;
             }
         }
+        Map<GraphPart, Integer> scopeDepths = new HashMap<>();
+        List<GraphPart> pending = new ArrayList<>();
+        pending.add(loop.loopPreContinue);
+        scopeDepths.put(loop.loopPreContinue, 0);
+        while (!pending.isEmpty()) {
+            GraphPart part = pending.remove(pending.size() - 1);
+            if (part == null) {
+                continue;
+            }
+            int scopeDepth = scopeDepths.get(part);
+            if (part == loop.loopContinue || part == loop.loopBreak) {
+                if (scopeDepth != 0) {
+                    return false;
+                }
+                continue;
+            }
+            for (int ip = part.start; ip <= part.end && ip < avm2code.code.size(); ip++) {
+                scopeDepth += avm2code.code.get(ip).definition.getScopeStackDelta(avm2code.code.get(ip), abc);
+                if (scopeDepth < 0) {
+                    // This tail leaves a scope opened in the body and cannot
+                    // be translated early as a for increment. Balanced scopes
+                    // inside an increment (such as XML filters) are allowed.
+                    return false;
+                }
+            }
+            for (GraphPart next : part.nextParts) {
+                Integer oldDepth = scopeDepths.putIfAbsent(next, scopeDepth);
+                if (oldDepth == null) {
+                    pending.add(next);
+                } else if (oldDepth != scopeDepth) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 

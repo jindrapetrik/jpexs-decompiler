@@ -2706,6 +2706,37 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "         }\n");
     }
 
+    @DataProvider(name = "withLoopScopeDepths")
+    public Object[][] withLoopScopeDepths() {
+        return new Object[][]{{1, false}, {1, true}, {2, false}, {2, true}};
+    }
+
+    @Test(dataProvider = "withLoopScopeDepths")
+    public void testWithLoopTailKeepsActivationScope(int depth, boolean deobfuscate) throws Exception {
+        boolean oldDeobfuscate = Configuration.autoDeobfuscate.get();
+        Configuration.autoDeobfuscate.set(deobfuscate);
+        try {
+            String withStart = depth == 2 ? "with(items[i]) { with(child) {" : "with(items[i]) {";
+            String withEnd = depth == 2 ? "} }" : "}";
+            String result = recompileSource("package { public class Test {"
+                    + "public static function test(items:Array):int {"
+                    + "var i:int = 0; var keep:Function = function():int { return i; };"
+                    + "while(i < items.length) {" + withStart
+                    + "var j:int = 0; while(j < 3) {"
+                    + "if(flag) { trace(\"first\"); if(leave) { return keep(); } } else { trace(\"second\"); }"
+                    + "j++; } if(tail) { trace(\"tail\"); }"
+                    + withEnd + "i++; } return keep(); } } }");
+            Assert.assertFalse(result.contains("§§"), result);
+            assertTrue(result.contains("with(items[i])"), result);
+            assertTrue(result.contains("while(i < items.length)"), result);
+            assertEquals(result.split("trace\\(\"first\"\\)", -1).length - 1, 1, result);
+            assertEquals(result.split("trace\\(\"second\"\\)", -1).length - 1, 1, result);
+            assertEquals(result.split("i\\+\\+", -1).length - 1, 1, result);
+        } finally {
+            Configuration.autoDeobfuscate.set(oldDeobfuscate);
+        }
+    }
+
     @Test
     public void testScriptInitializerImports() throws Exception {
         //top-level code after the package block, with no other trait outside
