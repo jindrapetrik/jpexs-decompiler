@@ -3675,6 +3675,32 @@ public class AVM2Graph extends Graph {
         return avm2code.code.get(part.end).definition instanceof LookupSwitchIns;
     }
 
+    @Override
+    protected GraphPart getIndependentSwitchCaseTail(List<GraphPart> cases, List<Loop> loops, List<ThrowState> throwStates) {
+        if (cases.isEmpty() || !loops.isEmpty() || !throwStates.isEmpty()) {
+            return null;
+        }
+        GraphPart target = getIndexLookupSwitchTarget(cases.get(0));
+        if (target == null) {
+            return null;
+        }
+        Set<GraphPart> entries = new HashSet<>(cases);
+        for (GraphPart entry : entries) {
+            if (getIndexLookupSwitchTarget(entry) != target) {
+                return null;
+            }
+            GraphPart part = entry;
+            while (part != target) {
+                part = part.nextParts.get(0);
+                if (part != target && entries.contains(part)) {
+                    // A body falling through another case still needs ordering.
+                    return null;
+                }
+            }
+        }
+        return target;
+    }
+
     private GraphPart getLinearLookupSwitchTarget(GraphPart part) {
         Set<GraphPart> visited = new HashSet<>();
         while (visited.add(part)) {

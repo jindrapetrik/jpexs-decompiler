@@ -114,6 +114,7 @@ public class LoopDetector {
         Set<GraphPartEdge> ignoredEdges = new LinkedHashSet<>();
 
         Set<GraphPart> multipleSameCase = new LinkedHashSet<>();
+        boolean orderedCases = !switchParts.isEmpty() && hasTopologicalClosedTimes(allParts, pnw);
         
         for (List<GraphPart> switchCases : switchParts) {
             for (int i = 1; i < switchCases.size(); i++) {
@@ -125,7 +126,7 @@ public class LoopDetector {
                     Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "duplicate case {0} detected", new Object[]{case1});
                     continue;
                 }
-                GraphPart leadsToPrev = partLeadsToGetPrev(case1, case2, backEdges, pnw);
+                GraphPart leadsToPrev = partLeadsToGetPrev(case1, case2, backEdges, pnw, orderedCases);
                 if (leadsToPrev != null) {
                     Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "- leadsto, ignoring edge {0} => {1}", new Object[]{leadsToPrev, case2});
                     ignoredEdges.add(new GraphPartEdge(leadsToPrev, case2));
@@ -1267,7 +1268,21 @@ public class LoopDetector {
         return visited;
     }
 
-    private GraphPart partLeadsToGetPrev(GraphPart part1, GraphPart part2, Set<GraphPartEdge> backEdges, PrevNextWalker pnw) {
+    private boolean hasTopologicalClosedTimes(Set<GraphPart> parts, PrevNextWalker pnw) {
+        for (GraphPart part : parts) {
+            if (part.closedTime <= 0) {
+                return false;
+            }
+            for (GraphPart next : pnw.getNext(part)) {
+                if (next.closedTime <= part.closedTime) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private GraphPart partLeadsToGetPrev(GraphPart part1, GraphPart part2, Set<GraphPartEdge> backEdges, PrevNextWalker pnw, boolean ordered) {
         if (part1 == part2) {
             return null;
         }
@@ -1276,6 +1291,11 @@ public class LoopDetector {
         Set<GraphPart> visited = new HashSet<>();
         while (!stack.isEmpty()) {
             GraphPart part = stack.pop();
+            if (ordered && part.closedTime >= part2.closedTime) {
+                // All edges advance in this verified topological order. A
+                // shared suffix beyond the target cannot lead back to it.
+                continue;
+            }
             if (visited.contains(part)) {
                 continue;
             }

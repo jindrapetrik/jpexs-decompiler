@@ -827,17 +827,19 @@ public class Graph {
             }
         }
 
-        Map<GraphPart, Set<GraphPart>> reachable = new HashMap<>();
-        Set<GraphPart> allReachable = new LinkedHashSet<>();
+        // Only the number of sources reaching each part is needed below.
+        // Retaining a full set per source costs quadratic memory for switches
+        // whose cases share a large continuation.
+        Map<GraphPart, PartCommon> reachCounts = new LinkedHashMap<>();
         for (GraphPart p : parts) {
             LinkedHashSet<GraphPart> r1 = new LinkedHashSet<>();
             getReachableParts(localData, p, r1, loops, throwStates);
-            Set<GraphPart> r2 = new LinkedHashSet<>();
-            r2.add(p);
-            r2.addAll(r1);
-            reachable.put(p, r2);
-            allReachable.add(p);
-            allReachable.addAll(r1);
+            reachCounts.computeIfAbsent(p, key -> new PartCommon(key, 0)).level++;
+            for (GraphPart reached : r1) {
+                if (!Objects.equals(reached, p)) {
+                    reachCounts.computeIfAbsent(reached, key -> new PartCommon(key, 0)).level++;
+                }
+            }
         }
         Comparator<PartCommon> comparator = new Comparator<PartCommon>() {
             @Override
@@ -864,23 +866,13 @@ public class Graph {
         };
         Set<PartCommon> commonSet = new TreeSet<>();
 
-        for (GraphPart r : allReachable) {
+        for (PartCommon candidate : reachCounts.values()) {
+            GraphPart r = candidate.part;
             if (loopContinues.contains(r)) {
                 continue;
             }
-            boolean common = true;
-            int commonLevel = 0;
-            for (GraphPart p : parts) {
-                if (p == r) {
-                    commonLevel++;
-                    continue;
-                }
-                if (!reachable.get(p).contains(r)) {
-                    common = false;
-                } else {
-                    commonLevel++;
-                }
-            }
+            int commonLevel = candidate.level;
+            boolean common = commonLevel == parts.size();
             if (common) {
                 Stack<GraphPart> toProcess = new Stack<>();
                 Set<GraphPart> visited = new HashSet<>();
@@ -931,7 +923,7 @@ public class Graph {
                 maxCommonLevel = commonLevel;
                 commonSet.add(e)
             }*/
-            commonSet.add(new PartCommon(r, commonLevel));
+            commonSet.add(candidate);
         }
 
         /*Set<GraphPart> partsLeadingToStopPart = new LinkedHashSet<>();
@@ -6212,6 +6204,19 @@ public class Graph {
     }
 
     /**
+     * Finds a shared tail when every case is independent until reaching it.
+     * A non-null result allows skipping fallthrough checks and case ordering.
+     *
+     * @param cases Case entries, including the default entry
+     * @param loops Loops
+     * @param throwStates Throw states
+     * @return Shared tail, or null when independence has not been proved
+     */
+    protected GraphPart getIndependentSwitchCaseTail(List<GraphPart> cases, List<Loop> loops, List<ThrowState> throwStates) {
+        return null;
+    }
+
+    /**
      * Handles switch statement.
      *
      * @param switchedObject Switched object
@@ -6242,6 +6247,19 @@ public class Graph {
             GraphSourceItem switchStartItem, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, Set<GraphPart> allParts, TranslateStack stack, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, BaseLocalData localData, int staticOperation, String path,
             List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef, Reference<Boolean> hasEmptyStackPops) throws InterruptedException {
 
+        List<GraphPart> allCaseBodies = new ArrayList<>(caseBodyParts);
+        allCaseBodies.add(defaultPart);
+        boolean terminalCases = throwStates.isEmpty();
+        if (terminalCases) {
+            for (GraphPart casePart : allCaseBodies) {
+                if (!casePart.nextParts.isEmpty() || checkPart(null, localData, null, casePart, null) != casePart) {
+                    terminalCases = false;
+                    break;
+                }
+            }
+        }
+        GraphPart independentCaseTail = getIndependentSwitchCaseTail(allCaseBodies, loops, throwStates);
+        boolean independentCases = terminalCases || independentCaseTail != null;
         boolean hasDefault = caseValuesMap.stream().anyMatch(value -> value instanceof DefaultItem);
         /*
                 case 4:
@@ -6263,7 +6281,7 @@ public class Graph {
             }
         }
 
-        if (!hasDefault) {
+        if (!hasDefault && !independentCases) {
             /*
                     case 1:
                         trace("1");
@@ -6286,7 +6304,7 @@ public class Graph {
             }
         }
 
-        if (!hasDefault) {
+        if (!hasDefault && !independentCases) {
             /*
                     case 1:
                         trace("1");
@@ -6321,7 +6339,8 @@ public class Graph {
         }
 
         //gotoTargets
-        GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops, throwStates, stopPart);
+        GraphPart breakPart = independentCaseTail != null ? independentCaseTail
+                : terminalCases ? null : getMostCommonPart(localData, caseBodyParts, loops, throwStates, stopPart);
         if (breakPart != null && isPartReturnOnly(breakPart)) {
             // A case which returns directly must not pull the shared tail of
             // the other cases into the first case body.
@@ -6345,18 +6364,11 @@ public class Graph {
         currentLoop.phase = 1;
         loops.add(currentLoop);
         List<Integer> valuesMapping = new ArrayList<>();
-        List<GraphPart> caseBodies = new ArrayList<>();
-
-        for (int i = 0; i < caseValuesMap.size(); i++) {
-            GraphPart cur = caseBodyParts.get(i);
-            if (!caseBodies.contains(cur)) {
-                caseBodies.add(cur);
-            }
-        }
+        List<GraphPart> caseBodies = new ArrayList<>(new LinkedHashSet<>(caseBodyParts));
 
         //Sort bodies by leadsto to proper handle clauses without a break statement
         loopi:
-        for (int i = 0; i < caseBodies.size(); i++) {
+        for (int i = 0; !independentCases && i < caseBodies.size(); i++) {
             GraphPart b = caseBodies.get(i);
             for (int j = i + 1; j < caseBodies.size(); j++) {
                 GraphPart b2 = caseBodies.get(j);
@@ -6378,26 +6390,32 @@ public class Graph {
             }
         }
 
+        Map<GraphPart, Integer> caseBodyIndices = new HashMap<>();
+        for (int i = 0; i < caseBodies.size(); i++) {
+            caseBodyIndices.put(caseBodies.get(i), i);
+        }
         for (int i = 0; i < caseValuesMap.size(); i++) {
             GraphPart cur = caseBodyParts.get(i);
-            valuesMapping.add(caseBodies.indexOf(cur));
+            valuesMapping.add(caseBodyIndices.get(cur));
         }
 
         for (int i = 0; i < caseBodies.size(); i++) {
             List<GraphTargetItem> currentCaseCommands = new ArrayList<>();
             boolean willHaveBreak = false;
             if (i < caseBodies.size() - 1) {
-                if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops, throwStates, false)) {
+                if (independentCases || !caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops, throwStates, false)) {
                     willHaveBreak = true;
                 }
             }
 
             List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
             List<StopPartKind> stopPartKind2x = new ArrayList<>(stopPartKind);
-            for (GraphPart b : caseBodies) {
-                if (b != caseBodies.get(i)) {
-                    stopPart2x.add(b);
-                    stopPartKind2x.add(StopPartKind.OTHER);
+            if (!independentCases) {
+                for (GraphPart b : caseBodies) {
+                    if (b != caseBodies.get(i)) {
+                        stopPart2x.add(b);
+                        stopPartKind2x.add(StopPartKind.OTHER);
+                    }
                 }
             }
             if (breakPart != null) {

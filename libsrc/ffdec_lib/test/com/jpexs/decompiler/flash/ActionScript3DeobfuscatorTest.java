@@ -2155,9 +2155,18 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
 
     @Test(dataProvider = "largeStringSwitchModes", timeOut = 30000)
     public void testLargeStringSwitchKeepsEveryMappingAndDefaultPosition(boolean deobfuscate) throws Exception {
+        assertLargeStringSwitch(deobfuscate, 512);
+    }
+
+    @Test(dataProvider = "largeStringSwitchModes", timeOut = 60000)
+    public void testThousandsOfStringSwitchCasesKeepEveryMapping(boolean deobfuscate) throws Exception {
+        assertLargeStringSwitch(deobfuscate, 7080);
+    }
+
+    private void assertLargeStringSwitch(boolean deobfuscate, int caseCount) throws Exception {
         List<String> names = new ArrayList<>();
         StringBuilder pcode = new StringBuilder("getlocal1\nsetlocal2\njump dispatch\n");
-        for (int i = 0; i < 512; i++) {
+        for (int i = 0; i < caseCount; i++) {
             if (i == 17) {
                 names.add("alias");
             }
@@ -2187,11 +2196,14 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 .append(String.join(", ", targets)).append("]\n");
         expected.append("         }\n");
         boolean oldDeobfuscate = Configuration.autoDeobfuscate.get();
+        int oldTimeout = Configuration.decompilationTimeoutSingleMethod.get();
         Configuration.autoDeobfuscate.set(false);
+        Configuration.decompilationTimeoutSingleMethod.set(60);
         try {
             decompilePCode(pcode.toString(), expected.toString(), deobfuscate);
         } finally {
             Configuration.autoDeobfuscate.set(oldDeobfuscate);
+            Configuration.decompilationTimeoutSingleMethod.set(oldTimeout);
         }
     }
 
