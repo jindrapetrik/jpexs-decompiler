@@ -121,6 +121,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
         FastActionList fastActions = new FastActionList(actions);
+        removeImmediatelyExitedTryHeaders(fastActions);
         fastActions.removeUnknownActions();
         fastActions.expandPushes();
         Map<String, Object> fakeFunctions = getFakeFunctionResults(fastActions);
@@ -147,6 +148,36 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             changed = updateJumpsAfterFunction(fastActions);
             if (changed) {
                 useVariables = false;
+            }
+        }
+    }
+
+    private void removeImmediatelyExitedTryHeaders(FastActionList actions) {
+        FastActionListIterator iterator = actions.iterator();
+        while (iterator.hasNext()) {
+            ActionItem item = iterator.next();
+            if (!(item.action instanceof ActionTry)) {
+                continue;
+            }
+            ActionTry action = (ActionTry) item.action;
+            long start = action.getAddress() + action.getHeaderSize();
+            long end = start + action.getContainerSizes().get(0);
+            ActionItem first = item.next;
+            if (action.finallyBlockFlag || first.action.getAddress() >= end) {
+                continue;
+            }
+            Set<ActionItem> visited = new HashSet<>();
+            while (first.action instanceof ActionJump && first.getJumpTarget() != null && visited.add(first)) {
+                first = first.getJumpTarget();
+                long target = first.action.getAddress();
+                if (target >= start && target < end) {
+                    continue;
+                }
+                // The initial jump cannot throw and leaves the protected range
+                // immediately. Its catch handler can never run. Keep all body
+                // actions, since the jump may enter them again from outside.
+                iterator.remove();
+                break;
             }
         }
     }

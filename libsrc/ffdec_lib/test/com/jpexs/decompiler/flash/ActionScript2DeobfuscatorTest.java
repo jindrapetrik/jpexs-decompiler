@@ -89,6 +89,49 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         return writer.toString().trim().replace("\r\n", "\n");
     }
 
+    @DataProvider(name = "immediatelyExitedTryHandlers")
+    public Object[][] immediatelyExitedTryHandlers() {
+        return new Object[][]{{"\"error\""}, {"register3"}};
+    }
+
+    @Test(dataProvider = "immediatelyExitedTryHandlers")
+    public void testTryInitialJumpLeavesRangeAndReentersBody(String handler) throws Exception {
+        String result = decompilePCode("Push \"before\"\nTrace\nTry " + handler + " {\n"
+                + "Jump relay\nrelay: Jump outside\n"
+                + "body: Push \"body\"\nTrace\nJump done\n}\nCatch {\n"
+                + "Push \"unreachable\"\nTrace\nJump done\n"
+                + "outside: Push \"outside\"\nTrace\nJump body\n}\n"
+                + "done: Push \"after\"\nTrace\n");
+        Assert.assertEquals(result, "trace(\"before\");\ntrace(\"outside\");\ntrace(\"body\");\ntrace(\"after\");");
+    }
+
+    @DataProvider(name = "protectedTryEntries")
+    public Object[][] protectedTryEntries() {
+        return new Object[][]{
+            {"Jump body\nbody: Push \"error\"\nThrow\n", "", false},
+            {"Push \"value\"\nTrace\nJump done\n", "", false},
+            {"Jump done\n", "Finally {\nPush \"finally\"\nTrace\n}\n", true},
+            {"again: Jump again\n", "", false}
+        };
+    }
+
+    @Test(dataProvider = "protectedTryEntries")
+    public void testTryHandlerIsKeptWhenEntryDoesNotImmediatelyEscape(String body, String finallyBody, boolean hasFinally) throws Exception {
+        String pcode = "Try \"error\" {\n" + body + "}\nCatch {\nPush \"caught\"\nTrace\nJump done\n}\n"
+                + finallyBody + "done: End\n";
+        List<Action> parsed = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        ActionList actions = new ActionList(parsed, swf.getCharset());
+        new ActionDeobfuscator().actionListParsed(actions, swf);
+        ActionTry kept = null;
+        for (Action action : actions) {
+            if (action instanceof ActionTry) {
+                kept = (ActionTry) action;
+            }
+        }
+        Assert.assertNotNull(kept, "The reachable exception handler must be preserved");
+        Assert.assertEquals(kept.finallyBlockFlag, hasFinally);
+    }
+
     @Test
     public void testFoldArrayLiteral() throws Exception {
         String res = decompilePCode("Push \"sample\"\n"
