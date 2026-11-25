@@ -50,6 +50,8 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.helpers.stat.StatisticData;
+import com.jpexs.helpers.stat.Statistics;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -58,6 +60,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -2735,6 +2738,51 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         } finally {
             Configuration.autoDeobfuscate.set(oldDeobfuscate);
         }
+    }
+
+    @DataProvider(name = "nestedFunctionDepths")
+    public Object[][] nestedFunctionDepths() {
+        return new Object[][]{{2, false}, {2, true}, {6, false}, {6, true}};
+    }
+
+    @Test(dataProvider = "nestedFunctionDepths")
+    public void testNestedFunctionPreparationDoesNotMultiplyConversions(int depth, boolean deobfuscate) throws Exception {
+        boolean oldStats = Configuration.showStat;
+        boolean oldDeobfuscate = Configuration.autoDeobfuscate.get();
+        Configuration.showStat = true;
+        Configuration.autoDeobfuscate.set(deobfuscate);
+        try {
+            String nested = "{value:17}";
+            for (int i = 0; i < depth; i++) {
+                nested = "{factory:function():Object { return " + nested + "; }}";
+            }
+            HashMap<String, StatisticData> before = new HashMap<>();
+            Statistics.addToMap(before);
+            String result = recompileSource("package { public class Test { public static function test():Object { return " + nested + "; } } }");
+            HashMap<String, StatisticData> after = new HashMap<>();
+            Statistics.addToMap(after);
+            int conversions = after.get("MethodBody.convert").count
+                    - (before.containsKey("MethodBody.convert") ? before.get("MethodBody.convert").count : 0);
+            assertTrue(conversions <= (depth + 2) * (depth + 2), "Too many method conversions: " + conversions);
+            assertEquals(result.split("function\\(\\):Object", -1).length - 1, depth, result);
+            assertTrue(result.contains("\"value\":17"), result);
+            Assert.assertFalse(result.contains("§§"), result);
+        } finally {
+            Configuration.showStat = oldStats;
+            Configuration.autoDeobfuscate.set(oldDeobfuscate);
+        }
+    }
+
+    @Test
+    public void testAnonymousFunctionPreparationKeepsLoopLabelsAndRecursion() throws Exception {
+        String result = recompileSource("package { public class Test { public static function test(check:Function):Function {"
+                + "var recurse:Function = function(n:int):int { return n <= 0 ? 0 : recurse(n - 1); };"
+                + "return function():int { outer:while(check()) { while(check()) { if(check()) { break outer; } } }"
+                + "return recurse(3); }; } } }");
+        assertTrue(result.contains("break loop"), result);
+        assertTrue(result.contains("return recurse(3);"), result);
+        assertTrue(result.contains("recurse(n - 1)"), result);
+        Assert.assertFalse(result.contains("§§"), result);
     }
 
     @Test
