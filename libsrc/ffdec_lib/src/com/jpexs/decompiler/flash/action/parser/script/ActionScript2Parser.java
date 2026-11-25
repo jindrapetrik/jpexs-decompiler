@@ -1548,11 +1548,6 @@ public class ActionScript2Parser {
                 ret = (traits(true, interfaceTypeStr, null, intExtendsTypeStrs, variables, functions, inTellTarget, hasEval));
                 expectedType(SymbolType.CURLY_CLOSE);
                 break;
-            case FUNCTION:
-                s = lex();
-                expectedIdentifier(s, lexer.yyline());
-                ret = (function(true, s.value.toString(), false, variables, functions, inTellTarget, hasEval));
-                break;
             case VAR:
                 s = lex();
                 expectedIdentifier(s, lexer.yyline());
