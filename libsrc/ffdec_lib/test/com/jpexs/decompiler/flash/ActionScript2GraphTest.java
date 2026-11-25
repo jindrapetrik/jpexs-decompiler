@@ -221,7 +221,12 @@ public class ActionScript2GraphTest {
     }
 
     private String decompilePcode(String pcode) throws Exception {
+        return decompilePcode(pcode, SWF.DEFAULT_VERSION);
+    }
+
+    private String decompilePcode(String pcode, int version) throws Exception {
         SWF swf = new SWF();
+        swf.version = version;
         List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
         return decompile(swf, new DoActionTag(swf), actions);
     }
@@ -385,6 +390,33 @@ public class ActionScript2GraphTest {
                 + "Pop\nPush true\nNot\nIf done\nGotoFrame 22\nPlay\ndone:\n");
         Assert.assertEquals(result, "ifFrameLoaded(23)\n{\n   gotoAndPlay(23);\n}");
         Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
+    @DataProvider(name = "frameLoadedLiteralValues")
+    public Object[][] frameLoadedLiteralValues() {
+        return new Object[][]{
+            {4, "\"0\"", "\"1\"", true},
+            {4, "0", "1", true},
+            {4, "\"0\"", "\"-2\"", true},
+            {5, "0", "1", true},
+            {5, "\"\"", "\"1\"", true},
+            {5, "\"0\"", "\"1\"", false},
+            {4, "\"0\"", "\"0\"", false},
+            {5, "0", "0", false}
+        };
+    }
+
+    @Test(dataProvider = "frameLoadedLiteralValues")
+    public void testFrameLoadedLiteralBranchRespectsSwfVersion(int version, String unloaded, String loaded, boolean fold) throws Exception {
+        String result = decompilePcode("Push " + unloaded + "\nWaitForFrame 22, 2\nPop\nPush " + loaded
+                + "\nNot\nIf done\nGotoFrame 22\nPlay\ndone:\n", version);
+        if (fold) {
+            Assert.assertEquals(result, "ifFrameLoaded(23)\n{\n   gotoAndPlay(23);\n}");
+            Assert.assertEquals(compileAndDecompile(result), result);
+        } else {
+            Assert.assertTrue(result.contains("§§"), result);
+            Assert.assertTrue(result.contains("gotoAndPlay(23)"), result);
+        }
     }
 
     @Test

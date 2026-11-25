@@ -60,6 +60,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
@@ -698,15 +699,30 @@ public class ActionGraph extends Graph {
         removeUnreachableGotosAfterTerminalControl(list);
     }
 
-    private boolean isBooleanLiteral(GraphTargetItem item, boolean value) {
-        return (value ? item instanceof TrueItem : item instanceof FalseItem)
-                || (item instanceof DirectValueActionItem
-                && Boolean.valueOf(value).equals(((DirectValueActionItem) item).value));
+    private boolean hasFrameLoadedBooleanValue(GraphTargetItem item, boolean value) {
+        if (item instanceof TrueItem || item instanceof FalseItem) {
+            return (item instanceof TrueItem) == value;
+        }
+        if (!(item instanceof DirectValueActionItem)) {
+            return false;
+        }
+        DirectValueActionItem literal = (DirectValueActionItem) item;
+        if (literal.isVariableComputed() || !(literal.value instanceof Boolean
+                || literal.value instanceof Number || literal.isString())) {
+            return false;
+        }
+        Object result = literal.getResult();
+        if (((ActionGraphSource) code).version <= 4) {
+            // SWF 4 uses numeric conditions, including the strings "0" and "1".
+            double number = EcmaScript.toNumberAs2(result);
+            return (!Double.isNaN(number) && number != 0) == value;
+        }
+        return EcmaScript.toBoolean(result) == value;
     }
 
     private void resolveFrameLoadedBooleanBranches(List<GraphTargetItem> list) {
         for (int i = 0; i + 2 < list.size(); i++) {
-            if (!(list.get(i) instanceof PushItem) || !isBooleanLiteral(list.get(i).value, false)
+            if (!(list.get(i) instanceof PushItem) || !hasFrameLoadedBooleanValue(list.get(i).value, false)
                     || !(list.get(i + 1) instanceof IfFrameLoadedActionItem)
                     || !(list.get(i + 2) instanceof IfItem)) {
                 continue;
@@ -724,7 +740,7 @@ public class ActionGraph extends Graph {
             if (!(loaded.getSrc() instanceof ActionStore) || ((ActionStore) loaded.getSrc()).getStoreSize() != 2
                     || body.size() != 2 || !(body.get(0) instanceof PopItem)
                     || ((PopItem) body.get(0)).resolvedValue != null
-                    || !isBooleanLiteral(body.get(1) instanceof PushItem ? body.get(1).value : body.get(1), true)
+                    || !hasFrameLoadedBooleanValue(body.get(1) instanceof PushItem ? body.get(1).value : body.get(1), true)
                     || !(condition instanceof PopItem) || ((PopItem) condition).resolvedValue != null
                     || (branch.onFalse != null && !branch.onFalse.isEmpty())) {
                 continue;
