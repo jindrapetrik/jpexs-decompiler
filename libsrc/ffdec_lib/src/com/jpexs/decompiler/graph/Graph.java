@@ -4419,6 +4419,16 @@ public class Graph {
     }
 
     /**
+     * Whether a command can precede the final value in a short-circuit comma expression.
+     *
+     * @param item Command
+     * @return True for an expression whose value may be discarded
+     */
+    private boolean isShortCircuitExpression(GraphTargetItem item) {
+        return !(item instanceof Block);
+    }
+
+    /**
      * Gets the right operand of a short-circuit branch which discards the left
      * operand and leaves a replacement value on the stack.
      *
@@ -4429,7 +4439,7 @@ public class Graph {
         int last = commands.size() - 1;
         if (last < 1 || !(commands.get(0) instanceof PopItem)
                 || !(commands.get(last) instanceof PushItem)
-                || !commands.subList(1, last).stream().allMatch(GraphTargetItem::hasReturnValue)) {
+                || !commands.subList(1, last).stream().allMatch(this::isShortCircuitExpression)) {
             return null;
         }
         GraphTargetItem rightSide = commands.get(last).value;

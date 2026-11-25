@@ -19,10 +19,14 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.action.ActionScriptObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.special.ActionUnknown;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionTrace;
+import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
+import com.jpexs.decompiler.flash.action.swf5.ActionSetMember;
+import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -142,7 +146,21 @@ public class ActionScript2GraphTest {
                 break;
             }
             local.jump = null;
-            Assert.assertTrue(action.execute(local), action.toString());
+            if (action instanceof ActionStoreRegister) {
+                // AVM1 StoreRegister copies the top value without popping it.
+                local.localRegisters.put(((ActionStoreRegister) action).registerNumber, local.stack.peek());
+            } else if (action instanceof ActionGetMember) {
+                String name = local.popAsString();
+                ActionScriptObject object = (ActionScriptObject) local.pop();
+                local.push(object.getOwnMembers().get(name));
+            } else if (action instanceof ActionSetMember) {
+                Object assignedValue = local.pop();
+                String name = local.popAsString();
+                ActionScriptObject object = (ActionScriptObject) local.pop();
+                object.setOwnMember(name, assignedValue);
+            } else {
+                Assert.assertTrue(action.execute(local), action.toString());
+            }
             ip = local.jump == null ? ip + 1 : Action.adr2ip(actions, local.jump);
         }
         Assert.assertTrue(local.stack.isEmpty(), "Comparison chain did not discard its saved value");
@@ -743,6 +761,96 @@ public class ActionScript2GraphTest {
                 + "Not\nIf done\nPush register0\nTrace\ndone: Push register0\nTrace\n";
     }
 
+    @Test
+    public void testCs6ShortCircuitCommaAssignment() throws Exception {
+        String pcode = "Push \"a\", 1\nDefineLocal\nPush \"b\", 2\nDefineLocal\n"
+                + "Push \"a\"\nGetVariable\nPush 1\nLess2\nNot\nPushDuplicate\nNot\nIf join\nPop\n"
+                + "Push \"b\", 3\nStoreRegister 0\nSetVariable\nPush register0\nPop\n"
+                + "Push \"a\"\nGetVariable\nPush 1\nEquals2\n"
+                + "join: Not\nIf done\nPush \"okay\"\nTrace\ndone:\n";
+        SWF swf = new SWF();
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions, 0);
+        Assert.assertEquals(result, "var a = 1;\nvar b = 2;\nif(a >= 1 && ((b = 3,a == 1)))\n{\n   trace(\"okay\");\n}");
+    }
+
+    @DataProvider(name = "shortCircuitCommaAssignments")
+    public Object[][] shortCircuitCommaAssignments() {
+        List<Object[]> paths = new ArrayList<>();
+        for (boolean and : new boolean[]{false, true}) {
+            for (boolean left : new boolean[]{false, true}) {
+                for (boolean right : new boolean[]{false, true}) {
+                    for (boolean member : new boolean[]{false, true}) {
+                        for (int deobfuscation : new int[]{0, 1}) {
+                            paths.add(new Object[]{and, left, right, member, deobfuscation});
+                        }
+                    }
+                }
+            }
+        }
+        return paths.toArray(new Object[paths.size()][]);
+    }
+
+    @DataProvider(name = "shortCircuitVoidCalls")
+    public Object[][] shortCircuitVoidCalls() {
+        return new Object[][]{{"Stop", "stop()"}, {"Play", "play()"}, {"Push \"marker\"\nTrace", "trace(\"marker\")"}};
+    }
+
+    private String shortCircuitCommaVoidCall(String instruction) {
+        return "Push \"a\", 1\nDefineLocal\nPush \"b\", 2\nDefineLocal\n"
+                + "Push \"a\"\nGetVariable\nPush 1\nLess2\nNot\nPushDuplicate\nNot\nIf join\nPop\n"
+                + "Push \"b\", 3\nStoreRegister 0\nSetVariable\nPush register0\nPop\n"
+                + instruction + "\nPush undefined, undefined\nPop\n"
+                + "Push \"a\"\nGetVariable\nPush 1\nEquals2\n"
+                + "join: Not\nIf done\nPush \"okay\"\nTrace\ndone:\n";
+    }
+
+    @Test(dataProvider = "shortCircuitVoidCalls")
+    public void testShortCircuitCommaWithVoidCallAndUnusedStackValue(String instruction, String call) throws Exception {
+        SWF swf = new SWF();
+        List<Action> actions = ASMParser.parse(0, true, shortCircuitCommaVoidCall(instruction), swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions, 0);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertTrue(result.contains("a >= 1 && ((b = 3," + call + ",undefined/*unpopped*/,undefined,a == 1))"), result);
+        Assert.assertEquals(result.split(Pattern.quote(call), -1).length - 1, 1, result);
+    }
+
+    @Test(dataProvider = "shortCircuitVoidCalls")
+    public void testShortCircuitCommaDoesNotDiscardStackValueReadLater(String instruction, String call) throws Exception {
+        SWF swf = new SWF();
+        List<Action> actions = ASMParser.parse(0, true, shortCircuitCommaVoidCall(instruction) + "Trace\n", swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), actions, 0);
+        Assert.assertTrue(result.contains("&&"), result);
+        Assert.assertTrue(result.contains("§§push(undefined)"), result);
+        Assert.assertTrue(result.contains("trace(§§pop())"), result);
+        Assert.assertFalse(result.contains("undefined/*unpopped*/"), result);
+    }
+
+    @Test(dataProvider = "shortCircuitCommaAssignments")
+    public void testShortCircuitCommaPreservesAssignmentsAndRegister(boolean and, boolean left, boolean right, boolean member, int deobfuscation) throws Exception {
+        String initialize = member ? "Push \"o\", \"b\", 2, 1\nInitObject\nSetVariable\n" : "Push \"b\", 2\nSetVariable\n";
+        String target = member ? "Push \"o\"\nGetVariable\nPush \"b\"\n" : "Push \"b\"\n";
+        String read = member ? "Push \"o\"\nGetVariable\nPush \"b\"\nGetMember\n" : "Push \"b\"\nGetVariable\n";
+        String pcode = "Push \"result\", 0\nSetVariable\nPush 2\nStoreRegister 0\nPop\n" + initialize
+                + "Push \"value\"\nGetVariable\nPushDuplicate\n" + (and ? "Not\n" : "") + "If join\nPop\n"
+                + target + "Push 3\nStoreRegister 0\n" + (member ? "SetMember\n" : "SetVariable\n")
+                + "Push register0\nPop\nPush \"y\"\nGetVariable\n"
+                + "join: Not\nIf done\nPush \"result\", 1\nSetVariable\n"
+                + "done: Push \"result\", \"result\"\nGetVariable\nPush 10\nMultiply\n"
+                + read + "Add2\nPush register0\nAdd2\nSetVariable\n";
+        SWF swf = new SWF();
+        List<Action> original = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        String result = decompile(swf, new DoActionTag(swf), original, deobfuscation);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertTrue(result.contains(and ? " && " : " || "), result);
+        List<Action> compiled = new ActionScript2Parser(swf, new DoActionTag(swf)).actionsFromString(result, Utf8Helper.charsetName);
+        boolean evaluatedRight = and ? left : !left;
+        boolean condition = and ? left && right : left || right;
+        double expected = (condition ? 10 : 0) + (evaluatedRight ? 6 : 4);
+        Assert.assertEquals(((Number) runComparisonAssignments(original, left, right)).doubleValue(), expected);
+        Assert.assertEquals(((Number) runComparisonAssignments(compiled, left, right)).doubleValue(), expected);
+    }
+
     @DataProvider(name = "savedShortCircuitOperands")
     public Object[][] savedShortCircuitOperands() {
         List<Object[]> values = new ArrayList<>();
@@ -797,10 +905,11 @@ public class ActionScript2GraphTest {
         } finally {
             Configuration.deobfuscateAs12RemoveGlobalDebugResolve.set(removeDebugResolve);
         }
-        Assert.assertTrue(result.contains("delete _global.__resolve;\n      var _temp_2 = undefined == pn.lockedIndex;\n"
-                + "      _global.__resolve = _global.__debugResolve;\n"
-                + "      §§push(_temp_2 || p.lockedIndex != pn.lockedIndex);"), result);
-        Assert.assertFalse(result.contains("§§push(undefined == pn.lockedIndex ||"), result);
+        // Folding into a comma expression must preserve the read between
+        // disabling the resolver and restoring it.
+        Assert.assertTrue(result.contains("delete _global.__resolve,_temp_2 = undefined == pn.lockedIndex,"
+                + "_global.__resolve = _global.__debugResolve,_temp_2 || p.lockedIndex != pn.lockedIndex"), result);
+        Assert.assertFalse(result.contains("undefined == pn.lockedIndex ||"), result);
     }
 
     @Test(dataProvider = "shortCircuitRegisterAssignments")
