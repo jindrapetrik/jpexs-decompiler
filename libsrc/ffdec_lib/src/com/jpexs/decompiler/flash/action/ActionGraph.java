@@ -1076,9 +1076,6 @@ public class ActionGraph extends Graph {
         }
         EnumerateActionItem enumerate = (EnumerateActionItem) list.get(index - 1);
         GraphTargetItem object = enumerate.object;
-        if (enumerate.getSrc() instanceof ActionEnumerate) {
-            object = new GetVariableActionItem(enumerate.getSrc(), enumerate.getLineStartItem(), object);
-        }
         List<GraphTargetItem> commands = new ArrayList<>(body.subList(4, body.size()));
         assignment.setValue(new DirectValueActionItem(Null.INSTANCE));
         // The extra stack copy and the empty drain belong to the enumeration

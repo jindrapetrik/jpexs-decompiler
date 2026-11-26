@@ -247,6 +247,32 @@ public class ActionScript2GraphTest {
         return decompile(swf, new DoActionTag(swf), actions);
     }
 
+    @DataProvider(name = "enumeratedObjects")
+    public Object[][] enumeratedObjects() {
+        return new Object[][]{
+            {"Push \"parent\"\nEnumerate\n", "parent"},
+            {"Push \"objectName\"\nGetVariable\nEnumerate\n", "eval(objectName)"},
+            {"Push \"parent\"\nGetVariable\nEnumerate2\n", "parent"},
+            {"Push \"parent\"\nEnumerate2\n", "\"parent\""}
+        };
+    }
+
+    @Test(dataProvider = "enumeratedObjects")
+    public void testForInResolvesOnlyEnumerateVariableNames(String enumeration, String object) throws Exception {
+        for (boolean namedKey : new boolean[]{false, true}) {
+            String pcode = enumeration + "nextKey: StoreRegister 0\nPush null\nEquals2\nIf done\n"
+                    + (namedKey ? "Push \"key\", register0\nDefineLocal\nPush \"key\"\nGetVariable\n" : "Push register0\n")
+                    + "Trace\nJump nextKey\ndone:\n";
+            for (int mode : new int[]{0, 1}) {
+                SWF swf = new SWF();
+                List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+                String result = decompile(swf, new DoActionTag(swf), actions, mode);
+                Assert.assertTrue(result.contains(" in " + object + ")"), result);
+                Assert.assertFalse(result.contains("§§"), result);
+            }
+        }
+    }
+
     @DataProvider(name = "conditionalSharedTailPaths")
     public Object[][] conditionalSharedTailPaths() {
         Object[][] paths = new Object[][]{{false, -1L}, {false, 0L}, {false, 1L}, {false, 2L},
