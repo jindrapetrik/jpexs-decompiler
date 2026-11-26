@@ -224,6 +224,22 @@ public class ActionScript2GraphTest {
         return decompilePcode(pcode, SWF.DEFAULT_VERSION);
     }
 
+    @Test
+    public void testForInSwitchCaseFallsThroughToSharedReturn() throws Exception {
+        String result = decompilePcode("DefineFunction \"sample\", 0 {\nPush register1\n"
+                + "Push \"kind\"\nGetVariable\nStoreRegister 0\nPush \"string\"\nStrictEquals\nIf emptyCase\n"
+                + "Push register0, \"object\"\nStrictEquals\nIf loopCase\n"
+                + "Push register0, \"function\"\nStrictEquals\nIf done\nJump done\n"
+                + "emptyCase: Jump done\nloopCase: Push \"obj\"\nGetVariable\nEnumerate2\n"
+                + "nextKey: StoreRegister 0\nPush null\nEquals2\nIf done\n"
+                + "Push \"key\", register0\nSetVariable\nPush \"key\"\nGetVariable\nTrace\nJump nextKey\n"
+                + "done: StoreRegister 1\nPop\n}\n");
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertTrue(result.contains("for(key in obj)"), result);
+        Assert.assertTrue(result.contains("trace(key);"), result);
+        Assert.assertEquals(compileAndDecompile(result), result);
+    }
+
     private String decompilePcode(String pcode, int version) throws Exception {
         SWF swf = new SWF();
         swf.version = version;

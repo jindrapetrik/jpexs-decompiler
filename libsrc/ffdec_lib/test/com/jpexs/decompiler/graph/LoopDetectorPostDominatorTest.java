@@ -202,6 +202,29 @@ public class LoopDetectorPostDominatorTest {
     }
 
     @Test
+    public void testSwitchFallthroughKeepsExitOfLoopInsideCase() throws InterruptedException {
+        GraphPart dispatch = new GraphPart(0, 0);
+        GraphPart emptyCase = new GraphPart(1, 1);
+        GraphPart loopCase = new GraphPart(2, 2);
+        GraphPart condition = new GraphPart(3, 3);
+        GraphPart body = new GraphPart(4, 4);
+        GraphPart done = new GraphPart(5, 5);
+        connect(dispatch, emptyCase, loopCase, done);
+        connect(emptyCase, done);
+        connect(loopCase, condition);
+        connect(condition, body, done);
+        connect(body, condition);
+        Set<GraphPart> parts = new LinkedHashSet<>(Arrays.asList(dispatch, emptyCase, loopCase, condition, body, done));
+        List<Loop> loops = new ArrayList<>();
+        new LoopDetector().detectLoops(Collections.singletonList(dispatch), loops, Collections.emptyList(),
+                parts, Collections.singletonList(Arrays.asList(emptyCase, loopCase, done)),
+                Collections.singletonList(done), true);
+        Assert.assertEquals(loops.size(), 1);
+        Assert.assertSame(loops.get(0).loopContinue, condition);
+        Assert.assertSame(loops.get(0).loopBreak, done);
+    }
+
+    @Test
     public void testAgainstOrderedSetAlgorithm() throws Exception {
         Method method = LoopDetector.class.getDeclaredMethod("findNearestCommonPostDominator",
                 Set.class, Set.class, Set.class, PrevNextWalker.class, Set.class, Set.class, Set.class);

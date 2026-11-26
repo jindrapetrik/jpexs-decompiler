@@ -128,6 +128,18 @@ public class LoopDetector {
                 }
                 GraphPart leadsToPrev = partLeadsToGetPrev(case1, case2, backEdges, pnw, orderedCases);
                 if (leadsToPrev != null) {
+                    boolean exitsLoop = false;
+                    for (Loop loop : loops) {
+                        if (loop.loopBody.contains(leadsToPrev) && !loop.loopBody.contains(case2)) {
+                            exitsLoop = true;
+                            break;
+                        }
+                    }
+                    if (exitsLoop) {
+                        // A case can reach the next case by finishing a nested
+                        // loop. This edge still defines that loop's exit.
+                        continue;
+                    }
                     Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "- leadsto, ignoring edge {0} => {1}", new Object[]{leadsToPrev, case2});
                     ignoredEdges.add(new GraphPartEdge(leadsToPrev, case2));
                 }
