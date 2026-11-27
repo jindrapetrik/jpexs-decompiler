@@ -84,8 +84,11 @@ foreach (array_keys($changelog_types) as $type) {
 $has_breaking_change = false;
 
 foreach ($messages as $message) {
-    $first_line = $message[0];
-
+    $first_line = trim($message[0]);
+    
+    if (array_key_exists($first_line, $changelog_replacements)) {
+        $first_line = $changelog_replacements[$first_line];
+    }
 
     if (preg_match('/^(?<type>feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\((?<scope>.+)\))?(?<breaking>!)?: (?<desc>.+)$/', $first_line, $matches)) {
         $type = $matches["type"];
@@ -100,11 +103,7 @@ foreach ($messages as $message) {
         if ($scope !== "") {
             $desc = $scope . ": " . $desc;
         }
-        
-        if (array_key_exists($desc, $changelog_replacements)) {
-            $desc = $changelog_replacements[$desc];
-        }
-
+                        
         if (array_key_exists($type, $changelog_types)) {
             $changelog[$type][] = $desc;
         }
