@@ -175,6 +175,8 @@ For EXE launchers we use [Launch5j] - MIT.
 ## Library
 See [library README](libsrc/ffdec_lib/README.md) for more info about FFDec library.
 
+TEST
+
 [GIT]: http://git-scm.com/downloads
 [Netbeans IDE]: http://www.netbeans.org/
 [Apache Ant]: http://ant.apache.org/
