@@ -1,6 +1,125 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [26.6.0] - 2026-11-27
+### Features
+- ai studio - experimental ([PR303])
+- as1/2: add deobfuscation option - remove _global.__debugResolve assignments ([#2486])
+- as3: ignore invalid exception target - use comment instead ([#2486])
+
+### Bug Fixes
+- simple editor: fix masking panel always visible
+- handle variables like _parent, _root, etc. as simple values ([#2486])
+- show decompiled path on invalid property index ([#2486])
+- as1/2: fix setvariable visit method ([#2486])
+- as1/2: share temporary index counter ([#2486])
+- as1/2: do not use temporaries for simple values ([#2486])
+- as: use previous output for getting pushes ([#2486])
+- as: fix promoting pushes ([#2486])
+- as: fix visit/visitNoBlock method ([#2486])
+- as1/2: fix deobfuscation of initarray, initobject ([#2486])
+- as: avoid stackoverflow on code with gotos ([#2486])
+- as3: fix deobfuscation problems caused by dups ([#2486])
+- as: fix loop detector in some cases ([#2486])
+- as: promote push in ternar etc. ([#2486])
+- as3: do not parse dependencies in immediately popped func ([#2486])
+- as3: handle findproperty as simple value ([#2486])
+- do not show raw edit as linked asset preview for font4
+- as3: fix try..finally detection with jumps ([#2486])
+- as3: fix XML literal lexer ([#2486])
+- as3: fix indexOutOfBounds in static initializer ([#2486])
+- as3: fix obfuscated names with hash sign ([#2486])
+- as1/2: fix obfuscated with ([#2486])
+- as3 editor: maintain order of metadata values
+- as3 editor: fix duplication of SWF metadata ([#2786])
+- as1/2: fix obfuscation of definefunction/2, try ([#2486])
+- close file properly on invalid swf signature
+- as3: fix increment/decrement in some cases ([#2786])
+- as3: fix increment/decrement in some cases ([#2786])
+- xfl: use a JDK-independent Bezier area ([#2785])
+- xfl: keep fill contours open during the area sweep ([#2785])
+- fla export: fix rounding and missing fills ([#2785])
+- as1/2: fix for..in detection ([#2486])
+- as3: fix decrement/increment ([#2486])
+- fla export: fix stroke scaling on small shapes ([#2788])
+- as3: fix try..finally ([#2486])
+- as3: fix try..finally ([#2486])
+- as3: fix gotos ([#2486])
+- as1/2: fix restoring registers in definefunction ([#2486])
+- as: fix if..else using dup ([#2486])
+- as: fix and/or conditions ([#2486])
+- as2: fix interface detection ([#2486])
+- allow nameCharacter without type field ([#2486])
+- allow missing latencySeek in soundStreamHead ([#2486])
+- as1/2: fold single usage registers ([#2486])
+- as1/2: fix for..in detection ([#2486])
+- as1/2: fix cached comparison ([#2486])
+- as: fix push/pop over ternar ([#2486])
+- fix improper escaping of quotes in text editation ([#2790])
+- as3: deobfuscate switches ([#2486])
+- as1/2: fix unfolding temp variables ([#2486])
+- fix always-break with return ([#2486])
+- fix synchronization of number to string conversion ([#2486])
+- as: fix increment/decrement ([#2486])
+- as3: change recursive methods from §§ to comment + undefined ([#2486])
+- as: fix do..while with and/or condition ([#2486])
+- as3: fix try..finally ([#2486])
+- as1/2: fix loops vs functions ([#2486])
+- as3: fix for..in vs precontinue ([#2486])
+- as3: fix gotos around switch ([#2486])
+- as: fix deobfuscation with loops ([#2486])
+- pass errors while opening swfs while playing ([#2486])
+- as3: fix deobfuscation - conversion to boolean ([#2486])
+- as3: fix and/or with assignment ([#2486])
+- as1/2: fix loops on function exit ([#2486])
+- as1/2: promote unpopped items before class ([#2486])
+- as1/2: fix ifFrameLoaded handling and offset ([#2486])
+- as1/2: respect function end on overlapping actions ([#2486])
+- as1/2: fix set target comparison ([#2486])
+- as3: fix try..catch overlapping ([#2486])
+- as2: fix variable initializers in classes ([#2486])
+- as3: fix switch gotos ([#2486])
+- as3: fix switch true with and/or cases ([#2486])
+- as3: fix post increment/decrement ([#2486])
+- as3: fix obfuscated loops becoming gotos ([#2486])
+- as3: fix try in finally block ([#2486])
+- as1/2: deobfuscate catch name ([#2486])
+- as: fix loop detector - switches ([#2486])
+- as3: fix switch in catch clause and using catch var ([#2486])
+- as1/2: fix resolving obfuscated constant pool ([#2486])
+- as1/2: avoid recursive function decoding ([#2486])
+- as3: fix switch with same return void branches ([#2486])
+- as3: fix deobfuscator ([#2486])
+- as: remove continuation after exit instruction ([#2486])
+- as: fix loops using and/or ([#2486])
+- as3 editor: fix xml attributes access like .@[param]
+- as3: prefer file-private namespace definition
+- as3: add file-private namespace when the definition is missing ([#2486])
+- fix goto handling for shared conditional tails ([#2486])
+- show proper error message on truncated shape ([#2486])
+- as3: fix slot increment/decrement ([#2486])
+- as3: fix for each in detection ([#2486])
+- as3: fix with statement boundaries ([#2486])
+- as1/2 editor: allow unnamed functions ([#2791])
+- as: fix and/or detection ([#2486])
+- as1/2: detect frame loading checks using numeric and string literals ([#2486])
+- as1/2: handle jumps escaping try blocks during deobfuscation ([#2486])
+- as: preserve loop exits shared with switch case fallthroughs ([#2486])
+- as1/2: resolve variable names in enumerate loops ([#2486])
+- as3: fix vars of type Function ([#2792])
+- as3: do not write the variable of a catch with its package ([PR319])
+- as3: do not write the variable of a catch with its package ([PR319])
+- as: structure shared loop exits and terminal branches without gotos ([#2486])
+
+### Performance Improvements
+- as1/2: optimize deobfuscation reachability ([#2486])
+- optimize utf8-helper getBytes on invalid bytes ([#2486])
+- as1/2: optimize deobfuscation ([#2486])
+- as3: optimize jump offset modification while deobfuscating ([#2486])
+- as3: optimize switch handling ([#2486])
+- as3: avoid redundant preparation passes for nested functions ([#2486])
+- as: optimize decompilation of large switches
+
 ## [26.5.0] - 2026-11-14
 ### Features
 - mxml export ([#763])
@@ -4367,6 +4486,7 @@ Major version of SWF to XML export changed to 2.
 ### Added
 - Initial public release
 
+[26.6.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.5.0...version26.6.0
 [26.5.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.4.0...version26.5.0
 [26.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.3.0...version26.4.0
 [26.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version26.2.1...version26.3.0
@@ -4553,6 +4673,13 @@ Major version of SWF to XML export changed to 2.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2486]: https://www.free-decompiler.com/flash/issues/2486
+[#2786]: https://www.free-decompiler.com/flash/issues/2786
+[#2785]: https://www.free-decompiler.com/flash/issues/2785
+[#2788]: https://www.free-decompiler.com/flash/issues/2788
+[#2790]: https://www.free-decompiler.com/flash/issues/2790
+[#2791]: https://www.free-decompiler.com/flash/issues/2791
+[#2792]: https://www.free-decompiler.com/flash/issues/2792
 [#763]: https://www.free-decompiler.com/flash/issues/763
 [#2770]: https://www.free-decompiler.com/flash/issues/2770
 [#2777]: https://www.free-decompiler.com/flash/issues/2777
@@ -4742,7 +4869,6 @@ Major version of SWF to XML export changed to 2.
 [#2338]: https://www.free-decompiler.com/flash/issues/2338
 [#1277]: https://www.free-decompiler.com/flash/issues/1277
 [#2483]: https://www.free-decompiler.com/flash/issues/2483
-[#2486]: https://www.free-decompiler.com/flash/issues/2486
 [#2493]: https://www.free-decompiler.com/flash/issues/2493
 [#1295]: https://www.free-decompiler.com/flash/issues/1295
 [#116]: https://www.free-decompiler.com/flash/issues/116
@@ -5945,6 +6071,8 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR303]: https://github.com/jindrapetrik/jpexs-decompiler/pull/303
+[PR319]: https://github.com/jindrapetrik/jpexs-decompiler/pull/319
 [PR299]: https://github.com/jindrapetrik/jpexs-decompiler/pull/299
 [PR309]: https://github.com/jindrapetrik/jpexs-decompiler/pull/309
 [PR297]: https://github.com/jindrapetrik/jpexs-decompiler/pull/297
