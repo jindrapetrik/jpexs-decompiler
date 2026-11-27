@@ -128,18 +128,6 @@ public class LoopDetector {
                 }
                 GraphPart leadsToPrev = partLeadsToGetPrev(case1, case2, backEdges, pnw, orderedCases);
                 if (leadsToPrev != null) {
-                    boolean exitsLoop = false;
-                    for (Loop loop : loops) {
-                        if (loop.loopBody.contains(leadsToPrev) && !loop.loopBody.contains(case2)) {
-                            exitsLoop = true;
-                            break;
-                        }
-                    }
-                    if (exitsLoop) {
-                        // A case can reach the next case by finishing a nested
-                        // loop. This edge still defines that loop's exit.
-                        continue;
-                    }
                     Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "- leadsto, ignoring edge {0} => {1}", new Object[]{leadsToPrev, case2});
                     ignoredEdges.add(new GraphPartEdge(leadsToPrev, case2));
                 }
@@ -152,6 +140,12 @@ public class LoopDetector {
                 Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "ignoring edge {0}->{1} detected", new Object[]{part.refs.get(r), part});
                 ignoredEdges.add(new GraphPartEdge(prev.get(r), part));
             }
+        }
+
+        // Both fallthroughs and grouped case labels can hide an edge which
+        // also exits a loop. Such edges must participate in exit selection.
+        for (Loop loop : loops) {
+            ignoredEdges.removeIf(edge -> loop.loopBody.contains(edge.from) && !loop.loopBody.contains(edge.to));
         }
 
         new GraphPrecontinueDetector().detectPrecontinues(heads, allParts, loops, throwStates);
@@ -771,14 +765,9 @@ public class LoopDetector {
                         return -1;
                     }
 
-                    boolean mb1 = o1.numBranches > 1;
-                    boolean mb2 = o2.numBranches > 1;
-
-                    if (mb1 != mb2) {
-                        if (mb1) {
-                            return -1;
-                        }
-                        return 1;
+                    int branches = Integer.compare(o2.numBranches, o1.numBranches);
+                    if (branches != 0) {
+                        return branches;
                     }
 
                     if (op1 != op2) {

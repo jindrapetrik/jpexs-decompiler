@@ -225,6 +225,57 @@ public class LoopDetectorPostDominatorTest {
     }
 
     @Test
+    public void testGroupedSwitchCasesKeepEveryLoopExit() throws InterruptedException {
+        GraphPart entry = new GraphPart(0, 0);
+        GraphPart dispatch = new GraphPart(1, 1);
+        GraphPart firstExit = new GraphPart(2, 2);
+        GraphPart body = new GraphPart(3, 3);
+        GraphPart lastExit = new GraphPart(4, 4);
+        GraphPart done = new GraphPart(5, 5);
+        connect(entry, dispatch);
+        connect(dispatch, firstExit, firstExit, body, body, lastExit);
+        connect(body, dispatch);
+        connect(firstExit, done);
+        connect(lastExit, done);
+        Set<GraphPart> parts = new LinkedHashSet<>(Arrays.asList(entry, dispatch, firstExit, body, lastExit, done));
+        List<Loop> loops = new ArrayList<>();
+        new LoopDetector().detectLoops(Collections.singletonList(entry), loops, Collections.emptyList(), parts,
+                Collections.singletonList(Arrays.asList(firstExit, firstExit, body, body, lastExit)),
+                Collections.singletonList(done), true);
+        Assert.assertEquals(loops.size(), 1);
+        Assert.assertSame(loops.get(0).loopBreak, done);
+    }
+
+    @Test
+    public void testLoopExitFallbackPrefersTailSharedByMorePaths() throws InterruptedException {
+        GraphPart condition = new GraphPart(0, 0);
+        GraphPart firstCheck = new GraphPart(1, 1);
+        GraphPart secondCheck = new GraphPart(2, 2);
+        GraphPart body = new GraphPart(3, 3);
+        GraphPart prefix = new GraphPart(4, 4);
+        GraphPart alternate = new GraphPart(5, 5);
+        GraphPart shared = new GraphPart(6, 6);
+        GraphPart otherFirst = new GraphPart(7, 7);
+        GraphPart otherSecond = new GraphPart(8, 8);
+        GraphPart otherShared = new GraphPart(9, 9);
+        connect(condition, firstCheck, secondCheck, alternate, shared, otherFirst, otherSecond);
+        connect(firstCheck, body, prefix);
+        connect(secondCheck, body, prefix);
+        connect(body, condition);
+        connect(prefix, shared);
+        connect(alternate, shared);
+        connect(otherFirst, otherShared);
+        connect(otherSecond, otherShared);
+        Set<GraphPart> parts = new LinkedHashSet<>(Arrays.asList(condition, firstCheck, secondCheck, body,
+                prefix, alternate, shared, otherFirst, otherSecond, otherShared));
+        List<Loop> loops = new ArrayList<>();
+        new LoopDetector().detectLoops(Collections.singletonList(condition), loops, Collections.emptyList(), parts,
+                Collections.emptyList(), Collections.emptyList(), true);
+        Assert.assertEquals(loops.size(), 1);
+        Assert.assertSame(loops.get(0).loopBreak, shared);
+    }
+
+    @Test
     public void testAgainstOrderedSetAlgorithm() throws Exception {
         Method method = LoopDetector.class.getDeclaredMethod("findNearestCommonPostDominator",
                 Set.class, Set.class, Set.class, PrevNextWalker.class, Set.class, Set.class, Set.class);

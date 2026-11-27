@@ -5121,6 +5121,32 @@ public class Graph {
                         boolean isEmpty = nps.get(0) == nps.get(1);
 
                         GraphPart next = getCommonPart(localData, part, nps, loops, throwStates);
+                        GraphPart sharedExit = null;
+                        if (next != null && localData.secondPassData != null
+                                && !localData.secondPassData.gotoTargetIps.isEmpty()
+                                && !localData.secondPassData.gotoTargetIps.contains(next.start)
+                                && isTerminalExitPart(localData, next, throwStates)) {
+                            for (GraphPart candidate : allParts) {
+                                if (!localData.secondPassData.gotoTargetIps.contains(candidate.start)
+                                        || !isTerminalExitPart(localData, candidate, throwStates)) {
+                                    continue;
+                                }
+                                boolean common = true;
+                                for (GraphPart branch : nps) {
+                                    if (branch != candidate && !branch.leadsTo(localData, this, code, candidate, loops, throwStates, false)) {
+                                        common = false;
+                                        break;
+                                    }
+                                }
+                                if (common) {
+                                    if (sharedExit != null) {
+                                        sharedExit = null;
+                                        break;
+                                    }
+                                    sharedExit = candidate;
+                                }
+                            }
+                        }
 
                         /*
                         Detect forward jumps (breaks) in always-break loops.                                                
@@ -5192,6 +5218,12 @@ public class Graph {
                                                     // A return/uncaught throw has no common continuation.
                                                     // Keep that exit inside the block and break to the shared tail.
                                                     n2 = next;
+                                                }
+                                                if (n2 == null && sharedExit != null && !ig.contains(sharedExit)
+                                                        && n.leadsTo(localData, this, code, sharedExit, loops, throwStates, true)) {
+                                                    // Leave the other terminal exit inside the block,
+                                                    // and break to the return shared by these branches.
+                                                    n2 = sharedExit;
                                                 }
                                                 if (n2 != null && n2.start < code.size()) {
                                                     //System.err.println("Found block: start = " + part + ", break = " + n2 + ", exit = " + r);

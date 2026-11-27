@@ -2153,6 +2153,50 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         return new Object[][]{{false}, {true}};
     }
 
+    @Test
+    public void testGroupedSwitchCasesBreakOuterLoopAtSharedReturn() throws Exception {
+        decompilePCodeWithLines("pushbyte 0\nsetlocal2\njump dispatch\n"
+                + "first: inclocal_i 2\njump done\n"
+                + "step: declocal_i 1\njump dispatch\n"
+                + "fallback: jump done\n"
+                + "dispatch: getlocal1\nlookupswitch fallback, [first, first, step, step]\n"
+                + "done: getlocal2\nreturnvalue\n",
+                "         var _loc2_:int = 0;\n"
+                + "         loop0:\n         while(true)\n         {\n"
+                + "            switch(param1)\n            {\n"
+                + "               case 0:\n               case 1:\n"
+                + "                  _loc2_++;\n                  break loop0;\n"
+                + "               case 2:\n               case 3:\n                  break;\n"
+                + "               default:\n                  break loop0;\n"
+                + "            }\n            param1--;\n         }\n         return _loc2_;\n");
+    }
+
+    @Test
+    public void testSharedTerminalReturnUsesSinglePassBlock() throws Exception {
+        decompilePCodeWithLines("getlocal1\npushbyte 10\nifnle second\n"
+                + "getlocal1\npushbyte 1\nsubtract\nconvert_i\nsetlocal1\n"
+                + "pushbyte 0\ngetlocal1\nifnle firstFailure\njump success\n"
+                + "firstFailure: jump failure\nsecond: getlocal1\npushbyte 20\nifnle third\n"
+                + "pushbyte 12\ngetlocal1\nifnle secondFailure\n"
+                + "getlocal1\npushbyte 5\nsubtract\nconvert_i\nsetlocal1\njump success\n"
+                + "secondFailure: jump failure\nthird: getlocal1\npushbyte 30\nifnle failure\n"
+                + "pushbyte 22\ngetlocal1\nifnle failure\n"
+                + "getlocal1\npushbyte 15\nsubtract\nconvert_i\nsetlocal1\njump success\n"
+                + "failure: pushbyte -1\nreturnvalue\n"
+                + "success: pushbyte 4\ngetlocal1\nadd\nreturnvalue\n",
+                "         while(true)\n         {\n"
+                + "            if(param1 <= 10)\n            {\n"
+                + "               param1 -= 1;\n               if(0 <= param1)\n               {\n"
+                + "                  break;\n               }\n            }\n"
+                + "            else if(param1 <= 20)\n            {\n"
+                + "               if(12 <= param1)\n               {\n"
+                + "                  param1 -= 5;\n                  break;\n               }\n            }\n"
+                + "            else if(param1 <= 30)\n            {\n"
+                + "               if(22 <= param1)\n               {\n"
+                + "                  param1 -= 15;\n                  break;\n               }\n            }\n"
+                + "            return -1;\n         }\n         return 4 + param1;\n");
+    }
+
     @Test(dataProvider = "largeStringSwitchModes", timeOut = 30000)
     public void testLargeStringSwitchKeepsEveryMappingAndDefaultPosition(boolean deobfuscate) throws Exception {
         assertLargeStringSwitch(deobfuscate, 512);
