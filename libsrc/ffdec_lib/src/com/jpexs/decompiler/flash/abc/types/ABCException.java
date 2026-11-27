@@ -132,7 +132,9 @@ public class ABCException implements Serializable, Cloneable {
         if (name_index == 0) {
             return DEFAULT_EXCEPTION_NAME;
         }
-        return constants.getMultiname(name_index).getName(usedDeobfuscations, abc, constants, fullyQualifiedNames, false, true);
+        //The variable of a catch is a local name: it is never written with its package, even when
+        //a definition of the script has its name and makes that name a fully qualified one
+        return constants.getMultiname(name_index).getName(usedDeobfuscations, abc, constants, null, false, true);
     }
 
     /**
