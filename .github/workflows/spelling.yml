@@ -62,7 +62,7 @@ on:
       - "**"
     tags-ignore:
       - "**"
-  pull_request:
+  pull_request_target:
     branches:
       - "**"
     types:
