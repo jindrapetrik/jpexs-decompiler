@@ -5,6 +5,11 @@
  * and increases version number.
  */
 
+
+$changelog_replacements = [
+    "feat: ai studio" => "feat: ai studio - experimental (PR303)"
+];
+
 function print_usage()
 {
    fwrite(STDERR,
@@ -94,6 +99,10 @@ foreach ($messages as $message) {
 
         if ($scope !== "") {
             $desc = $scope . ": " . $desc;
+        }
+        
+        if (array_key_exists($desc, $changelog_replacements)) {
+            $desc = $changelog_replacements[$desc];
         }
 
         if (array_key_exists($type, $changelog_types)) {
