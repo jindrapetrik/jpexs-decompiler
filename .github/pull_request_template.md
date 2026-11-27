@@ -1,3 +1,4 @@
+--------------------------------------
  1) IMPORTANT: Please DO NOT use Pull requests for requesting new features and or reporting bugs!!!
  Use Issue tracker for it https://www.free-decompiler.com/flash/issues/ instead!
 
@@ -8,3 +9,4 @@
 do NOT pull directly to `master`
 
 3) Delete this text and write appropriate pull request description
+--------------------------------------
