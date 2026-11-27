@@ -856,12 +856,6 @@ public class ActionScript2SimpleParser implements SimpleParser {
                     ret = true;
                 }
                 break;
-            case FUNCTION:
-                s = lexer.lex();
-                if (expectedIdentifier(errors, s, lexer.yyline())) {
-                    variables.add(function(errors, true, new Path(s.value.toString()), s.position, false, variables, inTellTarget, hasEval, false));
-                }
-                break;
             case VAR:
                 s = lex();
                 if (expectedIdentifier(errors, s, lexer.yyline())) {

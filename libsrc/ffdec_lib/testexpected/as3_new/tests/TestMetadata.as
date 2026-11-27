@@ -1,6 +1,6 @@
 package tests
 {
-   [MyClassTag(cls2="class 2",cls1="class 1")]
+   [MyClassTag(cls1="class 1",cls2="class 2")]
    public class TestMetadata
    {
       
@@ -22,7 +22,7 @@ package tests
          end ; body
       end ; method
       
-      [MyVarTag(var2="var 2",var1="var 1")]
+      [MyVarTag(var1="var 1",var2="var 2")]
       public var v:int = 5;
       
       [MyConstTag]

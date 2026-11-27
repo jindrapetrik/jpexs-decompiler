@@ -35,6 +35,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -278,6 +279,20 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
      */
     public GraphTargetItem getStoreValue() {
         return assignedValue;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        if (type != null) {
+            visitor.visit(type);
+        }
+        if (subtypes != null) {
+            visitor.visitAll(subtypes);
+        }
+        if (resolved != null) {
+            visitor.visit(resolved);
+        }
+        super.visit(visitor);
     }
 
     @Override

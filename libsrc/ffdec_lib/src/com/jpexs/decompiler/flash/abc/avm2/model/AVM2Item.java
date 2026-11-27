@@ -314,7 +314,7 @@ public abstract class AVM2Item extends GraphTargetItem {
             if (multinameIndex >= 0  && multinameIndex < localData.constantsAvm2.getMultinameCount()) {
                 Reference<DottedChain> customNsRef = new Reference<>(null);
                 isAttribute = localData.constantsAvm2.getMultiname(multinameIndex).isAttribute();
-                localName = localData.constantsAvm2.getMultiname(multinameIndex).getNameAndCustomNamespace(new HashSet<>(), localData.abc, new ArrayList<>(), true, true, customNsRef);
+                localName = localData.constantsAvm2.getMultiname(multinameIndex).getNameAndCustomNamespace(new HashSet<>(), localData.abc, new ArrayList<>(), true, true, customNsRef, localData.scriptIndex);
                 namespaceSuffix = localData.constantsAvm2.getMultiname(multinameIndex).getNamespaceSuffix();
                 
                 if ("*".equals(localName)) {
@@ -372,6 +372,19 @@ public abstract class AVM2Item extends GraphTargetItem {
             propertyName.toString(writer, localData);
             return writer.append("]");
         }
+    }
+
+    protected static String getLexicalPackagePropertyName(Multiname name, LocalData localData) {
+        DottedChain packageProperty = localData.abcIndex == null ? null
+                : localData.abcIndex.findLexicalPackageProperty(localData.abc, localData.scriptIndex, name);
+        if (packageProperty == null) {
+            return null;
+        }
+        if (localData.fullyQualifiedNames != null
+                && localData.fullyQualifiedNames.contains(DottedChain.parseWithSuffix(packageProperty.getLast()))) {
+            return packageProperty.toPrintableString(localData.usedDeobfuscations, localData.abc.getSwf(), true);
+        }
+        return name.getName(localData.usedDeobfuscations, localData.abc, localData.constantsAvm2, null, false, true);
     }
 
     /**

@@ -74,6 +74,15 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
     }
 
     /**
+     * Includes parts whose pending stack values contribute to this output.
+     *
+     * @param source List with the pending parts
+     */
+    public void startParts(GraphPartMarkedArrayList<?> source) {
+        currentParts.addAll(source.currentParts);
+    }
+
+    /**
      * Clears current parts.
      */
     public void clearCurrentParts() {

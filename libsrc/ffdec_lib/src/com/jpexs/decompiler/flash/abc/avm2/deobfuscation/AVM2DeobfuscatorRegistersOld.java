@@ -180,6 +180,12 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
             listedLastBodies.add(bodybefore);
         }
 
+        if (!listedRegs.isEmpty()) {
+            // Inlining a later register can make earlier branches constant.
+            // Revisit them after all substitutions and speculative rollbacks,
+            // without limiting evaluation to the current register's uses.
+            super.avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
+        }
         body.getCode().removeDeadCode(body);
 
         originalBody.exceptions = body.exceptions;

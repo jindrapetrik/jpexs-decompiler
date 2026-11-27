@@ -74,6 +74,9 @@ public class GetDescendantsAVM2Item extends AVM2Item {
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visit(object);
+        if (multiname != null) {
+            visitor.visit(multiname);
+        }
     }
 
     /**

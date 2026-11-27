@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
@@ -34,9 +35,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import static org.testng.Assert.*;
+import org.testng.annotations.BeforeClass;
 
 public class XflStaticShapeExportTest {
 
+    @BeforeClass
+    public void init() {
+        Configuration.useFoldersInFlaExport.set(false);
+    }
+    
     @DataProvider(name = "placement")
     public Object[][] placement() {
         String[] coat = {"#d90000", "#8c0000", "#bf0000", "#cc0000", "#aa0000", "#f0f0f0", "#e58508"};

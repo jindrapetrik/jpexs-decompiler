@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.as2;
 import com.jpexs.decompiler.flash.action.ActionGraphTargetDialect;
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
+import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.ExtendsActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
@@ -42,11 +43,14 @@ import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
+import com.jpexs.decompiler.graph.model.SetTemporaryItem;
+import com.jpexs.decompiler.graph.model.TemporaryItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
@@ -320,6 +324,129 @@ public class ActionScript2ClassDetector {
         return mnDv.getAsString();
     }
 
+    // A wrapper must not change register access, arguments, or dynamic name
+    // resolution. Collect literal names to avoid shadowing them with its local.
+    private boolean canMoveInitializerExpression(GraphTargetItem expression, Set<String> names) {
+        Reference<Boolean> valid = new Reference<>(true);
+        AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem item) {
+                if (item instanceof HasTempIndex || item instanceof TemporaryRegister || item instanceof FunctionActionItem
+                        || item instanceof StoreRegisterActionItem) {
+                    valid.setVal(false);
+                    return false;
+                }
+                if (item instanceof DirectValueActionItem) {
+                    DirectValueActionItem value = (DirectValueActionItem) item;
+                    if (value.value instanceof RegisterNumber) {
+                        valid.setVal(false);
+                    }
+                    if (value.isString()) {
+                        names.add(value.getAsString());
+                    }
+                }
+                if (item instanceof GetVariableActionItem) {
+                    GraphTargetItem name = ((GetVariableActionItem) item).name;
+                    if (!(name instanceof DirectValueActionItem) || !((DirectValueActionItem) name).isString()
+                            || "arguments".equals(((DirectValueActionItem) name).getAsString())
+                            || "super".equals(((DirectValueActionItem) name).getAsString())) {
+                        valid.setVal(false);
+                    }
+                }
+                if (item instanceof CallFunctionActionItem) {
+                    GraphTargetItem name = ((CallFunctionActionItem) item).functionName;
+                    if (!(name instanceof DirectValueActionItem) || !((DirectValueActionItem) name).isString()
+                            || "eval".equals(((DirectValueActionItem) name).getAsString())) {
+                        valid.setVal(false);
+                    }
+                }
+                return true;
+            }
+        };
+        if (visitor.visit(expression)) {
+            expression.visitRecursively(visitor);
+        }
+        return valid.getVal();
+    }
+
+    /**
+     * Combines a saved class receiver, setup calls, a saved field value, and
+     * cleanup calls into one initializer, without modifying the input commands.
+     */
+    private MyEntry<Integer, SetMemberActionItem> getSequencedStaticInitializer(List<GraphTargetItem> parts, int start, int classReg) {
+        SetTemporaryItem receiver = (SetTemporaryItem) parts.get(start);
+        if (!(receiver.value instanceof TemporaryRegister) || ((TemporaryRegister) receiver.value).getRegId() != classReg) {
+            return null;
+        }
+        List<GraphTargetItem> initializer = new ArrayList<>();
+        SetTemporaryItem saved = null;
+        Set<String> names = new HashSet<>();
+        for (int i = start + 1; i < parts.size(); i++) {
+            GraphTargetItem item = parts.get(i);
+            if (item instanceof SetTemporaryItem && saved == null) {
+                saved = (SetTemporaryItem) item;
+                if (!canMoveInitializerExpression(saved.value, names)) {
+                    return null;
+                }
+                initializer.add(saved);
+            } else if (item instanceof CallFunctionActionItem && canMoveInitializerExpression(item, names)) {
+                initializer.add(item);
+            } else if (item instanceof SetMemberActionItem && saved != null) {
+                SetMemberActionItem member = (SetMemberActionItem) item;
+                if (!(member.object instanceof TemporaryItem) || ((TemporaryItem) member.object).tempIndex != receiver.tempIndex
+                        || member.value != saved.value || member.getCompoundOperator() != null
+                        || !(member.objectName instanceof DirectValueActionItem) || !((DirectValueActionItem) member.objectName).isString()) {
+                    return null;
+                }
+                // Do not move shared temporary bindings into a new function.
+                for (int j = i + 1; j < parts.size(); j++) {
+                    Reference<Boolean> shared = new Reference<>(false);
+                    final int valueIndex = saved.tempIndex;
+                    AbstractGraphTargetVisitor visitor = new AbstractGraphTargetVisitor() {
+                        @Override
+                        public boolean visit(GraphTargetItem child) {
+                            if (child instanceof FunctionActionItem) {
+                                return false;
+                            }
+                            if (child instanceof HasTempIndex && (((HasTempIndex) child).getTempIndex() == valueIndex
+                                    || ((HasTempIndex) child).getTempIndex() == receiver.tempIndex)) {
+                                shared.setVal(true);
+                                return false;
+                            }
+                            return true;
+                        }
+                    };
+                    if (visitor.visit(parts.get(j))) {
+                        parts.get(j).visitRecursively(visitor);
+                    }
+                    if (shared.getVal()) {
+                        return null;
+                    }
+                }
+                String name = "_temp_" + saved.tempIndex;
+                while (names.contains(name)) {
+                    name += "_";
+                }
+                initializer.set(initializer.indexOf(saved), new DefineLocalActionItem(saved.getSrc(), saved.getLineStartItem(),
+                        new DirectValueActionItem(name), saved.value));
+                initializer.add(new ReturnActionItem(member.getSrc(), member.getLineStartItem(),
+                        new GetVariableActionItem(null, null, new DirectValueActionItem(name))));
+                // AS2 has no static initializer blocks. Use an immediately
+                // invoked function to keep the value across the cleanup calls.
+                FunctionActionItem function = new FunctionActionItem(null, null, "", new ArrayList<>(), new HashMap<>(),
+                        initializer, new ArrayList<>(), 1, new ArrayList<>(), new ArrayList<>(), false, new ArrayList<>(), new ArrayList<>());
+                List<GraphTargetItem> arguments = new ArrayList<>();
+                arguments.add(new GetVariableActionItem(null, null, new DirectValueActionItem("this")));
+                GraphTargetItem value = new CallMethodActionItem(null, null, function, new DirectValueActionItem("call"), arguments);
+                SetMemberActionItem result = new SetMemberActionItem(member.getSrc(), member.getLineStartItem(), receiver.value, member.objectName, value);
+                return new MyEntry<>(i, result);
+            } else {
+                return null;
+            }
+        }
+        return null;
+    }
+
     /**
      * Detects classes in AS2 script.
      *
@@ -480,6 +607,13 @@ public class ActionScript2ClassDetector {
                 if (item instanceof PushItem) { //push is optional
                     PushItem pi = (PushItem) item;
                     item = pi.value;
+                }
+                if (item instanceof SetTemporaryItem) {
+                    MyEntry<Integer, SetMemberActionItem> initializer = getSequencedStaticInitializer(parts, partsPos, classReg);
+                    if (initializer != null) {
+                        partsPos = initializer.getKey();
+                        item = initializer.getValue();
+                    }
                 }
                 if (item instanceof SetMemberActionItem) {
                     SetMemberActionItem sm = (SetMemberActionItem) item;
@@ -944,6 +1078,17 @@ public class ActionScript2ClassDetector {
                         List<String> classPath = pathToSearchVariant1;
                         classPath.remove(0); //remove _global
                         if (ifItem.onTrue.isEmpty()) { //if can have zero offset as the code is larger than bytes limit. TODO: make this check also for variant 2 (?)
+                            // Some compilers erase the runtime definition of an interface,
+                            // leaving only the package setup and its empty existence guard.
+                            if (ifItem.onFalse.isEmpty() && checkPos + 2 == commands.size()
+                                    && commands.get(checkPos + 1) instanceof PopItem) {
+                                GraphTargetItem interfaceName = getWithoutGlobal(condType);
+                                for (int k = checkPos + 1; k >= pos; k--) {
+                                    commands.remove(k);
+                                }
+                                commands.add(pos, new InterfaceActionItem(interfaceName, new ArrayList<>()));
+                                return true;
+                            }
                             if (this.checkClassContent(uninitializedClassTraits, commands, variables, checkPos + 1, pos, commands.size() - 1, commands, classPath, scriptPath)) {
                                 return true;
                             } else {

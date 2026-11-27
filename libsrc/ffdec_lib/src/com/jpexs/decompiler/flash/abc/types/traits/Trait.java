@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.Dependency;
 import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
 import com.jpexs.decompiler.flash.exporters.script.DependencyType;
+import com.jpexs.decompiler.flash.exporters.script.NamespaceUses;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
@@ -284,6 +285,10 @@ public abstract class Trait implements Cloneable, Serializable {
      * @throws InterruptedException On interrupt
      */
     public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+        getDependencies(usedDeobfuscations, abcIndex, scriptIndex, classIndex, isStatic, customNamespace, abc, dependencies, ignorePackage, fullyQualifiedNames, new NamespaceUses(uses, false), numberContextRef);
+    }
+
+    public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, NamespaceUses uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if (customNamespace == null) {
             Multiname m = getName(abc);
             int nskind = m.getSimpleNamespaceKind(abc.constants);
@@ -291,7 +296,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 customNamespace = m.getSimpleNamespaceName(abc.constants).toRawString();
             }
         }
-        DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE, uses);
+        DependencyParser.parseDependenciesFromMultiname(usedDeobfuscations, abcIndex, customNamespace, abc, scriptIndex, classIndex, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE, uses);
         //DependencyParser.parseUsagesFromMultiname(ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
     }
 
@@ -402,7 +407,8 @@ public abstract class Trait implements Cloneable, Serializable {
         //imports
         List<Dependency> dependencies = new ArrayList<>();
         String customNs = null;
-        List<String> uses = new ArrayList<>();
+        Map<String, DottedChain> generatedNamespaces = writer.getGeneratedNamespaces();
+        NamespaceUses uses = new NamespaceUses(new ArrayList<>(), generatedNamespaces != null);
         Reference<Integer> numberContextRef = new Reference<>(null);
 
         for (Trait trait : traits) {
@@ -538,6 +544,27 @@ public abstract class Trait implements Cloneable, Serializable {
             }
         }
 
+        if (!uses.undeclared.isEmpty()) {
+            Set<String> reservedNames = new HashSet<>(importedNames);
+            reservedNames.addAll(uses.names);
+            int nextAlias = generatedNamespaces.size() + 1;
+            for (Entry<String, Boolean> entry : uses.undeclared.entrySet()) {
+                DottedChain alias = generatedNamespaces.get(entry.getKey());
+                if (alias == null) {
+                    String name;
+                    do {
+                        name = "namespace" + nextAlias++;
+                    } while (reservedNames.contains(name) || abc.constants.getStringId(name, false) >= 0
+                            || abcIndex.containsString(name) || generatedNamespaces.containsValue(DottedChain.parseNoSuffix(name)));
+                    alias = DottedChain.parseNoSuffix(name);
+                    generatedNamespaces.put(entry.getKey(), alias);
+                }
+                if (entry.getValue()) {
+                    uses.add(alias.getLast());
+                }
+            }
+        }
+
         boolean hasImport = false;
         Collections.sort(imports);
         for (DottedChain imp : imports) {
@@ -559,17 +586,17 @@ public abstract class Trait implements Cloneable, Serializable {
         }
 
         boolean hasUse = false;
-        if (!uses.isEmpty()) {
+        if (!uses.names.isEmpty()) {
             hasUse = true;
             if (hasImport) {
                 writer.newLine();
             }
-            for (String u : uses) {
+            for (String u : uses.names) {
                 writer.appendNoHilight("use namespace " + u + ";").newLine();
             }
         }
         if (numberContextRef.getVal() != null) {
-            if (uses.isEmpty() && hasImport) {
+            if (uses.names.isEmpty() && hasImport) {
                 writer.newLine();
             }
             writer.appendNoHilight("use ");
@@ -673,6 +700,22 @@ public abstract class Trait implements Cloneable, Serializable {
      * @return Writer
      */
     public final GraphTextWriter getModifiers(Set<String> usedDeobfuscations, ABC abc, boolean isStatic, boolean insideInterface, GraphTextWriter writer, int classIndex) {
+        return getModifiers(usedDeobfuscations, abc, isStatic, insideInterface, writer, classIndex, -1);
+    }
+
+    /**
+     * Gets modifiers using namespace aliases visible from the given script.
+     *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param abc ABC
+     * @param isStatic Is static
+     * @param insideInterface Inside interface
+     * @param writer Writer
+     * @param classIndex Class index
+     * @param scriptIndex Script index, or -1 if unknown
+     * @return Writer
+     */
+    public final GraphTextWriter getModifiers(Set<String> usedDeobfuscations, ABC abc, boolean isStatic, boolean insideInterface, GraphTextWriter writer, int classIndex, int scriptIndex) {
         if ((kindFlags & ATTR_Final) > 0) {
             if (!isStatic) {
                 writer.appendNoHilight("final ");
@@ -683,7 +726,10 @@ public abstract class Trait implements Cloneable, Serializable {
         }
         Multiname m = getName(abc);
         if (m != null) {
-            DottedChain dc = abc.findCustomNsOfMultiname(m, classIndex);
+            DottedChain dc = abc.findCustomNsOfMultiname(m, classIndex, scriptIndex);
+            if (dc == null || dc.isEmpty()) {
+                dc = writer.getGeneratedNamespace(m, abc.constants);
+            }
             String nsname = dc != null ? dc.getLast() : null;
 
             int nskind = m.getSimpleNamespaceKind(abc.constants);

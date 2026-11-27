@@ -172,6 +172,7 @@ package
         SetupMyPackage2;
         SetupMyPackage3;
         
+        TestFunctionVar;
         TestThisOutsideClass;
         TestImports;
         TestImports2;

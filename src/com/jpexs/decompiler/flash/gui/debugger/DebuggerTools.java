@@ -91,6 +91,7 @@ public class DebuggerTools {
         if (hasDebugger(swf)) {
             ScriptPack dsp = getDebuggerScriptPack(swf);
             String debuggerPkg = dsp.getClassPath().packageStr.toRawString();
+            boolean eventBridgeAvailable = DebugLoaderEventBridge.isAvailable(dsp.abc, debuggerPkg);
             List<String> displayTypes = Arrays.asList("Loader");
             List<String> utilsTypes = Arrays.asList(
                     "getDefinitionByName",
@@ -166,6 +167,10 @@ public class DebuggerTools {
                         }
                     }
                 }
+                // Older debug.swf resources do not contain the forwarding helper.
+                if (eventBridgeAvailable && DebugLoaderEventBridge.inject(a, debuggerPkg)) {
+                    ((Tag) ct).setModified(true);
+                }
             }
         }
     }
@@ -199,6 +204,9 @@ public class DebuggerTools {
             //Change all debugger calls to normal trace / Loader
             for (ABCContainerTag ct : swf.getAbcList()) {
                 ABC a = ct.getABC();
+                if (DebugLoaderEventBridge.remove(a, found.getClassPath().packageStr.toRawString())) {
+                    ((Tag) ct).setModified(true);
+                }
                 for (int i = 1; i < a.constants.getMultinameCount(); i++) {
                     Multiname m = a.constants.getMultiname(i);
                     String packageStr = m.getNameWithNamespace(new LinkedHashSet<>(), a, a.constants, true).toString();

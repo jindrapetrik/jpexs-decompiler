@@ -1572,7 +1572,7 @@ public class ABC implements Openable {
                 for (Trait t : si.traits.traits) {
                     if (t instanceof TraitSlotConst) {
                         TraitSlotConst s = ((TraitSlotConst) t);
-                        if (s.isNamespace()) {
+                        if (s.isNamespace() && t.getName(this).getSimpleNamespaceKind(constants) != Namespace.KIND_PRIVATE) {
                             String key = constants.getNamespace(s.value_index).getName(constants).toRawString(); // assume not null
                             DottedChain val = constants.getMultiname(s.name_index).getNameWithNamespace(new LinkedHashSet<>(), this, constants, true);
                             map.put(key, val);
@@ -1662,6 +1662,29 @@ public class ABC implements Openable {
                 return ns;
             }
         }
+    }
+
+    /**
+     * Resolves a file-private namespace alias within its declaring script.
+     *
+     * @param valueStr Namespace URI
+     * @param scriptIndex Script index, or -1 if unknown
+     * @return Namespace declaration name, or null
+     */
+    public DottedChain findScriptPrivateNamespace(String valueStr, int scriptIndex) {
+        if (scriptIndex >= 0 && scriptIndex < script_info.size()) {
+            for (Trait trait : script_info.get(scriptIndex).traits.traits) {
+                if (trait instanceof TraitSlotConst && ((TraitSlotConst) trait).isNamespace()) {
+                    TraitSlotConst slot = (TraitSlotConst) trait;
+                    Multiname name = slot.getName(this);
+                    if (name.getSimpleNamespaceKind(constants) == Namespace.KIND_PRIVATE
+                            && valueStr.equals(constants.getNamespace(slot.value_index).getName(constants).toRawString())) {
+                        return name.getNameWithNamespace(new LinkedHashSet<>(), this, constants, true);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -2911,6 +2934,17 @@ public class ABC implements Openable {
      * @return Custom namespace name
      */
     public DottedChain findCustomNsOfNamespace(int link_ns_index) {
+        return findCustomNsOfNamespace(link_ns_index, -1);
+    }
+
+    /**
+     * Finds the custom namespace name visible from the given script.
+     *
+     * @param link_ns_index Namespace index
+     * @param scriptIndex Script index
+     * @return Custom namespace name
+     */
+    public DottedChain findCustomNsOfNamespace(int link_ns_index, int scriptIndex) {
         Namespace ns = constants.getNamespace(link_ns_index);
         if (ns.kind != Namespace.KIND_NAMESPACE && ns.kind != Namespace.KIND_PACKAGE_INTERNAL) {
             return null;
@@ -2920,16 +2954,11 @@ public class ABC implements Openable {
             return DottedChain.parseNoSuffix("AS3");
         }
 
-        return getSwf().getAbcIndex().nsValueToName(name);
+        DottedChain local = findScriptPrivateNamespace(name, scriptIndex);
+        return local == null ? getSwf().getAbcIndex().nsValueToName(name) : local;
     }
-
-    /**
-     * Finds custom namespace name of multiname.
-     *
-     * @param m Multiname
-     * @return Custom namespace name
-     */
-    public DottedChain findCustomNsOfMultiname(Multiname m) {
+        
+    private DottedChain findScriptOrGlobalNamespace(Multiname m, int scriptIndex) {
         int nskind = m.getSimpleNamespaceKind(constants);
         if (nskind != Namespace.KIND_NAMESPACE && nskind != Namespace.KIND_PACKAGE_INTERNAL) {
             return null;
@@ -2939,7 +2968,18 @@ public class ABC implements Openable {
             return DottedChain.parseNoSuffix("AS3");
         }
 
-        return getSwf().getAbcIndex().nsValueToName(name);
+        DottedChain local = findScriptPrivateNamespace(name, scriptIndex);
+        return local == null ? getSwf().getAbcIndex().nsValueToName(name) : local;
+    }
+
+    /**
+     * Finds custom namespace name of multiname.
+     *
+     * @param m Multiname
+     * @return Custom namespace name
+     */
+    public DottedChain findCustomNsOfMultiname(Multiname m) {
+        return findCustomNsOfMultiname(m, -1, -1);
     }
 
     /**
@@ -2950,12 +2990,38 @@ public class ABC implements Openable {
      * @return Namespace declaration name
      */
     public DottedChain findCustomNsOfMultiname(Multiname m, int classIndex) {
-        DottedChain global = findCustomNsOfMultiname(m);
-        if (global != null && !global.isEmpty() || classIndex < 0 || classIndex >= instance_info.size()
+        return findCustomNsOfMultiname(m, classIndex, -1);
+    }
+    
+    /**
+     * Resolves custom namespace aliases visible from a class and script.
+     *
+     * @param m Member multiname
+     * @param classIndex Current class, or -1 outside a class
+     * @param scriptIndex Current script, or -1 if unknown
+     * @return Namespace declaration name
+     */
+    public DottedChain findCustomNsOfMultiname(Multiname m, int classIndex, int scriptIndex) {
+        DottedChain resolved = findScriptOrGlobalNamespace(m, scriptIndex);
+        if ((resolved != null && !resolved.isEmpty())
                 || m.getSimpleNamespaceKind(constants) != Namespace.KIND_NAMESPACE) {
-            return global;
+            return resolved;
         }
-        String uri = m.getSimpleNamespaceName(constants).toRawString();
+        DottedChain local = findClassNamespace(m.getSimpleNamespaceName(constants).toRawString(), classIndex);
+        return local == null ? resolved : local;
+    }
+
+    /**
+     * Finds a namespace declaration on the given class.
+     *
+     * @param uri Namespace URI
+     * @param classIndex Class index, or -1 outside a class
+     * @return Namespace declaration name, or null
+     */
+    public DottedChain findClassNamespace(String uri, int classIndex) {
+        if (classIndex < 0 || classIndex >= instance_info.size()) {
+            return null;
+        }
         List<Trait> traits = new ArrayList<>(class_info.get(classIndex).static_traits.traits);
         traits.addAll(instance_info.get(classIndex).instance_traits.traits);
         for (Trait trait : traits) {
@@ -2964,7 +3030,7 @@ public class ABC implements Openable {
                 return DottedChain.parseWithSuffix(trait.getName(this).getName(new LinkedHashSet<>(), this, constants, null, true, true));
             }
         }
-        return global;
+        return null;
     }
 
     /**

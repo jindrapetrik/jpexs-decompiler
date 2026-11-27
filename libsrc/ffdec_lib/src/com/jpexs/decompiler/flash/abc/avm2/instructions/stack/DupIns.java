@@ -76,6 +76,13 @@ public class DupIns extends InstructionDefinition {
         } else {
             if (v instanceof HasTempIndex) {
                 temp = ((HasTempIndex) v).getTempIndex();
+                for (int i = output.size() - 1; i >= 0; i--) {
+                    GraphTargetItem command = output.get(i);
+                    if (command instanceof SetTemporaryItem && ((SetTemporaryItem) command).tempIndex == temp) {
+                        ((SetTemporaryItem) command).refCount++;
+                        break;
+                    }
+                }
                 stack.push(v);
             } else {
                 temp = localData.maxTempIndex.getVal() + 1;

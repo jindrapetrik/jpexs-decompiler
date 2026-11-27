@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -145,6 +146,27 @@ public class FunctionAVM2Item extends AVM2Item {
         this.hasRest = hasRest;
         this.isInterface = isInterface;
         this.isNative = isNative;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitNoBlock(visitor);
+        if (body != null) {
+            visitor.visitAll(body);
+        }
+    }
+
+    @Override
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+        visitor.visitAll(paramTypes);
+        for (GraphTargetItem defaultValue : paramValues) {
+            if (defaultValue != null) {
+                visitor.visit(defaultValue);
+            }
+        }
+        if (retType != null) {
+            visitor.visit(retType);
+        }
     }
 
     @Override

@@ -21,17 +21,21 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import java.io.IOException;
 import java.util.Arrays;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -60,7 +64,10 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     }
 
     private void decompileScriptPack(String swfId, String path, String expectedResult) {
+        assertEquals(decompileScriptPack(swfId, path), cleanPCode(expectedResult));
+    }
 
+    private String decompileScriptPack(String swfId, String path) {
         DoABC2Tag tag = null;
         ABC abc = null;
         ScriptPack scriptPack = null;
@@ -85,9 +92,42 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
             fail();
         }
         writer.finishHilights();
-        String actualResult = cleanPCode(writer.toString());
-        expectedResult = cleanPCode(expectedResult);
-        assertEquals(actualResult, expectedResult);
+        return cleanPCode(writer.toString());
+    }
+
+    @Test
+    public void testUndeclaredCustomNamespaceAvoidsLocalName() throws IOException, InterruptedException {
+        addSwf("undeclaredNamespace", "testdata/as3_new/bin/as3_new.flex.swf");
+        SWF swf = getSwf("undeclaredNamespace");
+        String classPath = "tests_classes.mypackage1.TestClass2";
+        boolean removed = false;
+        boolean renamed = false;
+        for (ABCContainerTag tag : swf.getAbcList()) {
+            ABC abc = tag.getABC();
+            ScriptPack declaration = abc.findScriptPackByPath("tests_classes.mypackage1.myNamespace", Arrays.asList(abc));
+            if (declaration != null) {
+                removed = abc.script_info.get(declaration.scriptIndex).traits.traits.removeIf(trait
+                        -> trait instanceof TraitSlotConst && ((TraitSlotConst) trait).isNamespace()
+                        && "myNamespace".equals(abc.constants.getString(trait.getName(abc).name_index)));
+            }
+            if (abc.findScriptPackByPath(classPath, Arrays.asList(abc)) != null) {
+                int localName = abc.constants.getStringId("res", false);
+                assertTrue(localName > 0, "Expected a debug name for the local variable");
+                abc.constants.setString(localName, "namespace1");
+                renamed = true;
+            }
+        }
+        assertTrue(removed, "Expected a namespace declaration in the fixture");
+        assertTrue(renamed, "Expected the class to decompile in the fixture");
+        swf.resetAbcIndex();
+
+        String actual = decompileScriptPack("undeclaredNamespace", classPath);
+        String declaration = "namespace namespace2 = \"https://www.free-decompiler.com/flash/test/namespace\";";
+        assertTrue(actual.endsWith(declaration), actual);
+        assertEquals(actual.indexOf(declaration), actual.lastIndexOf(declaration), actual);
+        assertTrue(actual.contains("var namespace1:String"), actual);
+        assertTrue(actual.contains("namespace2 function testCall2()"), actual);
+        assertFalse(actual.contains("§§namespace"), actual);
     }
 
     @Test
@@ -577,7 +617,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   import flash.events.EventDispatcher;\n"
                 + "   import flash.text.TextField;\n"
                 + "   \n"
-                + "   [SWF(width=\"256\", height=\"256\", backgroundColor=\"#ffffff\", frameRate=\"24\")]\n"
+                + "   [SWF(width=\"256\",height=\"256\",backgroundColor=\"#ffffff\",frameRate=\"24\")]\n"
                 + "   public class MainClass extends MovieClip\n"
                 + "   {\n"
                 + "       \n"
@@ -856,6 +896,32 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "}\n"
                 + "}\n"
                 + "}");
+    }
+
+    @Test
+    public void testFunctionVar() {
+        decompileScriptPack("standard", "tests_classes.TestFunctionVar", "package tests_classes\n"
+                + "{\n"
+                + "   public class TestFunctionVar\n"
+                + "   {\n"
+                + "      \n"
+                + "      private var scrollEngine:Function = function():void\n"
+                + "      {\n"
+                + "      };\n"
+                + "      \n"
+                + "      public function TestFunctionVar()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "         this.scrollEngine();\n"
+                + "         this.scrollEngine = function():void\n"
+                + "         {\n"
+                + "            trace(\"Hello, World!\");\n"
+                + "         };\n"
+                + "         this.scrollEngine();\n"
+                + "      }\n"
+                + "   }\n"
+                + "}\n"
+        );
     }
 
     @Test

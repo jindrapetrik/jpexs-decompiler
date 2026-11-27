@@ -109,7 +109,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (localData.seenMethods.contains(methodIndex)) {
-            return writer.append("§§method(").append(methodIndex).append(")");
+            return writer.append("undefined /* recursive function reference (id=").append(methodIndex).append(") */");
         }
         MethodBody body = abc.findBody(methodIndex);
         writer.append("function");
@@ -131,7 +131,12 @@ public class NewFunctionAVM2Item extends AVM2Item {
             List<MethodBody> callStack = new ArrayList<>(localData.callStack);
             callStack.add(body);
             body.convert(localData.swfVersion, callStack, localData.abcIndex, new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, scopeStack, 0, new NulWriter(), localData.fullyQualifiedNames, null, false, new HashSet<>(localData.seenMethods), new ArrayList<>(), localData.usedDeobfuscations);
-            body.toString(localData.usedDeobfuscations, localData.swfVersion, callStack, localData.abcIndex, path + "/inner", ScriptExportMode.AS, abc, null, writer, localData.fullyQualifiedNames, new HashSet<>(localData.seenMethods), localData.classIndex);
+            if (!(writer instanceof NulWriter)) {
+                // convert already walks the body with a NulWriter to prepare
+                // loop labels and nested functions. Repeating that walk here
+                // multiplies the work at every level of nested functions.
+                body.toString(localData.usedDeobfuscations, localData.swfVersion, callStack, localData.abcIndex, path + "/inner", ScriptExportMode.AS, abc, null, writer, localData.fullyQualifiedNames, new HashSet<>(localData.seenMethods), localData.classIndex, scriptIndex);
+            }
         }
         writer.endBlock();
         writer.endMethod();

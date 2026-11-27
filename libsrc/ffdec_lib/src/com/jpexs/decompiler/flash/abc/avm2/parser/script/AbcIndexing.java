@@ -882,6 +882,44 @@ public final class AbcIndexing {
     }
 
     /**
+     * Resolves a lexical reference that uses a generic namespace for a package.
+     *
+     * @param abc ABC containing the reference
+     * @param scriptIndex Script containing the reference
+     * @param name Referenced multiname
+     * @return Package-qualified name, or null if there is no package reference
+     */
+    public DottedChain findLexicalPackageProperty(ABC abc, int scriptIndex, Multiname name) {
+        if (name == null || name.kind != Multiname.QNAME || name.name_index <= 0) {
+            return null;
+        }
+        Namespace ns = name.getNamespace(abc.constants);
+        if (ns == null || ns.kind != Namespace.KIND_NAMESPACE) {
+            return null;
+        }
+        DottedChain pkg = ns.getName(abc.constants);
+        String member = abc.constants.getString(name.name_index);
+        TraitIndex definition = findScriptProperty(member, pkg);
+        if (definition != null) {
+            if (definition.trait.getName(definition.abc).getSimpleNamespaceKind(definition.abc.constants) != Namespace.KIND_PACKAGE) {
+                return null;
+            }
+        } else {
+            // A linked library class can be referenced with both namespace kinds.
+            String pkgName = pkg.toRawString();
+            if (abc.constants.getQnameId(member, Namespace.KIND_PACKAGE, pkgName, false) <= 0
+                    || abc.findScriptPrivateNamespace(pkgName, scriptIndex) != null) {
+                return null;
+            }
+            DottedChain namespaceAlias = nsValueToName(pkgName);
+            if (namespaceAlias != null && !namespaceAlias.isEmpty()) {
+                return null;
+            }
+        }
+        return pkg.add(member, name.getNamespaceSuffix());
+    }
+
+    /**
      * Finds property with namespace.
      * @param prop Property to find
      * @param findStatic Find static properties
@@ -1313,6 +1351,21 @@ public final class AbcIndexing {
             return parent.nsValueToName(valueStr);
         }
         return null;
+    }
+
+    /**
+     * Checks for an existing name in the indexed ABCs, including libraries.
+     *
+     * @param name Candidate name
+     * @return Whether a constant pool already contains the name
+     */
+    public boolean containsString(String name) {
+        for (ABC abc : abcs) {
+            if (abc.constants.getStringId(name, false) >= 0) {
+                return true;
+            }
+        }
+        return parent != null && parent.containsString(name);
     }
 
     /**

@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.Dependency;
 import com.jpexs.decompiler.flash.exporters.script.DependencyParser;
+import com.jpexs.decompiler.flash.exporters.script.NamespaceUses;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
@@ -83,7 +84,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         if (body == null) {
             writer.appendNoHilight("native ");
         }
-        getModifiers(usedDeobfuscations, abc, isStatic, insideInterface, writer, classIndex);
+        getModifiers(usedDeobfuscations, abc, isStatic, insideInterface, writer, classIndex, scriptIndex);
         writer.hilightSpecial("function ", HighlightSpecialType.TRAIT_TYPE);
         writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");
@@ -121,7 +122,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
             //writeUses(scriptIndex, classIndex, isStatic, abc, writer);               
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
-            abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "." + abc.constants.getMultiname(name_index).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex);
+            abc.bodies.get(bodyIndex).toString(usedDeobfuscations, swfVersion, callStack, abcIndex, path + "." + abc.constants.getMultiname(name_index).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>(), classIndex, scriptIndex);
         }
         writer.endBlock();
 
@@ -177,7 +178,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
     
     @Override
-    public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<String> uses, Reference<Integer> numberContextRef) throws InterruptedException {
+    public void getDependencies(Set<String> usedDeobfuscations, AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNamespace, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, NamespaceUses uses, Reference<Integer> numberContextRef) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }

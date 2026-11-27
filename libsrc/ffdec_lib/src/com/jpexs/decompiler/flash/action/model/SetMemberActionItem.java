@@ -79,6 +79,9 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
         visitor.visit(object);
         visitor.visit(objectName);
         visitor.visit(value);
+        if (compoundValue != null) {
+            visitor.visit(compoundValue);
+        }
     }
 
     @Override

@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
-import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -33,9 +32,7 @@ import com.jpexs.decompiler.flash.action.model.UnresolvedConstantActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
-import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.configuration.Configuration;
-import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
@@ -261,19 +258,16 @@ public class ActionPush extends Action implements ConstantPoolAwareAction {
      */
     public static boolean isValidValue(Object value) {
         if (value instanceof String) {
-            for (char ch : ((String) value).toCharArray()) {
-                if (ch == 0) {
-                    return false;
-                }
-            }
+            return ((String) value).indexOf('\0') < 0;
         }
         if (value instanceof Long) {
             long l = (Long) value;
-            if (l < -0x80000000 || l > 0x7fffffff) {
-                return false;
-            }
+            return l >= Integer.MIN_VALUE && l <= Integer.MAX_VALUE;
         }
-        return true;
+        return value == Null.INSTANCE || value == Undefined.INSTANCE || value instanceof Boolean
+                || value instanceof Float || value instanceof Double || value instanceof Integer
+                || value instanceof Short || value instanceof Byte || value instanceof RegisterNumber
+                || value instanceof ConstantIndex;
     }
 
     /**

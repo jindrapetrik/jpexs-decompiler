@@ -92,11 +92,11 @@ public class ActionGetProperty extends Action {
                 try {
                     indexInt = Integer.parseInt(((DirectValueActionItem) index).toString());
                 } catch (NumberFormatException nfe) {
-                    Logger.getLogger(ActionGetProperty.class.getName()).log(Level.SEVERE, "Invalid property index: {0}", index.toString());
+                    Logger.getLogger(ActionGetProperty.class.getName()).log(Level.SEVERE, "" + path + ": Invalid property index: {0}", index.toString());
                 }
             }
         } else {
-            Logger.getLogger(ActionGetProperty.class.getName()).log(Level.SEVERE, "Invalid property index: {0}", index.getClass().getSimpleName());
+            Logger.getLogger(ActionGetProperty.class.getName()).log(Level.SEVERE, "" + path + ": Invalid property index: {0}", index.getClass().getSimpleName());
         }
         stack.push(new GetPropertyActionItem(this, lineStartAction, target, indexInt));
     }

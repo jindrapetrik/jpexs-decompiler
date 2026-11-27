@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
@@ -102,6 +103,9 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         if (value != null) {
             visitor.visit(value);
         }
+        if (compoundValue != null) {
+            visitor.visit(compoundValue);
+        }
     }
 
     /**
@@ -167,6 +171,11 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
 
     @Override
     public GraphTargetItem returnType() {
+        // An assignment expression to an untyped property yields the right-hand value.
+        if (compoundOperator == null && value != null
+                && (TypeItem.UNKNOWN.equals(type) || TypeItem.UNBOUNDED.equals(type))) {
+            return value.returnType();
+        }
         return type;
         //return TypeItem.UNBOUNDED;
     }

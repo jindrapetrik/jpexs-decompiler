@@ -1,0 +1,32 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[import com.jpexs.classes.MyClass;
+
+var c = new com.jpexs.classes.MyClass();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="1071" publishTime="1795383978"/>
+          <PublishItem publishSize="1265" publishTime="1795382059" publishDebug="true"/>
+          <PublishItem publishSize="1056" publishTime="1795382054"/>
+          <PublishItem publishSize="530" publishTime="1795382020"/>
+          <PublishItem publishSize="1050" publishTime="1795381986"/>
+          <PublishItem publishSize="530" publishTime="1795381968"/>
+          <PublishItem publishSize="1255" publishTime="1795381933" publishDebug="true"/>
+          <PublishItem publishSize="1052" publishTime="1795381925"/>
+          <PublishItem publishSize="530" publishTime="1795381903"/>
+     </publishHistory>
+</DOMDocument>

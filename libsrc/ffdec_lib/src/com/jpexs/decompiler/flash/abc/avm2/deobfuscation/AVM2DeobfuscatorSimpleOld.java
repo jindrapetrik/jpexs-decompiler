@@ -64,6 +64,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
@@ -103,6 +104,7 @@ import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -257,45 +259,143 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         localData.localRegs = registers;
         InstructionReplacements replacements = new InstructionReplacements(code, body);
         Reference<Set<Long>> importantOffsets = new Reference<>(code.getImportantOffsets(body, isStatic));
-        for (int i = 0; i < code.code.size(); i++) {
-            if (CancellableWorker.isInterrupted()) {
-                throw new InterruptedException();
-            }
+        boolean branchesChanged;
+        do {
+            for (int i = 0; i < code.code.size(); i++) {
+                if (CancellableWorker.isInterrupted()) {
+                    throw new InterruptedException();
+                }
 
-            // Every attempt starts with an empty operand stack.
-            if (code.code.get(i).getStackPopCount(localData) > 0) {
-                continue;
-            }
-            localData.scopeStack.clear();
-            localData.localScopeStack.clear();
-            localData.localRegAssignmentIps.clear();
-            registers.reset();
-            Reference<Integer> minChangedIpRef = new Reference<>(-1);
-            if (executeInstructions(replacements, importantOffsets, staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns, jumpTargets, minChangedIpRef)) {
-                int minChangedIp = minChangedIpRef.getVal();
-                if (minChangedIp < i + 1) {
-                    i = minChangedIp - 1;
+                // Every attempt starts with an empty operand stack.
+                if (code.code.get(i).getStackPopCount(localData) > 0) {
+                    continue;
+                }
+                localData.scopeStack.clear();
+                localData.localScopeStack.clear();
+                localData.localRegAssignmentIps.clear();
+                registers.reset();
+                Reference<Integer> minChangedIpRef = new Reference<>(-1);
+                if (executeInstructions(replacements, importantOffsets, staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns, jumpTargets, minChangedIpRef)) {
+                    int minChangedIp = minChangedIpRef.getVal();
+                    if (minChangedIp < i + 1) {
+                        i = minChangedIp - 1;
+                    }
                 }
             }
-        }
 
-        replacements.flush();
+            replacements.flush();
+            branchesChanged = replacements.flushBranches();
+            if (branchesChanged) {
+                code.removeDeadCode(body);
+                removeZeroJumps(code, body);
+                // Removing a dead incoming edge can expose another constant branch.
+                importantOffsets.setVal(null);
+                jumpTargets.clear();
+                for (AVM2Instruction instruction : code.code) {
+                    if (instruction.definition instanceof JumpIns) {
+                        jumpTargets.add(code.adr2pos(instruction.getTargetAddress()));
+                    }
+                }
+            }
+        } while (branchesChanged);
         return false;
     }
 
     /**
-     * Batches non-branch replacements until control flow needs updated addresses.
-     * Positions stay unchanged during linear simulation.
+     * Batches replacements while simulation uses the original instruction
+     * positions. Folded branches end that simulation attempt; another pass can
+     * use the updated control flow after all folds have been committed.
      */
     static final class InstructionReplacements {
 
         private final AVM2Code code;
         private final MethodBody body;
         private final SortedMap<Integer, AVM2Instruction> pending = new TreeMap<>();
+        private final SortedMap<Integer, int[]> branches = new TreeMap<>();
+        private final boolean batchBranches;
+
+        private Map<Integer, List<Integer>> predecessors;
 
         InstructionReplacements(AVM2Code code, MethodBody body) {
             this.code = code;
             this.body = body;
+            // Removing a function literal changes instruction indices during
+            // simulation. Keep the existing eager algorithm for those methods.
+            this.batchBranches = code.code.stream().noneMatch(ins -> ins.definition instanceof NewFunctionIns);
+        }
+
+        void foldBranch(int index, int target, int popCount) {
+            branches.put(index, new int[]{target, popCount});
+        }
+
+        boolean flushBranches() {
+            if (branches.isEmpty()) {
+                return false;
+            }
+            final long[] addresses = new long[branches.size()];
+            final int[] deltas = new int[branches.size() + 1];
+            final int[] anchors = new int[branches.size()];
+            int i = 0;
+            for (Map.Entry<Integer, int[]> entry : branches.entrySet()) {
+                AVM2Instruction original = code.code.get(entry.getKey());
+                int[] branch = entry.getValue();
+                boolean taken = branch[0] >= 0;
+                addresses[i] = original.getAddress();
+                anchors[i] = taken ? branch[1] : branch[1] - 1;
+                deltas[i + 1] = deltas[i] + branch[1] + (taken ? 4 : 0) - original.getBytesLength();
+                i++;
+            }
+            code.updateOffsets(new OffsetUpdater() {
+                private int shift(long address) {
+                    int index = Arrays.binarySearch(addresses, address);
+                    // Sequential insertion maps incoming targets past the new
+                    // pops, to the original (replaced) branch instruction.
+                    return index >= 0 ? deltas[index] + anchors[index] : deltas[-index - 1];
+                }
+
+                @Override
+                public long updateInstructionOffset(long address) {
+                    return address + shift(address);
+                }
+
+                @Override
+                public int updateOperandOffset(long insAddr, long targetAddress, int offset) {
+                    int targetShift = shift(targetAddress);
+                    int targetIndex = Arrays.binarySearch(addresses, targetAddress);
+                    if (insAddr > targetAddress && targetIndex >= 0) {
+                        // Match insertInstruction(..., true): a backward jump
+                        // to the insertion point still enters before its pops.
+                        targetShift -= anchors[targetIndex];
+                    }
+                    return offset + targetShift - shift(insAddr);
+                }
+            }, body);
+            List<AVM2Instruction> result = new ArrayList<>(code.code.size() + branches.size());
+            for (i = 0; i < code.code.size(); i++) {
+                AVM2Instruction original = code.code.get(i);
+                int[] branch = branches.get(i);
+                if (branch == null) {
+                    result.add(original);
+                    continue;
+                }
+                boolean taken = branch[0] >= 0;
+                long address = original.getAddress() - (taken ? branch[1] : branch[1] - 1);
+                for (int p = 0; p < branch[1]; p++) {
+                    result.add(new AVM2Instruction(address++, DeobfuscatePopIns.getInstance(), null));
+                }
+                if (taken) {
+                    long target = code.code.get(branch[0]).getAddress();
+                    int[] targetBranch = branches.get(branch[0]);
+                    if (branch[0] < i && targetBranch != null) {
+                        target -= targetBranch[0] >= 0 ? targetBranch[1] : targetBranch[1] - 1;
+                    }
+                    result.add(new AVM2Instruction(address, AVM2Instructions.Jump, new int[]{(int) (target - address - 4)}));
+                }
+            }
+            code.code = result;
+            branches.clear();
+            invalidateControlFlow();
+            return true;
         }
 
         AVM2Instruction get(int index) {
@@ -306,6 +406,17 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         void put(int index, AVM2Instruction instruction) {
             instruction.setAddress(code.code.get(index).getAddress());
             pending.put(index, instruction);
+        }
+
+        Map<Integer, List<Integer>> getPredecessors() throws InterruptedException {
+            if (predecessors == null) {
+                predecessors = code.visitCode(body);
+            }
+            return predecessors;
+        }
+
+        void invalidateControlFlow() {
+            predecessors = null;
         }
 
         void flush() {
@@ -426,6 +537,10 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
         int instructionsProcessed = 0;
+        int executionStart = idx;
+        boolean linearExecution = true;
+        List<Integer> executionPath = new ArrayList<>();
+        boolean pathInvalidated = false;
 
         int minChangedIp = Integer.MAX_VALUE;
 
@@ -439,9 +554,17 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 break;
             }
 
+            // Its replacement will be committed at the end of this pass.
+            // Do not evaluate the original condition a second time.
+            if (replacements.branches.containsKey(idx)) {
+                break;
+            }
+
+            executionPath.add(idx);
+
             AVM2Instruction ins = replacements.get(idx);
             InstructionDefinition def = ins.definition;
-            if (def instanceof IfTypeIns) {
+            if (!replacements.batchBranches && (def instanceof IfTypeIns || def instanceof LookupSwitchIns)) {
                 replacements.flush();
             }
             //System.err.println("" + ins + " stack size:" + stack.size());
@@ -491,6 +614,8 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                                 idx = code.code.indexOf(nins);
                             }
                             importantOffsets.setVal(null);
+                            replacements.invalidateControlFlow();
+                            pathInvalidated = true;
                             continue;
                         }
                     }
@@ -511,7 +636,9 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                             minChangedIp = idx;
                         }
 
-                        importantOffsets.setVal(null);
+                        if (!replacements.batchBranches) {
+                            importantOffsets.setVal(null);
+                        }
                     }
                 }
             }
@@ -536,7 +663,9 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     ins = pushins;
                     def = ins.definition;
 
-                    importantOffsets.setVal(null);
+                    if (!replacements.batchBranches) {
+                        importantOffsets.setVal(null);
+                    }
                 }
             }
 
@@ -576,6 +705,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     || def instanceof DecrementIns//
                     || def instanceof DecrementIIns //
                     || def instanceof IfTypeIns
+                    || def instanceof LookupSwitchIns
                     || def instanceof JumpIns
                     || def instanceof EqualsIns
                     || def instanceof LessEqualsIns
@@ -638,35 +768,84 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 }
                 idx++;
             } else if (def instanceof JumpIns) {
+                linearExecution = false;
                 long address = ins.getTargetAddress();
                 idx = code.adr2pos(address);
                 if (idx == -1) {
                     throw new TranslateException("Jump target not found: " + address);
                 }
-            } else if (def instanceof IfTypeIns) {
+            } else if (def instanceof IfTypeIns || def instanceof LookupSwitchIns) {
 
-                long ifAddress = code.pos2adr(idx);
-                // Rebuild jump targets only when a conditional actually needs them.
+                long branchAddress = code.pos2adr(idx);
+                // Rebuild jump targets only when a branch actually needs them.
                 // Register substitutions can invalidate offsets thousands of times.
                 if (importantOffsets.getVal() == null) {
                     importantOffsets.setVal(code.getImportantOffsets(body, false));
                 }
-                if (importantOffsets.getVal().contains(ifAddress)) {
-                    //There is jump directly to ifTypeIns like in &&, || operator
+                if (pathInvalidated) {
                     return false;
+                }
+                if (linearExecution) {
+                    if (importantOffsets.getVal().contains(branchAddress)) {
+                        // Another path may supply different operands directly to this branch.
+                        return false;
+                    }
+                    for (int ip = executionStart + 1; ip < idx; ip++) {
+                        if (importantOffsets.getVal().contains(code.code.get(ip).getAddress())) {
+                            return false;
+                        }
+                    }
+                } else {
+                    // An unconditional jump may split a constant expression
+                    // across blocks. Fold only if every instruction after the
+                    // starting point has this path as its sole incoming edge.
+                    // Merges and loop backedges may carry different operands.
+                    Map<Integer, List<Integer>> predecessors = replacements.getPredecessors();
+                    for (int ip = 1; ip < executionPath.size(); ip++) {
+                        List<Integer> incoming = predecessors.get(executionPath.get(ip));
+                        if (incoming == null || incoming.size() != 1
+                                || !incoming.get(0).equals(executionPath.get(ip - 1))) {
+                            return false;
+                        }
+                    }
                 }
                 if (stack.isEmpty()) {
                     return false;
                 }
 
                 GraphTargetItem top = stack.pop();
-                Boolean res = top.getResultAsBoolean();
-                long address = ins.getTargetAddress();
+                boolean res;
+                long address;
+                if (def instanceof LookupSwitchIns) {
+                    if (!top.isCompileTime() || top.hasSideEffect()) {
+                        return false;
+                    }
+                    Object value = top.getResult();
+                    if (!(value instanceof Number)) {
+                        return false;
+                    }
+                    double number = ((Number) value).doubleValue();
+                    int index = ((Number) value).intValue();
+                    // lookupswitch expects an int, without coercing arbitrary values.
+                    if (number != index) {
+                        return false;
+                    }
+                    int offset = index >= 0 && index <= ins.operands[1] ? ins.operands[index + 2] : ins.operands[0];
+                    address = ins.getAddress() + offset;
+                    res = true;
+                } else {
+                    res = top.getResultAsBoolean();
+                    address = ins.getTargetAddress();
+                }
                 int nidx = code.adr2pos(address);
                 AVM2Instruction tarIns = code.code.get(nidx);
 
                 //Some IfType instructions need more than 1 operand, we must pop out all of them
                 int stackCount = -def.getStackDelta(ins, abc);
+                if (replacements.batchBranches) {
+                    replacements.foldBranch(idx, res ? nidx : -1, stackCount);
+                    return false;
+                }
                 if (res) {
                     //System.err.println("replacing " + ins + " on " + idx + " with jump");
                     AVM2Instruction jumpIns = new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{0});
@@ -709,6 +888,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 }
 
                 importantOffsets.setVal(null);
+                replacements.invalidateControlFlow();
 
                 minChangedIpRef.setVal(minChangedIp);
                 return true;

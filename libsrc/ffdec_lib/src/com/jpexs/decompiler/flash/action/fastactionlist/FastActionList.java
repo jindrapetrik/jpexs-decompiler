@@ -25,8 +25,10 @@ import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.helpers.CancellableWorker;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -631,23 +633,15 @@ public class FastActionList implements Collection<ActionItem> {
      * @return Unreachable action count
      */
     public int getUnreachableActionCount(ActionItem jump, ActionItem jumpTarget) throws InterruptedException {
-        ActionItem item = firstItem;
-        if (item == null) {
+        if (firstItem == null) {
             return 0;
         }
 
-        updateReachableFlags(jump, jumpTarget);
-        jump.reachable = 0;
-
-        int count = 0;
-        do {
-            if (item.reachable == 0) {
-                count++;
-            }
-
-            item = item.next;
-        } while (item != firstItem);
-
+        int count = size - updateReachableFlags(jump, jumpTarget);
+        if (jump.reachable != 0) {
+            count++;
+            jump.reachable = 0;
+        }
         return count;
     }
 
@@ -688,70 +682,49 @@ public class FastActionList implements Collection<ActionItem> {
      *
      * @param jump Jump
      * @param jumpTarget Jump target
+     * @return Number of reachable actions
      */
-    private void updateReachableFlags(ActionItem jump, ActionItem jumpTarget) throws InterruptedException {
+    private int updateReachableFlags(ActionItem jump, ActionItem jumpTarget) throws InterruptedException {
         if (firstItem == null) {
-            return;
+            return 0;
         }
 
         clearReachableFlags();
 
         firstItem.reachable = 1;
-        ActionItem firstItem2 = firstItem;
-        boolean modified = true;
-        while (modified) {
-            if (CancellableWorker.isInterrupted()) {
+        Deque<ActionItem> pending = new ArrayDeque<>();
+        pending.add(firstItem);
+        int processed = 0;
+        while (!pending.isEmpty()) {
+            if ((processed++ & 255) == 0 && CancellableWorker.isInterrupted()) {
                 throw new InterruptedException();
             }
-            modified = false;
-            ActionItem item = firstItem2;
-            do {
-                ActionItem next = item.next;
-                //ActionItem alternativeNext = null;
-                Action action = item.action;
-                if (item.reachable == 1) {
-                    item.reachable = 2;
-                    modified = true;
-
-                    if (item == firstItem2) {
-                        firstItem2 = next;
-                    }
-
-                    if (item == jump) {
-                        if (jumpTarget.reachable == 0) {
-                            jumpTarget.reachable = 1;
-                            //alternativeNext = jumpTarget;
-                        }
-                    } else {
-
-                        if (!action.isExit() && !(action instanceof ActionJump)) {
-                            if (next.reachable == 0) {
-                                next.reachable = 1;
-                            }
-                        }
-
-                        if (action instanceof GraphSourceItemContainer) {
-                            for (ActionItem lastActionItem : item.getContainerLastActions()) {
-                                if (lastActionItem != null && lastActionItem.next != null && lastActionItem.next.reachable == 0) {
-                                    lastActionItem.next.reachable = 1;
-                                    //alternativeNext = lastActionItem.next;
-                                }
-                            }
-                        }
-
-                        ActionItem target = item.getJumpTarget();
-                        if (target != null) {
-                            if (target.reachable == 0) {
-                                target.reachable = 1;
-                                //alternativeNext = target;
-                            }
-                        }
+            ActionItem item = pending.removeFirst();
+            item.reachable = 2;
+            if (item == jump) {
+                enqueueReachable(jumpTarget, pending);
+                continue;
+            }
+            Action action = item.action;
+            if (!action.isExit() && !(action instanceof ActionJump)) {
+                enqueueReachable(item.next, pending);
+            }
+            if (action instanceof GraphSourceItemContainer) {
+                for (ActionItem lastActionItem : item.getContainerLastActions()) {
+                    if (lastActionItem != null) {
+                        enqueueReachable(lastActionItem.next, pending);
                     }
                 }
+            }
+            enqueueReachable(item.getJumpTarget(), pending);
+        }
+        return processed;
+    }
 
-                //item = alternativeNext == null || next.reachable == 1 ? next : alternativeNext;
-                item = next;
-            } while (item != firstItem);
+    private void enqueueReachable(ActionItem item, Deque<ActionItem> pending) {
+        if (item != null && item.reachable == 0) {
+            item.reachable = 1;
+            pending.addLast(item);
         }
     }
 

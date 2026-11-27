@@ -1,0 +1,53 @@
+name: Pull request target warning
+
+on:
+  # Use the trusted workflow to comment on fork PRs. Keep this job limited to metadata and comments.
+  pull_request_target:
+    branches: [master]
+    types: [opened, reopened, edited]
+
+jobs:
+  warn:
+    name: Warn about pull requests targeting master
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    concurrency:
+      group: pull-request-target-warning-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    steps:
+      - name: Comment on the pull request
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const issue = { ...context.repo, issue_number: context.issue.number };
+            // Check the current target in case the PR changed while this run was queued.
+            const { data: pr } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: issue.issue_number,
+            });
+            const isRelease = pr.head.ref === 'dev' && pr.head.repo?.id === pr.base.repo.id;
+            if (pr.state !== 'open' || pr.base.ref !== 'master' || isRelease) {
+              return;
+            }
+
+            const marker = '<!-- ffdec-pull-request-target-warning -->';
+            for await (const { data: comments } of github.paginate.iterator(
+              github.rest.issues.listComments, { ...issue, per_page: 100 },
+            )) {
+              if (comments.some(comment =>
+                comment.user?.login === 'github-actions[bot]' && comment.body?.includes(marker),
+              )) {
+                return;
+              }
+            }
+
+            await github.rest.issues.createComment({
+              ...issue,
+              body: [
+                marker,
+                'Please change the base branch of this pull request to `dev`.',
+                "Only release pull requests from this repository's `dev` branch should target `master`.",
+                'You can change the base branch by clicking **Edit** next to the pull request title.',
+              ].join('\n'),
+            });

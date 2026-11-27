@@ -171,13 +171,13 @@
 					<li>swc: store the SWC library.swf uncompressed (PR312)</li>
 					<li>shape bitmap exporter: differentiate start and end cap style</li>
 					<li>simple editor: fix timeline frames border, empty frames drawing</li>
-					<li>fix nullpointer in CalcellableWorker</li>
+					<li>fix nullpointer in CancellableWorker</li>
 					<li>fix pixel hinting</li>
 					<li>simple editor: select newly created swf tab</li>
 					<li>fix nullpointer on timeline</li>
 					<li>fix add/remove character on non-unicode fonts</li>
 					<li>as3: compile super.method() as callsuper (#2784, PR315)</li>
-					<li>fix nullpointer on nonswf item</li>
+					<li>fix nullpointer on non-swf item</li>
 				</ul>
 				<p>Performance Improvements</p>
 				<ul>

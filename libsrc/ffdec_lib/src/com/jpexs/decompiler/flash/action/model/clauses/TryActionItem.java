@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
@@ -97,6 +98,7 @@ public class TryActionItem extends ActionItem implements Block {
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
+        visitNoBlock(visitor);
         if (tryCommands != null) {
             visitor.visitAll(tryCommands);
         }
@@ -110,7 +112,12 @@ public class TryActionItem extends ActionItem implements Block {
 
     @Override
     public void visitNoBlock(GraphTargetVisitorInterface visitor) {
-
+        visitor.visitAll(catchExceptionNames);
+        for (GraphTargetItem type : catchExceptionTypes) {
+            if (type != null) {
+                visitor.visit(type);
+            }
+        }
     }
 
     /**
@@ -142,7 +149,13 @@ public class TryActionItem extends ActionItem implements Block {
                 writer.append(" ");
             }
             writer.append("(");
-            catchExceptionNames.get(e).toStringNoQuotes(writer, localData);
+            
+            if (!IdentifiersDeobfuscation.isValidName(false, catchExceptionNames.get(e).toStringNoQuotes(localData))) {
+                IdentifiersDeobfuscation.appendObfuscatedIdentifier(localData.swf, localData.usedDeobfuscations, catchExceptionNames.get(e).toStringNoQuotes(localData), writer);
+            } else {
+                stripQuotes(catchExceptionNames.get(e), localData, writer);
+            }
+            
             if (catchExceptionTypes.get(e) != null) {
                 writer.append(":");
                 catchExceptionTypes.get(e).toStringNoQuotes(writer, localData);

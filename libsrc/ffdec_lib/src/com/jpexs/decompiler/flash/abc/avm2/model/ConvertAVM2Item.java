@@ -125,7 +125,7 @@ public class ConvertAVM2Item extends AVM2Item {
     public Object getResult() {
         switch (type.toString()) {
             case "Boolean":
-                return EcmaScript.toBoolean(value.getResult());
+                return value.getResultAsBoolean();
             case "Number":
                 return value.getResultAsNumber();
             case "int":

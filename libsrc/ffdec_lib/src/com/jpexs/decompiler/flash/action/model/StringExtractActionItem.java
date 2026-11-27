@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -59,6 +60,13 @@ public class StringExtractActionItem extends ActionItem {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
         this.index = index;
         this.count = count;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        super.visit(visitor);
+        visitor.visit(index);
+        visitor.visit(count);
     }
 
     @Override

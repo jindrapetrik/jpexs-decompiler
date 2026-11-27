@@ -18,9 +18,11 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
@@ -51,6 +53,7 @@ import com.jpexs.decompiler.graph.model.DuplicateSourceItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SetTemporaryItem;
 import java.util.List;
+import java.util.Set;
 
 /**
  * getlocal type instruction - get local register value.
@@ -123,6 +126,10 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
         
         
         stack.finishBlock(output);
+
+        if (foldUnsignedLocalPostUpdate(localData, stack, ins, output, result)) {
+            return;
+        }
         
         if (!output.isEmpty()) {            
             if (output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
@@ -437,6 +444,77 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
     @Override
     public int getStackPushCount(AVM2Instruction ins, ABC abc) {
         return 1;
+    }
+
+    private boolean foldUnsignedLocalPostUpdate(AVM2LocalData localData, TranslateStack stack,
+            AVM2Instruction ins, List<GraphTargetItem> output, LocalRegAVM2Item loaded) {
+        if (output.isEmpty() || !(output.get(output.size() - 1) instanceof SetLocalAVM2Item)) {
+            return false;
+        }
+        SetLocalAVM2Item write = (SetLocalAVM2Item) output.get(output.size() - 1);
+        if (write.regIndex == loaded.regIndex || !(write.value instanceof ConvertAVM2Item)
+                || !TypeItem.UINT.equals(write.value.returnType())) {
+            return false;
+        }
+        GraphTargetItem update = write.value.value;
+        if (!(update instanceof IncrementAVM2Item || update instanceof DecrementAVM2Item)
+                || !(update.getSrc() instanceof AVM2Instruction) || !(update.value instanceof SetLocalAVM2Item)) {
+            return false;
+        }
+        int opcode = ((AVM2Instruction) update.getSrc()).definition.instructionCode;
+        if (opcode != AVM2Instructions.Increment && opcode != AVM2Instructions.Decrement) {
+            return false;
+        }
+        SetLocalAVM2Item saved = (SetLocalAVM2Item) update.value;
+        if (saved.regIndex != loaded.regIndex || saved.getSrc() == null
+                || saved.value != loaded.computedValue || !(saved.value instanceof ConvertAVM2Item)
+                || !TypeItem.UINT.equals(saved.value.returnType()) || !(saved.value.value instanceof LocalRegAVM2Item)) {
+            return false;
+        }
+        LocalRegAVM2Item original = (LocalRegAVM2Item) saved.value.value;
+        if (original.regIndex != write.regIndex || !TypeItem.UINT.equals(original.returnType()) || write.getSrc() == null) {
+            return false;
+        }
+        int readPos = localData.code.adr2pos(ins.getAddress());
+        Set<Integer> usages = localData.getSetLocalUsages(localData.code.adr2pos(saved.getSrc().getAddress()));
+        if (usages.size() != 1 || !usages.contains(readPos) || localData.code.adr2pos(write.getSrc().getAddress()) + 1 != readPos
+                || !hasUnsignedWrites(localData, write.regIndex)) {
+            return false;
+        }
+
+        // Both the saved value and the write came from the same duplicated local read.
+        output.remove(output.size() - 1);
+        stack.moveToStack(output);
+        stack.push(opcode == AVM2Instructions.Increment
+                ? new PostIncrementAVM2Item(update.getSrc(), update.getLineStartItem(), original, TypeItem.UINT)
+                : new PostDecrementAVM2Item(update.getSrc(), update.getLineStartItem(), original, TypeItem.UINT));
+        return true;
+    }
+
+    private boolean hasUnsignedWrites(AVM2LocalData localData, int regId) {
+        // A register reused for another type may be declared as *, losing the coercion on ++/--.
+        List<AVM2Instruction> instructions = localData.code.code;
+        for (int i = 0; i < instructions.size(); i++) {
+            AVM2Instruction instruction = instructions.get(i);
+            if (instruction.definition instanceof SetLocalTypeIns) {
+                if (((SetLocalTypeIns) instruction.definition).getRegisterId(instruction) == regId) {
+                    int source = i - 1;
+                    if (source >= 0 && instructions.get(source).definition.instructionCode == AVM2Instructions.Dup) {
+                        source--;
+                    }
+                    if (source < 0 || instructions.get(source).definition.instructionCode != AVM2Instructions.ConvertU) {
+                        return false;
+                    }
+                }
+            } else if (!(instruction.definition instanceof GetLocalTypeIns)) {
+                for (int op = 0; op < instruction.definition.operands.length; op++) {
+                    if (instruction.definition.operands[op] == AVM2Code.DAT_LOCAL_REG_INDEX && instruction.operands[op] == regId) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public abstract int getRegisterId(AVM2Instruction ins);

@@ -245,19 +245,20 @@ public class ActionScript3SimpleParser implements SimpleParser {
         boolean ret = obj;
         ParsedSymbol s = lex();
         while (s.isType(SymbolType.DOT, SymbolType.NULL_DOT, SymbolType.BRACKET_OPEN, SymbolType.TYPENAME)) {
-            ParsedSymbol s2 = lex();
-            if (s.type == SymbolType.NULL_DOT) {
+            if (s.isType(SymbolType.DOT, SymbolType.NULL_DOT)) {
                 variables.add(new Separator(lastVarName, s.position));
-                lexer.pushback(s2);
-            } else if (s.type == SymbolType.DOT) {
-                variables.add(new Separator(lastVarName, s.position));
-                if (s2.type == SymbolType.ATTRIBUTE) {
-                    //attribute
-                } else {
-                    lexer.pushback(s2);
+            }
+            if (s.type == SymbolType.DOT) {
+                ParsedSymbol next = lex();
+                boolean attr = next.type == SymbolType.ATTRIBUTE;
+                if (attr) {
+                    next = lex();
                 }
-            } else {
-                lexer.pushback(s2);
+                if (attr && next.type == SymbolType.BRACKET_OPEN) {
+                    s = next;
+                } else {
+                    lexer.pushback(next);
+                }
             }
             if (s.type == SymbolType.TYPENAME) {
                 lexer.pushback(s);
@@ -340,7 +341,6 @@ public class ActionScript3SimpleParser implements SimpleParser {
         lastName += s.value.toString();
         int identPos = s.position;
         s = lex();
-        boolean attrBracket = false;
         if (s.type == SymbolType.NAMESPACESUFFIX) {
             if (nsKeyword != null) {
                 errors.add(new SimpleParseException(nsKeyword.value + " not expected in this situation", lexer.yyline(), nsKeyword.position));
@@ -355,26 +355,28 @@ public class ActionScript3SimpleParser implements SimpleParser {
             if (nsKeyword != null) {
                 errors.add(new SimpleParseException(nsKeyword.value + " not expected in this situation", lexer.yyline(), nsKeyword.position));
             }
-            variables.add(new Variable(false, fullName, identPos));
-            variables.add(new Separator(fullName, s.position));
+            ParsedSymbol dot = s;
             s = lex();
-            lastName = "";
-            if (s.type == SymbolType.ATTRIBUTE) {
-                lastName += s.value.toString();
+            boolean attr = s.type == SymbolType.ATTRIBUTE;
+            if (attr) {
+                ParsedSymbol attributeSign = s;
                 s = lex();
-                if (s.type == SymbolType.MULTIPLY) {
-                    lastName += s.value.toString();
-                    identPos = s.position;
-                } else if (s.group == SymbolGroup.IDENTIFIER) {
-                    lastName += s.value.toString();
-                    identPos = s.position;
-                } else {
-                    if (s.type != SymbolType.BRACKET_OPEN) {
-                        errors.add(new SimpleParseException("Attribute identifier or bracket expected", lexer.yyline(), s.position));
-                    }
-                    attrBracket = true;
-                    continue;
+                if (s.type == SymbolType.BRACKET_OPEN) {
+                    lexer.pushback(s);
+                    lexer.pushback(attributeSign);
+                    s = dot;
+                    break;
                 }
+            }
+            variables.add(new Variable(false, fullName, identPos));
+            variables.add(new Separator(fullName, dot.position));
+            if (attr) {
+                if (!s.isType(SymbolType.MULTIPLY, SymbolGroup.IDENTIFIER)) {
+                    errors.add(new SimpleParseException("Attribute identifier or bracket expected", lexer.yyline(), s.position));
+                    break;
+                }
+                lastName = "@" + s.value;
+                identPos = s.position;
             } else {
                 if (!expected(errors, s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE, SymbolType.MULTIPLY,
                         SymbolType.PUBLIC, SymbolType.PROTECTED, SymbolType.PRIVATE, SymbolType.INTERNAL
@@ -418,12 +420,8 @@ public class ActionScript3SimpleParser implements SimpleParser {
         }
 
         Path ret = fullName;
-        if (s.type == SymbolType.BRACKET_OPEN) {
+        if (s.isType(SymbolType.BRACKET_OPEN, SymbolType.DOT)) {
             lexer.pushback(s);
-            if (attrBracket) {
-                lexer.pushback(new ParsedSymbol(s.position - 1, SymbolGroup.OPERATOR, SymbolType.ATTRIBUTE, "@"));
-                lexer.pushback(new ParsedSymbol(s.position - 2, SymbolGroup.OPERATOR, SymbolType.DOT, "."));
-            }
             ret = member(fullName, errors, thisType, needsActivation, importedClasses, openedNamespaces, true, registerVars, inFunction, inMethod, isStatic, variables, abc);
         } else {
             lexer.pushback(s);
@@ -1312,14 +1310,7 @@ public class ActionScript3SimpleParser implements SimpleParser {
     private boolean xml(List<SimpleParseException> errors, TypeItem thisType, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean isStatic, List<VariableOrScope> variables, ABC abc) throws IOException, AVM2ParseException, SimpleParseException, InterruptedException {
         List<String> openedTags = new ArrayList<>();
         xmltag(errors, thisType, new Reference<>(false), openedTags, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, isStatic, variables, abc);
-        lexer.setEnableWhiteSpace(true);
         lexer.begin(ActionScriptLexer.YYINITIAL);
-        ParsedSymbol s = lexer.lex();
-        while (s.isType(SymbolType.XML_WHITESPACE)) {
-            s = lexer.lex();
-        }
-        lexer.setEnableWhiteSpace(false);
-        lexer.pushback(s);
         //TODO: Order of additions as in official compiler
         return true;
     }

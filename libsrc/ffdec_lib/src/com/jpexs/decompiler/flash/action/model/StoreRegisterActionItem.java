@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -110,6 +111,14 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
         super(instruction, lineStartIns, PRECEDENCE_ASSIGNMENT, value);
         this.register = register;
         this.define = define;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        super.visit(visitor);
+        if (compoundValue != null) {
+            visitor.visit(compoundValue);
+        }
     }
 
     @Override

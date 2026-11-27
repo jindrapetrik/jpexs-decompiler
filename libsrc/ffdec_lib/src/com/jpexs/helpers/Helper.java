@@ -162,12 +162,13 @@ public class Helper {
     }
 
     /**
-     * Escapes string by adding backslashes
+     * Escapes string by adding backslashes.
+     * This one does not escape ' and ".
      *
      * @param s String to escape
      * @return Escaped string
      */
-    public static String escapeString(String s) {
+    public static String escapeStringNoQuotes(String s) {
         StringBuilder ret = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);

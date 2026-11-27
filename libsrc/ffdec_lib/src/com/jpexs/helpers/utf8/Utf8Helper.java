@@ -50,6 +50,8 @@ public class Utf8Helper {
 
     private static List<String> allowedCharsets = null;
 
+    private static final Pattern INVALID_UTF8_PATTERN = Pattern.compile("\\{invalid_utf8[=:]([0-9]+)\\}");
+
     /**
      * Get a list of allowed charsets. They are limited to single byte charsets
      * + allowedVariableLengthCharsets
@@ -118,29 +120,17 @@ public class Utf8Helper {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
-            Pattern invPattern = Pattern.compile("^(\\{invalid_utf8[=:]([0-9]+)\\}).*", Pattern.DOTALL);
-            for (int i = 0; i < string.length(); i++) {
-                char c = string.charAt(i);
-                if (c == '{') {
-                    String subStr = string.substring(i);
-                    if (!subStr.isEmpty() && subStr.charAt(0) == '+') {
-                        baos.write(("" + c).getBytes(charset));
-                        i++;
-                        continue;
-                    }
-
-                    Matcher m = invPattern.matcher(subStr);
-                    if (m.matches()) {
-                        int v = Integer.parseInt(m.group(2));
-                        baos.write(v);
-                        i += m.group(1).length();
-                        i--;
-                        continue;
-                    }
-
-                }
-                baos.write(("" + c).getBytes(charset));
+            // Match only the escape itself. Matching the entire remaining
+            // suffix for every escape makes strings with many invalid bytes
+            // quadratic, and action lengths can encode them repeatedly.
+            Matcher matcher = INVALID_UTF8_PATTERN.matcher(string);
+            int start = 0;
+            while (matcher.find()) {
+                baos.write(string.substring(start, matcher.start()).getBytes(charset));
+                baos.write(Integer.parseInt(matcher.group(1)));
+                start = matcher.end();
             }
+            baos.write(string.substring(start).getBytes(charset));
         } catch (IOException iex) {
             //should not happen
         }

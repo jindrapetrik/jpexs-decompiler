@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.abc.avm2.instructions.arithmetic.DecrementIIns;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -41,16 +43,29 @@ public class DecrementAVM2Item extends AVM2Item {
         super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, object);
     }
 
+    private boolean isInteger() {
+        return getInstruction() != null && getInstruction().definition instanceof DecrementIIns;
+    }
+
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (value.getPrecedence() > precedence) {
+        boolean integer = isInteger();
+        if (integer) {
+            writer.append("int(");
+        }
+        if (integer && !TypeItem.INT.equals(value.returnType())) {
+            writer.append("int(");
+            value.toString(writer, localData);
+            writer.append(")");
+        } else if (value.getPrecedence() > precedence) {
             writer.append("(");
             value.toString(writer, localData);
             writer.append(")");
         } else {
             value.toString(writer, localData);
         }
-        return writer.append(" - 1");
+        writer.append(" - 1");
+        return integer ? writer.append(")") : writer;
     }
 
     @Override
@@ -64,12 +79,15 @@ public class DecrementAVM2Item extends AVM2Item {
 
     @Override
     public Object getResult() {
+        if (isInteger()) {
+            return EcmaScript.toInt32(value.getResult()) - 1;
+        }
         return value.getResultAsNumber() - 1;
     }
 
     @Override
-    public GraphTargetItem returnType() {       
-        return TypeItem.NUMBER;
+    public GraphTargetItem returnType() {
+        return isInteger() ? TypeItem.INT : TypeItem.NUMBER;
     }
 
     @Override
@@ -88,7 +106,10 @@ public class DecrementAVM2Item extends AVM2Item {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final GraphTargetItem other = (GraphTargetItem) obj;
+        final DecrementAVM2Item other = (DecrementAVM2Item) obj;
+        if (isInteger() != other.isInteger()) {
+            return false;
+        }
         if (!Objects.equals(this.value, other.value)) {
             return false;
         }

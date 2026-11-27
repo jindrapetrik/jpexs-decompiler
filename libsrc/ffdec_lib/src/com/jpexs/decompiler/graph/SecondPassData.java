@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.graph;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Second pass data.
@@ -35,4 +37,9 @@ public class SecondPassData {
      * List of breaks of each switch statement
      */
     public List<GraphPart> switchBreaks = new ArrayList<>();
+
+    /**
+     * Instruction positions targeted by unstructured jumps in the first pass.
+     */
+    public Set<Integer> gotoTargetIps = new HashSet<>();
 }

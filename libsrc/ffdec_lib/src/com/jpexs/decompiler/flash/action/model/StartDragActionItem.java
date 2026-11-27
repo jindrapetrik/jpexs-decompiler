@@ -26,6 +26,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -97,6 +98,19 @@ public class StartDragActionItem extends ActionItem {
         this.x2 = x2;
         this.y1 = y1;
         this.x1 = x1;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(target);
+        visitor.visit(lockCenter);
+        visitor.visit(constrain);
+        if (x1 != null) {
+            visitor.visit(x1);
+            visitor.visit(y1);
+            visitor.visit(x2);
+            visitor.visit(y2);
+        }
     }
 
     @Override

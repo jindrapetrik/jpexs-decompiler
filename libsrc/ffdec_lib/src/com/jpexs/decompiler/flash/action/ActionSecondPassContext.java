@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.graph.SecondPassData;
+import com.jpexs.helpers.Helper;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +35,9 @@ final class ActionSecondPassContext implements AutoCloseable {
     private static final ThreadLocal<ActionSecondPassContext> CURRENT = new ThreadLocal<>();
 
     private final Map<GraphKey, SecondPassData> secondPassData = new HashMap<>();
+
+    // Collected by child graphs and emitted by the owning scope in the render pass.
+    private final Map<Action, String> externalLabels = new IdentityHashMap<>();
 
     private boolean collecting = true;
 
@@ -74,6 +79,14 @@ final class ActionSecondPassContext implements AutoCloseable {
 
     public SecondPassData get(GraphKey key) {
         return secondPassData.get(key);
+    }
+
+    public String registerExternalLabel(Action action) {
+        return externalLabels.computeIfAbsent(action, item -> "addr" + Helper.formatAddress(item.getAddress()));
+    }
+
+    public String getExternalLabel(Action action) {
+        return externalLabels.get(action);
     }
 
     @Override

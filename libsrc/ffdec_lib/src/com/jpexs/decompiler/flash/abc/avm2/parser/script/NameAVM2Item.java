@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -280,6 +281,20 @@ public class NameAVM2Item extends AssignableAVM2Item {
      */
     public GraphTargetItem getStoreValue() {
         return assignedValue;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        if (type != null) {
+            visitor.visit(type);
+        }
+        if (ns != null) {
+            visitor.visit(ns);
+        }
+        if (redirect != null) {
+            visitor.visit(redirect);
+        }
+        super.visit(visitor);
     }
 
     @Override

@@ -19,25 +19,35 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.action.as2.ActionScript2ClassDetector;
 import com.jpexs.decompiler.flash.action.as2.Trait;
+import com.jpexs.decompiler.flash.action.model.CloneSpriteActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.PlayActionItem;
+import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTarget2ActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
+import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.StopActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
+import com.jpexs.decompiler.flash.action.model.TraceActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
+import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.TellTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.EqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictEqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictNeqActionItem;
+import com.jpexs.decompiler.flash.action.special.ActionStore;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
@@ -45,10 +55,12 @@ import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionEnumerate;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
@@ -59,6 +71,7 @@ import com.jpexs.decompiler.graph.GraphPartChangeException;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
@@ -69,13 +82,18 @@ import com.jpexs.decompiler.graph.ThrowState;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.CommentItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
+import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
+import com.jpexs.decompiler.graph.model.HasTempIndex;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LabelItem;
+import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
@@ -108,6 +126,8 @@ public class ActionGraph extends Graph {
      */
     private final Set<String> labelsOfRemovedGotos = new HashSet<>();
 
+    private ActionRegisterUsage registerUsage;
+
     /**
      * Inside DoInitAction
      */
@@ -117,6 +137,9 @@ public class ActionGraph extends Graph {
      * Inside function
      */
     private boolean insideFunction;
+
+    /** Parts whose execution from before the function would redeclare it. */
+    private final Set<GraphPart> recursiveFunctionEntries = new HashSet<>();
 
     /**
      * Needs uninitialized class fields detection
@@ -234,6 +257,67 @@ public class ActionGraph extends Graph {
 
     }
 
+    @Override
+    protected void beforeGetLoops(BaseLocalData localData, String path, Set<GraphPart> allParts, List<ThrowState> throwStates) throws InterruptedException {
+        if (insideFunction && startIp > 0 && startIp < code.size()) {
+            long startAddress = code.pos2adr(startIp);
+            Action lastAction = (Action) code.get(code.size() - 1);
+            long endAddress = lastAction.getAddress() + lastAction.getTotalActionLength();
+            for (int ip = startIp - 1; ip >= 0; ip--) {
+                GraphSourceItem item = code.get(ip);
+                if (!(item instanceof ActionDefineFunction) && !(item instanceof ActionDefineFunction2)) {
+                    continue;
+                }
+                GraphSourceItemContainer container = (GraphSourceItemContainer) item;
+                long bodyStart = ((Action) item).getAddress() + container.getHeaderSize();
+                if (bodyStart > startAddress || bodyStart + container.getContainerSizes().get(0) < endAddress) {
+                    continue;
+                }
+                GraphPart headerPart = searchPart(ip, allParts);
+                if (headerPart != null) {
+                    List<GraphPart> pending = new ArrayList<>();
+                    pending.add(headerPart);
+                    while (!pending.isEmpty()) {
+                        GraphPart part = pending.remove(pending.size() - 1);
+                        if (recursiveFunctionEntries.add(part)) {
+                            pending.addAll(part.refs);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        if (registerUsage == null) {
+            registerUsage = new ActionRegisterUsage(getGraphCode(), startIp);
+        }
+    }
+
+    /**
+     * Gets register usage shared with with/try subgraphs of this scope.
+     *
+     * @return Register usage
+     */
+    public ActionRegisterUsage getRegisterUsage() {
+        return registerUsage;
+    }
+
+    @Override
+    protected GraphPart checkPartWithOutput(List<GraphTargetItem> output, TranslateStack stack,
+            BaseLocalData localData, GraphPart prev, GraphPart part, Set<GraphPart> allParts) {
+        if (part.start < startIp && recursiveFunctionEntries.contains(part)) {
+            // A backward transfer which redeclares this function cannot be
+            // expanded into a finite tree of nested function declarations.
+            Action target = (Action) code.get(part.start);
+            ActionSecondPassContext context = ActionSecondPassContext.current();
+            String label = context == null ? "addr" + Helper.formatAddress(target.getAddress())
+                    : context.registerExternalLabel(target);
+            makeAllCommands(output, stack);
+            output.add(new GotoItem(ActionGraphTargetDialect.INSTANCE, target, localData.lineStartInstruction, label));
+            return null;
+        }
+        return super.checkPartWithOutput(output, stack, localData, prev, part, allParts);
+    }
+
     /**
      * Translates via Graph - decompiles.
      *
@@ -256,12 +340,40 @@ public class ActionGraph extends Graph {
      * @throws InterruptedException On interrupt
      */
     public static List<GraphTargetItem> translateViaGraph(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {
+        return translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, secondPassData,
+                insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp, null);
+    }
+
+    /**
+     * Translates a graph, optionally sharing register usage of its enclosing
+     * scope when translating a with/try section.
+     *
+     * @param usedDeobfuscations Used deobfuscations
+     * @param needsUninitializedClassFieldsDetection Needs uninitialized class fields detection
+     * @param uninitializedClassTraits Uninitialized class traits
+     * @param secondPassData Second pass data
+     * @param insideDoInitAction Is inside DoInitAction
+     * @param insideFunction Is inside a function or container
+     * @param registerNames Register names
+     * @param variables Variables
+     * @param functions Functions
+     * @param code Code
+     * @param version SWF version
+     * @param staticOperation Static operation
+     * @param path Script path
+     * @param charset Charset
+     * @param startIp Start IP
+     * @param registerUsage Register usage of the complete enclosing scope
+     * @return Translated items
+     * @throws InterruptedException On interruption
+     */
+    public static List<GraphTargetItem> translateViaGraph(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp, ActionRegisterUsage registerUsage) throws InterruptedException {
         ActionSecondPassContext context = ActionSecondPassContext.current();
         if (context != null && secondPassData == null) {
             ActionSecondPassContext.GraphKey key = context.getKey(code, startIp, path);
             if (context.isCollecting()) {
                 try {
-                    return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+                    return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp, registerUsage);
                 } catch (SecondPassException spe) {
                     context.put(key, spe.getData());
                     return spe.getFirstPassResult();
@@ -274,7 +386,7 @@ public class ActionGraph extends Graph {
                 HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
                 context.startCollecting();
                 try {
-                    translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+                    translateViaGraph(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, null, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp, registerUsage);
                 } finally {
                     context.startRendering();
                 }
@@ -287,11 +399,12 @@ public class ActionGraph extends Graph {
             secondPassData = collectedData;
         }
 
-        return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, secondPassData, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp);
+        return translateViaGraphOnce(usedDeobfuscations, needsUninitializedClassFieldsDetection, uninitializedClassTraits, secondPassData, insideDoInitAction, insideFunction, registerNames, variables, functions, code, version, staticOperation, path, charset, startIp, registerUsage);
     }
 
-    private static List<GraphTargetItem> translateViaGraphOnce(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp) throws InterruptedException {
+    private static List<GraphTargetItem> translateViaGraphOnce(Set<String> usedDeobfuscations, boolean needsUninitializedClassFieldsDetection, Map<String, Map<String, Trait>> uninitializedClassTraits, SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset, int startIp, ActionRegisterUsage registerUsage) throws InterruptedException {
         ActionGraph g = new ActionGraph(needsUninitializedClassFieldsDetection, uninitializedClassTraits, path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset, startIp);
+        g.registerUsage = registerUsage;
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, uninitializedClassTraits, usedDeobfuscations, new ArrayList<>(), new ArrayList<>());
         g.init(localData);
         return g.translate(localData, staticOperation, path);
@@ -332,6 +445,54 @@ public class ActionGraph extends Graph {
             }
         }
         return !isSwitch;
+    }
+  
+    @Override
+    protected GraphTargetItem getShortCircuitRightSide(List<GraphTargetItem> commands) {
+        if (commands.size() == 3 && commands.get(0) instanceof PopItem
+                && (commands.get(1) instanceof SetVariableActionItem || commands.get(1) instanceof SetMemberActionItem)
+                && commands.get(2) instanceof PushItem) {
+            SetTypeActionItem assignment = (SetTypeActionItem) commands.get(1);
+            GraphTargetItem result = commands.get(2).value;
+            if (assignment.getCompoundOperator() == null && assignment.getValue() instanceof StoreRegisterActionItem
+                    && result instanceof DirectValueActionItem && ((DirectValueActionItem) result).value instanceof RegisterNumber) {
+                StoreRegisterActionItem store = (StoreRegisterActionItem) assignment.getValue();
+                if (!store.define && store.register.number == ((RegisterNumber) ((DirectValueActionItem) result).value).number) {
+                    // A reused register is still an assignment result. Keep its
+                    // write in the expression in case it is read again later.
+                    if (commands.get(1) instanceof SetVariableActionItem) {
+                        GraphTargetItem name = ((SetVariableActionItem) commands.get(1)).name;
+                        if (!(name instanceof DirectValueActionItem) || !((DirectValueActionItem) name).isString()
+                                || !IdentifiersDeobfuscation.isValidName(false, name.toStringNoQuotes(LocalData.empty), "this", "super")) {
+                            // set(name, value) does not return the assigned value.
+                            List<GraphTargetItem> expressions = new ArrayList<>();
+                            expressions.add(commands.get(1));
+                            expressions.add(result);
+                            return new CommaExpressionItem(dialect, null, result.getLineStartItem(), expressions);
+                        }
+                    }
+                    List<GraphSourceItemPos> reads = registerUsage == null ? null : registerUsage.getReads(store.getSrc());
+                    if (store.register.name == null && reads != null && reads.size() == 1
+                            && reads.get(0).item == result.getSrc() && reads.get(0).pos == result.getPos()) {
+                        // Only this consumed read uses the write. Return a copy:
+                        // the caller may still decide this is not a logical operator.
+                        GraphTargetItem original = commands.get(1);
+                        if (original instanceof SetVariableActionItem) {
+                            SetVariableActionItem variable = (SetVariableActionItem) original;
+                            SetVariableActionItem replacement = new SetVariableActionItem(original.getSrc(), original.getLineStartItem(), variable.name, store.value);
+                            replacement.forceUseSet = variable.forceUseSet;
+                            return replacement;
+                        }
+                        SetMemberActionItem member = (SetMemberActionItem) original;
+                        SetMemberActionItem replacement = new SetMemberActionItem(original.getSrc(), original.getLineStartItem(), member.object, member.objectName, store.value);
+                        replacement.isSetter = member.isSetter;
+                        return replacement;
+                    }
+                    return commands.get(1);
+                }
+            }
+        }
+        return super.getShortCircuitRightSide(commands);
     }
 
     @Override
@@ -416,7 +577,7 @@ public class ActionGraph extends Graph {
                         t--;
                         continue;
                     }
-                    if ((st.target instanceof DirectValueActionItem) && st.target.getResult().equals("")) {
+                    if ((st.target instanceof DirectValueActionItem) && "".equals(st.target.getResult())) {
                         if (targetStart > -1) {
                             targetEnd = t;
                             break;
@@ -479,7 +640,7 @@ public class ActionGraph extends Graph {
             }
             if (it instanceof SetTarget2ActionItem) {
                 SetTarget2ActionItem st = (SetTarget2ActionItem) it;
-                if ((st.target instanceof DirectValueActionItem) && st.target.getResult().equals("")) {
+                if ((st.target instanceof DirectValueActionItem) && "".equals(st.target.getResult())) {
                     if (targetStart > -1) {
                         targetEnd = t;
                     } else {
@@ -518,7 +679,213 @@ public class ActionGraph extends Graph {
                 t = -1;
             }
         }
+        resolveFrameLoadedBooleanBranches(list);
+        resolveDuplicatedComparisonChains(list);
+        structureForInLoops(list, localData);
+
+        for (int t = 0; t < list.size(); t++) {
+            GraphTargetItem it = list.get(t);
+            if (it instanceof PushItem) {
+                it = it.value;
+            }
+            if (it instanceof EnumeratedValueActionItem) {
+                list.remove(t);
+                t--;
+            }
+        }
+
+        //Handle for loops at the end:
+        super.finalProcess(parent, list, level, localData, path);
+        removeUnreachableGotosAfterTerminalControl(list);
+    }
+
+    private boolean hasFrameLoadedBooleanValue(GraphTargetItem item, boolean value) {
+        if (item instanceof TrueItem || item instanceof FalseItem) {
+            return (item instanceof TrueItem) == value;
+        }
+        if (!(item instanceof DirectValueActionItem)) {
+            return false;
+        }
+        DirectValueActionItem literal = (DirectValueActionItem) item;
+        if (literal.isVariableComputed() || !(literal.value instanceof Boolean
+                || literal.value instanceof Number || literal.isString())) {
+            return false;
+        }
+        Object result = literal.getResult();
+        if (((ActionGraphSource) code).version <= 4) {
+            // SWF 4 uses numeric conditions, including the strings "0" and "1".
+            double number = EcmaScript.toNumberAs2(result);
+            return (!Double.isNaN(number) && number != 0) == value;
+        }
+        return EcmaScript.toBoolean(result) == value;
+    }
+
+    private void resolveFrameLoadedBooleanBranches(List<GraphTargetItem> list) {
+        for (int i = 0; i + 2 < list.size(); i++) {
+            if (!(list.get(i) instanceof PushItem) || !hasFrameLoadedBooleanValue(list.get(i).value, false)
+                    || !(list.get(i + 1) instanceof IfFrameLoadedActionItem)
+                    || !(list.get(i + 2) instanceof IfItem)) {
+                continue;
+            }
+            IfFrameLoadedActionItem loaded = (IfFrameLoadedActionItem) list.get(i + 1);
+            IfItem branch = (IfItem) list.get(i + 2);
+            GraphTargetItem condition = branch.expression;
+            while (condition instanceof NotItem && condition.value instanceof NotItem) {
+                condition = condition.value.value;
+            }
+            List<GraphTargetItem> body = loaded.getActions();
+            // The skipped pair must replace the saved false with true. A graph
+            // translated separately for this pair can print its final push as
+            // a bare value, even though the surrounding graph consumes it.
+            if (!(loaded.getSrc() instanceof ActionStore) || ((ActionStore) loaded.getSrc()).getStoreSize() != 2
+                    || body.size() != 2 || !(body.get(0) instanceof PopItem)
+                    || ((PopItem) body.get(0)).resolvedValue != null
+                    || !hasFrameLoadedBooleanValue(body.get(1) instanceof PushItem ? body.get(1).value : body.get(1), true)
+                    || !(condition instanceof PopItem) || ((PopItem) condition).resolvedValue != null
+                    || (branch.onFalse != null && !branch.onFalse.isEmpty())) {
+                continue;
+            }
+            list.set(i, new IfFrameLoadedActionItem(loaded.getFrame(), branch.onTrue, loaded.getSrc(), loaded.getLineStartItem()));
+            list.remove(i + 1);
+            list.remove(i + 1);
+        }
+    }
+
+    private boolean isCachedTemporary(GraphTargetItem item, int index) {
+        return item instanceof HasTempIndex && !(item instanceof SetTemporaryItem)
+                && ((HasTempIndex) item).getTempIndex() == index;
+    }
+
+    private boolean leavesPreservedStackAlone(List<GraphTargetItem> commands, int preservedTemp) {
+        Reference<Boolean> valid = new Reference<>(true);
+        Set<GraphTargetItem> seen = new LinkedIdentityHashSet<>();
+        GraphTargetVisitorInterface visitor = new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem item) {
+                if (item == null || !valid.getVal() || !seen.add(item) || item instanceof FunctionActionItem) {
+                    return false;
+                }
+                if (item instanceof PushItem || (item instanceof PopItem && ((PopItem) item).resolvedValue == null)
+                        || item instanceof EnumerateActionItem || item instanceof EnumeratedValueActionItem
+                        || item instanceof GotoItem || item instanceof LabelItem || item instanceof BreakItem || item instanceof ContinueItem
+                        || (item instanceof SetTemporaryItem && ((SetTemporaryItem) item).tempIndex == preservedTemp)) {
+                    valid.setVal(false);
+                    return false;
+                }
+                // Temporary references print the cached value, not their backing expression.
+                if (!(item instanceof HasTempIndex) || item instanceof SetTemporaryItem) {
+                    item.visit(this);
+                }
+                return true;
+            }
+        };
+        for (GraphTargetItem command : commands) {
+            visitor.visit(command);
+        }
+        return valid.getVal();
+    }
+
+    private boolean isCachedComparison(IfItem item, int temp, int preservedTemp) {
+        if (!(item.expression instanceof EqActionItem || item.expression instanceof NeqActionItem)) {
+            return false;
+        }
+        BinaryOpItem comparison = (BinaryOpItem) item.expression;
+        GraphTargetItem other;
+        if (isCachedTemporary(comparison.leftSide, temp)) {
+            other = comparison.rightSide;
+        } else if (isCachedTemporary(comparison.rightSide, temp)) {
+            other = comparison.leftSide;
+        } else {
+            return false;
+        }
+        List<GraphTargetItem> expression = new ArrayList<>();
+        expression.add(other);
+        return leavesPreservedStackAlone(expression, preservedTemp);
+    }
+
+    private boolean isRestoredComparison(List<GraphTargetItem> commands) {
+        return commands.size() == 3 && commands.get(0) instanceof SetTemporaryItem
+                && commands.get(1) instanceof PushItem && commands.get(2) instanceof IfItem;
+    }
+
+    private void resolveDuplicatedComparisonChains(List<GraphTargetItem> list) {
+        for (int i = 1; i + 2 < list.size(); i++) {
+            if (!(list.get(i - 1) instanceof SetTemporaryItem) || !(list.get(i) instanceof PushItem)
+                    || !(list.get(i + 1) instanceof IfItem) || !(list.get(i + 2) instanceof PopItem)
+                    || ((PopItem) list.get(i + 2)).resolvedValue != null) {
+                continue;
+            }
+            SetTemporaryItem snapshot = (SetTemporaryItem) list.get(i - 1);
+            if (snapshot.tempIndex <= 0 || !isCachedTemporary(list.get(i).value, snapshot.tempIndex)) {
+                continue;
+            }
+            IfItem current = (IfItem) list.get(i + 1);
+            int currentTemp = snapshot.tempIndex;
+            Set<Integer> aliases = new HashSet<>();
+            aliases.add(currentTemp);
+            List<List<GraphTargetItem>> restores = new ArrayList<>();
+            List<PopItem> pops = new ArrayList<>();
+            boolean valid = true;
+            while (true) {
+                if (!isCachedComparison(current, currentTemp, snapshot.tempIndex)) {
+                    valid = false;
+                    break;
+                }
+                boolean restoreTrue = isRestoredComparison(current.onTrue);
+                boolean restoreFalse = isRestoredComparison(current.onFalse);
+                if (restoreTrue == restoreFalse) {
+                    valid = !restoreTrue && leavesPreservedStackAlone(current.onTrue, snapshot.tempIndex)
+                            && leavesPreservedStackAlone(current.onFalse, snapshot.tempIndex);
+                    break;
+                }
+                List<GraphTargetItem> unmatched = restoreTrue ? current.onTrue : current.onFalse;
+                List<GraphTargetItem> matched = restoreTrue ? current.onFalse : current.onTrue;
+                if (!leavesPreservedStackAlone(matched, snapshot.tempIndex)) {
+                    valid = false;
+                    break;
+                }
+                SetTemporaryItem restore = (SetTemporaryItem) unmatched.get(0);
+                if (!(restore.value instanceof PopItem) || ((PopItem) restore.value).resolvedValue != null
+                        || restore.tempIndex <= 0 || !aliases.add(restore.tempIndex)
+                        || !isCachedTemporary(unmatched.get(1).value, restore.tempIndex)) {
+                    valid = false;
+                    break;
+                }
+                restores.add(unmatched);
+                pops.add((PopItem) restore.value);
+                currentTemp = restore.tempIndex;
+                current = (IfItem) unmatched.get(2);
+            }
+            if (!valid || restores.isEmpty()) {
+                continue;
+            }
+            // Every branch preserves this one stack slot. The duplicates in
+            // subsequent comparisons therefore read the original cached value.
+            for (int r = 0; r < restores.size(); r++) {
+                List<GraphTargetItem> restored = restores.get(r);
+                SetTemporaryItem alias = (SetTemporaryItem) restored.get(0);
+                IfItem next = (IfItem) restored.get(2);
+                BinaryOpItem comparison = (BinaryOpItem) next.expression;
+                GraphTargetItem cached = new TemporaryItem(dialect, snapshot.getSrc(), snapshot.getLineStartItem(), snapshot.value, snapshot.tempIndex);
+                pops.get(r).resolvedValue = cached;
+                if (isCachedTemporary(comparison.leftSide, alias.tempIndex)) {
+                    comparison.leftSide = cached;
+                } else {
+                    comparison.rightSide = cached;
+                }
+                restored.remove(1);
+            }
+            list.remove(i + 2);
+            list.remove(i);
+        }
+    }
+
+    private void structureForInLoops(List<GraphTargetItem> list, FinalProcessLocalData localData) {
         for (int t = 1/*not first*/; t < list.size(); t++) {
+            if (structureCopiedEnumerationKey(list, t)) {
+                t--;
+                continue;
+            }
             GraphTargetItem it = list.get(t);
             List<GraphTargetItem> checkedBody = null;
             GraphTargetItem checkedCondition = null;
@@ -645,22 +1012,79 @@ public class ActionGraph extends Graph {
                 }
             }
         }
+    }
 
-        for (int t = 0; t < list.size(); t++) {
-            GraphTargetItem it = list.get(t);
-            if (it instanceof PushItem) {
-                it = it.value;
-            }
-            if (it instanceof EnumeratedValueActionItem) {
-                list.remove(t);
-                t--;
+    private boolean isNullValue(GraphTargetItem item) {
+        return item instanceof DirectValueActionItem && ((DirectValueActionItem) item).value == Null.INSTANCE;
+    }
+
+    private boolean isRegisterValue(GraphTargetItem item, int register) {
+        return item instanceof DirectValueActionItem && ((DirectValueActionItem) item).value instanceof RegisterNumber
+                && ((RegisterNumber) ((DirectValueActionItem) item).value).number == register;
+    }
+
+    private boolean structureCopiedEnumerationKey(List<GraphTargetItem> list, int index) {
+        if (!(list.get(index - 1) instanceof EnumerateActionItem) || !(list.get(index) instanceof WhileItem)
+                || index + 1 >= list.size() || !(list.get(index + 1) instanceof WhileItem)) {
+            return false;
+        }
+        WhileItem loop = (WhileItem) list.get(index);
+        WhileItem drain = (WhileItem) list.get(index + 1);
+        List<GraphTargetItem> body = loop.commands;
+        if (loop.expression.size() != 1 || !(loop.expression.get(0) instanceof TrueItem) || body.size() < 4
+                || !(body.get(0) instanceof PushItem) || !(body.get(0).value instanceof StoreRegisterActionItem)
+                || !(body.get(1) instanceof IfItem) || !(body.get(2) instanceof PopItem)
+                || ((PopItem) body.get(2)).resolvedValue != null
+                || !(body.get(3) instanceof SetVariableActionItem || body.get(3) instanceof SetMemberActionItem)
+                || drain.expression.size() != 1 || !drain.commands.isEmpty()
+                || !(drain.expression.get(0) instanceof NeqActionItem)) {
+            return false;
+        }
+        StoreRegisterActionItem store = (StoreRegisterActionItem) body.get(0).value;
+        IfItem endCheck = (IfItem) body.get(1);
+        if (!(store.value.getThroughDuplicate() instanceof EnumeratedValueActionItem)
+                || !(endCheck.expression instanceof EqActionItem) || !endCheck.onFalse.isEmpty()
+                || endCheck.onTrue.size() != 1 || !(endCheck.onTrue.get(0) instanceof BreakItem)
+                || ((BreakItem) endCheck.onTrue.get(0)).loopId != loop.loop.id) {
+            return false;
+        }
+        EqActionItem comparison = (EqActionItem) endCheck.expression;
+        GraphTargetItem key = comparison.leftSide;
+        if (isNullValue(key)) {
+            key = comparison.rightSide;
+        } else if (!isNullValue(comparison.rightSide)) {
+            return false;
+        }
+        SetTypeActionItem assignment = (SetTypeActionItem) body.get(3);
+        NeqActionItem drainCheck = (NeqActionItem) drain.expression.get(0);
+        boolean drainsEnumeration = (drainCheck.leftSide instanceof EnumeratedValueActionItem && isNullValue(drainCheck.rightSide))
+                || (drainCheck.rightSide instanceof EnumeratedValueActionItem && isNullValue(drainCheck.leftSide));
+        if (store.register.name != null || assignment.getCompoundOperator() != null
+                || !isRegisterValue(key, store.register.number) || !isRegisterValue(assignment.getValue(), store.register.number)
+                || !drainsEnumeration || registerUsage == null) {
+            return false;
+        }
+        List<GraphSourceItemPos> reads = registerUsage.getReads(store.getSrc());
+        if (reads == null || reads.size() != 2) {
+            return false;
+        }
+        for (GraphSourceItemPos read : reads) {
+            if (!(read.item == key.getSrc() && read.pos == key.getPos())
+                    && !(read.item == assignment.getValue().getSrc() && read.pos == assignment.getValue().getPos())) {
+                return false;
             }
         }
-
-        //Handle for loops at the end:
-        super.finalProcess(parent, list, level, localData, path);
-        removeUnreachableGotosAfterTerminalControl(list);
-
+        EnumerateActionItem enumerate = (EnumerateActionItem) list.get(index - 1);
+        GraphTargetItem object = enumerate.object;
+        List<GraphTargetItem> commands = new ArrayList<>(body.subList(4, body.size()));
+        assignment.setValue(new DirectValueActionItem(Null.INSTANCE));
+        // The extra stack copy and the empty drain belong to the enumeration
+        // protocol. The source-level for-in also handles cleanup on break.
+        for (int i = index + 1; i >= index - 1; i--) {
+            list.remove(i);
+        }
+        list.add(index - 1, new ForInActionItem(null, null, loop.loop, (GraphTargetItem) assignment, object, commands));
+        return true;
     }
 
     private void removeUnreachableGotosAfterTerminalControl(List<GraphTargetItem> list) {
@@ -683,6 +1107,9 @@ public class ActionGraph extends Graph {
     @Override
     protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
         super.finalProcessAfter(list, level, localData, path);
+        // An inner enumeration may become a conditional while only after
+        // the graph pass has moved its continue of the outer loop.
+        structureForInLoops(list, localData);
         Set<String> usedLabels = new HashSet<>();
         collectUsedLabels(list, usedLabels);
         for (int i = list.size() - 1; i >= 0; i--) {
@@ -778,6 +1205,9 @@ public class ActionGraph extends Graph {
         if (insideDoInitAction && !insideFunction) {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
             detector.checkClass(uninitializedClassTraits, ret, ((ActionGraphSource) code).getVariables(), path);
+            // Class construction can contain pops that disappear only during
+            // detection, after the common graph pass checked unused pushes.
+            promoteUnpoppedPushItemsToCommands(ret);
             if (needsUninitializedClassFieldsDetection && Configuration.skipDetectionOfUninitializedClassFields.get()) {
                 ret.add(0, new CommentItem(AppResources.translate("decompilationWarning.as2.noUninitializedClassFieldsDetection")));
             }
@@ -831,8 +1261,12 @@ public class ActionGraph extends Graph {
                         if (item instanceof TemporaryRegister) {
                             return true;
                         }
-                        //can has definition in for in...
+                        // A for-in header can declare its iteration register directly.
                         if ((ti instanceof ForInActionItem) && (item == ((ForInActionItem) ti).variableName)) {
+                            if (item instanceof StoreRegisterActionItem) {
+                                StoreRegisterActionItem sr = (StoreRegisterActionItem) item;
+                                sr.define = definedRegisters.add(sr.register.number);
+                            }
                             return true;
                         }
                         if (item instanceof StoreRegisterActionItem) {

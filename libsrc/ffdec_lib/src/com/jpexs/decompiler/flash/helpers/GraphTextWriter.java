@@ -16,10 +16,15 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import java.util.Map;
 
 /**
  * Provides methods for highlighting positions of instructions in the text.
@@ -27,6 +32,30 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
  * @author JPEXS
  */
 public abstract class GraphTextWriter {
+
+    /**
+     * Namespace aliases for the script being written, or null outside a script.
+     */
+    private Map<String, DottedChain> generatedNamespaces;
+
+    public Map<String, DottedChain> getGeneratedNamespaces() {
+        return generatedNamespaces;
+    }
+
+    public void setGeneratedNamespaces(Map<String, DottedChain> generatedNamespaces) {
+        this.generatedNamespaces = generatedNamespaces;
+    }
+
+    public DottedChain getGeneratedNamespace(String uri) {
+        return generatedNamespaces == null ? null : generatedNamespaces.get(uri);
+    }
+
+    public DottedChain getGeneratedNamespace(Multiname multiname, AVM2ConstantPool constants) {
+        if (generatedNamespaces == null || multiname.getSimpleNamespaceKind(constants) != Namespace.KIND_NAMESPACE) {
+            return null;
+        }
+        return getGeneratedNamespace(multiname.getSimpleNamespaceName(constants).toRawString());
+    }
 
     /**
      * Start time

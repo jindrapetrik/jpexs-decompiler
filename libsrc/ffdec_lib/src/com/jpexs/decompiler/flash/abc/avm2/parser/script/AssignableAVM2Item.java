@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.OrItem;
 import com.jpexs.helpers.Reference;
@@ -41,6 +42,14 @@ public abstract class AssignableAVM2Item extends AVM2Item {
      * Assigned value
      */
     protected GraphTargetItem assignedValue;
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        super.visit(visitor);
+        if (assignedValue != null) {
+            visitor.visit(assignedValue);
+        }
+    }
 
     /**
      * Makes coerced.

@@ -562,6 +562,13 @@ public abstract class InstructionDefinition implements Serializable {
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins, output);
         GraphTargetItem obj = stack.pop();
 
+        if (!init && foldPrefixPropertyUpdate(localData, stack, obj, multiname, value)) {
+            return;
+        }
+        if (!init && foldPostfixPropertyUpdate(localData, stack, output, obj, multiname, value)) {
+            return;
+        }
+
         /*
         if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
             boolean isIncrement = (value instanceof IncrementAVM2Item);
@@ -1401,6 +1408,104 @@ public abstract class InstructionDefinition implements Serializable {
         }
         SetPropertyIns.handleCompound(localData, obj, multiname, value, output, stack, result);
         SetTypeIns.handleResult(value, stack, output, localData, (GraphTargetItem) result, -1, type.getVal());
+    }
+
+    private boolean foldPrefixPropertyUpdate(AVM2LocalData localData, TranslateStack stack,
+            GraphTargetItem obj, FullMultinameAVM2Item name, GraphTargetItem value) {
+        // ASC duplicates the increment result before storing it in a temporary register.
+        if (!(obj instanceof LocalRegAVM2Item) || !(value instanceof LocalRegAVM2Item)
+                || stack.isEmpty() || !(stack.peek() instanceof SetLocalAVM2Item)
+                || name.name != null || name.namespace != null) {
+            return false;
+        }
+        SetLocalAVM2Item saved = (SetLocalAVM2Item) stack.peek();
+        LocalRegAVM2Item loaded = (LocalRegAVM2Item) value;
+        GraphTargetItem update = saved.value;
+        if (!saved.directlyCausedByDup || saved.regIndex != loaded.regIndex || saved.getSrc() == null || loaded.getSrc() == null
+                || loaded.computedValue == null || loaded.computedValue.getThroughDuplicate() != update
+                || !(update instanceof IncrementAVM2Item || update instanceof DecrementAVM2Item)
+                || !(update.value instanceof GetPropertyAVM2Item)) {
+            return false;
+        }
+        // uint prefix updates keep a Number result on the stack and coerce
+        // only the value stored back to the property. int updates use int arithmetic.
+        GraphTargetItem numberType = update.returnType();
+        GetPropertyAVM2Item property = (GetPropertyAVM2Item) update.value;
+        if (!(property.object instanceof FindPropertyAVM2Item)
+                || property.object != ((LocalRegAVM2Item) obj).computedValue
+                || !name.equals(property.propertyName)
+                || !(numberType.equals(property.returnType())
+                    || (TypeItem.NUMBER.equals(numberType) && TypeItem.UINT.equals(property.returnType())))) {
+            return false;
+        }
+        Set<Integer> usages = localData.getSetLocalUsages(localData.code.adr2pos(saved.getSrc().getAddress()));
+        if (usages.size() != 1 || !usages.contains(localData.code.adr2pos(loaded.getSrc().getAddress()))) {
+            return false;
+        }
+
+        stack.pop();
+        stack.push(update instanceof IncrementAVM2Item
+                ? new PreIncrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, numberType)
+                : new PreDecrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, numberType));
+        return true;
+    }
+
+    private boolean foldPostfixPropertyUpdate(AVM2LocalData localData, TranslateStack stack, List<GraphTargetItem> output,
+            GraphTargetItem obj, FullMultinameAVM2Item name, GraphTargetItem value) {
+        // ASC saves the old value on the stack and writes the updated value through a local register.
+        int start = output.size() - 3;
+        if (!stack.isEmpty() || start < 0 || !(obj instanceof LocalRegAVM2Item) || !(value instanceof LocalRegAVM2Item)
+                || name.name != null || name.namespace != null || !(output.get(start) instanceof SetTemporaryItem)
+                || !(output.get(start + 1) instanceof PushItem) || !(output.get(start + 1).value instanceof DuplicateSourceItem)
+                || !(output.get(start + 2) instanceof SetLocalAVM2Item)) {
+            return false;
+        }
+
+        SetTemporaryItem original = (SetTemporaryItem) output.get(start);
+        DuplicateSourceItem oldValue = (DuplicateSourceItem) output.get(start + 1).value;
+        SetLocalAVM2Item saved = (SetLocalAVM2Item) output.get(start + 2);
+        LocalRegAVM2Item loaded = (LocalRegAVM2Item) value;
+        GraphTargetItem update = saved.value;
+        if (saved.regIndex != loaded.regIndex || saved.getSrc() == null || loaded.getSrc() == null
+                || loaded.computedValue != update || !(update instanceof IncrementAVM2Item || update instanceof DecrementAVM2Item)
+                || !(update.value instanceof DuplicateItem)) {
+            return false;
+        }
+
+        DuplicateItem duplicate = (DuplicateItem) update.value;
+        GraphTargetItem oldValueExpression = original.value;
+        GraphTargetItem propertyExpression = oldValueExpression;
+        if (propertyExpression instanceof ConvertAVM2Item && TypeItem.NUMBER.equals(propertyExpression.returnType())) {
+            propertyExpression = propertyExpression.value;
+        }
+        if (!(propertyExpression instanceof GetPropertyAVM2Item)) {
+            return false;
+        }
+        GetPropertyAVM2Item property = (GetPropertyAVM2Item) propertyExpression;
+        GraphTargetItem numberType = update.returnType();
+        boolean integerUpdate = TypeItem.INT.equals(numberType) && TypeItem.INT.equals(property.returnType());
+        boolean numberUpdate = TypeItem.NUMBER.equals(numberType) && TypeItem.NUMBER.equals(oldValueExpression.returnType());
+        if (duplicate.tempIndex != original.tempIndex || oldValue.tempIndex != original.tempIndex
+                || duplicate.getThroughDuplicate() != oldValueExpression || oldValue.getThroughDuplicate() != oldValueExpression
+                || !(property.object instanceof FindPropertyAVM2Item)
+                || property.object != ((LocalRegAVM2Item) obj).computedValue
+                || !name.equals(property.propertyName) || !(integerUpdate || numberUpdate)) {
+            return false;
+        }
+
+        Set<Integer> usages = localData.getSetLocalUsages(localData.code.adr2pos(saved.getSrc().getAddress()));
+        if (usages.size() != 1 || !usages.contains(localData.code.adr2pos(loaded.getSrc().getAddress()))) {
+            return false;
+        }
+
+        for (int i = output.size() - 1; i >= start; i--) {
+            output.remove(i);
+        }
+        stack.moveToStack(output);
+        stack.push(update instanceof IncrementAVM2Item
+                ? new PostIncrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, numberType)
+                : new PostDecrementAVM2Item(update.getSrc(), update.getLineStartItem(), property, numberType));
+        return true;
     }
 
     /**

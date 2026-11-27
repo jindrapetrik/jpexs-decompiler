@@ -108,6 +108,11 @@ public class LocalData {
     public int classIndex;
 
     /**
+     * Script index, or -1 if unknown
+     */
+    public int scriptIndex = -1;
+
+    /**
      * Current AS2 class and names shadowed by function locals.
      */
     public As2ClassMemberScope as2ClassMemberScope;
@@ -148,6 +153,26 @@ public class LocalData {
      * @return Local data
      */
     public static LocalData create(List<MethodBody> callStack, AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods, ScriptExportMode exportMode, int swfVersion, Set<String> usedDeobfuscations, int classIndex) {
+        return create(callStack, abcIndex, abc, localRegNames, fullyQualifiedNames, seenMethods, exportMode, swfVersion, usedDeobfuscations, classIndex, -1);
+    }
+
+    /**
+     * Creates local data for an AVM2 script.
+     *
+     * @param callStack Call stack
+     * @param abcIndex ABC indexing
+     * @param abc ABC
+     * @param localRegNames Local register names
+     * @param fullyQualifiedNames Fully qualified names
+     * @param seenMethods Seen methods
+     * @param exportMode Export mode
+     * @param swfVersion SWF version
+     * @param usedDeobfuscations Used deobfuscations
+     * @param classIndex Class index
+     * @param scriptIndex Script index, or -1 if unknown
+     * @return Local data
+     */
+    public static LocalData create(List<MethodBody> callStack, AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods, ScriptExportMode exportMode, int swfVersion, Set<String> usedDeobfuscations, int classIndex, int scriptIndex) {
         LocalData localData = new LocalData();
         localData.abc = abc;
         localData.constantsAvm2 = abc.constants;
@@ -161,6 +186,7 @@ public class LocalData {
         localData.swf = abc.getSwf();
         localData.usedDeobfuscations = usedDeobfuscations;
         localData.classIndex = classIndex;
+        localData.scriptIndex = scriptIndex;
         return localData;
     }
 }

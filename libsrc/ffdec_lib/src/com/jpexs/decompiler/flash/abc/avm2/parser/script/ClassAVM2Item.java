@@ -132,8 +132,27 @@ public class ClassAVM2Item extends AVM2Item implements Block {
     }
 
     @Override
-    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitNoBlock(visitor);
+        if (traits != null) {
+            visitor.visitAll(traits);
+        }
+        if (iinit != null) {
+            visitor.visit(iinit);
+        }
+        if (staticInit != null) {
+            visitor.visitAll(staticInit);
+        }
+    }
 
+    @Override
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+        if (extendsOp != null) {
+            visitor.visit(extendsOp);
+        }
+        if (implementsOp != null) {
+            visitor.visitAll(implementsOp);
+        }
     }
 
     /**

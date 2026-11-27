@@ -1,0 +1,10 @@
+This package contains the OpenJDK 8 two-dimensional area implementation,
+from Azul Zulu 8u512-b09 (source revision de13ce86a602). The original
+copyright notices and GPL version 2 with Classpath exception apply.
+The Classpath exception is extended to this modified version.
+
+FFDec relocates the classes, renames Area to BezierArea, uses strict
+floating-point arithmetic and the local OpenJDK quadratic solver, and
+returns an empty area for a degenerate single-edge input. The port also adds
+collection type parameters. The sweep emits finished contours as it goes and
+coalesces adjoining slices on open chains instead of prematurely closing them.

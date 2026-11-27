@@ -24,8 +24,65 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.annotations.DataProvider;
 
 public class AVM2DeobfuscatorReplacementsTest {
+    @DataProvider(name = "branchFolds")
+    public Object[][] branchFolds() {
+        return new Object[][]{{false, false, 1}, {true, false, 1}, {false, true, 2}, {true, true, 2}};
+    }
+
+    @Test(dataProvider = "branchFolds")
+    public void testBatchBranchesMatchSequentialEdits(boolean firstTaken, boolean switchTaken, int firstPops) {
+        MethodBody sequential = body();
+        MethodBody batched = body();
+        AVM2DeobfuscatorSimpleOld.InstructionReplacements replacements =
+                new AVM2DeobfuscatorSimpleOld.InstructionReplacements(batched.getCode(), batched);
+        sequential.getCode().replaceInstruction(0, new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{7}), sequential);
+        replacements.put(0, new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{7}));
+        // Keep the original indices while applying edits from the end. The
+        // switch jumps to the other replaced branch, exercising its pop anchor.
+        int[] indices = {3, 1};
+        int[] targets = {switchTaken ? 1 : -1, firstTaken ? 5 : -1};
+        int[] pops = {1, firstPops};
+        java.util.List<AVM2Instruction> originals = new java.util.ArrayList<>(sequential.getCode().code);
+        for (int i = 0; i < indices.length; i++) {
+            int index = indices[i];
+            if (targets[i] >= 0) {
+                AVM2Instruction target = originals.get(targets[i]);
+                AVM2Instruction jump = new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{0});
+                sequential.getCode().replaceInstruction(index, jump, sequential);
+                for (int p = 0; p < pops[i]; p++) {
+                    sequential.getCode().insertInstruction(index, new AVM2Instruction(0,
+                            com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns.getInstance(), null), true, sequential);
+                }
+                jump.operands[0] = (int) (target.getAddress() - jump.getAddress() - jump.getBytesLength());
+            } else {
+                sequential.getCode().replaceInstruction(index, new AVM2Instruction(0,
+                        com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns.getInstance(), null), sequential);
+                for (int p = 1; p < pops[i]; p++) {
+                    sequential.getCode().insertInstruction(index, new AVM2Instruction(0,
+                            com.jpexs.decompiler.flash.abc.avm2.instructions.DeobfuscatePopIns.getInstance(), null), true, sequential);
+                }
+            }
+            replacements.foldBranch(index, targets[i], pops[i]);
+        }
+        replacements.flush();
+        Assert.assertTrue(replacements.flushBranches());
+        Assert.assertFalse(replacements.flushBranches());
+        Assert.assertEquals(batched.getCode().code.size(), sequential.getCode().code.size());
+        for (int i = 0; i < sequential.getCode().code.size(); i++) {
+            AVM2Instruction expected = sequential.getCode().code.get(i);
+            AVM2Instruction actual = batched.getCode().code.get(i);
+            Assert.assertEquals(actual.getAddress(), expected.getAddress());
+            Assert.assertEquals(actual.getBytes(), expected.getBytes());
+        }
+        Assert.assertEquals(batched.exceptions[0].start, sequential.exceptions[0].start);
+        Assert.assertEquals(batched.exceptions[0].end, sequential.exceptions[0].end);
+        Assert.assertEquals(batched.exceptions[0].target, sequential.exceptions[0].target);
+        batched.getCode().checkValidOffsets(batched);
+    }
+
     private MethodBody body() {
         AVM2Code code = new AVM2Code();
         code.code.add(new AVM2Instruction(0, AVM2Instructions.GetLocal, new int[]{128}));

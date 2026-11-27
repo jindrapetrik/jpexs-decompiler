@@ -69,8 +69,13 @@ public class WithAVM2Item extends AVM2Item {
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
-        visitor.visit(scope);
+        visitNoBlock(visitor);
         visitor.visitAll(items);
+    }
+
+    @Override
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+        visitor.visit(scope);
     }
 
     /**

@@ -406,7 +406,7 @@ public abstract class StaticTextTag extends TextTag {
                 if (!simpleSpacing.isEmpty()) {
                     //writer.append("[").newLine();
                     for (Character c : simpleSpacing.keySet()) {
-                        writer.append("spacing \"").append(Helper.escapeString("" + c)).append("\"");
+                        writer.append("spacing \"").append(Helper.escapeActionScriptString("" + c)).append("\"");
                         writer.append(" ");
                         writer.append(simpleSpacing.get(c));
                         writer.newLine();
@@ -418,10 +418,10 @@ public abstract class StaticTextTag extends TextTag {
                     //writer.append("[").newLine();
 
                     for (String spacingKey : spacing.keySet()) {
-                        writer.append("spacingpair \"").append(Helper.escapeString("" + spacingKey.charAt(0))).append("\"");
+                        writer.append("spacingpair \"").append(Helper.escapeActionScriptString("" + spacingKey.charAt(0))).append("\"");
                         writer.append(" ");
                         if (spacingKey.length() > 1) {
-                            writer.append("\"").append(spacingKey.charAt(1)).append("\"");
+                            writer.append("\"").append(Helper.escapeActionScriptString("" + spacingKey.charAt(1))).append("\"");
                         } else {
                             writer.append("\"\"");
                         }

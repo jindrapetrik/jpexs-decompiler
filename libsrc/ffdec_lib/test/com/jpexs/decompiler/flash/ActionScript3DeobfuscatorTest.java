@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGroupParts;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorSimpleOld;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
@@ -37,6 +38,11 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewCatchIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropVoidIns;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
@@ -44,14 +50,22 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.helpers.stat.StatisticData;
+import com.jpexs.helpers.stat.Statistics;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import macromedia.asc.util.Decimal128;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
@@ -73,6 +87,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     public void init() throws IOException, InterruptedException {
         //Main.initLogging(false);
         Configuration.autoDeobfuscate.set(true);
+        Configuration.simplifyExpressions.set(false);
         Configuration.decimalAddress.set(false);
         Configuration.decompilationTimeoutSingleMethod.set(Integer.MAX_VALUE);
         Configuration.padAs3PCodeInstructionName.set(false);
@@ -219,6 +234,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         MethodBody b = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
         AVM2Code code = ASM3Parser.parse(abc, new StringReader(str), null, b, new MethodInfo());
         b.setCode(code);
+        abc.addMethodInfo(new MethodInfo(new int[0], 0, 0, 0, new ValueKind[0], new int[0]));
         deobfuscator.avm2CodeRemoveTraps("test", 0, true, 0, abc, null, 0, b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         code.toASMSource(abc, abc.constants, new MethodInfo(), new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]), ScriptExportMode.PCODE, writer);
@@ -236,6 +252,14 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     private String recompileSource(String str) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+        return recompileSource(str, null);
+    }
+
+    private String recompileSource(String str, String scriptInitializer) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
+        return recompileSource(str, scriptInitializer, null);
+    }
+
+    private String recompileSource(String str, String scriptInitializer, Consumer<ABC> edit) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
         final ABC abc = new ABC(new ABCContainerTag() {
             @Override
             public ABC getABC() {
@@ -262,10 +286,77 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         ActionScript3Parser par = new ActionScript3Parser(index);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         par.addScript(str, "Test.as", 0, 0, swf.getDocumentClass(), abc);
+        if (edit != null) {
+            edit.accept(abc);
+        }
 
-        abc.script_info.get(0).getPacks(abc, 0, "", new ArrayList<>()).get(0).toSource(swf.getAbcIndex(), writer, abc.script_info.get(0).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false, false);
+        ConvertData conversion = new ConvertData();
+        ScriptInfo script = abc.script_info.get(0);
+        if (scriptInitializer != null) {
+            MethodBody body = abc.findBody(script.init_index);
+            body.max_regs = 2;
+            body.setCode(ASM3Parser.parse(abc, new StringReader(scriptInitializer), null, body, abc.method_info.get(script.init_index)));
+            conversion.deobfuscationMode = 0;
+        }
+        script.getPacks(abc, 0, "", new ArrayList<>()).get(0).toSource(swf.getAbcIndex(), writer, script.traits.traits, conversion, ScriptExportMode.AS, false, false, false);
         writer.finishHilights();
         return writer.toString();
+    }
+
+    @DataProvider(name = "invalidExceptionHandlers")
+    public Object[][] invalidExceptionHandlers() {
+        return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
+    }
+
+    @Test(dataProvider = "invalidExceptionHandlers")
+    public void testInvalidExceptionTargetDoesNotHideMethod(boolean deobfuscate, boolean keepValidCatch) throws Exception {
+        boolean oldDeobfuscate = Configuration.autoDeobfuscate.get();
+        Configuration.autoDeobfuscate.set(deobfuscate);
+        MethodBody[] original = new MethodBody[1];
+        byte[][] bytes = new byte[1][];
+        int[] target = new int[1];
+        try {
+            String result = recompileSource("package { public class Test { public static function test():void {"
+                    + "try { trace(\"body\"); } catch(e:Error) { trace(\"caught\"); } } } }", null, abc -> {
+                for (Trait trait : abc.class_info.get(0).static_traits.traits) {
+                    if (!(trait instanceof TraitMethodGetterSetter)) {
+                        continue;
+                    }
+                    MethodBody body = abc.findBody(((TraitMethodGetterSetter) trait).method_info);
+                    ABCException invalid = body.exceptions[0].clone();
+                    for (AVM2Instruction ins : body.getCode().code) {
+                        if (ins.definition instanceof CallPropVoidIns) {
+                            invalid.target = (int) ins.getAddress() + 1;
+                            break;
+                        }
+                    }
+                    if (keepValidCatch) {
+                        body.exceptions = new ABCException[]{invalid, body.exceptions[0]};
+                        for (AVM2Instruction ins : body.getCode().code) {
+                            if (ins.definition instanceof NewCatchIns) {
+                                ins.setOperand(0, 1, body.getCode(), body);
+                            }
+                        }
+                    } else {
+                        body.exceptions = new ABCException[]{invalid};
+                    }
+                    original[0] = body;
+                    bytes[0] = body.getCodeBytes().clone();
+                    target[0] = invalid.target;
+                    break;
+                }
+            });
+            Assert.assertFalse(result.contains("Decompilation error"), result);
+            assertTrue(result.contains("Ignored invalid exception handler #0"), result);
+            assertTrue(result.contains("trace(\"body\");"), result);
+            assertEquals(result.contains("catch(e:Error)"), keepValidCatch, result);
+            assertEquals(result.contains("trace(\"caught\");"), keepValidCatch, result);
+            assertEquals(original[0].exceptions.length, keepValidCatch ? 2 : 1);
+            assertEquals(original[0].exceptions[0].target, target[0]);
+            assertEquals(original[0].getCodeBytes(), bytes[0]);
+        } finally {
+            Configuration.autoDeobfuscate.set(oldDeobfuscate);
+        }
     }
 
     @DataProvider(name = "provideBasicTrueExpressions")
@@ -273,6 +364,232 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         return new Object[][]{
             {"1!=5"}, {"5==5"}, {"1<4"}, {"5>4"}, {"5*6==30"}
         };
+    }
+
+    @DataProvider(name = "thisBooleanConversions")
+    public Object[][] thisBooleanConversions() {
+        return new Object[][]{
+            {"convert_b\n"}, {"coerce_b\n"},
+            {"convert_b\nconvert_b\n"}, {"convert_b\nnot\nnot\n"}
+        };
+    }
+
+    @Test(dataProvider = "thisBooleanConversions")
+    public void testThisBooleanConversionPreservesFrameScriptCall(String conversion) throws Exception {
+        // ghost3_die: the call's receiver and arguments remain on the stack
+        // while an always-false !Boolean(this) guards an unreachable return.
+        decompilePCode("findpropstrict QName(PackageNamespace(\"\"),\"addFrameScript\")\n"
+                + "pushbyte 2\ngetlex QName(PackageInternalNs(\"\"),\"frame3\")\n"
+                + "pushbyte 3\ngetlex QName(PackageInternalNs(\"\"),\"frame4\")\n"
+                + "getlocal0\n" + conversion + "not\niffalse registerFrames\n"
+                + "pushbyte 100\nlookupswitch invalidReturn, [invalidReturn, invalidReturn]\n"
+                + "invalidReturn: pushfalse\nnot\nreturnvalue\n"
+                + "registerFrames: callpropvoid QName(PackageNamespace(\"\"),\"addFrameScript\"), 4\n",
+                "         addFrameScript(2,frame3,3,frame4);\n");
+    }
+
+    @DataProvider(name = "shortCircuitConstantAssignments")
+    public Object[][] shortCircuitConstantAssignments() {
+        return new Object[][]{
+            {"iffalse", "&&", false}, {"iftrue", "||", false},
+            {"iffalse", "&&", true}, {"iftrue", "||", true}
+        };
+    }
+
+    @Test(dataProvider = "shortCircuitConstantAssignments")
+    public void testShortCircuitConstantAssignmentWithTemporary(String branch, String operator, boolean simplify) throws Exception {
+        boolean originalSimplify = Configuration.simplifyExpressions.get();
+        Configuration.simplifyExpressions.set(simplify);
+        try {
+            decompilePCode("getlocal1\npushbyte 0\nlessthan\ncoerce_a\ndup\n" + branch + " done\n"
+                    + "pop\npushbyte 0\ndup\nsetlocal2\nconvert_i\nsetlocal1\n"
+                    + "getlocal2\nkill 2\ncoerce_a\ndone: pop\n",
+                    "         param1 < 0 " + operator + " (param1 = 0);\n");
+        } finally {
+            Configuration.simplifyExpressions.set(originalSimplify);
+        }
+    }
+
+    @Test
+    public void testManyConstantRegisterBranches() throws Exception {
+        StringBuilder pcode = new StringBuilder("pushfalse\npushtrue\nsetlocal 128\nsetlocal 129\n");
+        StringBuilder expected = new StringBuilder();
+        for (int i = 0; i < 128; i++) {
+            pcode.append("getlocal 128\niftrue check").append(i).append('\n')
+                    .append(switchTrace("unreachable"))
+                    .append("check").append(i).append(": getlocal 129\niftrue dead").append(i).append('\n')
+                    .append(switchTrace("kept" + i))
+                    .append("jump next").append(i).append('\n')
+                    .append("dead").append(i).append(": ").append(switchTrace("unreachable"))
+                    .append("next").append(i).append(": nop\n");
+            expected.append("         trace(\"kept").append(i).append("\");\n");
+        }
+        decompilePCode(pcode.toString(), expected.toString());
+    }
+
+    @DataProvider(name = "constantSwitchIndices")
+    public Object[][] constantSwitchIndices() {
+        return new Object[][]{
+            {"pushbyte 0", "zero"}, {"pushbyte 1", "one"}, {"pushbyte 2", "two"},
+            {"pushbyte -1", "default"}, {"pushbyte 107", "default"},
+            {"pushint 2147483647", "default"}, {"pushint -2147483648", "default"},
+            {"pushbyte 5\npushbyte 3\nsubtract_i", "two"},
+            {"pushdouble 1.8\nconvert_i", "one"},
+            {"pushdouble 4294967297\nconvert_i", "one"}
+        };
+    }
+
+    private String switchTrace(String value) {
+        return "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"" + value + "\"\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n";
+    }
+
+    @Test(dataProvider = "constantSwitchIndices")
+    public void testConstantLookupSwitch(String index, String selected) throws Exception {
+        decompilePCode(index + "\nlookupswitch other, [zero, one, two]\n"
+                + "zero: " + switchTrace("zero") + "jump done\n"
+                + "one: " + switchTrace("one") + "jump done\n"
+                + "two: " + switchTrace("two") + "jump done\n"
+                + "other: " + switchTrace("default") + "done:\n",
+                "         trace(\"" + selected + "\");\n");
+    }
+
+    @Test
+    public void testConstantLookupSwitchRemovesObfuscationLoop() throws Exception {
+        decompilePCode("jump dispatch\n"
+                + "zero: jump dispatch\none: jump dispatch\n"
+                + "other: " + switchTrace("selected") + "jump done\n"
+                + "dispatch: pushbyte 107\nlookupswitch other, [zero, one]\ndone:\n",
+                "         trace(\"selected\");\n");
+    }
+
+    @Test
+    public void testConstantLookupSwitchPreservesLowerStackAndFallthrough() throws Exception {
+        decompilePCode(switchTrace("before")
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"saved\"\n"
+                + "pushbyte 0\nlookupswitch other, [zero, one]\n"
+                + "zero: callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "one: " + switchTrace("fallthrough") + "jump done\n"
+                + "other: pop\npop\n" + switchTrace("unreachable") + "done:\n",
+                "         trace(\"before\");\n         trace(\"saved\");\n         trace(\"fallthrough\");\n");
+    }
+
+    @DataProvider(name = "switchMergePoints")
+    public Object[][] switchMergePoints() {
+        return new Object[][]{{""}, {"nop\n"}};
+    }
+
+    @Test(dataProvider = "switchMergePoints")
+    public void testLookupSwitchWithMergedIndicesIsPreserved(String afterMerge) throws Exception {
+        String result = recompilePCode("getlocal0\ngetproperty QName(PackageNamespace(\"\"),\"enabled\")\n"
+                + "iftrue alternate\npushbyte 0\njump dispatch\n"
+                + "alternate: pushbyte 1\ndispatch: " + afterMerge + "lookupswitch other, [zero, one]\n"
+                + "zero: returnvoid\none: returnvoid\nother: returnvoid\n",
+                new AVM2DeobfuscatorSimpleOld());
+        Assert.assertTrue(result.contains("lookupswitch"), result);
+        Assert.assertTrue(result.contains("pushbyte 0") && result.contains("pushbyte 1"), result);
+    }
+
+    @Test
+    public void testNonIntegerLookupSwitchIndexIsNotCoerced() throws Exception {
+        String result = recompilePCode("pushbyte 3\npushbyte 2\ndivide\n"
+                + "lookupswitch other, [zero, one]\nzero: returnvoid\none: returnvoid\nother: returnvoid\n",
+                new AVM2DeobfuscatorSimpleOld());
+        Assert.assertTrue(result.contains("lookupswitch"), result);
+    }
+
+    @DataProvider(name = "stackCounterBranches")
+    public Object[][] stackCounterBranches() {
+        return new Object[][]{{"iffalse", ""}, {"iftrue", "not\n"}};
+    }
+
+    @Test(dataProvider = "stackCounterBranches")
+    public void testStackCountdownKeepsLoopExit(String branch, String negate) throws Exception {
+        String result = recompilePCode("pushshort 664\n"
+                + "loop: dup\n" + negate + branch + " done\ndecrement_i\njump loop\n"
+                + "done: pop\npushbyte 99\nreturnvalue\n", new AVM2DeobfuscatorSimpleOld());
+        assertTrue(result.contains(branch), result);
+        assertTrue(result.contains("pushbyte 99"), result);
+    }
+
+    @Test(dataProvider = "stackCounterBranches")
+    public void testConditionalBranchWithMergedStackOperandsIsPreserved(String branch, String negate) throws Exception {
+        String result = recompilePCode("getlocal0\ngetproperty QName(PackageNamespace(\"\"),\"enabled\")\n"
+                + "iftrue alternate\npushbyte 0\njump join\nalternate: pushbyte 1\n"
+                + "join: nop\n" + negate + branch + " selected\npushbyte -99\nreturnvalue\n"
+                + "selected: pushbyte 99\nreturnvalue\n", new AVM2DeobfuscatorSimpleOld());
+        assertTrue(result.contains("pushbyte -99") && result.contains("pushbyte 99"), result);
+    }
+
+    @Test(dataProvider = "stackCounterBranches")
+    public void testConstantBranchAcrossUniqueJumpTargets(String branch, String negate) throws Exception {
+        String result = recompilePCode("jump setup\n"
+                + "decision: " + negate + branch + " rejected\n"
+                + "pushbyte 99\nreturnvalue\n"
+                + "setup: pushtrue\ndup\npop\njump relay\n"
+                + "rejected: pushbyte -99\nreturnvalue\n"
+                + "relay: nop\njump decision\n", new AVM2DeobfuscatorSimpleOld());
+        Assert.assertFalse(result.contains(branch) || result.contains("pushbyte -99"), result);
+        assertTrue(result.contains("pushbyte 99"), result);
+    }
+
+    @Test
+    public void testConstantLookupSwitchAcrossUniqueJumpTargets() throws Exception {
+        String result = recompilePCode("jump setup\n"
+                + "decision: lookupswitch other, [zero, one]\n"
+                + "zero: pushbyte -98\nreturnvalue\n"
+                + "one: pushbyte 99\nreturnvalue\n"
+                + "setup: pushbyte 1\njump relay\n"
+                + "other: pushbyte -99\nreturnvalue\n"
+                + "relay: nop\njump decision\n", new AVM2DeobfuscatorSimpleOld());
+        Assert.assertFalse(result.contains("lookupswitch") || result.contains("pushbyte -98") || result.contains("pushbyte -99"), result);
+        assertTrue(result.contains("pushbyte 99"), result);
+    }
+
+    @Test
+    public void testBranchAcrossJumpsWithMergedStackOperandsIsPreserved() throws Exception {
+        String result = recompilePCode("getlocal0\ngetproperty QName(PackageNamespace(\"\"),\"enabled\")\n"
+                + "iftrue alternate\npushfalse\njump decision\n"
+                + "alternate: pushtrue\njump relay\n"
+                + "decision: iftrue selected\npushbyte -99\nreturnvalue\n"
+                + "selected: pushbyte 99\nreturnvalue\n"
+                + "relay: nop\njump decision\n", new AVM2DeobfuscatorSimpleOld());
+        assertTrue(result.contains("iftrue") && result.contains("pushbyte -99") && result.contains("pushbyte 99"), result);
+    }
+
+    @Test
+    public void testConstantConditionInsideStackCountdownStillFolds() throws Exception {
+        String result = recompilePCode("pushbyte 3\nloop: dup\niffalse done\ndecrement_i\n"
+                + "pushfalse\niftrue unreachable\njump loop\n"
+                + "unreachable: pop\npushbyte -99\nreturnvalue\n"
+                + "done: pop\npushbyte 99\nreturnvalue\n", new AVM2DeobfuscatorSimpleOld());
+        assertTrue(result.contains("iffalse") && result.contains("pushbyte 99"), result);
+        Assert.assertFalse(result.contains("iftrue") || result.contains("pushbyte -99"), result);
+    }
+
+    @Test
+    public void testConstantBranchesAfterRegisterInlining() throws Exception {
+        boolean autoDeobfuscate = Configuration.autoDeobfuscate.get();
+        // The helper runs removeTraps explicitly; do not repeat it in toSource.
+        Configuration.autoDeobfuscate.set(false);
+        try {
+            decompilePCode(new String(Files.readAllBytes(Paths.get(
+                    "testdata/as3_deobfuscation/constantBranchesAfterRegisterInlining.pcode")), StandardCharsets.UTF_8),
+                    "         if(this.state.count >= 1)\n"
+                    + "         {\n"
+                    + "            ++this.state.count;\n"
+                    + "            Service.instance().invoke(\"event\");\n"
+                    + "            this.value *= 3;\n"
+                    + "            this.enabled = true;\n"
+                    + "            if(this.state.phase == 5)\n"
+                    + "            {\n"
+                    + "               this.state.phase = 6;\n"
+                    + "            }\n"
+                    + "            Observer.notify();\n"
+                    + "         }\n");
+        } finally {
+            Configuration.autoDeobfuscate.set(autoDeobfuscate);
+        }
     }
 
     @DataProvider(name = "provideBasicFalseExpressions")
@@ -635,6 +952,137 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "         }\n");
     }
 
+    @DataProvider(name = "switchSharedExits")
+    public Object[][] switchSharedExits() {
+        return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
+    }
+
+    @DataProvider(name = "logicalSwitchCases")
+    public Object[][] logicalSwitchCases() {
+        return new Object[][]{{"&&", true}, {"||", true}, {"&&", false}, {"||", false}};
+    }
+
+    @Test(dataProvider = "logicalSwitchCases")
+    public void testBooleanSwitchWithLogicalCaseExpressions(String operator, boolean switchedValue) throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test(a:int, b:int):String { var result:String; switch(" + switchedValue + ") {"
+                + "case a < 0 " + operator + " b < 0: result = \"negative\"; break;"
+                + "case a + 1 == b: result = \"next\"; break;"
+                + "case a > 0 " + operator + " b == a: result = \"same\"; break;"
+                + "case a > 0 " + operator + " b > a: result = \"larger\"; break;"
+                + "default: result = \"other\"; } return result; } } }");
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertEquals(result.split("switch\\(", -1).length - 1, 1, result);
+        String compact = result.replaceAll("\\s+", "");
+        assertTrue(compact.contains("switch(" + switchedValue + ")"), result);
+        assertTrue(compact.contains("casea<0" + operator + "b<0:"), result);
+        assertTrue(compact.contains("casea>0" + operator + "b==a:"), result);
+        assertTrue(compact.contains("casea>0" + operator + "b>a:"), result);
+    }
+
+    @Test(dataProvider = "switchSharedExits")
+    public void testSwitchSharedTailBeforeConditionalExit(boolean booleanSwitch, boolean throwExit) throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test(which:int, exit:Boolean):void {"
+                + "switch(" + (booleanSwitch ? "true" : "which") + ") {"
+                + "case " + (booleanSwitch ? "which == 0" : "0") + ": trace(\"zero\"); break;"
+                + "case " + (booleanSwitch ? "which == 1" : "1") + ": trace(\"one\"); break;"
+                + "default: return; }"
+                + "if (exit) { trace(\"exit\"); " + (throwExit ? "throw new Error();" : "return;") + " }"
+                + "trace(\"after\"); } } }");
+        Assert.assertFalse(result.contains("§§"), result);
+        assertTrue(result.replaceAll("\\s+", "").contains("default:return;}if(exit){trace(\"exit\");"), result);
+        assertEquals(result.split("trace\\(\"exit\"\\);", -1).length - 1, 1, result);
+        assertEquals(result.split("trace\\(\"after\"\\);", -1).length - 1, 1, result);
+    }
+
+    @Test
+    public void testLookupSwitchSharedTailWithEarlyReturn() throws Exception {
+        decompilePCodeWithLines("getlocal1\nlookupswitch invalid, [zero, one]\n"
+                + "zero: " + switchTrace("zero") + "jump shared\n"
+                + "one: " + switchTrace("one") + "jump shared\n"
+                + "invalid: returnvoid\n"
+                + "shared: getlocal1\niffalse after\n" + switchTrace("exit") + "returnvoid\n"
+                + "after: " + switchTrace("after"),
+                "         switch(param1)\n         {\n"
+                + "            case 0:\n               trace(\"zero\");\n               break;\n"
+                + "            case 1:\n               trace(\"one\");\n               break;\n"
+                + "            default:\n               return;\n         }\n"
+                + "         if(param1)\n         {\n            trace(\"exit\");\n            return;\n         }\n"
+                + "         trace(\"after\");\n");
+    }
+
+    @DataProvider(name = "switchFallthroughReturns")
+    public Object[][] switchFallthroughReturns() {
+        return new Object[][]{{false}, {true}};
+    }
+
+    @Test(dataProvider = "switchFallthroughReturns")
+    public void testSwitchSharedTailEndingAtEarlyReturnCase(boolean debugLine) throws Exception {
+        decompilePCodeWithLines("getlocal1\nlookupswitch other, [zero, one, done]\n"
+                + "zero: " + switchTrace("zero") + "jump shared\n"
+                + "one: " + switchTrace("one") + "jump shared\n"
+                + "other: " + switchTrace("other") + "jump shared\n"
+                + "shared: " + switchTrace("shared")
+                + "done: label\n" + (debugLine ? "jump exit\nexit: label\ndebugline 42\nnop\n" : "") + "returnvoid\n",
+                "         switch(param1)\n         {\n"
+                + "            case 0:\n               trace(\"zero\");\n               break;\n"
+                + "            case 1:\n               trace(\"one\");\n               break;\n"
+                + "            default:\n               trace(\"other\");\n               break;\n"
+                + "            case 2:\n               return;\n         }\n"
+                + "         trace(\"shared\");\n");
+    }
+
+    @Test(dataProvider = "switchFallthroughReturns")
+    public void testSwitchSharedTailTiedWithFallthroughReturn(boolean inTry) throws Exception {
+        String pcode = "pushbyte 0\nsetlocal2\nprotected_start: jump dispatch\n"
+                + "zero: label\n" + switchTrace("zero") + "jump shared\n"
+                + "one: label\n" + switchTrace("one") + "jump shared\n"
+                + "two: label\n" + switchTrace("two") + "jump shared\n"
+                + "three: label\n" + switchTrace("three")
+                + "four: label\n" + switchTrace("four")
+                + "other: label\npushbyte 0\nreturnvalue\n"
+                + "dispatch: getlocal1\nlookupswitch other, [zero, one, two, three, four]\n"
+                + "shared: getlocal2\npushbyte 0\nifnlt done\npushbyte -1\nreturnvalue\n"
+                + "done: getlocal2\nreturnvalue\n";
+        String expected = "         var _loc2_:int = 0;\n"
+                + "         switch(param1)\n         {\n"
+                + "            case 0:\n               trace(\"zero\");\n               break;\n"
+                + "            case 1:\n               trace(\"one\");\n               break;\n"
+                + "            case 2:\n               trace(\"two\");\n               break;\n"
+                + "            case 3:\n               trace(\"three\");\n"
+                + "            case 4:\n               trace(\"four\");\n"
+                + "            default:\n               return 0;\n         }\n"
+                + "         if(_loc2_ < 0)\n         {\n            return -1;\n         }\n"
+                + "         return _loc2_;\n";
+        if (inTry) {
+            pcode += "protected_end: getlocal0\npushscope\nnewcatch 0\ndup\nsetlocal3\ndup\npushscope\nswap\nsetslot 1\n"
+                    + "pushbyte -2\nreturnvalue\n"
+                    + "try from protected_start to protected_end target protected_end type QName(PackageNamespace(\"\"),\"Error\") name QName(PackageNamespace(\"\"),\"e\") end\n";
+            expected = "         var _loc2_:int = 0;\n         try\n         {\n"
+                    + expected.substring(expected.indexOf('\n') + 1).replaceAll("(?m)^", "   ")
+                    + "         }\n         catch(e:Error)\n         {\n            return -2;\n         }\n";
+        }
+        decompilePCodeWithLines(pcode, expected);
+    }
+
+    @Test
+    public void testSwitchFallthroughReturnInsideConditionalTry() throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test(which:int, split:Boolean):int { var ret:int = 0; try {"
+                + "if (split) { trace(\"split\"); } else { switch(which) {"
+                + "case 0: trace(\"zero\"); ret = first(); break;"
+                + "case 1: trace(\"one\"); ret = second(); break;"
+                + "case 2: trace(\"two\"); ret = third(); break;"
+                + "case 3: trace(\"three\");"
+                + "case 4: trace(\"four\"); default: return 0; }"
+                + "if (ret < 0) { return -1; } } return ret;"
+                + "} catch(e:Error) { return -2; } } } }");
+        Assert.assertFalse(result.contains("§§"), result);
+        assertEquals(result.split("ret < 0", -1).length - 1, 1, result);
+        assertTrue(result.replaceAll("\\s+", "").contains("case3:trace(\"three\");case4:trace(\"four\");default:return0;"), result);
+    }
+
     @Test
     public void testSwitchFollowedByStrictComparison() throws Exception {
         decompilePCode("getlocal1\n"
@@ -822,6 +1270,290 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "            trace(\"after inner\");\n"
                 + "         }\n"
                 + "         trace(\"done\");\n");
+    }
+
+    @Test
+    public void testSwitchInLoopWithForwardedBreakTarget() throws Exception {
+        decompilePCodeWithLines("pushfalse\nsetlocal2\njump repeat\n"
+                + "loop: label\njump dispatch\n"
+                + "caseZero: label\ngetlocal2\niffalse alternate\n"
+                + "pushbyte 1\nsetlocal1\npushtrue\nsetlocal2\njump repeat\n"
+                + "alternate: getlocal1\npushbyte 0\nequals\niffalse switchEnd\n"
+                + "pushbyte 1\nsetlocal1\npushtrue\nsetlocal2\njump repeat\n"
+                + "caseOne: label\nfindpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"one\"\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\njump switchEnd\n"
+                + "defaultCase: label\njump switchEnd\n"
+                + "dispatch: getlocal1\nlookupswitch defaultCase, [caseZero, caseOne]\n"
+                + "switchEnd: jump afterLoop\nrepeat: jump loop\n"
+                + "afterLoop: findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"after\"\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n",
+                "         var _loc2_:Boolean = false;\n"
+                + "         loop0:\n"
+                + "         while(true)\n"
+                + "         {\n"
+                + "            switch(param1)\n"
+                + "            {\n"
+                + "               case 0:\n"
+                + "                  if(_loc2_)\n"
+                + "                  {\n"
+                + "                     param1 = 1;\n"
+                + "                     _loc2_ = true;\n"
+                + "                  }\n"
+                + "                  else\n"
+                + "                  {\n"
+                + "                     if(param1 != 0)\n"
+                + "                     {\n"
+                + "                        break loop0;\n"
+                + "                     }\n"
+                + "                     param1 = 1;\n"
+                + "                     _loc2_ = true;\n"
+                + "                  }\n"
+                + "                  break;\n"
+                + "               case 1:\n"
+                + "                  trace(\"one\");\n"
+                + "                  break loop0;\n"
+                + "               default:\n"
+                + "                  break loop0;\n"
+                + "            }\n"
+                + "         }\n"
+                + "         trace(\"after\");\n");
+    }
+
+    @Test
+    public void testNestedCatchReturningThroughFinally() throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test(flag:Boolean):void {"
+                + "try {"
+                + "if (flag) { trace(\"string\"); } else {"
+                + "try { trace(\"inner\"); return; }"
+                + "catch (e:Error) { trace(\"inner catch\"); }"
+                + "}"
+                + "trace(\"after inner\");"
+                + "} catch (e:Error) { trace(\"outer catch\"); }"
+                + "finally { trace(\"finally\"); }"
+                + "} } }").replace("\r\n", "\n");
+        assertTrue(!result.contains("§§"), result);
+        assertEquals(result.split("trace\\(\"finally\"\\);", -1).length - 1, 1, result);
+        assertTrue(result.contains("trace(\"inner\");\n                  return;"), result);
+        assertTrue(result.contains("catch(e:Error)\n               {\n                  trace(\"inner catch\");\n               }"), result);
+        assertTrue(result.contains("finally\n         {\n            trace(\"finally\");\n         }"), result);
+        assertTrue(result.indexOf("trace(\"after inner\");") > result.indexOf("trace(\"inner catch\");"), result);
+    }
+
+    @DataProvider(name = "catchScopeSetups")
+    public Object[][] catchScopeSetups() {
+        return new Object[][]{{false, false}, {true, false}, {true, true}};
+    }
+
+    @Test(dataProvider = "catchScopeSetups")
+    public void testTryRangeOverlapsCatchScopeSetup(boolean coversNewCatch, boolean loopInCatch) throws Exception {
+        decompilePCodeWithLines("newactivation\ndup\nsetlocal2\npushscope\n"
+                + "protected_start: findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"work\"\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "pushnull\nreturnvalue\n"
+                + "security_handler: getlocal0\npushscope\ngetlocal2\npushscope\n"
+                + (coversNewCatch ? "" : "protected_end:\n") + "newcatch 0\n"
+                + (coversNewCatch ? "protected_end:\n" : "")
+                + "dup\nsetlocal3\ndup\npushscope\nswap\nsetslot 1\n"
+                + (loopInCatch ? "repeat_security: label\n" : "")
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"security\"\n"
+                + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + (loopInCatch ? "getlocal1\niftrue repeat_security\n" : "")
+                + "popscope\nkill 3\njump done\n"
+                + "error_handler: getlocal0\npushscope\ngetlocal2\npushscope\nnewcatch 1\n"
+                + "dup\nsetlocal3\ndup\npushscope\nswap\nsetslot 1\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"error\"\n"
+                + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\npopscope\nkill 3\n"
+                + "done: pushnull\nreturnvalue\n"
+                + "try from protected_start to protected_end target security_handler type QName(PackageNamespace(\"\"),\"SecurityError\") name QName(PackageNamespace(\"\"),\"e\") end\n"
+                + "try from protected_start to protected_end target error_handler type QName(PackageNamespace(\"\"),\"Error\") name QName(PackageNamespace(\"\"),\"e\") end\n",
+                "         try\n"
+                + "         {\n"
+                + "            trace(\"work\");\n"
+                + "            return null;\n"
+                + "         }\n"
+                + "         catch(e:SecurityError)\n"
+                + "         {\n"
+                + (loopInCatch ? "            do\n            {\n               trace(\"security\");\n            }\n            while(param1);\n"
+                        : "            trace(\"security\");\n")
+                + "         }\n"
+                + "         catch(e:Error)\n"
+                + "         {\n"
+                + "            trace(\"error\");\n"
+                + "         }\n"
+                + "         return null;\n");
+    }
+
+    @DataProvider(name = "enumerationSharedTails")
+    public Object[][] enumerationSharedTails() {
+        return new Object[][]{{false, false}, {true, false}, {false, true}, {true, true}};
+    }
+
+    @Test(dataProvider = "enumerationSharedTails")
+    public void testEnumerationKeepsSharedTailInsideBody(boolean each, boolean skipTail) throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test(items:Array):void {"
+                + "for " + (each ? "each " : "") + "(var entry:* in items) {"
+                + (skipTail ? "if (entry.skip) { continue; }" : "")
+                + "if (entry.active) { switch(entry.kind) {"
+                + "case 1: trace(\"one\"); break;"
+                + "case 2: trace(\"two\"); break; } }"
+                + "trace(\"tail\"); } trace(\"after\"); } } }").replace("\r\n", "\n");
+        Assert.assertFalse(result.contains("§§"), result);
+        String expected = (each ? "foreach" : "for") + "(varentryinitems){"
+                + (skipTail ? "if(!entry.skip){" : "")
+                + "if(entry.active){switch(entry.kind){case1:trace(\"one\");break;case2:trace(\"two\");}}"
+                + "trace(\"tail\");" + (skipTail ? "}" : "") + "}trace(\"after\");";
+        assertTrue(result.replaceAll("\\s+", "").contains(expected), result);
+    }
+
+    @Test
+    public void testCatchReturningThroughUnconditionalFinallyReturn() throws Exception {
+        String result = recompileSource("package { public class Test {"
+                + "public function test():void {"
+                + "try { trace(\"try\"); }"
+                + "catch (e:ArgumentError) { trace(e); return; }"
+                + "finally { return; }"
+                + "} } }").replace("\r\n", "\n");
+        assertTrue(!result.contains("§§"), result);
+        assertTrue(!result.contains("unpopped"), result);
+        assertTrue(!result.matches("(?s).*addr[0-9a-f]+:.*"), result);
+        assertTrue(result.contains("trace(\"try\");"), result);
+        assertTrue(result.contains("catch(e:ArgumentError)\n         {\n            trace(e);\n         }"), result);
+        assertTrue(result.contains("finally\n         {\n            return;\n         }"), result);
+    }
+
+    @Test
+    public void testSwitchCasesPreserveCatchScope() throws Exception {
+        decompilePCodeWithLines(
+                "protected_start:\n" + switchTrace("work")
+                + "protected_end: jump done\n"
+                + "handler: getlocal0\npushscope\nnewcatch 0\ndup\nsetlocal2\ndup\npushscope\nswap\nsetslot 1\n"
+                + "jump selector\n"
+                + "handled: " + switchTrace("handled") + "popscope\nkill 2\njump done\n"
+                + "rethrow: getscopeobject 1\ngetslot 1\nthrow\n"
+                + "selector: pushtrue\nsetlocal3\n"
+                + "getscopeobject 1\ngetslot 1\ngetlex QName(PackageNamespace(\"\"),\"ArgumentError\")\n"
+                + "istypelate\ngetlocal3\nifstrictne next\npushbyte 0\njump dispatch\n"
+                + "next: getscopeobject 1\ngetslot 1\ngetlex QName(PackageNamespace(\"\"),\"TypeError\")\n"
+                + "istypelate\ngetlocal3\nifstrictne otherwise\npushbyte 1\njump dispatch\n"
+                + "otherwise: pushbyte 2\n"
+                + "dispatch: kill 3\nlookupswitch rethrow, [handled, handled, rethrow]\n"
+                + "done: " + switchTrace("after")
+                + "try from protected_start to protected_end target handler type QName(PackageNamespace(\"\"),\"Error\") name QName(PackageNamespace(\"\"),\"e\") end\n",
+                "         try\n"
+                + "         {\n            trace(\"work\");\n         }\n"
+                + "         catch(e:Error)\n"
+                + "         {\n            switch(true)\n            {\n"
+                + "               case e is ArgumentError:\n"
+                + "               case e is TypeError:\n"
+                + "                  trace(\"handled\");\n                  break;\n"
+                + "               default:\n                  throw e;\n"
+                + "            }\n         }\n"
+                + "         trace(\"after\");\n");
+    }
+
+    @Test
+    public void testFinallyWithSplitExceptionHandler() throws Exception {
+        decompilePCodeWithLines(
+                "   protected_start:\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"work\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            jump normal_exit\n"
+                + "            pushtrue\n"
+                + "            pop\n"
+                + "   normal_exit:\n"
+                + "            pushbyte -1\n"
+                + "   protected_end:\n"
+                + "            jump cleanup\n"
+                + "   handler:\n"
+                + "            getlocal0\n"
+                + "            pushscope\n"
+                + "            jump save_exception\n"
+                + "            pushtrue\n"
+                + "            pop\n"
+                + "   save_exception:\n"
+                + "            coerce_a\n"
+                + "            setlocal2\n"
+                + "            pushbyte 0\n"
+                + "            jump cleanup\n"
+                + "   rethrow:\n"
+                + "            getlocal2\n"
+                + "            kill 2\n"
+                + "            throw\n"
+                + "   cleanup:\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"cleanup\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            lookupswitch done, [rethrow]\n"
+                + "   done:\n"
+                + "            findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "            pushstring \"after\"\n"
+                + "            callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "            try from protected_start to protected_end target handler type null name null end\n",
+                "         try\n"
+                + "         {\n"
+                + "            trace(\"work\");\n"
+                + "         }\n"
+                + "         finally\n"
+                + "         {\n"
+                + "            trace(\"cleanup\");\n"
+                + "         }\n"
+                + "         trace(\"after\");\n");
+    }
+
+    @DataProvider(name = "savedFinallySelectors")
+    public Object[][] savedFinallySelectors() {
+        return new Object[][]{
+            {false, false, true}, {true, false, true}, {false, true, true}, {true, true, true},
+            {false, false, false}, {true, false, false}, {false, true, false}, {true, true, false}
+        };
+    }
+
+    @Test(dataProvider = "savedFinallySelectors")
+    public void testNestedTryPreservesOuterFinallySelector(boolean coerce, boolean reuseRegister, boolean conditional) throws Exception {
+        String inner = "try\n"
+                + "{\n"
+                + "   trace(\"inner\");\n"
+                + "}\n"
+                + "catch(e:Error)\n"
+                + "{\n"
+                + "}";
+        if (conditional) {
+            inner = "if(param1)\n{\n" + inner.replaceAll("(?m)^", "   ") + "\n}";
+        }
+        StringBuilder expected = new StringBuilder("         try\n         {\n            trace(\"work\");\n"
+                + "         }\n         catch(e:Error)\n         {\n         }\n         finally\n         {\n");
+        expected.append(inner.replaceAll("(?m)^", "            ")).append("\n         }\n         trace(\"after\");\n");
+        if (reuseRegister) {
+            expected.append("         var _loc3_:int = 42;\n         trace(_loc3_);\n");
+        }
+        decompilePCodeWithLines(
+                "protected_start:\nfindpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"work\"\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "caught_end: jump normal\n"
+                + "outer_catch: getlocal0\npushscope\nnewcatch 0\ndup\nsetlocal 4\ndup\npushscope\nswap\n"
+                + "setslot 1\npopscope\nkill 4\n"
+                + "normal: pushbyte -1\nprotected_end: jump cleanup\n"
+                + "handler: getlocal0\npushscope\ncoerce_a\nsetlocal2\npushbyte 0\njump cleanup\n"
+                + "rethrow: getlocal2\nkill 2\nthrow\n"
+                + "cleanup: " + (conditional ? "getlocal1\niffalse dispatch\n" : "")
+                + "inner_start:\n" + (coerce ? "coerce_a\n" : "") + "setlocal3\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"inner\"\n"
+                + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\ninner_end: jump restore\n"
+                + "inner_handler: getlocal0\npushscope\nnewcatch 2\ndup\nsetlocal 4\ndup\npushscope\nswap\n"
+                + "setslot 1\npopscope\nkill 4\n"
+                + "restore: getlocal3\n" + (coerce ? "convert_i\n" : "") + "kill 3\n"
+                + "dispatch: lookupswitch done, [rethrow]\n"
+                + "done: findpropstrict QName(PackageNamespace(\"\"),\"trace\")\npushstring \"after\"\n"
+                + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + (reuseRegister ? "pushbyte 42\nsetlocal3\nfindpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                        + "getlocal3\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n" : "")
+                + "try from protected_start to caught_end target outer_catch type QName(PackageNamespace(\"\"),\"Error\") name QName(PackageNamespace(\"\"),\"e\") end\n"
+                + "try from protected_start to protected_end target handler type null name null end\n"
+                + "try from inner_start to inner_end target inner_handler type QName(PackageNamespace(\"\"),\"Error\") name QName(PackageNamespace(\"\"),\"e\") end\n",
+                expected.toString());
     }
 
     @Test
@@ -1399,6 +2131,127 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testForInWithSwitchesBeforeBreak() throws Exception {
+        String result = recompileSource("package { public class Test { public function test(items:Object):void {"
+                + "for (var key:String in items) {"
+                + "if (items[key].first) {"
+                + "switch (items[key].kind) { case 'a': trace('firstCase'); break; default: trace('firstDefault'); }"
+                + "trace('firstEnd'); break; }"
+                + "if (items[key].second) {"
+                + "switch (items[key].kind) { case 'b': trace('secondCase'); break; default: trace('secondDefault'); }"
+                + "trace('secondEnd'); break; }"
+                + "} trace('after'); } } }");
+        Assert.assertFalse(result.contains("§§") || result.contains("while(true)"), result);
+        assertTrue(result.contains(" in items)"), result);
+        for (String message : new String[]{"firstCase", "firstDefault", "firstEnd", "secondCase", "secondDefault", "secondEnd", "after"}) {
+            assertEquals(result.split("trace\\(\"" + message + "\"\\);", -1).length - 1, 1, result);
+        }
+    }
+
+    @DataProvider(name = "largeStringSwitchModes")
+    public Object[][] largeStringSwitchModes() {
+        return new Object[][]{{false}, {true}};
+    }
+
+    @Test
+    public void testGroupedSwitchCasesBreakOuterLoopAtSharedReturn() throws Exception {
+        decompilePCodeWithLines("pushbyte 0\nsetlocal2\njump dispatch\n"
+                + "first: inclocal_i 2\njump done\n"
+                + "step: declocal_i 1\njump dispatch\n"
+                + "fallback: jump done\n"
+                + "dispatch: getlocal1\nlookupswitch fallback, [first, first, step, step]\n"
+                + "done: getlocal2\nreturnvalue\n",
+                "         var _loc2_:int = 0;\n"
+                + "         loop0:\n         while(true)\n         {\n"
+                + "            switch(param1)\n            {\n"
+                + "               case 0:\n               case 1:\n"
+                + "                  _loc2_++;\n                  break loop0;\n"
+                + "               case 2:\n               case 3:\n                  break;\n"
+                + "               default:\n                  break loop0;\n"
+                + "            }\n            param1--;\n         }\n         return _loc2_;\n");
+    }
+
+    @Test
+    public void testSharedTerminalReturnUsesSinglePassBlock() throws Exception {
+        decompilePCodeWithLines("getlocal1\npushbyte 10\nifnle second\n"
+                + "getlocal1\npushbyte 1\nsubtract\nconvert_i\nsetlocal1\n"
+                + "pushbyte 0\ngetlocal1\nifnle firstFailure\njump success\n"
+                + "firstFailure: jump failure\nsecond: getlocal1\npushbyte 20\nifnle third\n"
+                + "pushbyte 12\ngetlocal1\nifnle secondFailure\n"
+                + "getlocal1\npushbyte 5\nsubtract\nconvert_i\nsetlocal1\njump success\n"
+                + "secondFailure: jump failure\nthird: getlocal1\npushbyte 30\nifnle failure\n"
+                + "pushbyte 22\ngetlocal1\nifnle failure\n"
+                + "getlocal1\npushbyte 15\nsubtract\nconvert_i\nsetlocal1\njump success\n"
+                + "failure: pushbyte -1\nreturnvalue\n"
+                + "success: pushbyte 4\ngetlocal1\nadd\nreturnvalue\n",
+                "         while(true)\n         {\n"
+                + "            if(param1 <= 10)\n            {\n"
+                + "               param1 -= 1;\n               if(0 <= param1)\n               {\n"
+                + "                  break;\n               }\n            }\n"
+                + "            else if(param1 <= 20)\n            {\n"
+                + "               if(12 <= param1)\n               {\n"
+                + "                  param1 -= 5;\n                  break;\n               }\n            }\n"
+                + "            else if(param1 <= 30)\n            {\n"
+                + "               if(22 <= param1)\n               {\n"
+                + "                  param1 -= 15;\n                  break;\n               }\n            }\n"
+                + "            return -1;\n         }\n         return 4 + param1;\n");
+    }
+
+    @Test(dataProvider = "largeStringSwitchModes", timeOut = 30000)
+    public void testLargeStringSwitchKeepsEveryMappingAndDefaultPosition(boolean deobfuscate) throws Exception {
+        assertLargeStringSwitch(deobfuscate, 512);
+    }
+
+    @Test(dataProvider = "largeStringSwitchModes", timeOut = 60000)
+    public void testThousandsOfStringSwitchCasesKeepEveryMapping(boolean deobfuscate) throws Exception {
+        assertLargeStringSwitch(deobfuscate, 7080);
+    }
+
+    private void assertLargeStringSwitch(boolean deobfuscate, int caseCount) throws Exception {
+        List<String> names = new ArrayList<>();
+        StringBuilder pcode = new StringBuilder("getlocal1\nsetlocal2\njump dispatch\n");
+        for (int i = 0; i < caseCount; i++) {
+            if (i == 17) {
+                names.add("alias");
+            }
+            names.add("asset_" + i);
+            pcode.append("body").append(i).append(": pushshort ").append(i).append("\nreturnvalue\n");
+        }
+        pcode.append("defaultBody: pushbyte -1\nreturnvalue\ndispatch:\n");
+        StringBuilder expected = new StringBuilder("         switch(param1)\n         {\n");
+        List<String> targets = new ArrayList<>();
+        for (int i = 0; i < names.size(); i++) {
+            if (i == 128) {
+                targets.add("defaultBody");
+                expected.append("            default:\n               return -1;\n");
+            }
+            String name = names.get(i);
+            int bodyIndex = name.equals("alias") ? 17 : Integer.parseInt(name.substring(6));
+            pcode.append("check").append(i).append(": pushstring \"").append(name)
+                    .append("\"\ngetlocal2\nifstrictne check").append(i + 1)
+                    .append("\npushshort ").append(i < 128 ? i : i + 1).append("\njump lookup\n");
+            targets.add("body" + bodyIndex);
+            expected.append("            case \"").append(name).append("\":\n");
+            if (!name.equals("alias")) {
+                expected.append("               return ").append(bodyIndex).append(";\n");
+            }
+        }
+        pcode.append("check").append(names.size()).append(": pushshort 128\nlookup: kill 2\nlookupswitch defaultBody, [")
+                .append(String.join(", ", targets)).append("]\n");
+        expected.append("         }\n");
+        boolean oldDeobfuscate = Configuration.autoDeobfuscate.get();
+        int oldTimeout = Configuration.decompilationTimeoutSingleMethod.get();
+        Configuration.autoDeobfuscate.set(false);
+        Configuration.decompilationTimeoutSingleMethod.set(60);
+        try {
+            decompilePCode(pcode.toString(), expected.toString(), deobfuscate);
+        } finally {
+            Configuration.autoDeobfuscate.set(oldDeobfuscate);
+            Configuration.decompilationTimeoutSingleMethod.set(oldTimeout);
+        }
+    }
+
+    @Test
     public void testStringSwitchCasesContinuingOuterLoop() throws Exception {
         String res = recompileSource("package { public class Test { public function testLoop() {"
                 + "var result = 0;"
@@ -1573,6 +2426,194 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testDescendantsPreservesNameTemporary() throws Exception {
+        decompilePCodeWithLines("getlex QName(PackageNamespace(\"\"),\"xml\")\n"
+                + "getlocal1\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "pushstring \"marker\"\n"
+                + "callpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "getdescendants MultinameL([PackageNamespace(\"\")])\n"
+                + "returnvalue\n",
+                "         var _temp_2:* = xml;\n"
+                + "         var _temp_1:* = param1;\n"
+                + "         trace(\"marker\");\n"
+                + "         return _temp_2..[_temp_1];\n");
+    }
+
+    @DataProvider(name = "integerIncrementAndDecrement")
+    public Object[][] integerIncrementAndDecrement() {
+        return new Object[][]{{"increment_i", "+"}, {"decrement_i", "-"}};
+    }
+
+    @Test(dataProvider = "integerIncrementAndDecrement")
+    public void testChainedIndexedAssignmentWithIntegerUpdate(String instruction, String operator) throws Exception {
+        //ASC keeps the indexed receiver and key below the expansion of ++uid or --uid.
+        decompilePCodeWithLines("getlex QName(PackageNamespace(\"\"),\"table\")\n"
+                + "getlocal1\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"uid\")\n"
+                + "dup\n"
+                + "setlocal 2\n"
+                + "getproperty QName(PackageNamespace(\"\"),\"uid\")\n"
+                + instruction + "\n"
+                + "dup\n"
+                + "setlocal 3\n"
+                + "getlocal 2\n"
+                + "getlocal 3\n"
+                + "setproperty QName(PackageNamespace(\"\"),\"uid\")\n"
+                + "kill 3\n"
+                + "kill 2\n"
+                + "dup\n"
+                + "setlocal 2\n"
+                + "setproperty MultinameL([PackageNamespace(\"\")])\n"
+                + "getlocal 2\n"
+                + "kill 2\n"
+                + "convert_i\n"
+                + "returnvalue\n",
+                "         var _temp_4:* = table;\n"
+                + "         var _temp_3:* = param1;\n"
+                + "         var _loc3_:int;\n"
+                + "         var _temp_2:* = _loc3_ = int(int(uid) " + operator + " 1);\n"
+                + "         uid = _loc3_;\n"
+                + "         var _loc2_:int = _temp_2;\n"
+                + "         _temp_4[_temp_3] = _temp_2;\n"
+                + "         return _loc2_;\n");
+    }
+
+    @DataProvider(name = "updateOperators")
+    public Object[][] updateOperators() {
+        return new Object[][]{{"++"}, {"--"}};
+    }
+
+    @Test(dataProvider = "updateOperators")
+    public void testChainedIndexedAssignmentWithTypedPrefixUpdate(String operator) throws Exception {
+        String update = "id = table[key] = " + operator + "uid;";
+        String source = recompileSource("package {"
+                + "import flash.utils.Dictionary;"
+                + "public class Test {"
+                + "private static var uid:int;"
+                + "private static var table:Dictionary = new Dictionary();"
+                + "public static function test(key:Object):int {"
+                + "var id:int = int(table[key]);"
+                + "if(id == 0) { " + update + " }"
+                + "return id;"
+                + "}"
+                + "}"
+                + "}");
+        assertTrue(source.contains("var id:int = int(table[key]);"), source);
+        assertTrue(source.contains(update), source);
+    }
+
+    @DataProvider(name = "postUpdates")
+    public Object[][] postUpdates() {
+        return new Object[][]{{"increment", "++"}, {"decrement", "--"}};
+    }
+
+    @Test(dataProvider = "postUpdates")
+    public void testIndexedReadWithNumberPropertyPostUpdate(String instruction, String operator) throws Exception {
+        decompilePCodeWithLines("getlex QName(PackageNamespace(\"\"),\"inbuf\")\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"incnt\")\ndup\nsetlocal2\n"
+                + "getproperty QName(PackageNamespace(\"\"),\"incnt\")\nconvert_d\ndup\n"
+                + instruction + "\nsetlocal3\ngetlocal2\ngetlocal3\n"
+                + "setproperty QName(PackageNamespace(\"\"),\"incnt\")\nkill 3\nkill 2\n"
+                + "getproperty MultinameL([PackageNamespace(\"\")])\nreturnvalue\n",
+                "         return inbuf[incnt" + operator + "];\n");
+    }
+
+    @Test(dataProvider = "updateOperators")
+    public void testIndexedPropertyPostUpdateInShortCircuit(String operator) throws Exception {
+        String result = recompileSource("package { import flash.utils.ByteArray; public class Test {"
+                + "private var inbuf:ByteArray; private var incnt:uint;"
+                + "public function test():void { var len:uint = inbuf[incnt" + operator + "];"
+                + "len |= inbuf[incnt" + operator + "] << 8;"
+                + "if(inbuf[incnt" + operator + "] != (~len & 255) || inbuf[incnt" + operator + "] != (~len >> 8 & 255)) {"
+                + "throw new Error(\"mismatch\"); } } } }");
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertEquals(result.split("inbuf\\[incnt" + (operator.equals("++") ? "\\+\\+" : "--") + "\\]", -1).length - 1, 4, result);
+    }
+
+    @DataProvider(name = "numberPrefixConditions")
+    public Object[][] numberPrefixConditions() {
+        return new Object[][]{
+            {"++", "||", "Number"}, {"--", "||", "Number"}, {"++", "&&", "Number"}, {"--", "&&", "Number"},
+            {"++", "||", "uint"}, {"--", "||", "uint"}, {"++", "&&", "uint"}, {"--", "&&", "uint"}
+        };
+    }
+
+    @Test(dataProvider = "numberPrefixConditions")
+    public void testNumberPropertyPrefixUpdateInShortCircuit(String update, String logical, String type) throws Exception {
+        String condition = "ready() " + logical + " " + update + "deadCount == liveTime";
+        String result = recompileSource("package { public class Test {"
+                + "private var deadCount:" + type + "; private var liveTime:Number;"
+                + "private function ready():Boolean { return false; }"
+                + "private function removeMe():void { }"
+                + "public function test():void { if(" + condition + ") { removeMe(); } }"
+                + "} }");
+        assertTrue(result.contains("if(" + condition + ")"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+    }
+
+    @Test(dataProvider = "updateOperators")
+    public void testChainedIndexedAssignmentWithNumberPrefixUpdate(String operator) throws Exception {
+        String update = "id = table[key] = " + operator + "uid;";
+        String source = recompileSource("package { import flash.utils.Dictionary; public class Test {"
+                + "private static var uid:Number; private static var table:Dictionary = new Dictionary();"
+                + "public static function test(key:Object):Number { var id:Number = Number(table[key]);"
+                + "if(id == 0) { " + update + " } return id; } } }");
+        assertTrue(source.contains(update), source);
+        Assert.assertFalse(source.contains("§§"), source);
+    }
+
+    @Test(dataProvider = "updateOperators")
+    public void testUnsignedPrefixUpdateReturnsNumberAtOverflow(String operator) throws Exception {
+        String initial = "++".equals(operator) ? "4294967295" : "0";
+        String result = recompileSource("package { public class Test {"
+                + "private var counter:uint = " + initial + ";"
+                + "public function test():Number { return " + operator + "counter; }"
+                + "} }");
+        assertTrue(result.contains("return " + operator + "counter;"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+    }
+
+    @Test(dataProvider = "updateOperators")
+    public void testIntegerPropertyPostUpdateInShortCircuit(String operator) throws Exception {
+        String condition = "counter < 2147483647 && counter" + operator + " == 0";
+        String result = recompileSource("package { public class Test {"
+                + "private var counter:int;"
+                + "public function test():Boolean { return " + condition + "; }"
+                + "} }");
+        assertTrue(result.contains("return " + condition + ";"), result);
+    }
+
+    @Test(dataProvider = "postUpdates")
+    public void testUnsignedPostUpdateInShortCircuit(String instruction, String operator) throws Exception {
+        String readByte = "getlocal2\n"
+                + "dup\n"
+                + "convert_u\n"
+                + "setlocal3\n"
+                + instruction + "\n"
+                + "convert_u\n"
+                + "setlocal2\n"
+                + "getlocal3\n"
+                + "li8\n";
+        decompilePCodeWithLines("getlocal1\n"
+                + "convert_u\n"
+                + "setlocal2\n"
+                + "pushtrue\n"
+                + readByte
+                + "pushbyte 47\n"
+                + "ifne done\n"
+                + "pop\n"
+                + readByte
+                + "pushbyte 42\n"
+                + "equals\n"
+                + "not\n"
+                + "done:\n"
+                + "returnvalue\n",
+                "         var _loc2_:uint = param1;\n"
+                + "         return li8(_loc2_" + operator + ") != 47 || li8(_loc2_" + operator + ") != 42;\n");
+    }
+
+    @Test
     public void testSlotIncrementWithTempRegister() throws Exception {
         //ASC compiles i++ of a script variable (a slot of the global scope)
         //with a temporary register, killed at the end
@@ -1599,6 +2640,208 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
     }
 
     @Test
+    public void testSlotArithmeticResultAcrossAssignment() throws Exception {
+        // The duplicated result survives the write to the slot and is then
+        // recovered from output for the branch condition. Its temporary
+        // assignment must be written to the merged output as well.
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\n"
+                + "pushbyte 2\nadd\ndup\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 1\nkill 2\n"
+                + "iftrue done\ngetlocal1\nreturnvalue\ndone:\n",
+                "         var _loc2_:Number = global.§§slot[1] + 2;\n"
+                + "         var _temp_3:* = _loc2_;\n"
+                + "         global.§§slot[1] = _loc2_;\n"
+                + "         if(!_temp_3)\n"
+                + "         {\n"
+                + "            return param1;\n"
+                + "         }\n");
+    }
+
+    @DataProvider(name = "slotUpdates")
+    public Object[][] slotUpdates() {
+        return new Object[][]{{"increment", "++"}, {"increment_i", "++"},
+            {"decrement", "--"}, {"decrement_i", "--"}};
+    }
+
+    @Test(dataProvider = "slotUpdates")
+    public void testSlotPrefixUpdateWithTempRegisterInCondition(String instruction, String operator) throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\n"
+                + instruction + "\ndup\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 1\nkill 2\n"
+                + "iftrue done\ngetlocal1\nreturnvalue\ndone:\n",
+                "         if(!" + operator + "global.§§slot[1])\n"
+                + "         {\n"
+                + "            return param1;\n"
+                + "         }\n");
+    }
+
+    @Test(dataProvider = "slotUpdates")
+    public void testSlotPrefixUpdateWithTempRegisterReturned(String instruction, String operator) throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\n"
+                + instruction + "\ndup\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 1\nkill 2\nreturnvalue\n",
+                "         return " + operator + "global.§§slot[1];\n");
+    }
+
+    @Test(dataProvider = "slotUpdates")
+    public void testSlotPostfixUpdateWithTempRegisterInCondition(String instruction, String operator) throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\ndup\n"
+                + instruction + "\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 1\nkill 2\n"
+                + "iftrue done\ngetlocal1\nreturnvalue\ndone:\n",
+                "         if(!global.§§slot[1]" + operator + ")\n"
+                + "         {\n"
+                + "            return param1;\n"
+                + "         }\n");
+    }
+
+    @Test(dataProvider = "slotUpdates")
+    public void testSlotPostfixUpdateWithTempRegisterReturned(String instruction, String operator) throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\ndup\n"
+                + instruction + "\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 1\nkill 2\nreturnvalue\n",
+                "         return global.§§slot[1]" + operator + ";\n");
+    }
+
+    @Test
+    public void testSlotPostfixUpdateToDifferentSlotKeepsAssignment() throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\ndup\n"
+                + "increment_i\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 2\nkill 2\nreturnvalue\n",
+                "         var _temp_1:* = global.§§slot[1];\n"
+                + "         global.§§slot[2] = int(int(_temp_1) + 1);\n"
+                + "         return _temp_1;\n");
+    }
+
+    @Test
+    public void testSlotUpdateToDifferentSlotKeepsAssignment() throws Exception {
+        decompilePCodeWithLines("getglobalscope\ngetslot 1\n"
+                + "decrement_i\ndup\nsetlocal2\ngetlocal2\n"
+                + "getglobalscope\nswap\nsetslot 2\nkill 2\nreturnvalue\n",
+                "         var _loc2_:int = int(int(global.§§slot[1]) - 1);\n"
+                + "         var _temp_3:* = _loc2_;\n"
+                + "         global.§§slot[2] = _loc2_;\n"
+                + "         return _temp_3;\n");
+    }
+
+    @DataProvider(name = "nestedEnumerationReads")
+    public Object[][] nestedEnumerationReads() {
+        return new Object[][]{{"nextvalue", "for each"}, {"nextname", "for"}};
+    }
+
+    @Test(dataProvider = "nestedEnumerationReads")
+    public void testEnumerationReadInsideChainedAssignment(String instruction, String loop) throws Exception {
+        decompilePCodeWithLines("getlocal1\nsetlocal2\npushbyte 0\nsetlocal3\njump check\n"
+                + "body:\nlabel\ngetlocal2\ngetlocal3\n" + instruction + "\n"
+                + "getproperty QName(PackageNamespace(\"\"),\"value\")\n"
+                + "coerce_s\ndup\nsetlocal 4\ngetproperty QName(PackageNamespace(\"\"),\"length\")\n"
+                + "convert_u\nsetlocal 5\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "getlocal 4\ngetlocal 5\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 2\n"
+                + "check:\nhasnext2 2, 3\niftrue body\n",
+                "         var _loc2_:* = param1;\n"
+                + "         var _loc3_:* = 0;\n"
+                + "         " + loop + "(_loc3_ in _loc2_)\n"
+                + "         {\n"
+                + "            var _loc4_:String = (_loc3_).value;\n"
+                + "            var _loc5_:uint = uint(_loc4_.length);\n"
+                + "            trace(_loc4_,_loc5_);\n"
+                + "         }\n");
+    }
+
+    @Test
+    public void testEnumerationWithoutReadKeepsFirstAssignment() throws Exception {
+        decompilePCodeWithLines("getlocal1\nsetlocal2\npushbyte 0\nsetlocal3\njump check\n"
+                + "body:\nlabel\npushbyte 7\nsetlocal 4\n"
+                + "findpropstrict QName(PackageNamespace(\"\"),\"trace\")\n"
+                + "getlocal 4\ncallpropvoid QName(PackageNamespace(\"\"),\"trace\"), 1\n"
+                + "check:\nhasnext2 2, 3\niftrue body\n",
+                "         var _loc2_:* = param1;\n"
+                + "         var _loc3_:int = 0;\n"
+                + "         while(§§hasnext(_loc2_,_loc3_))\n"
+                + "         {\n"
+                + "            var _loc4_:int = 7;\n"
+                + "            trace(_loc4_);\n"
+                + "         }\n");
+    }
+
+    @DataProvider(name = "withLoopScopeDepths")
+    public Object[][] withLoopScopeDepths() {
+        return new Object[][]{{1, false}, {1, true}, {2, false}, {2, true}};
+    }
+
+    @Test(dataProvider = "withLoopScopeDepths")
+    public void testWithLoopTailKeepsActivationScope(int depth, boolean deobfuscate) throws Exception {
+        boolean oldDeobfuscate = Configuration.autoDeobfuscate.get();
+        Configuration.autoDeobfuscate.set(deobfuscate);
+        try {
+            String withStart = depth == 2 ? "with(items[i]) { with(child) {" : "with(items[i]) {";
+            String withEnd = depth == 2 ? "} }" : "}";
+            String result = recompileSource("package { public class Test {"
+                    + "public static function test(items:Array):int {"
+                    + "var i:int = 0; var keep:Function = function():int { return i; };"
+                    + "while(i < items.length) {" + withStart
+                    + "var j:int = 0; while(j < 3) {"
+                    + "if(flag) { trace(\"first\"); if(leave) { return keep(); } } else { trace(\"second\"); }"
+                    + "j++; } if(tail) { trace(\"tail\"); }"
+                    + withEnd + "i++; } return keep(); } } }");
+            Assert.assertFalse(result.contains("§§"), result);
+            assertTrue(result.contains("with(items[i])"), result);
+            assertTrue(result.contains("while(i < items.length)"), result);
+            assertEquals(result.split("trace\\(\"first\"\\)", -1).length - 1, 1, result);
+            assertEquals(result.split("trace\\(\"second\"\\)", -1).length - 1, 1, result);
+            assertEquals(result.split("i\\+\\+", -1).length - 1, 1, result);
+        } finally {
+            Configuration.autoDeobfuscate.set(oldDeobfuscate);
+        }
+    }
+
+    @DataProvider(name = "nestedFunctionDepths")
+    public Object[][] nestedFunctionDepths() {
+        return new Object[][]{{2, false}, {2, true}, {6, false}, {6, true}};
+    }
+
+    @Test(dataProvider = "nestedFunctionDepths")
+    public void testNestedFunctionPreparationDoesNotMultiplyConversions(int depth, boolean deobfuscate) throws Exception {
+        boolean oldStats = Configuration.showStat;
+        boolean oldDeobfuscate = Configuration.autoDeobfuscate.get();
+        Configuration.showStat = true;
+        Configuration.autoDeobfuscate.set(deobfuscate);
+        try {
+            String nested = "{value:17}";
+            for (int i = 0; i < depth; i++) {
+                nested = "{factory:function():Object { return " + nested + "; }}";
+            }
+            HashMap<String, StatisticData> before = new HashMap<>();
+            Statistics.addToMap(before);
+            String result = recompileSource("package { public class Test { public static function test():Object { return " + nested + "; } } }");
+            HashMap<String, StatisticData> after = new HashMap<>();
+            Statistics.addToMap(after);
+            int conversions = after.get("MethodBody.convert").count
+                    - (before.containsKey("MethodBody.convert") ? before.get("MethodBody.convert").count : 0);
+            assertTrue(conversions <= (depth + 2) * (depth + 2), "Too many method conversions: " + conversions);
+            assertEquals(result.split("function\\(\\):Object", -1).length - 1, depth, result);
+            assertTrue(result.contains("\"value\":17"), result);
+            Assert.assertFalse(result.contains("§§"), result);
+        } finally {
+            Configuration.showStat = oldStats;
+            Configuration.autoDeobfuscate.set(oldDeobfuscate);
+        }
+    }
+
+    @Test
+    public void testAnonymousFunctionPreparationKeepsLoopLabelsAndRecursion() throws Exception {
+        String result = recompileSource("package { public class Test { public static function test(check:Function):Function {"
+                + "var recurse:Function = function(n:int):int { return n <= 0 ? 0 : recurse(n - 1); };"
+                + "return function():int { outer:while(check()) { while(check()) { if(check()) { break outer; } } }"
+                + "return recurse(3); }; } } }");
+        assertTrue(result.contains("break loop"), result);
+        assertTrue(result.contains("return recurse(3);"), result);
+        assertTrue(result.contains("recurse(n - 1)"), result);
+        Assert.assertFalse(result.contains("§§"), result);
+    }
+
+    @Test
     public void testScriptInitializerImports() throws Exception {
         //top-level code after the package block, with no other trait outside
         //the package, lost the import of a name from another package
@@ -1611,5 +2854,48 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         String afterPackage = res.substring(packageEnd);
         assertTrue(afterPackage.contains("import flash.utils.getTimer;"), res);
         assertTrue(afterPackage.indexOf("import flash.utils.getTimer;") < afterPackage.indexOf("getTimer();"), res);
+    }
+
+    @Test
+    public void testScriptInitializerImportsNamesEndingInHashDigits() throws Exception {
+        String res = recompileSource("package { public class Test { } }",
+                "code\n"
+                + "getlocal0\n"
+                + "pushscope\n"
+                + "pushnull\n"
+                + "coerce QName(PackageNamespace(\"haxe.io\"),\"#3\")\n"
+                + "pop\n"
+                + "pushnull\n"
+                + "coerce QName(PackageNamespace(\"haxe.io\"),\"Bytes#4\")\n"
+                + "pop\n"
+                + "returnvoid\n");
+        assertTrue(res.contains("import haxe.io.\u00a7#3\u00a7;"), res);
+        assertTrue(res.contains("import haxe.io.\u00a7Bytes#4\u00a7;"), res);
+        assertTrue(!res.contains("import haxe.io.;"), res);
+    }
+
+    @Test
+    public void testStaticFieldInitializerUsingScriptLocal() throws Exception {
+        String res = recompileSource("package { public class Test { public static var data:Array; public static var literal:int; } }",
+                "code\n"
+                + "getlocal0\n"
+                + "pushscope\n"
+                + "getlex QName(PackageNamespace(\"\"),\"Test\")\n"
+                + "pushbyte 42\n"
+                + "initproperty QName(PackageNamespace(\"\"),\"literal\")\n"
+                + "pushbyte 7\n"
+                + "newarray 1\n"
+                + "setlocal1\n"
+                + "getlex QName(PackageNamespace(\"\"),\"Test\")\n"
+                + "getlocal1\n"
+                + "initproperty QName(PackageNamespace(\"\"),\"data\")\n"
+                + "returnvoid\n").replace("\r\n", "\n");
+        int packageEnd = res.lastIndexOf("\n}\n");
+        assertTrue(packageEnd >= 0, res);
+        String classSource = res.substring(0, packageEnd);
+        String scriptSource = res.substring(packageEnd);
+        assertTrue(classSource.contains("public static var data:Array;"), res);
+        assertTrue(classSource.contains("public static var literal:int = 42;"), res);
+        assertTrue(scriptSource.contains("var _loc1_:Array = [7];\nTest.data = _loc1_;"), res);
     }
 }

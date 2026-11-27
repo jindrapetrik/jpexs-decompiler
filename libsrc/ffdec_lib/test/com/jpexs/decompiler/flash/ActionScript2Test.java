@@ -568,7 +568,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
     @Test
     public void frame50_ifFrameLoadedTest() {
         compareSrc(50, "trace(\"ifFrameLoadedTest\");\r\n"
-                + "ifFrameLoaded(9)\r\n"
+                + "ifFrameLoaded(10)\r\n"
                 + "{\r\n"
                 + "trace(\"loaded\");\r\n"
                 + "}\r\n"
@@ -737,7 +737,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "a = getVersion();\r\n"
                 + "gotoAndPlay(5);\r\n"
                 + "gotoAndStop(8);\r\n"
-                + "ifFrameLoaded(4)\r\n"
+                + "ifFrameLoaded(5)\r\n"
                 + "{\r\n"
                 + "trace(\"loaded\");\r\n"
                 + "}\r\n"
@@ -2353,7 +2353,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
     public void frame83_ifframeLoaded2Test() {
         compareSrc(83, "trace(\"ifframeLoaded2Test\");\r\n"
                 + "trace(\"A\");\r\n"
-                + "ifFrameLoaded(9)\r\n"
+                + "ifFrameLoaded(10)\r\n"
                 + "{\r\n"
                 + "var d = 5;\r\n"
                 + "if(d == 4)\r\n"

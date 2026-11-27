@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -35,7 +36,7 @@ import java.util.Objects;
  *
  * @author JPEXS
  */
-public class FindPropertyAVM2Item extends AVM2Item {
+public class FindPropertyAVM2Item extends AVM2Item implements SimpleValue {
 
     /**
      * Property name
@@ -104,6 +105,11 @@ public class FindPropertyAVM2Item extends AVM2Item {
         if (!Objects.equals(this.propertyName, other.propertyName)) {
             return false;
         }
+        return true;
+    }
+
+    @Override
+    public boolean isSimpleValue() {
         return true;
     }
 

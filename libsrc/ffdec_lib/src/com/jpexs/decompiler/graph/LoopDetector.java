@@ -4,6 +4,7 @@ import com.jpexs.decompiler.graph.precontinues.GraphPrecontinueDetector;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
@@ -24,6 +25,26 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class LoopDetector {
+
+    /**
+     * First instruction position outside the source, when known.
+     */
+    private final int codeSize;
+
+    /**
+     * Creates a detector for a graph without a known instruction limit.
+     */
+    public LoopDetector() {
+        this(Integer.MAX_VALUE);
+    }
+
+    /**
+     * @param codeSize First position after the real instructions; parts at this
+     * position represent implicit method completion rather than shared code.
+     */
+    public LoopDetector(int codeSize) {
+        this.codeSize = codeSize;
+    }
 
     /**
      * Detects loops.
@@ -93,6 +114,7 @@ public class LoopDetector {
         Set<GraphPartEdge> ignoredEdges = new LinkedHashSet<>();
 
         Set<GraphPart> multipleSameCase = new LinkedHashSet<>();
+        boolean orderedCases = !switchParts.isEmpty() && hasTopologicalClosedTimes(allParts, pnw);
         
         for (List<GraphPart> switchCases : switchParts) {
             for (int i = 1; i < switchCases.size(); i++) {
@@ -104,7 +126,7 @@ public class LoopDetector {
                     Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "duplicate case {0} detected", new Object[]{case1});
                     continue;
                 }
-                GraphPart leadsToPrev = partLeadsToGetPrev(case1, case2, backEdges, pnw);
+                GraphPart leadsToPrev = partLeadsToGetPrev(case1, case2, backEdges, pnw, orderedCases);
                 if (leadsToPrev != null) {
                     Logger.getLogger(LoopDetector.class.getName()).log(Level.FINEST, "- leadsto, ignoring edge {0} => {1}", new Object[]{leadsToPrev, case2});
                     ignoredEdges.add(new GraphPartEdge(leadsToPrev, case2));
@@ -120,9 +142,15 @@ public class LoopDetector {
             }
         }
 
+        // Both fallthroughs and grouped case labels can hide an edge which
+        // also exits a loop. Such edges must participate in exit selection.
+        for (Loop loop : loops) {
+            ignoredEdges.removeIf(edge -> loop.loopBody.contains(edge.from) && !loop.loopBody.contains(edge.to));
+        }
+
         new GraphPrecontinueDetector().detectPrecontinues(heads, allParts, loops, throwStates);
 
-        findBreaks(loops, backEdges, throwStates, ignoredEdges, switchBreaks);
+        findBreaks(loops, backEdges, throwStates, ignoredEdges, switchParts, switchBreaks);
 
         loops.sort(new LoopDetector.LoopComparator());
 
@@ -416,7 +444,7 @@ public class LoopDetector {
      *
      * @param loops Loops
      */
-    private void findBreaks(List<Loop> loops, Set<GraphPartEdge> backEdges, List<ThrowState> throwStates, Set<GraphPartEdge> ignoredEdges, List<GraphPart> switchBreaks) {
+    private void findBreaks(List<Loop> loops, Set<GraphPartEdge> backEdges, List<ThrowState> throwStates, Set<GraphPartEdge> ignoredEdges, List<List<GraphPart>> switchParts, List<GraphPart> switchBreaks) {
         PrevNextWalker pnw = new BasicPrevNextWalker();
         //PrevNextWalker tpnw = new ThrowPrevNextWalker(throwStates); //new BasicPrevNextWalker();                        
 
@@ -495,6 +523,7 @@ public class LoopDetector {
             //The natural exit of this loop (from its continue part) leading to the precontinue
             //of a parent loop, or to the continue of the direct parent when this loop ends its
             //body (as in a for each), is the code after this loop, not a continue of the parent loop
+            Set<GraphPart> naturalParentContinues = new LinkedHashSet<>();
             for (GraphPartEdge edge : loop.edgesOutside) {
                 if (edge.from == loop.loopContinue
                         && !ignoredEdges.contains(edge)
@@ -502,10 +531,28 @@ public class LoopDetector {
                         && (isParentPreContinueOnly(loop, edge.to)
                         || (loop.parentLoop != null && loop.parentLoop.loopContinue == edge.to))) {
                     parentContinues.remove(edge.to);
+                    naturalParentContinues.add(edge.to);
                 }
             }
 
-            parentBreaks.addAll(switchBreaks); //these are not real parent, but should work(?)
+            for (int i = 0; i < switchBreaks.size(); i++) {
+                GraphPart switchBreak = switchBreaks.get(i);
+                Set<GraphPart> dispatchParts = new LinkedHashSet<>(loop.loopBody);
+                for (GraphPart casePart : switchParts.get(i)) {
+                    dispatchParts.retainAll(casePart.refs);
+                }
+                // A switch in a branch which exits the loop is outside its
+                // natural cycle too. Only an enclosing switch has a case which
+                // reaches the loop header without traversing a back edge.
+                if (dispatchParts.isEmpty()) {
+                    for (GraphPart casePart : switchParts.get(i)) {
+                        if (getReachable(casePart, backEdges, Collections.emptySet(), pnw, ignoredEdges).contains(loop.loopContinue)) {
+                            parentBreaks.add(switchBreak);
+                            break;
+                        }
+                    }
+                }
+            }
 
             PrevNextWalker walker = loopWalkers.get(loop);
             List<ThrowState> subThrowStates = loopThrowStates.get(loop);
@@ -559,15 +606,48 @@ public class LoopDetector {
                 }
             }
 
+            if (naturalOutParts.isEmpty()) {
+                // A short-circuit condition can leave from a later part, not
+                // the loop header itself. Its join may also be the parent's
+                // branching precontinue. Retain that join when all local exits
+                // must reach it before any enclosing loop boundary.
+                for (GraphPart target : parentContinues) {
+                    if (!outParts.contains(target) || parentBreaks.contains(target)
+                            || target.nextParts.size() <= 1 || !isParentPreContinueOnly(loop, target)) {
+                        continue;
+                    }
+                    Set<GraphPart> boundaries = new LinkedHashSet<>(abruptTargets);
+                    boundaries.addAll(exceptionTargets);
+                    boundaries.remove(target);
+                    Set<GraphPart> localExits = new LinkedHashSet<>(outParts);
+                    localExits.removeAll(boundaries);
+                    if (localExits.size() > 1 && findNearestCommonPostDominator(localExits, backEdges,
+                            boundaries, walker, ignoredEdges, boundaries, outParts) == target) {
+                        abruptTargets.remove(target);
+                    }
+                }
+            }
+
             Set<GraphPart> classifiedAbruptTargets = new LinkedHashSet<>(abruptTargets);
             if (!naturalOutParts.isEmpty() && !abruptTargets.isEmpty()) {
-                Set<GraphPart> boundaryTargets = new LinkedHashSet<>(abruptTargets);
-                boundaryTargets.addAll(naturalOutParts);
-                boundaryTargets.addAll(exceptionTargets);
+                Set<GraphPart> stopTargets = new LinkedHashSet<>(abruptTargets);
+                stopTargets.addAll(exceptionTargets);
+                stopTargets.addAll(naturalParentContinues);
+                Set<GraphPart> boundaryTargets = new LinkedHashSet<>(stopTargets);
+                // An early exit can join the natural exit after their first blocks.
+                Set<GraphPart> naturalContinuation = getReachable(naturalOutParts, backEdges, stopTargets, walker, ignoredEdges, false);
+                boundaryTargets.addAll(naturalContinuation);
+                // A branching precontinue may be emitted as part of the parent body.
+                // If the natural exit reaches it, it can also be the inner loop's join.
+                for (GraphPart target : parentContinues) {
+                    if (naturalContinuation.contains(target) && target.nextParts.size() > 1 && !parentBreaks.contains(target)
+                            && isParentPreContinueOnly(loop, target)) {
+                        abruptTargets.remove(target);
+                        classifiedAbruptTargets.remove(target);
+                    }
+                }
                 for (GraphPart outPart : outParts) {
-                    if (naturalOutParts.contains(outPart)
-                            || exceptionTargets.contains(outPart)
-                            || abruptTargets.contains(outPart)) {
+                    if (boundaryTargets.contains(outPart)) {
                         continue;
                     }
                     if (leadsOnlyToAbruptTargets(
@@ -602,6 +682,11 @@ public class LoopDetector {
                 if (isDeadEnd(loop, outPart, backEdges, walker, ignoredEdges)) {
                     deadEndOutParts.add(outPart);
                 }
+            }
+            if (deadEndOutParts.size() == localOutParts.size()) {
+                // Keep the condition's normal continuation when every exit
+                // eventually finishes the method. Other exits can return inline.
+                deadEndOutParts.removeAll(naturalOutParts);
             }
             if (!deadEndOutParts.isEmpty() && deadEndOutParts.size() < localOutParts.size()) {
                 localOutParts.removeAll(deadEndOutParts);
@@ -680,14 +765,9 @@ public class LoopDetector {
                         return -1;
                     }
 
-                    boolean mb1 = o1.numBranches > 1;
-                    boolean mb2 = o2.numBranches > 1;
-
-                    if (mb1 != mb2) {
-                        if (mb1) {
-                            return -1;
-                        }
-                        return 1;
+                    int branches = Integer.compare(o2.numBranches, o1.numBranches);
+                    if (branches != 0) {
+                        return branches;
                     }
 
                     if (op1 != op2) {
@@ -743,6 +823,10 @@ public class LoopDetector {
     private boolean isDeadEnd(Loop loop, GraphPart outPart, Set<GraphPartEdge> backEdges, PrevNextWalker walker, Set<GraphPartEdge> ignoredEdges) {
         Set<GraphPart> reachable = getReachable(outPart, backEdges, new HashSet<>(), walker, ignoredEdges);
         for (GraphPart part : reachable) {
+            if (part.start >= codeSize) {
+                // Sharing the empty end-of-code node does not share statements.
+                continue;
+            }
             for (GraphPart prev : walker.getPrev(part)) {
                 if (prev.start < 0) {
                     continue;
@@ -1153,16 +1237,19 @@ public class LoopDetector {
         return null;
     }*/
     private Set<GraphPart> getReachable(GraphPart startPart, Set<GraphPartEdge> backEdges, Set<GraphPart> ignoredParts, PrevNextWalker pnw, Set<GraphPartEdge> ignoredEdges) {
+        return getReachable(Collections.singleton(startPart), backEdges, ignoredParts, pnw, ignoredEdges, true);
+    }
+
+    private Set<GraphPart> getReachable(Set<GraphPart> startParts, Set<GraphPartEdge> backEdges, Set<GraphPart> stopParts,
+            PrevNextWalker pnw, Set<GraphPartEdge> ignoredEdges, boolean includeBackEdgeTargets) {
         Set<GraphPart> visited = new LinkedHashSet<>();
 
-        Queue<GraphPart> q = new ArrayDeque<>();
-        q.offer(startPart);
+        Queue<GraphPart> q = new ArrayDeque<>(startParts);
         while (!q.isEmpty()) {
             GraphPart part = q.poll();
-            if (visited.contains(part)) {
+            if (!visited.add(part) || stopParts.contains(part)) {
                 continue;
-            }            
-            visited.add(part);
+            }
 
             for (GraphPart next : pnw.getNext(part)) {
                 GraphPartEdge edge = new GraphPartEdge(part, next);
@@ -1170,11 +1257,10 @@ public class LoopDetector {
                 if (ignoredEdges.contains(edge)) {
                     continue;
                 }
-                if (ignoredParts.contains(part)) {
-                    continue;
-                }
                 if (backEdges.contains(edge)) {
-                    visited.add(edge.to);
+                    if (includeBackEdgeTargets) {
+                        visited.add(edge.to);
+                    }
                     continue;
                 }
                 q.offer(next);
@@ -1183,7 +1269,21 @@ public class LoopDetector {
         return visited;
     }
 
-    private GraphPart partLeadsToGetPrev(GraphPart part1, GraphPart part2, Set<GraphPartEdge> backEdges, PrevNextWalker pnw) {
+    private boolean hasTopologicalClosedTimes(Set<GraphPart> parts, PrevNextWalker pnw) {
+        for (GraphPart part : parts) {
+            if (part.closedTime <= 0) {
+                return false;
+            }
+            for (GraphPart next : pnw.getNext(part)) {
+                if (next.closedTime <= part.closedTime) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private GraphPart partLeadsToGetPrev(GraphPart part1, GraphPart part2, Set<GraphPartEdge> backEdges, PrevNextWalker pnw, boolean ordered) {
         if (part1 == part2) {
             return null;
         }
@@ -1192,6 +1292,11 @@ public class LoopDetector {
         Set<GraphPart> visited = new HashSet<>();
         while (!stack.isEmpty()) {
             GraphPart part = stack.pop();
+            if (ordered && part.closedTime >= part2.closedTime) {
+                // All edges advance in this verified topological order. A
+                // shared suffix beyond the target cannot lead back to it.
+                continue;
+            }
             if (visited.contains(part)) {
                 continue;
             }

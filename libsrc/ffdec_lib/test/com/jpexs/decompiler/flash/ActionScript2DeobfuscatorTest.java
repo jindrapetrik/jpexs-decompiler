@@ -19,9 +19,15 @@ package com.jpexs.decompiler.flash;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ActionListReader;
+import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionWith;
+import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
+import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -32,6 +38,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -80,6 +87,169 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         Action.actionsToSource(new HashMap<>(), doa, doa.getActions(), "", writer, swf.getCharset());
         writer.finishHilights();
         return writer.toString().trim().replace("\r\n", "\n");
+    }
+
+    @DataProvider(name = "immediatelyExitedTryHandlers")
+    public Object[][] immediatelyExitedTryHandlers() {
+        return new Object[][]{{"\"error\""}, {"register3"}};
+    }
+
+    @Test(dataProvider = "immediatelyExitedTryHandlers")
+    public void testTryInitialJumpLeavesRangeAndReentersBody(String handler) throws Exception {
+        String result = decompilePCode("Push \"before\"\nTrace\nTry " + handler + " {\n"
+                + "Jump relay\nrelay: Jump outside\n"
+                + "body: Push \"body\"\nTrace\nJump done\n}\nCatch {\n"
+                + "Push \"unreachable\"\nTrace\nJump done\n"
+                + "outside: Push \"outside\"\nTrace\nJump body\n}\n"
+                + "done: Push \"after\"\nTrace\n");
+        Assert.assertEquals(result, "trace(\"before\");\ntrace(\"outside\");\ntrace(\"body\");\ntrace(\"after\");");
+    }
+
+    @DataProvider(name = "protectedTryEntries")
+    public Object[][] protectedTryEntries() {
+        return new Object[][]{
+            {"Jump body\nbody: Push \"error\"\nThrow\n", "", false},
+            {"Push \"value\"\nTrace\nJump done\n", "", false},
+            {"Jump done\n", "Finally {\nPush \"finally\"\nTrace\n}\n", true},
+            {"again: Jump again\n", "", false}
+        };
+    }
+
+    @Test(dataProvider = "protectedTryEntries")
+    public void testTryHandlerIsKeptWhenEntryDoesNotImmediatelyEscape(String body, String finallyBody, boolean hasFinally) throws Exception {
+        String pcode = "Try \"error\" {\n" + body + "}\nCatch {\nPush \"caught\"\nTrace\nJump done\n}\n"
+                + finallyBody + "done: End\n";
+        List<Action> parsed = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        ActionList actions = new ActionList(parsed, swf.getCharset());
+        new ActionDeobfuscator().actionListParsed(actions, swf);
+        ActionTry kept = null;
+        for (Action action : actions) {
+            if (action instanceof ActionTry) {
+                kept = (ActionTry) action;
+            }
+        }
+        Assert.assertNotNull(kept, "The reachable exception handler must be preserved");
+        Assert.assertEquals(kept.finallyBlockFlag, hasFinally);
+    }
+
+    @Test
+    public void testFoldArrayLiteral() throws Exception {
+        String res = decompilePCode("Push \"sample\"\n"
+                + "Push undefined\n"
+                + "Push 40\n"
+                + "Push 2\n"
+                + "Add\n"
+                + "Push 2\n"
+                + "InitArray\n"
+                + "SetVariable\n"
+                + "Push \"sample\"\n"
+                + "GetVariable\n"
+                + "Trace");
+        Assert.assertEquals(res, "sample = [42,undefined];\ntrace(sample);");
+    }
+
+    @DataProvider(name = "discardedConstantPools")
+    public Object[][] discardedConstantPools() {
+        return new Object[][]{{Arrays.asList("wrongName")}, {Arrays.asList("wrongName", "wrongValue")}};
+    }
+
+    @Test(dataProvider = "discardedConstantPools")
+    public void testDiscardedPoolDoesNotBecomeLiteralString(List<String> discardedPool) throws Exception {
+        ActionList actions = ASMParser.parse(0, true, "ConstantPool \"value\", \"resolved\"\n"
+                + "Push \"external\"\nGetVariable\nTrace\n"
+                + "Push constant0, constant1\nPushDuplicate\nPop\nSetVariable\n"
+                + "Push constant0\nGetVariable\nTrace\nEnd\n",
+                swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        // This is the intermediate state after an obfuscation pool is removed:
+        // the surviving pool is correct, but Push metadata still names the old one.
+        for (Action action : actions) {
+            if (action instanceof ActionPush) {
+                ((ActionPush) action).constantPool = discardedPool;
+            }
+        }
+        new ActionDeobfuscator().actionListParsed(actions, swf);
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        Action.actionsToSource(new HashMap<>(), null, actions, "", writer, swf.getCharset());
+        writer.finishHilights();
+        Assert.assertEquals(writer.toString().trim().replace("\r\n", "\n"),
+                "trace(external);\nvalue = \"resolved\";\ntrace(value);");
+    }
+
+    @Test
+    public void testInvalidPoolIndexIsNotReplacedWithString() throws Exception {
+        String result = decompilePCode("ConstantPool \"value\"\n"
+                + "Push constant0, constant7\nSetVariable\nEnd\n");
+        Assert.assertEquals(result, "value = §§constant(7);");
+    }
+
+    @Test
+    public void testEntryDispatcherKeepsExternalVariableRead() throws Exception {
+        StringBuilder pcode = new StringBuilder("Push \"state\", 7\nDefineLocal\nJump dispatch\n");
+        for (int i = 0; i < 100; i++) {
+            pcode.append("decoy").append(i).append(": Push \"external\"\nGetVariable\nIf decoy")
+                    .append((i + 1) % 100).append("\nJump dispatch\n");
+        }
+        pcode.append("dispatch: Push \"state\"\nGetVariable\nPush 7\nEquals2\nIf selected\n")
+                .append("Jump decoy0\nselected: Push \"external\"\nGetVariable\nTrace\nEnd\n");
+        Assert.assertEquals(decompilePCode(pcode.toString()), "var state = 7;\ntrace(external);");
+    }
+
+    @Test
+    public void testFoldObjectWithNestedArray() throws Exception {
+        String res = decompilePCode("Push \"sample\"\n"
+                + "Push \"second\"\n"
+                + "Push false\n"
+                + "Push \"first\"\n"
+                + "Push undefined\n"
+                + "Push 40\n"
+                + "Push 2\n"
+                + "Add\n"
+                + "Push 2\n"
+                + "InitArray\n"
+                + "Push 2\n"
+                + "InitObject\n"
+                + "SetVariable\n"
+                + "Push \"sample\"\n"
+                + "GetVariable\n"
+                + "Trace");
+        Assert.assertEquals(res, "sample = {second:false,first:[42,undefined]};\ntrace(sample);");
+    }
+
+    @Test
+    public void testKeepSharedArrayReference() throws Exception {
+        String res = decompilePCode("Push \"a\"\n"
+                + "Push 40\n"
+                + "Push 2\n"
+                + "Add\n"
+                + "Push 1\n"
+                + "InitArray\n"
+                + "SetVariable\n"
+                + "Push \"b\"\n"
+                + "Push \"a\"\n"
+                + "GetVariable\n"
+                + "SetVariable\n"
+                + "Push \"b\"\n"
+                + "GetVariable\n"
+                + "Trace");
+        assertTrue(res.contains("b = a;"), res);
+    }
+
+    @Test
+    public void testKeepFunctionReturningArray() throws Exception {
+        decompilePCode("DefineFunction \"-\" 0 {\n"
+                + "Push 0\n"
+                + "InitArray\n"
+                + "Return\n"
+                + "}\n"
+                + "Push \"result\"\n"
+                + "Push 0\n"
+                + "Push \"-\"\n"
+                + "CallFunction\n"
+                + "SetVariable\n"
+                + "Push \"result\"\n"
+                + "GetVariable\n"
+                + "Trace");
+        assertTrue(getFirstActionTag().getActions().stream().anyMatch(a -> a instanceof ActionDefineFunction));
     }
 
     @DataProvider(name = "provideBasicTrueExpressions")
@@ -445,6 +615,74 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         } catch (IOException | ActionParseException | InterruptedException ex) {
             fail();
         }
+    }
+
+    @DataProvider
+    public Object[][] bypassedContainerHeaders() {
+        return new Object[][]{
+            {"With {\n", "}\n", "", ActionWith.class},
+            {"DefineFunction \"bypassed\" 0 {\n", "}\n", "", ActionDefineFunction.class},
+            {"DefineFunction2 \"bypassed\" 0 1 false false false false false false false false false {\n", "}\n", "", ActionDefineFunction2.class},
+            {"Try \"e\" {\n", "}\nCatch {\n", "}\nFinally {\nJump done\n}\n", ActionTry.class},
+            {"Try \"e\" {\nJump correct\n}\nCatch {\n", "}\nFinally {\n", "}\n", ActionTry.class},
+            {"Try \"e\" {\nJump correct\n}\nCatch {\nJump correct\n}\nFinally {\n", "}\n", "", ActionTry.class}
+        };
+    }
+
+    @Test(dataProvider = "bypassedContainerHeaders")
+    public void testJumpPastContainerBodyEnteredFromScriptEntry(String header, String boundary, String trailingSections, Class<? extends Action> containerClass) throws Exception {
+        String pcode = "Jump entry\n"
+                + "containerHeader: " + header
+                + "entry: Push \"state\", 7\n"
+                + "DefineLocal\n"
+                + "dispatch: Push \"state\"\n"
+                + "GetVariable\n"
+                + "Push 9\n"
+                + "Equals\n"
+                + "If containerHeader\n"
+                + "Push true\n"
+                + "Push \"state\"\n"
+                + "GetVariable\n"
+                + "Push 7\n"
+                + "Equals\n"
+                + "If afterContainer\n"
+                + "Jump dispatch\n"
+                + boundary
+                + "afterContainer: If correct\n"
+                + "Push \"WRONG\"\n"
+                + "Trace\n"
+                + "Jump done\n"
+                + "correct: Push \"OK\"\n"
+                + "Trace\n"
+                + trailingSections
+                + "done: End\n";
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        DoActionTag source = getFirstActionTag();
+        source.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+        ActionList deobfuscated = source.getActions();
+        Assert.assertFalse(deobfuscated.stream().anyMatch(containerClass::isInstance), "The bypassed container must be removed");
+
+        HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+        source.getActionScriptSource(writer, deobfuscated);
+        writer.finishHilights();
+        Assert.assertEquals(writer.toString().trim().replace("\r\n", "\n"), "var state = 7;\ntrace(\"OK\");");
+    }
+
+    @Test
+    public void testKeepExecutedWithScope() throws Exception {
+        String result = recompile("var scope = {value: 1}; with(scope) { trace(value); } trace(2);");
+        assertTrue(result.contains("with(scope)"), result);
+        assertTrue(result.contains("trace(value);"), result);
+        assertTrue(result.contains("trace(2);"), result);
+    }
+
+    @Test
+    public void testKeepExecutedTryCatchFinally() throws Exception {
+        String result = recompile("try { throw 'error'; } catch (e) { trace(e); } finally { trace('finally'); } trace('after');");
+        assertTrue(result.contains("throw \"error\";"), result);
+        assertTrue(result.contains("catch") && result.contains("trace(e);"), result);
+        assertTrue(result.contains("finally") && result.contains("trace(\"finally\");"), result);
+        assertTrue(result.contains("trace(\"after\");"), result);
     }
 
     @Test

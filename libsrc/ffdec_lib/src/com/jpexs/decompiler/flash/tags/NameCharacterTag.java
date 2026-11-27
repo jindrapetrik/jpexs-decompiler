@@ -47,6 +47,7 @@ public class NameCharacterTag extends Tag implements CharacterModifier {
     public static final int TYPE_SYMBOL = 6;
     public static final int TYPE_SOUND = 0xFFFF;
     
+    public static final int TYPE_NOT_SET = -1;
     
     /**
      * ID of character to name
@@ -80,7 +81,11 @@ public class NameCharacterTag extends Tag implements CharacterModifier {
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterId = sis.readUI16("characterId");
         name = sis.readString("name");
-        type = sis.readUI16("type");
+        if (sis.available() > 0) {
+            type = sis.readUI16("type");
+        } else {
+            type = TYPE_NOT_SET;
+        }
     }
 
     /**
@@ -93,7 +98,9 @@ public class NameCharacterTag extends Tag implements CharacterModifier {
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(characterId);
         sos.writeString(name);
-        sos.writeUI16(type);
+        if (type != TYPE_NOT_SET) {            
+            sos.writeUI16(type);
+        }
     }
 
     @Override

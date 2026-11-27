@@ -117,9 +117,8 @@ public interface SetTypeIns {
                 GraphTargetItem insideDup = notCoercedValue.value;
                 if (!AVM2Item.mustStayIntact1(insideDup.getNotCoercedNoDup())) {
                     if (stack.peek().getThroughDuplicate() == insideDup.getThroughDuplicate()) {
-                        stack.pop();
-
                         if ((insideDup instanceof DuplicateItem) && regId > -1) {
+                            stack.pop();
                             int numDups = 1;
                             while ((insideDup instanceof DuplicateItem) && !stack.isEmpty() && stack.peek().getThroughDuplicate() == insideDup.getThroughDuplicate()) {
                                 insideDup = insideDup.value;

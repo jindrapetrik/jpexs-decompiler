@@ -221,6 +221,12 @@ public class FullMultinameAVM2Item extends AVM2Item {
             AVM2ConstantPool constants = localData.constantsAvm2;
             List<DottedChain> fullyQualifiedNames = afterDot ? new ArrayList<>() : localData.fullyQualifiedNames;
             if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
+                if (!afterDot && !property) {
+                    String packageProperty = getLexicalPackagePropertyName(constants.getMultiname(multinameIndex), localData);
+                    if (packageProperty != null) {
+                        return writer.append(packageProperty);
+                    }
+                }
                 String simpleName = constants.getMultiname(multinameIndex).getName(new HashSet<>(), localData.abc, constants, fullyQualifiedNames, true, false);
                 if ("*".equals(simpleName)) {
                     writer.append("*");
@@ -231,9 +237,9 @@ public class FullMultinameAVM2Item extends AVM2Item {
                     String namespaceSuffix = constants.getMultiname(multinameIndex).getNamespaceSuffix();
                     if (!isAttribute && afterDot && namespaceSuffix.isEmpty() && Configuration.as3QNameObfuscatedPropsInSquareBrackets.get()) {
                         //do not deobfuscate
-                        localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(new HashSet<>(), localData.abc, fullyQualifiedNames, true, true, customNsRef);
+                        localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(new HashSet<>(), localData.abc, fullyQualifiedNames, true, true, customNsRef, localData.scriptIndex);
                     } else {
-                        localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(localData.usedDeobfuscations, localData.abc, fullyQualifiedNames, false, true, customNsRef);                        
+                        localName = constants.getMultiname(multinameIndex).getNameAndCustomNamespace(localData.usedDeobfuscations, localData.abc, fullyQualifiedNames, false, true, customNsRef, localData.scriptIndex);
                     }
                     
                     DottedChain customNs = customNsRef.getVal();
@@ -241,6 +247,9 @@ public class FullMultinameAVM2Item extends AVM2Item {
                     DottedChain globalNamespace = localData.abc.findCustomNsOfMultiname(constants.getMultiname(multinameIndex));
                     if (customNs == null && (globalNamespace == null || globalNamespace.isEmpty())) {
                         DottedChain resolved = localData.abc.findCustomNsOfMultiname(constants.getMultiname(multinameIndex), localData.classIndex);
+                        if (resolved == null || resolved.isEmpty()) {
+                            resolved = writer.getGeneratedNamespace(constants.getMultiname(multinameIndex), constants);
+                        }
                         if (resolved != null && !resolved.isEmpty()) {
                             customNs = resolved;
                             localNamespace = true;

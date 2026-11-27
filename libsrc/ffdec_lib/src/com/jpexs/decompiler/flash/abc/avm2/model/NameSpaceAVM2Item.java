@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -56,7 +57,11 @@ public class NameSpaceAVM2Item extends AVM2Item {
         }
         AVM2ConstantPool constants = localData.constantsAvm2;
 
-        DottedChain dc = localData.abc.findCustomNsOfNamespace(namespaceIndex);
+        DottedChain dc = localData.abc.findCustomNsOfNamespace(namespaceIndex, localData.scriptIndex);
+        Namespace namespace = constants.getNamespace(namespaceIndex);
+        if ((dc == null || dc.isEmpty()) && namespace.kind == Namespace.KIND_NAMESPACE) {
+            dc = writer.getGeneratedNamespace(namespace.getRawName(constants));
+        }
         String nsname = dc != null ? dc.getLast() : null;
 
         if (nsname != null) {
@@ -68,7 +73,7 @@ public class NameSpaceAVM2Item extends AVM2Item {
         }
 
         writer.append("new Namespace").spaceBeforeCallParenthesis(1).append("(");
-        writer.append("\"").append(Helper.escapeActionScriptString(constants.getNamespace(namespaceIndex).getRawName(constants))).append("\""); //assume not null name        
+        writer.append("\"").append(Helper.escapeActionScriptString(namespace.getRawName(constants))).append("\"");
         writer.append(")");
         return writer;
     }

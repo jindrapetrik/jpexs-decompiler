@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.xfl;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.exporters.shape.PathExporter;
+import com.jpexs.decompiler.flash.math.area.BezierArea;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -38,7 +39,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.Helper;
 import java.awt.BasicStroke;
-import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -270,9 +270,9 @@ final class MorphShapeEndings {
 
     private static final class Paint {
         Object style;
-        Area area;
+        BezierArea area;
 
-        Paint(Object style, Area area) {
+        Paint(Object style, BezierArea area) {
             this.style = style;
             this.area = area;
         }
@@ -281,7 +281,7 @@ final class MorphShapeEndings {
     private static List<Paint> paints(CharacterTag tag, SHAPEWITHSTYLE shape, int shapeNum) {
         List<Paint> result = new ArrayList<>();
         for (int i = 0; i < shape.fillStyles.fillStyles.length; i++) {
-            Area area = new Area(PathExporter.exportFillStyle(ShapeTag.WIND_EVEN_ODD, shapeNum, tag.getSwf(), shape, i + 1));
+            BezierArea area = new BezierArea(PathExporter.exportFillStyle(ShapeTag.WIND_EVEN_ODD, shapeNum, tag.getSwf(), shape, i + 1));
             FILLSTYLE fill = normalizedFill(shape.fillStyles.fillStyles[i]);
             if (!area.isEmpty() && !(fill.fillStyleType == FILLSTYLE.SOLID && ((RGBA) fill.color).alpha == 0)) {
                 result.add(new Paint(fill, area));
@@ -298,7 +298,7 @@ final class MorphShapeEndings {
             } else {
                 line.fillType = normalizedFill(line.fillType);
             }
-            Area area = new Area(new BasicStroke(1).createStrokedShape(PathExporter.exportLineStyle(
+            BezierArea area = new BezierArea(new BasicStroke(1).createStrokedShape(PathExporter.exportLineStyle(
                     ShapeTag.WIND_EVEN_ODD, shapeNum, tag.getSwf(), shape, i + 1)));
             if (!area.isEmpty()) {
                 result.add(new Paint(line, area));
@@ -326,10 +326,10 @@ final class MorphShapeEndings {
             if (!Objects.equals(a.get(i).style, b.get(i).style)) {
                 return false;
             }
-            Area difference = new Area(a.get(i).area);
+            BezierArea difference = new BezierArea(a.get(i).area);
             difference.exclusiveOr(b.get(i).area);
             // A compiler may split/rejoin a quadratic at a rounded twip.
-            difference.subtract(new Area(new BasicStroke(2).createStrokedShape(a.get(i).area)));
+            difference.subtract(new BezierArea(new BasicStroke(2).createStrokedShape(a.get(i).area)));
             if (!difference.isEmpty()) {
                 return false;
             }

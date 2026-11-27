@@ -33,6 +33,9 @@ import com.jpexs.decompiler.flash.exporters.swf.SwfIntelliJIdeaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfMxmlProjectExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfVsCodeExporter;
 import com.jpexs.decompiler.flash.ftr.FtrSwfBundle;
+import com.jpexs.decompiler.flash.gui.ai.AIContextManager;
+import com.jpexs.decompiler.flash.gui.ai.AISettingsDialog;
+import com.jpexs.decompiler.flash.gui.ai.AIStudioDialog;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
@@ -949,6 +952,22 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Main.advancedSettings();
     }
 
+    protected void aiSettingsActionPerformed(ActionEvent evt) {
+        new AISettingsDialog(mainFrame.getWindow()).setVisible(true);
+    }
+
+    protected void aiStudioActionPerformed(ActionEvent evt) {
+        SWF swf = mainFrame.getPanel().getCurrentSwf();
+        String swfTitle = swf == null ? "" : swf.getTitleOrShortFileName();
+        String swfContext = new AIContextManager().describe(swf);
+        com.jpexs.decompiler.flash.gui.abc.ASMSourceEditorPane sourceEditor = null;
+        if (swf != null && swf.isAS3()) {
+            sourceEditor = mainFrame.getPanel().getABCPanel().detailPanel
+                    .methodTraitPanel.methodCodePanel.getSourceTextArea();
+        }
+        new AIStudioDialog(mainFrame.getWindow(), swfTitle, swfContext, sourceEditor).setVisible(true);
+    }
+
     protected void solEditorActionPerformed(ActionEvent evt) {
         Main.openSolEditor();
     }
@@ -1561,6 +1580,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         finishMenu("/debuggingListen");
 
         addMenuItem("/tools", translate("menu.tools"), null, null, 0, null, false, null, false);
+        if (Configuration.ai.get()) {
+            addMenuItem("/tools/aiStudio", translate("menu.ai.studio"), "ai32",
+                    this::aiStudioActionPerformed, PRIORITY_TOP, null, true, null, false);
+        }
         addMenuItem("/tools/search", translate("menu.tools.search"), "search16", this::searchActionPerformed, PRIORITY_TOP, this::loadRecentSearches, !supportsMenuAction(), null, false);
 
         if (!supportsMenuAction()) {
@@ -1629,11 +1652,15 @@ public abstract class MainFrameMenu implements MenuBuilder {
          finishMenu("/settings/deobfuscation");*/
         addMenuItem("/settings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), null, null, 0, null, false, null, false);
         addMenuItem("/settings/advancedSettings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), "settings32", this::advancedSettingsActionPerformed, PRIORITY_TOP, null, true, null, false);
+        if (Configuration.ai.get()) {
+            addMenuItem("/settings/advancedSettings/ai", translate("menu.ai.settings"), "aisettings32",
+                    this::aiSettingsActionPerformed, PRIORITY_TOP, null, true, null, false);
+        }
         addMenuItem("/settings/advancedSettings/clearRecentFiles", translate("menu.tools.otherTools.clearRecentFiles"), "clearrecent16", this::clearRecentFilesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/settings/advancedSettings/clearRecentSearches", translate("menu.tools.otherTools.clearRecentSearches"), "clearrecent16", this::clearRecentSearchesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/settings/advancedSettings/clearPinnedItems", translate("menu.tools.otherTools.clearPinnedItems"), "clearrecent16", this::clearPinnedItemsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/settings/advancedSettings");
-
+        
         finishMenu("/settings");
 
         setMenuChecked("/settings/autoDeobfuscation", Configuration.autoDeobfuscate.get());

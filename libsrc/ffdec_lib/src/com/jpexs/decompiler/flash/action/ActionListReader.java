@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
+import com.jpexs.decompiler.flash.action.swf7.ActionTry;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -131,7 +132,7 @@ public class ActionListReader {
         Action entryAction = readActionListAtPos(listeners, null,
                 sis, actionMap, nextOffsets,
                 ip, 0, endIp, path, false, new ArrayList<>(),
-                sis.getCharset());
+                sis.getCharset(), null);
 
         if (actionMap.isEmpty()) {
             return new ActionList(sis.getCharset(), version);
@@ -214,6 +215,10 @@ public class ActionListReader {
                             int size = jump.getTotalActionLength();
                             jump.setJumpOffset((int) (nextAddress - action.getAddress() - size));
                             ret.add(jump);
+                            // This jump represents the original action's
+                            // continuation. Keep it in the same container,
+                            // including when that action overlaps its end.
+                            replaceContainerLastActions(containerLastActions, action, jump);
                         }
                     }
                 }
@@ -255,7 +260,7 @@ public class ActionListReader {
         readActionListAtPos(new ArrayList<>(), null,
                 sis, actionMap, nextOffsets,
                 startIp, startIp, endIp + 1, "", false, new ArrayList<>(),
-                sis.getCharset());
+                sis.getCharset(), null);
 
         return new ArrayList<>(actionMap.values());
     }
@@ -802,12 +807,13 @@ public class ActionListReader {
      * @param indeterminate Indeterminate
      * @param visitedContainers Visited containers
      * @param charset Charset
+     * @param outerJumpQueue Targets leaving a try block, to read in its enclosing stream
      * @return Action
      * @throws IOException On I/O error
      */
     private static Action readActionListAtPos(List<DisassemblyListener> listeners, ConstantPool cpool,
             SWFInputStream sis, Map<Long, Action> actions, Map<Long, Long> nextOffsets,
-            long ip, long startIp, long endIp, String path, boolean indeterminate, List<Long> visitedContainers, String charset) throws IOException {
+            long ip, long startIp, long endIp, String path, boolean indeterminate, List<Long> visitedContainers, String charset, Queue<Long> outerJumpQueue) throws IOException {
 
         Action entryAction = null;
 
@@ -821,6 +827,14 @@ public class ActionListReader {
         while (!jumpQueue.isEmpty()) {
             ip = jumpQueue.remove();
             if (ip < startIp) {
+                continue;
+            }
+            if (endIp != -1 && ip >= endIp) {
+                if (outerJumpQueue != null) {
+                    // A jump can leave a try/catch range without executing
+                    // the remaining bytes of that range.
+                    outerJumpQueue.add(ip);
+                }
                 continue;
             }
 
@@ -883,7 +897,7 @@ public class ActionListReader {
                             readActionListAtPos(listeners, cpool,
                                     sis, actions, nextOffsets,
                                     ip2, startIp, endIp2, newPath, indeterminate, visitedContainers,
-                                    charset);
+                                    charset, a instanceof ActionTry ? jumpQueue : null);
                             actionLengthWithHeader += size;
                         }
                     }
