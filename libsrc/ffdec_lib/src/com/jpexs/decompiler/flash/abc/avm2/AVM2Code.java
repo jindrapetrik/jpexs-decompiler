@@ -2933,7 +2933,8 @@ public class AVM2Code implements Cloneable {
                                                 }
                                             }
                                         }
-                                        if (value instanceof NewFunctionAVM2Item) {
+                                        if (initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER
+                                                && classMultiname == -1 && value instanceof NewFunctionAVM2Item) {
                                             NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
                                             f.functionName = tsc.getName(abc).getName(usedDeobfuscations, abc, abc.constants, fullyQualifiedNames, true, true);
                                         }
@@ -2958,7 +2959,8 @@ public class AVM2Code implements Cloneable {
                     // initTraits for ordinary methods (initializerType == 0); skipping
                     // locals there would incorrectly promote later SetProperty.
                     if (initializerType == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER
-                            && ((ti instanceof SetLocalAVM2Item) || (ti instanceof DeclarationAVM2Item))) {
+                            && (ti instanceof SetLocalAVM2Item || ti instanceof DeclarationAVM2Item
+                            || ti instanceof StoreNewActivationAVM2Item)) {
                         continue loopi;
                     }
                     // Stop once real constructor body starts (calls, super, control flow, …).

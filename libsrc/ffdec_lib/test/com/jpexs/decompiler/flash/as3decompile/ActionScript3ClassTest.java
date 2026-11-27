@@ -106,8 +106,8 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
             ABC abc = tag.getABC();
             ScriptPack declaration = abc.findScriptPackByPath("tests_classes.mypackage1.myNamespace", Arrays.asList(abc));
             if (declaration != null) {
-                removed = abc.script_info.get(declaration.scriptIndex).traits.traits.removeIf(trait ->
-                        trait instanceof TraitSlotConst && ((TraitSlotConst) trait).isNamespace()
+                removed = abc.script_info.get(declaration.scriptIndex).traits.traits.removeIf(trait
+                        -> trait instanceof TraitSlotConst && ((TraitSlotConst) trait).isNamespace()
                         && "myNamespace".equals(abc.constants.getString(trait.getName(abc).name_index)));
             }
             if (abc.findScriptPackByPath(classPath, Arrays.asList(abc)) != null) {
@@ -896,6 +896,32 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "}\n"
                 + "}\n"
                 + "}");
+    }
+
+    @Test
+    public void testFunctionVar() {
+        decompileScriptPack("standard", "tests_classes.TestFunctionVar", "package tests_classes\n"
+                + "{\n"
+                + "   public class TestFunctionVar\n"
+                + "   {\n"
+                + "      \n"
+                + "      private var scrollEngine:Function = function():void\n"
+                + "      {\n"
+                + "      };\n"
+                + "      \n"
+                + "      public function TestFunctionVar()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "         this.scrollEngine();\n"
+                + "         this.scrollEngine = function():void\n"
+                + "         {\n"
+                + "            trace(\"Hello, World!\");\n"
+                + "         };\n"
+                + "         this.scrollEngine();\n"
+                + "      }\n"
+                + "   }\n"
+                + "}\n"
+        );
     }
 
     @Test

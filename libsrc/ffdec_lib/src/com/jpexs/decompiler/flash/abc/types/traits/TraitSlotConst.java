@@ -259,14 +259,12 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (showModifier) {
             getModifiers(usedDeobfuscations, abc, isStatic, insideInterface, writer, classIndex, scriptIndex);
         }
-        if (convertData.assignedValues.containsKey(this)) {
-            GraphTargetItem val = convertData.assignedValues.get(this).value;
-            if (val instanceof NewFunctionAVM2Item) {
-                List<MethodBody> callStack = new ArrayList<>();
-                AssignedValue assignment = convertData.assignedValues.get(this);
-                callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
-                return val.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion, usedDeobfuscations, classIndex, scriptIndex));
-            }
+        AssignedValue assignment = convertData.assignedValues.get(this);
+        if (classIndex == -1 && assignment != null && assignment.initializer == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER
+                && assignment.value instanceof NewFunctionAVM2Item) {
+            List<MethodBody> callStack = new ArrayList<>();
+            callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
+            return assignment.value.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>(), exportMode, swfVersion, usedDeobfuscations, classIndex, scriptIndex));
         }
         getNameStr(writer, abc, fullyQualifiedNames, usedDeobfuscations);
         if (hasValueStr(abc, convertData)) {
