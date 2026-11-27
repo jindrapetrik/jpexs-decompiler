@@ -77,7 +77,7 @@ public class AIStudioDialog extends AppDialog {
         targetBodyIndex = targetEditor == null ? -1 : targetEditor.bodyIndex;
         targetMethodIndex = targetEditor == null ? -1 : targetEditor.methodIndex;
         targetScriptIndex = targetEditor == null ? -1 : targetEditor.getScriptIndex();
-        setTitle(text("studio.title"));
+        setTitle(text("studio.title") + " (EXPERIMENTAL)");
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setModal(false);
         setResizable(true);
@@ -91,6 +91,7 @@ public class AIStudioDialog extends AppDialog {
         initComponents();
         updateApplyButton();
         View.centerScreen(this);
+        View.setWindowIcon(this, "ai");
         setSize(900, 650);
         loadConfiguration();
         if (!swfTitleEmpty(swfTitle)) {

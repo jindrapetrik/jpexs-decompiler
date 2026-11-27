@@ -46,13 +46,14 @@ public class AISettingsDialog extends AppDialog {
 
     public AISettingsDialog(Window owner) {
         super(owner);
-        setTitle(text("settings.title"));
+        setTitle(text("settings.title") + " (EXPERIMENTAL)");
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setModal(true);
         setResizable(true);
         setMinimumSize(new Dimension(560, 390));
         initComponents();
         View.centerScreen(this);
+        View.setWindowIcon(this, "aisettings");
         pack();
     }
 

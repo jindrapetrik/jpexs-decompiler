@@ -1581,7 +1581,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addMenuItem("/tools", translate("menu.tools"), null, null, 0, null, false, null, false);
         if (Configuration.ai.get()) {
-            addMenuItem("/tools/aiStudio", translate("menu.ai.studio"), "abcexplorer32",
+            addMenuItem("/tools/aiStudio", translate("menu.ai.studio"), "ai32",
                     this::aiStudioActionPerformed, PRIORITY_TOP, null, true, null, false);
         }
         addMenuItem("/tools/search", translate("menu.tools.search"), "search16", this::searchActionPerformed, PRIORITY_TOP, this::loadRecentSearches, !supportsMenuAction(), null, false);
@@ -1653,7 +1653,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/settings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), null, null, 0, null, false, null, false);
         addMenuItem("/settings/advancedSettings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), "settings32", this::advancedSettingsActionPerformed, PRIORITY_TOP, null, true, null, false);
         if (Configuration.ai.get()) {
-            addMenuItem("/settings/advancedSettings/ai", translate("menu.ai.settings"), "settings32",
+            addMenuItem("/settings/advancedSettings/ai", translate("menu.ai.settings"), "aisettings32",
                     this::aiSettingsActionPerformed, PRIORITY_TOP, null, true, null, false);
         }
         addMenuItem("/settings/advancedSettings/clearRecentFiles", translate("menu.tools.otherTools.clearRecentFiles"), "clearrecent16", this::clearRecentFilesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
