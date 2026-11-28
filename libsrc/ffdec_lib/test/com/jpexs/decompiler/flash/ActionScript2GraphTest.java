@@ -1119,6 +1119,177 @@ public class ActionScript2GraphTest {
         Assert.assertEquals(compileAndDecompile(result), expected);
     }
 
+    private String repeatedAssignmentCondition(boolean and, String target, String value) {
+        return repeatedAssignmentCondition(and, target, value, "");
+    }
+
+    private String repeatedAssignmentCondition(boolean and, String target, String value, String discarded) {
+        String assignment = target + value + "SetVariable\n" + discarded;
+        String comparison = "Push \"scratch\"\nGetVariable\nPush 0\nLess\n";
+        return "Push \"rightCount\", 0\nSetVariable\n" + assignment + comparison + assignment + comparison
+                + (and ? "Not\n" : "") + "If join\nPop\n"
+                + "Push \"rightCount\", \"rightCount\"\nGetVariable\nPush 1\nAdd\nSetVariable\n"
+                + "Push \"scratch\", \"y\"\nGetVariable\nSetVariable\n" + comparison
+                + "join: Not\nIf otherwise\nPush \"result\", 10\nSetVariable\nJump done\n"
+                + "otherwise: Push \"result\", 0\nSetVariable\ndone:\n"
+                + "Push \"result\", \"result\"\nGetVariable\nPush \"rightCount\"\nGetVariable\nAdd\nSetVariable\n";
+    }
+
+    @DataProvider(name = "repeatedAssignmentValues")
+    public Object[][] repeatedAssignmentValues() {
+        List<Object[]> cases = new ArrayList<>();
+        for (boolean and : new boolean[]{false, true}) {
+            for (boolean left : new boolean[]{false, true}) {
+                for (boolean right : new boolean[]{false, true}) {
+                    for (boolean discardResult : new boolean[]{false, true}) {
+                        cases.add(new Object[]{and, left, right, discardResult});
+                    }
+                }
+            }
+        }
+        return cases.toArray(new Object[cases.size()][]);
+    }
+
+    @Test(dataProvider = "repeatedAssignmentValues")
+    public void testRepeatedAssignmentConditionKeepsShortCircuitEvaluation(boolean and, boolean left, boolean right, boolean discardResult) throws Exception {
+        SWF swf = new SWF();
+        swf.version = 4;
+        String pcode = repeatedAssignmentCondition(and, "Push \"scratch\"\n", "Push \"value\"\nGetVariable\n",
+                discardResult ? "Push \"scratch\"\nGetVariable\nPop\n" : "");
+        List<Action> original = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        for (int mode : new int[]{0, 1}) {
+            String result = decompile(swf, new DoActionTag(swf), original, mode);
+            Assert.assertFalse(result.contains("§§"), result);
+            Assert.assertTrue(result.contains(and ? " && " : " || "), result);
+            Assert.assertEquals(result.split("scratch = value", -1).length - 1, 1, result);
+            List<Action> compiled = new ActionScript2Parser(swf, new DoActionTag(swf)).actionsFromString(result, Utf8Helper.charsetName);
+            double expected = ((and ? left && right : left || right) ? 10 : 0) + ((and ? left : !left) ? 1 : 0);
+            Assert.assertEquals(((Number) runComparisonAssignments(original, left ? -1L : 1L, right ? -1L : 1L)).doubleValue(), expected);
+            Assert.assertEquals(((Number) runComparisonAssignments(compiled, left ? -1L : 1L, right ? -1L : 1L)).doubleValue(), expected);
+        }
+    }
+
+    @DataProvider(name = "legacyRepeatedAssignments")
+    public Object[][] legacyRepeatedAssignments() {
+        return new Object[][]{
+            {4, "Push \"scratch\"\n", "Push \"scratch\"\nGetVariable\nPush 1\nAdd\n", "scratch += 1"},
+            {4, "Push \"scratch\"\n", "Push \"SCRATCH\"\nGetVariable\nPush 1\nAdd\n", "scratch = SCRATCH + 1"},
+            {4, "Push \"scratch\"\n", "Push 0, \"read\"\nCallFunction\n", "read()"},
+            {4, "Push \"_x\"\n", "Push \"value\"\nGetVariable\n", "_x = value"},
+            {4, "Push \"name\"\nGetVariable\n", "Push \"value\"\nGetVariable\n", "set(name,value)"},
+            {5, "Push \"scratch\"\n", "Push \"value\"\nGetVariable\n", "scratch = value"}
+        };
+    }
+
+    @Test(dataProvider = "legacyRepeatedAssignments")
+    public void testRepeatedLegacyAssignmentsUseCommaOperand(int version, String target, String value, String retained) throws Exception {
+        String result = decompilePcode(repeatedAssignmentCondition(true, target, value), version);
+        Assert.assertEquals(result.split(Pattern.quote(retained), -1).length - 1, version <= 4 ? 1 : 2, result);
+        if (version <= 4) {
+            Assert.assertFalse(result.contains("§§"), result);
+        }
+    }
+
+    @DataProvider(name = "legacyAssignmentFollowingExpressions")
+    public Object[][] legacyAssignmentFollowingExpressions() {
+        return new Object[][]{{"Push \"other\"\nGetVariable\nPop\n", ",other,"}, {"Push 0, \"read\"\nCallFunction\nPop\n", "read()"}};
+    }
+
+    @Test(dataProvider = "legacyAssignmentFollowingExpressions")
+    public void testRepeatedLegacyAssignmentIncludesFollowingExpressions(String discarded, String expression) throws Exception {
+        String result = decompilePcode(repeatedAssignmentCondition(true, "Push \"scratch\"\n", "Push \"value\"\nGetVariable\n", discarded), 4);
+        Assert.assertEquals(result.split("scratch = value", -1).length - 1, 1, result);
+        Assert.assertEquals(result.split(Pattern.quote(expression), -1).length - 1, 1, result);
+        Assert.assertFalse(result.contains("§§"), result);
+    }
+
+    private String legacyCommaAssignmentCondition(String firstPrefix, String repeatedPrefix) {
+        return legacyCommaAssignmentCondition(firstPrefix, repeatedPrefix, true);
+    }
+
+    private String legacyCommaAssignmentCondition(String firstPrefix, String repeatedPrefix, boolean and) {
+        String assignment = "Push \"a\", \"2\"\nSetVariable\nPush \"a\"\nGetVariable\nPop\n";
+        String comparison = "Push \"a\"\nGetVariable\nPush \"1\"\nEquals\n";
+        return "Push \"a\", \"1\"\nSetVariable\n" + firstPrefix + assignment + comparison + repeatedPrefix + assignment + comparison
+                + (and ? "Not\n" : "") + "If join\nPop\nPush \"a\"\nGetVariable\nPush \"3\"\nEquals\n"
+                + "join: Not\nIf done\nPush \"xx\"\nTrace\ndone:\n";
+    }
+
+    @DataProvider(name = "legacyCommaPrefixes")
+    public Object[][] legacyCommaPrefixes() {
+        Object[][] prefixes = new Object[][]{
+            {"", ""},
+            {"Stop\nPush \"\"\nPop\n", "stop(),"},
+            {"Stop\nPlay\nPush \"first\"\nTrace\n", "stop(),play(),trace(\"first\"),"},
+            {"Push 0, \"prepare\"\nCallFunction\nPop\n", "prepare(),"}
+        };
+        List<Object[]> cases = new ArrayList<>();
+        for (Object[] prefix : prefixes) {
+            for (boolean and : new boolean[]{false, true}) {
+                cases.add(new Object[]{prefix[0], prefix[1], and});
+            }
+        }
+        return cases.toArray(new Object[cases.size()][]);
+    }
+
+    @Test(dataProvider = "legacyCommaPrefixes")
+    public void testRepeatedLegacyCommaAssignmentCondition(String prefix, String sourcePrefix, boolean and) throws Exception {
+        String pcode = legacyCommaAssignmentCondition(prefix, prefix, and);
+        SWF swf = new SWF();
+        swf.version = 4;
+        List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset(), swf.getSwfProfile());
+        for (int mode : new int[]{0, 1}) {
+            String result = decompile(swf, new DoActionTag(swf), actions, mode);
+            Assert.assertEquals(result, (mode == 0 || !prefix.isEmpty() ? "a = \"1\";\n" : "")
+                    + "if(((" + sourcePrefix + "a = \"2\",a == \"1\")) " + (and ? "&&" : "||") + " a == \"3\")\n{\n   trace(\"xx\");\n}");
+            Assert.assertFalse(compileAndDecompile(result).contains("§§"), result);
+        }
+    }
+
+    @DataProvider(name = "nonMatchingLegacyCommaPrefixes")
+    public Object[][] nonMatchingLegacyCommaPrefixes() {
+        return new Object[][]{
+            {"Stop\n", "Play\n"},
+            {"Stop\nPlay\n", "Stop\n"},
+            {"Push \"first\"\nTrace\n", "Push \"second\"\nTrace\n"},
+            {"Push \"guard\"\nGetVariable\nNot\nIf firstSkip\nPush \"inside\"\nTrace\nfirstSkip:\n",
+                "Push \"guard\"\nGetVariable\nNot\nIf secondSkip\nPush \"inside\"\nTrace\nsecondSkip:\n"}
+        };
+    }
+
+    @Test(dataProvider = "nonMatchingLegacyCommaPrefixes")
+    public void testLegacyCommaPrefixesMustMatchWithoutBlocks(String first, String repeated) throws Exception {
+        String result = decompilePcode(legacyCommaAssignmentCondition(first, repeated), 4);
+        Assert.assertEquals(result.split("a = \"2\"", -1).length - 1, 2, result);
+        Assert.assertFalse(result.contains(" && "), result);
+    }
+
+    private String legacyDistanceCondition(String prefix, String property, String origin, String limit) {
+        return "Push \"/:scratch\", \"clip\"\nGetVariable\nPush \"" + property + "\"\nGetProperty\n"
+                + "Push \"" + origin + "\"\nSubtract\nSetVariable\n"
+                + "Push \"/:scratch\"\nGetVariable\nPush \"0\"\nLess\nIf " + prefix + "Negative\n"
+                + "Push \"/:scratch\"\nGetVariable\nJump " + prefix + "Absolute\n"
+                + prefix + "Negative: Push \"0\", \"/:scratch\"\nGetVariable\nSubtract\n"
+                + prefix + "Absolute: Push \"" + limit + "\"\nLess\n";
+    }
+
+    @Test
+    public void testRepeatedLegacyDistanceConditionUsesCommaOperands() throws Exception {
+        String pcode = "Push \"before\"\nTrace\n"
+                + legacyDistanceCondition("first", "0", "100", "10")
+                + legacyDistanceCondition("repeat", "0", "100", "10")
+                + "Not\nIf join\nPop\n" + legacyDistanceCondition("right", "1", "200", "30")
+                + "join: Not\nIf no\nPush \"result\", \"1\"\nSetVariable\nJump done\n"
+                + "no: Push \"result\", \"0\"\nSetVariable\ndone:\n";
+        String result = decompilePcode(pcode, 4);
+        Assert.assertFalse(result.contains("§§"), result);
+        Assert.assertTrue(result.startsWith("trace(\"before\");\nif("), result);
+        Assert.assertTrue(result.contains(" && ((set(\"/:scratch\",getProperty(clip, _Y) - \"200\"),"), result);
+        Assert.assertEquals(result.split("getProperty\\(clip, _X\\)", -1).length - 1, 1, result);
+        Assert.assertEquals(result.split("getProperty\\(clip, _Y\\)", -1).length - 1, 1, result);
+        Assert.assertFalse(compileAndDecompile(result).contains("§§"), result);
+    }
+
     @Test
     public void testRepeatedCallsKeepBothEvaluations() throws Exception {
         String call = "Push 0, \"check\"\nCallFunction\n";

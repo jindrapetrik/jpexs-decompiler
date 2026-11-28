@@ -4445,6 +4445,18 @@ public class Graph {
     }
 
     /**
+     * Restores a dialect-specific cached operand for short-circuit matching.
+     *
+     * @param condition Branch condition
+     * @param output Commands preceding the branch, which may be moved to the stack
+     * @param stack Operand stack
+     * @return Condition referring to the restored operand, or the original condition
+     */
+    protected GraphTargetItem prepareShortCircuitCondition(GraphTargetItem condition, List<GraphTargetItem> output, TranslateStack stack) {
+        return condition;
+    }
+
+    /**
      * Walks graph parts and converts them to target items.
      *
      * @param hasEmptyStackPops Has empty stack pops
@@ -5380,13 +5392,17 @@ public class Graph {
                             }
                             int last = filteredOnTrue.size() - 1;
                             GraphTargetItem shortCircuitRightSide = getShortCircuitRightSide(filteredOnTrue);
+                            GraphTargetItem shortCircuitCondition = expr;
+                            if (shortCircuitRightSide != null) {
+                                shortCircuitCondition = prepareShortCircuitCondition(expr, currentRet, stack);
+                            }
                             if (!stack.isEmpty() && last >= 0 && filteredOnTrue.get(0) instanceof PopItem
                                     && (last == 0 || shortCircuitRightSide != null)) {
                                 if (last > 0) {
                                     GraphTargetItem rightSide = shortCircuitRightSide;
                                     GraphTargetItem originalPrevExpr = stack.pop();
                                     GraphTargetItem prevExpr = originalPrevExpr;
-                                    GraphTargetItem leftSide = expr.getNotCoercedNoDup();
+                                    GraphTargetItem leftSide = shortCircuitCondition.getNotCoercedNoDup();
                                     GraphTargetItem invertedLeftSide = leftSide;
                                     if (invertedLeftSide instanceof NotItem) {
                                         invertedLeftSide = ((NotItem) invertedLeftSide).value;

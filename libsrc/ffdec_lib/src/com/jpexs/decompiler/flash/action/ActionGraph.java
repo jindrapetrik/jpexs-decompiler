@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.PlayActionItem;
@@ -754,6 +755,88 @@ public class ActionGraph extends Graph {
     private boolean isCachedTemporary(GraphTargetItem item, int index) {
         return item instanceof HasTempIndex && !(item instanceof SetTemporaryItem)
                 && ((HasTempIndex) item).getTempIndex() == index;
+    }
+
+    @Override
+    protected GraphTargetItem prepareShortCircuitCondition(GraphTargetItem condition, List<GraphTargetItem> output, TranslateStack stack) {
+        int size = output.size();
+        if (getGraphCode().version > 4 || !stack.isEmpty() || size < 3) {
+            return condition;
+        }
+        int pushIndex = size - 1;
+        while (pushIndex >= 0 && isLegacyCommaCommand(output.get(pushIndex))) {
+            pushIndex--;
+        }
+        int commandCount = size - pushIndex - 1;
+        int firstStart = pushIndex - commandCount;
+        if (commandCount == 0 || firstStart < 0 || !(output.get(pushIndex) instanceof PushItem)) {
+            return condition;
+        }
+        GraphTargetItem saved = output.get(pushIndex).value;
+        if (saved.hasSideEffect() || condition.hasSideEffect()
+                || saved instanceof HasTempIndex || condition instanceof HasTempIndex) {
+            return condition;
+        }
+        for (int i = 0; i < commandCount; i++) {
+            GraphTargetItem first = output.get(firstStart + i);
+            if (!isLegacyCommaCommand(first) || !first.valueEquals(output.get(pushIndex + 1 + i))) {
+                return condition;
+            }
+        }
+        boolean inverted = condition.invert(null).valueEquals(saved);
+        if (!inverted && !condition.valueEquals(saved)) {
+            return condition;
+        }
+        List<GraphTargetItem> commands = new ArrayList<>();
+        for (int i = firstStart; i < pushIndex; i++) {
+            GraphTargetItem item = output.get(i);
+            // Void calls and assignments can leave a discarded literal or a
+            // read of the assigned variable in a lowered comma expression.
+            if (item instanceof DirectValueActionItem && item.isCompileTime() && !item.isVariableComputed()) {
+                continue;
+            }
+            if (i > firstStart && item instanceof GetVariableActionItem && output.get(i - 1) instanceof SetVariableActionItem
+                    && ((GetVariableActionItem) item).name.valueEquals(((SetVariableActionItem) output.get(i - 1)).name)) {
+                continue;
+            }
+            commands.add(item);
+        }
+        commands.add(saved);
+        GraphTargetItem first = output.get(firstStart);
+        GraphTargetItem left = new CommaExpressionItem(dialect, first.getSrc(), first.getLineStartItem(), commands);
+        // SWF 4 compilers lower a short-circuit comma operand by emitting its
+        // entire statement sequence twice instead of duplicating its result.
+        // Recover that source idiom only for exactly matching, linear sequences.
+        for (int i = size - firstStart; i > 0; i--) {
+            output.remove(output.size() - 1);
+        }
+        stack.push(left);
+        return inverted ? new NotItem(dialect, condition.getSrc(), condition.getLineStartItem(), left) : left;
+    }
+
+    private boolean isLegacyCommaCommand(GraphTargetItem command) {
+        Reference<Boolean> valid = new Reference<>(true);
+        Set<GraphTargetItem> seen = new LinkedIdentityHashSet<>();
+        GraphTargetVisitorInterface visitor = new AbstractGraphTargetVisitor() {
+            @Override
+            public boolean visit(GraphTargetItem item) {
+                if (item == null || !valid.getVal() || !seen.add(item)) {
+                    return false;
+                }
+                if (item instanceof Block || item instanceof ExitItem || item instanceof BreakItem || item instanceof ContinueItem
+                        || item instanceof LabelItem || item instanceof GotoItem || item instanceof PushItem || item instanceof PopItem
+                        || item instanceof HasTempIndex || item instanceof EnumerateActionItem || item instanceof EnumeratedValueActionItem
+                        || item instanceof SetTargetActionItem || item instanceof SetTarget2ActionItem) {
+                    valid.setVal(false);
+                }
+                if (valid.getVal()) {
+                    item.visit(this);
+                }
+                return valid.getVal();
+            }
+        };
+        visitor.visit(command);
+        return valid.getVal();
     }
 
     private boolean leavesPreservedStackAlone(List<GraphTargetItem> commands, int preservedTemp) {
