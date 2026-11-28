@@ -276,6 +276,60 @@ public class LoopDetectorPostDominatorTest {
     }
 
     @Test
+    public void testSwitchFallthroughStatesRemainInsideLoop() throws InterruptedException {
+        GraphPart entry = new GraphPart(0, 0);
+        GraphPart header = new GraphPart(1, 1);
+        GraphPart dispatch = new GraphPart(2, 2);
+        GraphPart step = new GraphPart(3, 3);
+        GraphPart first = new GraphPart(4, 4);
+        GraphPart second = new GraphPart(5, 5);
+        GraphPart fallback = new GraphPart(6, 6);
+        GraphPart route = new GraphPart(7, 7);
+        GraphPart done = new GraphPart(8, 8);
+        GraphPart failed = new GraphPart(9, 9);
+        connect(entry, header);
+        connect(header, dispatch);
+        connect(dispatch, step, first, second, fallback);
+        connect(step, header, route);
+        connect(route, first);
+        connect(first, second);
+        connect(second, done);
+        connect(fallback, failed);
+        Set<GraphPart> parts = new LinkedHashSet<>(Arrays.asList(entry, header, dispatch, step,
+                first, second, fallback, route, done, failed));
+        List<Loop> loops = new ArrayList<>();
+        new LoopDetector().detectLoops(Collections.singletonList(entry), loops, Collections.emptyList(), parts,
+                Collections.singletonList(Arrays.asList(step, first, second, fallback)),
+                Collections.singletonList(null), true);
+        Assert.assertEquals(loops.size(), 1);
+        Assert.assertSame(loops.get(0).loopContinue, header);
+        Assert.assertNull(loops.get(0).loopBreak, "A switch state must not split its fallthrough continuation");
+    }
+
+    @Test
+    public void testLoopInsideSwitchCanExitToFollowingCase() throws InterruptedException {
+        GraphPart dispatch = new GraphPart(0, 0);
+        GraphPart first = new GraphPart(1, 1);
+        GraphPart condition = new GraphPart(2, 2);
+        GraphPart body = new GraphPart(3, 3);
+        GraphPart second = new GraphPart(4, 4);
+        GraphPart third = new GraphPart(5, 5);
+        GraphPart done = new GraphPart(6, 6);
+        connect(dispatch, first, second, third);
+        connect(first, condition);
+        connect(condition, body, second);
+        connect(body, condition);
+        connect(second, third);
+        connect(third, done);
+        Set<GraphPart> parts = new LinkedHashSet<>(Arrays.asList(dispatch, first, condition, body, second, third, done));
+        List<Loop> loops = new ArrayList<>();
+        new LoopDetector().detectLoops(Collections.singletonList(dispatch), loops, Collections.emptyList(), parts,
+                Collections.singletonList(Arrays.asList(first, second, third)), Collections.singletonList(done), true);
+        Assert.assertEquals(loops.size(), 1);
+        Assert.assertSame(loops.get(0).loopBreak, second);
+    }
+
+    @Test
     public void testAgainstOrderedSetAlgorithm() throws Exception {
         Method method = LoopDetector.class.getDeclaredMethod("findNearestCommonPostDominator",
                 Set.class, Set.class, Set.class, PrevNextWalker.class, Set.class, Set.class, Set.class);

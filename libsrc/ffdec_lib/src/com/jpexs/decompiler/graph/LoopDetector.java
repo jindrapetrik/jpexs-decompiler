@@ -731,7 +731,7 @@ public class LoopDetector {
                     outParts
             );
             if (commonLocalExit != null) {
-                loop.loopBreak = commonLocalExit;
+                loop.loopBreak = isSwitchFallthroughExit(loop, commonLocalExit, switchParts, backEdges, walker) ? null : commonLocalExit;
                 continue;
             }
 
@@ -784,8 +784,35 @@ public class LoopDetector {
             for (CandidateResult cand : candidateList) {
                 Logger.getLogger(LoopDetector.class.getName()).log(Level.FINE, "- {0}", cand);
             }
-            loop.loopBreak = candidateList.get(0).part;
+            GraphPart candidate = candidateList.get(0).part;
+            loop.loopBreak = isSwitchFallthroughExit(loop, candidate, switchParts, backEdges, walker) ? null : candidate;
         }
+    }
+
+    private boolean isSwitchFallthroughExit(Loop loop, GraphPart exit, List<List<GraphPart>> switchParts,
+            Set<GraphPartEdge> backEdges, PrevNextWalker walker) {
+        for (List<GraphPart> cases : switchParts) {
+            if (!cases.contains(exit)) {
+                continue;
+            }
+            Set<GraphPart> dispatchParts = new LinkedHashSet<>(loop.loopBody);
+            for (GraphPart casePart : cases) {
+                dispatchParts.retainAll(casePart.refs);
+            }
+            if (dispatchParts.isEmpty()) {
+                continue;
+            }
+            // These cases are outside the natural cycle but still belong to
+            // its switch. Splitting a fallthrough chain here would require a
+            // jump from after the loop back into another case of that loop.
+            Set<GraphPart> reachable = getReachable(exit, backEdges, Collections.emptySet(), walker, Collections.emptySet());
+            for (GraphPart casePart : cases) {
+                if (casePart != exit && !loop.loopBody.contains(casePart) && reachable.contains(casePart)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

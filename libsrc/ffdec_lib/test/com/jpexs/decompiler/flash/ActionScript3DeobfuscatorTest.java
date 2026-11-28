@@ -2197,6 +2197,34 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "            return -1;\n         }\n         return 4 + param1;\n");
     }
 
+    @DataProvider(name = "switchFallthroughStates")
+    public Object[][] switchFallthroughStates() {
+        return new Object[][]{{false}, {true}};
+    }
+
+    @Test(dataProvider = "switchFallthroughStates")
+    public void testSwitchFallthroughStatesStayInsideLoop(boolean guarded) throws Exception {
+        String expected = "         while(true)\n         {\n            switch(param1)\n            {\n"
+                + "               case 0:\n                  if(!advance)\n                  {\n"
+                + "                     continue;\n                  }\n"
+                + "                  trace(\"route\");\n                  param1 = 1;\n               case 1:\n"
+                + (guarded
+                        ? "                  if(ready)\n                  {\n                     trace(\"first\");\n"
+                        + "                     param1 = 2;\n                     break;\n                  }\n"
+                        + "                  return 0;\n"
+                        : "                  trace(\"first\");\n                  param1 = 2;\n")
+                + "               case 2:\n                  break;\n               default:\n                  return -1;\n"
+                + "            }\n            trace(\"second\");\n            return 1;\n         }\n";
+        decompilePCodeWithLines("jump dispatch\nstep: getlex QName(PackageNamespace(\"\"),\"advance\")\n"
+                + "iffalse dispatch\n" + switchTrace("route") + "pushbyte 1\nsetlocal1\n"
+                + "first: " + (guarded ? "getlex QName(PackageNamespace(\"\"),\"ready\")\niffalse wait\n" : "")
+                + switchTrace("first") + "pushbyte 2\nsetlocal1\n"
+                + "second: " + switchTrace("second") + "pushbyte 1\nreturnvalue\n"
+                + (guarded ? "wait: pushbyte 0\nreturnvalue\n" : "")
+                + "fallback: pushbyte -1\nreturnvalue\n"
+                + "dispatch: getlocal1\nlookupswitch fallback, [step, first, second]\n", expected);
+    }
+
     @Test(dataProvider = "largeStringSwitchModes", timeOut = 30000)
     public void testLargeStringSwitchKeepsEveryMappingAndDefaultPosition(boolean deobfuscate) throws Exception {
         assertLargeStringSwitch(deobfuscate, 512);
